@@ -1,0 +1,9 @@
+# Local session environment file — contains tokens, secrets, and environment URLs.
+# NEVER commit this file.
+.env.ps1
+
+# VS Code workspace settings (machine-local)
+.vscode/settings.json
+
+# Build output
+*.log

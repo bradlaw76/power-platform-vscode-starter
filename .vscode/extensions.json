@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "GitHub.copilot",
+    "microsoft-IsvExpTools.powerplatform-vscode",
+    "ms-vscode.powershell",
+    "ms-vscode.vscode-json",
+    "DavidAnson.vscode-markdownlint",
+    "redhat.vscode-yaml",
+    "ms-vscode.azure-account"
+  ]
+}
