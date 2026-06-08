@@ -1,5 +1,8 @@
 # Power Platform VS Code Starter
 
+<img width="2172" height="724" alt="ChatGPT Image Jun 8, 2026, 03_05_25 PM" src="https://github.com/user-attachments/assets/97e80bbb-df45-41a2-9459-63976cac0d4d" />
+
+
 A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution — without manual portal clicks.
 
 > [!IMPORTANT]
