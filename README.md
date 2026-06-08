@@ -1,49 +1,224 @@
 # Power Platform VS Code Starter
 
-A generic, repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API.
-Not tied to any specific project — clone or copy this repo into any new environment to get a repeatable build baseline.
+A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution — without manual portal clicks.
+
+> [!IMPORTANT]
+> **Spec Kit planning is a mandatory gate.** Do not run build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The wizard helps you create them.
+
+---
+
+## Table of Contents
+
+- [What this repo is for](#what-this-repo-is-for)
+- [Who this is for](#who-this-is-for)
+- [Key concepts](#key-concepts)
+- [How it works](#how-it-works)
+- [Getting started](#getting-started)
+- [Build sequence](#build-sequence)
+- [Using VS Code chat and Claude Code](#using-vs-code-chat-and-claude-code)
+- [Solution lifecycle](#solution-lifecycle)
+- [Git workflow](#git-workflow)
+- [Script reference](#script-reference)
+- [Repo contents](#repo-contents)
+- [Troubleshooting](#troubleshooting)
+- [Related documents](#related-documents)
+
+---
+
+## What this repo is for
+
+Use this starter when you want to:
+
+- Build Dynamics 365 or Power Platform demos and apps from VS Code
+- Replace manual portal clicks with repeatable, source-controlled scripts
+- Plan work with Spec Kit artifacts before writing any metadata
+- Package and promote results as a Power Platform solution across environments
+
+**Core outcome:** Move from requirements to working Dataverse artifacts, packaged as a solution that can be exported, versioned in Git, and imported into any environment.
+
+---
 
 ## Who this is for
 
-- First-time Dynamics builders who have never used VS Code for this purpose.
-- Teams who want a repeatable, scripted alternative to clicking through the Maker portal.
-- Repos that need a consistent onboarding contract so any new person can get started in under an hour.
+| You are... | This repo gives you... |
+| --- | --- |
+| A first-time Dynamics builder new to VS Code | A step-by-step wizard with no assumed knowledge |
+| A team that wants scripted, repeatable builds | Idempotent bootstrap scripts for every build phase |
+| A repo needing a consistent onboarding contract | A single `docs/onboarding.md` any new person can follow in under an hour |
 
-## Contents
+No prior experience needed with VS Code terminals, Git branches, PAC CLI, or Dataverse solution management. This documentation explains each term on first use.
 
+---
+
+## Key concepts
+
+| Term | Meaning |
+| --- | --- |
+| **PAC CLI** | The Power Platform command-line tool (`pac`) for solution operations and environment auth |
+| **Dataverse** | The data platform behind model-driven apps: tables, columns, relationships, forms, views |
+| **Solution** | The deployable package containing your app components |
+| **Unpack / Pack** | Convert a solution zip to editable source files (unpack), then rebuild the zip (pack) |
+| **Spec Kit** | A planning method requiring `spec.md`, `plan.md`, and `tasks.md` before any implementation |
+| **Claude Code skill** | A reusable workflow guide made available to Claude Code for AI-assisted builds |
+
+---
+
+## How it works
+
+Three entry points — all leading to the same build sequence:
+
+| Entry point | How to start | Best for |
+| --- | --- | --- |
+| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Answer discovery questions interactively, scaffold planning files |
+| **VS Code Copilot Chat** | `/power-platform-demo-wizard` in Copilot Chat | Chat-first planning and Spec Kit generation |
+| **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
+
+All three paths converge on the same sequence:
+
+```text
+Discovery → Spec Kit → Dataverse schema → App experience → Solution export → Git → Import
 ```
-dynamics-vscode-starter/
-  .vscode/
-    extensions.json           — VS Code extension recommendations (installs on first open)
-  .gitignore                  — Protects .env.ps1 (tokens/secrets) from accidental commits
-  docs/
-    onboarding.md             — Step-by-step setup guide for new builders
-    build-log.md              — Log template for recording each build run
-  requirements/
-    how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  — Full playbook
-    how-to-build-dynamics-model-driven-apps-wizard.md                  — Guided wizard variant
-  scripts/
-    bootstrap/
-      00-prereq-check.ps1     — Verify tools are installed (no changes made)
-      10-auth-connect.ps1     — Interactive sign-in, token acquisition, config save
-      20-build-tables.ps1     — Create tables from payloads/table-*.json
-      30-build-columns.ps1    — Add columns from payloads/columns-*.json
-      40-build-relationships.ps1 — Create lookups from payloads/relationships-*.json
-      50-add-to-solution.ps1  — Add tables to target solution
-      60-build-forms-views.ps1 — Create starter forms and views, publish all
-  payloads/                   — Place your table-*.json, columns-*.json, relationships-*.json here
-```
 
-## Quick start
+---
+
+## Getting started
+
+### 1. Install required tools
 
 ```powershell
-# 1. Check tools
+winget install Microsoft.PowerShell
+winget install Microsoft.AzureCLI
+winget install Microsoft.PowerPlatformCLI
+winget install Git.Git
+```
+
+Verify all tools are accessible:
+
+```powershell
+pwsh --version; az --version; pac --version; git --version; code --version
+```
+
+Each command must return a version number. Fix any failures before continuing.
+
+---
+
+### 2. Clone and open
+
+```powershell
+git clone https://github.com/bradlaw76/power-platform-vscode-starter
+cd power-platform-vscode-starter
+code .
+```
+
+When VS Code opens, accept the extension recommendations when prompted. If you missed the prompt, open Extensions (`Ctrl+Shift+X`), search `@recommended`, and install all.
+
+**Extensions installed by this repo:**
+
+| Extension | Purpose |
+| --- | --- |
+| GitHub Copilot | AI assistant |
+| GitHub Copilot Chat | In-editor chat for the prompt-based wizard |
+| Power Platform Tools | Maker portal and CLI integration |
+| PowerShell | Terminal language support |
+| JSON | Schema validation for payload files |
+| Markdown lint | Documentation quality checks |
+| YAML | Process definition file support |
+
+---
+
+### 3. Install Claude Code skills (once per machine)
+
+```powershell
+pwsh ./scripts/bootstrap/01-install-skills.ps1
+```
+
+Expected output:
+
+```text
+=== Install Claude Code Skills ===
+Source: ..\.claude\skills
+Dest:   C:\Users\<you>\.claude\skills
+
+  INSTALLED power-platform-vscode-wizard
+
+Done. Installed: 1  Skipped: 0
+```
+
+This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
+
+---
+
+### 4. Check prerequisites
+
+```powershell
 pwsh ./scripts/bootstrap/00-prereq-check.ps1
+```
 
-# 2. Sign in (prompts for all values — no hardcoded credentials)
+All tools must show **PASS** before continuing. Install any that show **FAIL** using the install commands in step 1.
+
+---
+
+### 5. Run the discovery wizard
+
+```powershell
+pwsh ./scripts/bootstrap/05-start-wizard.ps1
+```
+
+The wizard asks 11 discovery questions and scaffolds `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`. Alternatively, use `/power-platform-demo-wizard` in VS Code Copilot Chat to go through the same discovery flow interactively.
+
+**Discovery questions:**
+
+1. What type of demo or app are you building?
+2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
+3. Who is the target audience?
+4. What business problem does it solve?
+5. Who are the users?
+6. What data tables or entities are needed?
+7. What screens, forms, views, pages, flows, or copilots are needed?
+8. What does a successful demo look like?
+9. What environment should it be built in?
+10. Does it need demo data?
+11. Should the output be a managed or unmanaged solution?
+
+Exit criteria: all 11 answers captured and reviewed before moving to authentication.
+
+---
+
+### 6. Authenticate
+
+```powershell
 pwsh ./scripts/bootstrap/10-auth-connect.ps1
+```
 
-# 3. Build in order
+Prompts for environment URL, Azure tenant, publisher prefix, and solution names. Saves a local `.env.ps1` — never committed (protected by `.gitignore`).
+
+Additional auth modes:
+
+```powershell
+pwsh ./scripts/bootstrap/10-auth-connect.ps1 -UseDeviceCode    # No browser / remote machine
+pwsh ./scripts/bootstrap/10-auth-connect.ps1 -ServicePrincipal # CI / service principal
+```
+
+Validation: `az account show` and `pac auth list` both return your profile and environment.
+
+---
+
+## Build sequence
+
+> [!IMPORTANT]
+> Do not run build scripts until your planning files are complete and reviewed (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). This is a hard gate — building before planning creates rework.
+
+Add payload files to `payloads/` before running scripts:
+
+| File pattern | Contents |
+| --- | --- |
+| `payloads/table-*.json` | Table definitions |
+| `payloads/columns-*.json` | Column definitions |
+| `payloads/relationships-*.json` | Lookup relationship definitions |
+
+Run build scripts in order:
+
+```powershell
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
@@ -51,12 +226,149 @@ pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 ```
 
-See [docs/onboarding.md](docs/onboarding.md) for the full walkthrough including common issues.
+After each script: check that the failed count is zero before running the next. All scripts are idempotent — safe to rerun after fixing any failure.
 
-## How to use in a new repo
+**After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
 
-1. Clone or copy this repo: `git clone https://github.com/bradlaw76/power-platform-vscode-starter`
-2. Add your `table-*.json`, `columns-*.json`, and `relationships-*.json` files to `payloads/`.
-3. Open the folder in VS Code and accept extension recommendations.
-4. Run `00-prereq-check.ps1` then `10-auth-connect.ps1` to set up your session.
-5. Run scripts 20–60 in order.
+---
+
+## Using VS Code chat and Claude Code
+
+### Copilot Chat prompts
+
+```text
+/power-platform-demo-wizard Create a Dynamics 365 Customer Service demo for case triage
+Walk me through this repo like a beginner wizard
+Ask me the discovery questions one at a time and help me write spec.md, plan.md, and tasks.md
+```
+
+### Claude Code skill
+
+After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill is installed on this machine and available in Claude Code sessions. The skill provides the full wizard workflow, validation checkpoints, script reference, solution lifecycle commands, and troubleshooting.
+
+### How the entry points connect
+
+```text
+Terminal wizard              → spec.md, plan.md, tasks.md → build scripts
+Copilot Chat                 → same planning artifacts     → build scripts
+Claude Code skill (available) → guides the entire flow     → inline help at each step
+```
+
+---
+
+## Solution lifecycle
+
+After validating in the Maker portal, use PAC CLI to source-control the solution:
+
+```powershell
+# Export unmanaged solution from source environment
+pac solution export --name "<SolutionName>" --path "./out/<SolutionName>_unmanaged.zip" --managed false
+
+# Unpack to editable source files (diff-friendly in Git)
+pac solution unpack --zipfile "./out/<SolutionName>_unmanaged.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
+
+# Pack source files back into a zip
+pac solution pack --zipfile "./out/<SolutionName>_unmanaged_new.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
+
+# Import into target environment
+pac solution import --path "./out/<SolutionName>_unmanaged_new.zip"
+```
+
+Unpacked solution files can be diffed, reviewed in pull requests, and rolled back via Git history. The pack/import pattern gives a repeatable, reversible promotion path across environments.
+
+---
+
+## Git workflow
+
+```powershell
+git checkout -b feature/<short-description>
+git status
+git add .
+git commit -m "Add <feature> Dataverse artifacts and docs"
+git push -u origin feature/<short-description>
+```
+
+`git status` must show a clean working tree after commit. Never commit `.env.ps1` — it contains tokens and is protected by `.gitignore`. Verify with `git status` before every commit.
+
+---
+
+## Script reference
+
+| Script | Purpose | Changes environment? | Safe to rerun? |
+| --- | --- | --- | --- |
+| `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
+| `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
+| `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
+| `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
+| `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
+| `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
+| `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
+| `50-add-to-solution.ps1` | Add tables to the target solution | Yes | Yes |
+| `60-build-forms-views.ps1` | Create starter forms and views, publish customizations | Yes | Yes |
+
+---
+
+## Repo contents
+
+```text
+power-platform-vscode-starter/
+  .claude/
+    skills/
+      power-platform-vscode-wizard/
+        SKILL.md              — Claude Code skill: wizard workflow, scripts, troubleshooting
+  .github/
+    copilot-instructions.md   — Repo-wide Copilot Chat behavior and workflow guidance
+    prompts/
+      power-platform-demo-wizard.prompt.md — Slash prompt for guided chat-based wizard
+  .vscode/
+    extensions.json           — Recommended extensions (installs on first open)
+  .gitignore                  — Protects .env.ps1 (tokens/secrets) from accidental commits
+  docs/
+    onboarding.md             — Step-by-step setup guide for new builders
+    build-log.md              — Log template for recording each build run
+  payloads/                   — Add table-*.json, columns-*.json, relationships-*.json here
+  requirements/
+    how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  — Full implementation playbook
+    how-to-build-dynamics-model-driven-apps-wizard.md                  — Guided wizard and Spec Kit steps
+  scripts/
+    bootstrap/
+      00-prereq-check.ps1          — Verify tools are installed (no changes made)
+      01-install-skills.ps1        — Copy Claude Code skills to ~/.claude/skills/
+      05-start-wizard.ps1          — Discovery questions → Spec Kit starter files
+      10-auth-connect.ps1          — Sign in, configure PAC auth, save session
+      20-build-tables.ps1          — Create tables from payloads/table-*.json
+      30-build-columns.ps1         — Add columns from payloads/columns-*.json
+      40-build-relationships.ps1   — Create lookups from payloads/relationships-*.json
+      50-add-to-solution.ps1       — Add tables to target solution
+      60-build-forms-views.ps1     — Create starter forms and views, publish all
+```
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+| --- | --- | --- |
+| `pac` not found | CLI not installed or PATH not updated | `winget install Microsoft.PowerPlatformCLI`, close and reopen terminal |
+| 401 on every API call | Token resource URL mismatch | Rerun `10-auth-connect.ps1` — no trailing slash on environment URL |
+| Token works then stops mid-run | Token expired (60–90 min timeout) | Rerun `10-auth-connect.ps1` to refresh |
+| PAC errors after `az login` | PAC and Azure CLI are separate auth mechanisms | Run both `az login` and `pac auth create` |
+| Login opens wrong tenant | Multiple tenants on account | Pass `-tenantId` flag or rerun auth with explicit tenant |
+| Solution not found in script 50 | Solution does not exist in environment yet | Create solution in Maker portal, then rerun `50-add-to-solution.ps1` |
+| Build script fails midway | Any error during execution | Scripts are idempotent — fix issue and rerun the same script |
+| `code` command not found | VS Code shell command not in PATH | Command palette → "Shell Command: Install 'code' command in PATH", restart terminal |
+| `git push` rejected | Branch behind remote | `git pull --ff-only`, then push with `-u origin <branch>` |
+| `.env.ps1` accidentally staged | `.gitignore` changed or bypassed | `git rm --cached .env.ps1`, verify `.gitignore` includes `.env.ps1` |
+| Unpack fails | Wrong zip path or invalid export | Re-run export, verify zip exists in `out/`, then re-run unpack |
+| Import fails: missing dependencies | Target environment missing base components | Import into correct base environment or include required dependencies |
+
+---
+
+## Related documents
+
+| Document | Purpose |
+| --- | --- |
+| [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
+| [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
+| [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
+| [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |

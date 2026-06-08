@@ -18,6 +18,52 @@ Wizard outcome:
 - A complete, traceable blueprint and implementation path for a model-driven Dynamics app built from VS Code.
 - A beginner-usable onboarding path that works in any repository.
 
+Mandatory rule:
+- Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+
+### 0A. End-to-end flow this wizard supports
+
+Use this sequence from first clone to final handoff:
+
+1. Clone repo.
+2. Open repo in VS Code.
+3. Install required tools and extensions.
+4. Validate PAC CLI and prerequisites.
+5. Authenticate to Power Platform.
+6. Choose/create environment.
+7. Answer discovery questions.
+8. Generate Spec Kit specification.
+9. Create implementation plan.
+10. Create task list.
+11. Build or modify artifacts.
+12. Export and unpack solution.
+13. Commit to Git.
+14. Pack and import solution.
+15. Document finished demo.
+
+Validation checkpoint:
+- Pause at each step until validation passes. Do not continue on failed checks.
+
+### 0B. Required discovery questionnaire
+
+Ask and capture these answers before Step 1:
+
+1. What type of demo or app are you building?
+2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
+3. Who is the target audience?
+4. What business problem does it solve?
+5. Who are the users?
+6. What data tables or entities are needed?
+7. What screens, forms, views, pages, flows, or copilots are needed?
+8. What does a successful demo look like?
+9. What environment should it be built in?
+10. Does it need demo data?
+11. Should the output be a managed or unmanaged solution?
+
+Exit criteria:
+- All questions answered.
+- Stakeholder confirms the answers are complete enough to draft `spec.md`.
+
 Before Step 1:
 - Ensure the repo includes a standard bootstrap contract (`scripts/bootstrap/*`, `payloads/*`, `docs/onboarding.md`, `.vscode/extensions.json`).
 - Run the new-hire setup path from `how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md` Section 15.

@@ -1,6 +1,7 @@
 {
   "recommendations": [
     "GitHub.copilot",
+    "GitHub.copilot-chat",
     "microsoft-IsvExpTools.powerplatform-vscode",
     "ms-vscode.powershell",
     "ms-vscode.vscode-json",

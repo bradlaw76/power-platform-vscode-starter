@@ -5,7 +5,10 @@ Scope: Generic guide (not project-specific)
 Audience: Builders using Dynamics 365, Dataverse, VS Code, and Copilot
 
 Companion wizard:
-- Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a guided, question-by-question process that walks users from principles and Spec Kit setup through design, build, validation, and handoff.
+
+- Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
+  guided, question-by-question process that walks users from principles and
+  Spec Kit setup through design, build, validation, and handoff.
 
 ## 0. How to Use This Guide
 
@@ -14,9 +17,61 @@ Companion wizard:
 - Use Sections 12-14 as release gates and handoff criteria.
 - Treat this as a baseline playbook and add domain-specific requirements in separate docs.
 
+Required process gate:
+
+- Spec Kit planning is mandatory before implementation.
+- Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
+
+### 0A. Beginner first-run flow (clone to demo)
+
+Use this exact sequence for predictable onboarding:
+
+1. Clone repo and open in VS Code.
+2. Install required tools and extensions.
+3. Validate Power Platform CLI and prerequisites.
+4. Authenticate to Azure and Power Platform.
+5. Choose/create a Power Platform environment.
+6. Answer discovery questions.
+7. Create Spec Kit artifacts (`spec.md`, `plan.md`, `tasks.md`).
+8. Convert requirements to implementation tasks.
+9. Build metadata artifacts (tables, columns, relationships, forms, views).
+10. Export and unpack solution.
+11. Commit changes to Git.
+12. Pack and import solution.
+13. Validate imported result.
+14. Document final demo and handoff.
+
+Validation checkpoints:
+
+- Stop if any step fails; fix before continuing.
+- Do not skip planning artifacts.
+
+### 0B. Wizard discovery questions (required intake)
+
+Answer these before writing or changing metadata:
+
+1. What type of demo or app are you building?
+2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact
+  Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
+3. Who is the target audience?
+4. What business problem does it solve?
+5. Who are the users?
+6. What data tables or entities are needed?
+7. What screens, forms, views, pages, flows, or copilots are needed?
+8. What does a successful demo look like?
+9. What environment should it be built in?
+10. Does it need demo data?
+11. Should the output be a managed or unmanaged solution?
+
+Why this matters:
+
+- These answers become the source for `spec.md`, then `plan.md`, then
+  `tasks.md`.
+
 ## 1. What You Are Building
 
 A model-driven app is a Dataverse-first application where:
+
 - Data model drives UI behavior.
 - Forms, views, business rules, and processes are generated from schema.
 - Security and environment strategy determine operational readiness.
@@ -33,11 +88,13 @@ Use this guide for a repeatable build process in VS Code with Copilot support.
 - Copilot available in VS Code.
 
 Minimum tooling baseline:
+
 - Power Platform CLI (`pac`) authenticated to target tenant.
 - Environment URL and publisher prefix agreed before metadata creation.
 - One service account or managed identity strategy documented for automation.
 
 Recommended VS Code extensions:
+
 - GitHub Copilot (`GitHub.copilot`)
 - Power Platform Tools (`microsoft-IsvExpTools.powerplatform-vscode`)
 - PowerShell (`ms-vscode.powershell`)
@@ -46,15 +103,16 @@ Recommended VS Code extensions:
 
 ## 2A. First-Time Builder Setup (Day 0)
 
-Use this section for people who are completely new to VS Code and Dynamics app building.
+Use this section for people who are completely new to VS Code and Dynamics app
+building.
 
 ### Install required tools
 
 Install each tool before running any build scripts.
 
 | Tool | Install command or link |
-|------|------------------------|
-| VS Code | https://code.visualstudio.com |
+| --- | --- |
+| VS Code | <https://code.visualstudio.com> |
 | PowerShell 7+ | `winget install Microsoft.PowerShell` |
 | Azure CLI | `winget install Microsoft.AzureCLI` |
 | Power Platform CLI | `winget install Microsoft.PowerPlatformCLI` |
@@ -99,77 +157,99 @@ $token = az account get-access-token --resource $envUrl --query accessToken -o t
 
 These are real issues encountered during builds. Read before starting.
 
-**Token URL mismatch (most common error)**
+#### Token URL mismatch (most common error)
+
 - The `--resource` URL passed to `az account get-access-token` must match the
   Dataverse environment URL exactly.
 - A trailing slash or wrong subdomain produces a valid-looking token that
   returns 401 on every API call.
-- Fix: always copy the URL from Power Platform admin center and strip trailing `/`.
+- Fix: always copy the URL from Power Platform admin center and strip trailing
+  `/`.
 
-**Two separate auth mechanisms**
+#### Two separate auth mechanisms
+
 - `az login` and `pac auth create` are independent. You need both.
 - `az login` produces the bearer token used in API scripts.
-- `pac auth create` is used by `pac` CLI commands (solution pack, publish, etc).
+- `pac auth create` is used by `pac` CLI commands (solution pack, publish,
+  etc).
 - Confusion here is the number-one onboarding blocker.
 
-**Token expiry during long runs**
-- Azure tokens expire after approximately 60–90 minutes.
-- If scripts fail mid-run with 401, re-run the token command and re-export `$token`.
+#### Token expiry during long runs
+
+- Azure tokens expire after approximately 60-90 minutes.
+- If scripts fail mid-run with 401, re-run the token command and re-export
+  `$token`.
 - Add token refresh at the top of any long-running script.
 
-**Browser vs device code flow**
-- `az login` launches a browser by default. On headless servers use:
-  ```powershell
-  az login --use-device-code
-  ```
-- A code is printed. Visit https://microsoft.com/devicelogin and enter it.
+#### Browser vs device code flow
 
-**Multiple tenants**
+- `az login` launches a browser by default. On headless servers use:
+
+```powershell
+az login --use-device-code
+```
+
+- A code is printed. Visit <https://microsoft.com/devicelogin> and enter it.
+
+#### Multiple tenants
+
 - If you have multiple Azure tenants, login may resolve to the wrong one.
 - Force a specific tenant:
-  ```powershell
-  az login --tenant "<tenant-id-or-domain>"
-  ```
-- Verify you are in the right tenant:
-  ```powershell
-  az account show --query tenantId -o tsv
-  ```
 
-**PAC profile points to wrong environment**
+```powershell
+az login --tenant "TENANT_ID_OR_DOMAIN"
+```
+
+- Verify you are in the right tenant:
+
+```powershell
+az account show --query tenantId -o tsv
+```
+
+#### PAC profile points to wrong environment
+
 - Running `pac auth list` shows all profiles. The active one has an asterisk.
 - Switch with:
-  ```powershell
-  pac auth select --index <number>
-  ```
 
-**MFA / Conditional Access blocking terminal login**
+```powershell
+pac auth select --index <number>
+```
+
+#### MFA / Conditional Access blocking terminal login
+
 - Some tenants block non-interactive auth entirely.
-- Workaround: use an application registration with client credentials (client ID + secret) for CI scenarios:
-  ```powershell
-  az login --service-principal -u "<client-id>" -p "<client-secret>" --tenant "<tenant-id>"
-  $token = az account get-access-token --resource $envUrl --query accessToken -o tsv
-  ```
-- Never commit client secrets to source control. Use environment variables or a secrets manager.
+- Workaround: use an application registration with client credentials
+  (client ID + secret) for CI scenarios:
+
+```powershell
+az login --service-principal -u "<client-id>" -p "<client-secret>" --tenant "<tenant-id>"
+$token = az account get-access-token --resource $envUrl --query accessToken -o tsv
+```
+
+- Never commit client secrets to source control. Use environment variables or a
+  secrets manager.
 
 ### First environment decisions to record before build
 
 Capture these values in your `docs/onboarding.md` before creating any metadata:
 
 | Decision | Value |
-|----------|-------|
+| --- | --- |
 | Dataverse environment URL | `https://<your-org>.crm.dynamics.com` |
 | Publisher name | e.g. `Contoso` |
-| Publisher prefix | e.g. `cto` (3–8 chars, lowercase, no spaces) |
+| Publisher prefix | e.g. `cto` (3-8 chars, lowercase, no spaces) |
 | Solution unique name | e.g. `ContosoHRApp` |
 | Solution display name | e.g. `Contoso HR Application` |
 | Build mode | Demo / Production / Phased |
 | Table naming standard | `<prefix>_<entity>` e.g. `cto_employee` |
 
 Minimum success criteria before continuing:
+
 - You can sign in and retrieve a token without errors.
 - `pac auth list` shows your environment with an asterisk.
 - `az account show` shows the correct tenant and user.
-- You can describe the create order: tables → columns → relationships → solution → forms/views.
+- You can describe the create order: tables -> columns -> relationships ->
+  solution -> forms/views.
 
 ## 3. Workspace and Source Strategy
 
@@ -228,6 +308,7 @@ repo-root/
 ```
 
 Why this works across repos:
+
 - New users always find setup scripts in the same location.
 - Build order is explicit from script naming.
 - Payload-driven metadata keeps app design portable.
@@ -250,6 +331,7 @@ Suggested `.vscode/extensions.json` recommendations:
 ## 4. Define the App Blueprint First
 
 Before creating tables, define:
+
 - Business capability scope
 - Core user roles
 - Data entities and relationships
@@ -257,12 +339,14 @@ Before creating tables, define:
 - Reporting and audit requirements
 
 Use Copilot to draft:
+
 - Entity list with primary keys and required fields
 - State/status model
 - Security role matrix outline
 - Initial acceptance criteria
 
 Also define non-functional requirements early:
+
 - Data retention and auditing obligations
 - Performance targets (for example, form load expectations)
 - Accessibility and localization needs
@@ -277,6 +361,7 @@ Also define non-functional requirements early:
 5. Add audit-friendly columns where needed (owner, created on, modified on, source).
 
 Copilot prompt pattern:
+
 - Ask Copilot to generate a table definition checklist including:
   - Column names
   - Data types
@@ -285,6 +370,7 @@ Copilot prompt pattern:
   - Relationship targets
 
 Naming standard baseline (generic):
+
 - Publisher prefix on all custom tables/columns.
 - Singular table names and explicit relationship names.
 - Separate display label from schema name decisions.
@@ -318,6 +404,7 @@ Recommended payload split:
 - `relationships-*.json` for relationship definitions
 
 Validation additions:
+
 - Lint payloads before execution.
 - Record every create/update response in a build log.
 - Fail fast when required metadata dependencies are missing.
@@ -350,12 +437,14 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1 -EnvironmentUrl $envUrl -Acces
 ```
 
 Expected output per step:
+
 - Created count, skipped count, failed count
 - List of affected tables/forms/views
 - Clear non-zero exit code on failure
 - Build-log entry in `docs/build-log.md`
 
 If your repo already has differently named scripts:
+
 - Keep the same execution order.
 - Add wrappers in `scripts/bootstrap/` so beginners always run a consistent command set.
 
@@ -369,6 +458,7 @@ If your repo already has differently named scripts:
 6. Add charts/dashboards for operational visibility.
 
 Design guidance:
+
 - Keep top-level navigation aligned to business tasks.
 - Prefer task-centric forms over field-dense forms.
 - Use views for queue/triage behavior.
@@ -377,6 +467,7 @@ Design guidance:
 ## 7. Add Business Logic
 
 Implement logic in this order:
+
 1. Column-level validation
 2. Business rules
 3. Business process flows
@@ -384,11 +475,13 @@ Implement logic in this order:
 5. Optional plug-ins/custom code
 
 Keep logic placement consistent:
+
 - Simple deterministic UI/data rules in Business Rules.
 - Multi-step orchestration and integration in Power Automate.
 - Advanced transactional logic in plug-ins when required.
 
 Automation quality baseline:
+
 - Define retry policy and idempotency keys for integration flows.
 - Separate synchronous user-facing logic from asynchronous background processing.
 - Track flow ownership and alert targets.
@@ -396,6 +489,7 @@ Automation quality baseline:
 ## 7A. Integration Design (Generic)
 
 When integrating with external systems:
+
 1. Define source-of-truth per business field.
 2. Standardize request/response contracts and error codes.
 3. Add dead-letter or retry queues for non-transient failures.
@@ -410,6 +504,7 @@ When integrating with external systems:
 4. Validate least-privilege behavior with test users.
 
 For demo builds:
+
 - Use simplified roles.
 - Document deferred production hardening items explicitly.
 
@@ -430,12 +525,14 @@ For demo builds:
 5. Store configuration differences by environment.
 
 Recommended pipeline quality gates:
+
 - Solution unpack/pack validation.
 - Static checks (including solution checker where applicable).
 - Environment variable and connection reference validation.
 - Import smoke test in a clean validation environment.
 
 Minimum ALM checkpoints:
+
 - Solution version increment
 - Schema migration impact check
 - Security regression check
@@ -444,6 +541,7 @@ Minimum ALM checkpoints:
 ## 10. Copilot-Driven Working Pattern in VS Code
 
 Use Copilot for:
+
 - Schema draft generation
 - Validation checklist creation
 - Documentation synthesis
@@ -451,24 +549,30 @@ Use Copilot for:
 - Refactoring long markdown and config files
 
 Best prompt pattern:
+
 1. State the exact artifact to create.
 2. Give constraints (demo vs production, required sections).
 3. Require explicit acceptance criteria.
 4. Ask for output in reusable checklist/table format.
 
 Quality guardrails:
+
 - Never accept generated output without source validation.
 - Keep one requirement-to-artifact trace path.
 - Record rationale for architectural choices.
 
 Prompt templates that scale:
-1. "Generate a Dataverse table definition checklist for <domain>, include required fields, relationships, and lifecycle states."
-2. "Create validation scenarios for <feature> covering happy path, permission denial, and integration failure."
+
+1. "Generate a Dataverse table definition checklist for [domain], include
+  required fields, relationships, and lifecycle states."
+2. "Create validation scenarios for [feature] covering happy path, permission
+  denial, and integration failure."
 3. "Draft a release checklist for model-driven app changes with rollback criteria and owner per gate."
 
 ## 10A. Reusable KB Article + PDF Workflow (For Future Repos)
 
-Use this pattern when you need to consolidate source material (including extracted PDF content) into one shareable knowledge-base article.
+Use this pattern when you need to consolidate source material (including
+extracted PDF content) into one shareable knowledge-base article.
 
 Recommended structure:
 
@@ -484,15 +588,18 @@ repo-root/
 
 Execution sequence:
 
-1. Consolidate source inputs
+1. Consolidate source inputs.
+
 - Gather extracted text from PDFs and any supplemental source notes.
 - Normalize into one canonical file, for example `Knowledge/_extracted/combined.txt`.
 
-2. Draft or generate the KB article
+1. Draft or generate the KB article.
+
 - Create a human-readable article in `docs/` as HTML or Markdown.
 - Prefer a stable naming pattern such as `<topic>-knowledge-base-<year>.html`.
 
-3. Export a shareable PDF
+1. Export a shareable PDF.
+
 - Use a headless browser export to avoid LaTeX dependencies.
 - Keep output next to the article source for easy handoff.
 
@@ -507,9 +614,11 @@ $uri = (New-Object System.Uri((Resolve-Path $html).Path)).AbsoluteUri
 & $edge --headless --disable-gpu --print-to-pdf="$pdf" "$uri"
 ```
 
-4. Verify output and publish reference links
+1. Verify output and publish reference links.
+
 - Confirm file exists, size is non-zero, and timestamp is current.
-- Add links to both HTML and PDF artifacts in the repo's primary README or docs index.
+- Add links to both HTML and PDF artifacts in the repo's primary README or
+  docs index.
 
 Verification snippet:
 
@@ -519,6 +628,7 @@ Get-Item "./docs/<topic>-knowledge-base-<year>.pdf" |
 ```
 
 Quality guardrails:
+
 - Keep a single canonical combined source file to reduce drift.
 - Regenerate PDF after each substantive KB content update.
 - Treat HTML as source-of-truth and PDF as distribution artifact.
@@ -527,6 +637,7 @@ Quality guardrails:
 ## 11. Testing and Validation
 
 Run validation in layers:
+
 1. Data model integrity (required fields, relationships, status transitions)
 2. Form/view usability (task completion time, error clarity)
 3. Security behavior (access boundaries)
@@ -536,12 +647,14 @@ Run validation in layers:
 Include one timed reviewer scenario for practical usability validation.
 
 Add these test dimensions:
+
 - Accessibility checks for forms and navigation.
 - Performance checks for high-volume views.
 - Regression checks for role-based visibility after schema changes.
 - Negative-path tests for failed automation and retry behavior.
 
 Evidence expectations:
+
 - Keep test logs, screenshots, and defect disposition notes per release.
 
 ## 12. Common Pitfalls and How to Avoid Them
@@ -570,6 +683,7 @@ Evidence expectations:
 ## 13. Definition of Done (Generic)
 
 A model-driven app increment is done when:
+
 - Data model changes are applied and validated.
 - Forms/views/navigation support target user tasks.
 - Security is tested for in-scope personas.
@@ -581,6 +695,8 @@ A model-driven app increment is done when:
 
 ## 14. Reusable Build Checklist
 
+- [ ] Discovery questions completed and approved
+- [ ] Spec Kit artifacts complete (`spec.md`, `plan.md`, `tasks.md`)
 - [ ] Scope and personas confirmed
 - [ ] Core entities and relationships finalized
 - [ ] App shell and sitemap configured
@@ -588,6 +704,9 @@ A model-driven app increment is done when:
 - [ ] Business rules and flows implemented
 - [ ] Security roles applied and tested
 - [ ] Validation scenarios executed
+- [ ] Solution exported and unpacked for source control
+- [ ] Git branch/commit/push completed
+- [ ] Solution packed and imported into target environment
 - [ ] KB article generated from combined source and exported as PDF
 - [ ] Build and release notes documented
 - [ ] Demo vs production gaps documented
@@ -602,19 +721,28 @@ A model-driven app increment is done when:
 Use this path to onboard someone with no VS Code or Dynamics build experience.
 
 1. Install and validate tools
+
 - Install VS Code, Power Platform Tools, and PowerShell extension.
 - Confirm `az`, `pac`, and `pwsh` are available in terminal.
 
-2. Clone repo and open in VS Code
+1. Clone repo and open in VS Code
+
 - Open the repo root.
 - Accept extension recommendations.
 - Review `docs/onboarding.md` if present.
 
-3. Authenticate once
+1. Authenticate once
+
 - Run Azure sign-in and Power Platform auth profile creation.
 - Validate target Dataverse environment URL.
 
-4. Run bootstrap in order
+1. Complete planning before implementation (required)
+
+- Answer discovery questions for scenario, users, data, and success criteria.
+- Create `spec.md`, `plan.md`, and `tasks.md`.
+
+1. Run bootstrap in order
+
 - `00-prereq-check.ps1`
 - `10-auth-connect.ps1`
 - `20-build-tables.ps1`
@@ -623,12 +751,25 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - `50-add-to-solution.ps1`
 - `60-build-forms-views.ps1`
 
-5. Validate in Maker experience
+1. Validate in Maker experience
+
 - Verify tables exist.
 - Verify forms and views are attached.
 - Verify model-driven app shell navigation renders expected tables.
 
-6. Capture evidence
+1. Export/unpack and commit
+
+- Export solution zip and unpack to source files.
+- Commit unpacked changes to a feature branch and push.
+
+1. Pack/import and validate
+
+- Pack solution from source files.
+- Import into target environment.
+- Validate required scenarios.
+
+1. Capture evidence
+
 - Add results to `docs/build-log.md`.
 - Record blockers and remediation actions.
 - Create handoff note with environment, branch, and artifact list.
