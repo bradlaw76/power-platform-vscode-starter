@@ -102,14 +102,44 @@ $answers["TargetAudience"] = Read-RequiredValue "3. Who is the target audience?"
 $answers["BusinessProblem"] = Read-RequiredValue "4. What business problem does it solve?"
 $answers["Users"] = Read-RequiredValue "5. Who are the users?"
 $answers["DataEntities"] = Read-RequiredValue "6. What data tables or entities are needed?"
+$answers["TableChoice"] = Read-RequiredValue "6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)" "both"
 $answers["ArtifactsNeeded"] = Read-RequiredValue "7. What screens, forms, views, pages, flows, or copilots are needed?"
 $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful demo look like?"
 $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment should it be built in?"
 $answers["NeedsDemoData"] = Read-RequiredValue "10. Does it need demo data?" "Yes"
 $answers["SolutionType"] = Read-RequiredValue "11. Should the output be a managed or unmanaged solution?" "Unmanaged"
 
+$solutionChoice = Read-RequiredValue "12. New solution or use an existing one? (new/existing)" "new"
+$answers["SolutionChoice"] = $solutionChoice
+if ($solutionChoice -ieq "existing") {
+    $answers["SolutionName"] = Read-RequiredValue "    Existing solution unique name"
+} else {
+    $answers["SolutionName"] = Read-RequiredValue "    New solution unique name (no spaces, letters/numbers only, e.g. ContosoHRApp)"
+}
+
+$prefixChoice = Read-RequiredValue "13. New publisher prefix or use an existing one? (new/existing)" "new"
+$answers["PrefixChoice"] = $prefixChoice
+if ($prefixChoice -ieq "existing") {
+    $answers["PublisherPrefix"] = Read-RequiredValue "    Existing prefix (e.g. vafe, contoso)"
+} else {
+    $answers["PublisherPrefix"] = Read-RequiredValue "    New prefix (3-8 lowercase letters, e.g. cto, demo)"
+}
+
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
+
+# Write planning values to .env.ps1 so 10-auth-connect.ps1 can use them as defaults.
+# 10-auth-connect.ps1 will overwrite this file with full auth + config when it runs.
+$envFilePath = Join-Path $repoRoot ".env.ps1"
+$planEnvContent = @"
+# Planning values set by 05-start-wizard.ps1 -- do not commit this file.
+# Run 10-auth-connect.ps1 next to complete authentication and full configuration.
+`$env:DV_SOLUTION_NAME       = "$($answers["SolutionName"])"
+`$env:DV_PUBLISHER_PREFIX    = "$($answers["PublisherPrefix"])"
+`$global:DV_SOLUTION_NAME    = "`$env:DV_SOLUTION_NAME"
+`$global:DV_PUBLISHER_PREFIX = "`$env:DV_PUBLISHER_PREFIX"
+"@
+Set-Content -Path $envFilePath -Value $planEnvContent -Encoding UTF8
 
 $answersPath = Join-Path $scenarioFolder "answers.md"
 $specPath = Join-Path $scenarioFolder "spec.md"
@@ -140,11 +170,14 @@ $answersContent = @"
 4. Business problem: $($answers["BusinessProblem"])
 5. Users: $($answers["Users"])
 6. Data entities: $($answers["DataEntities"])
+6b. Standard vs custom tables: $($answers["TableChoice"])
 7. Needed artifacts: $($answers["ArtifactsNeeded"])
 8. Success definition: $($answers["SuccessLooksLike"])
 9. Build environment: $($answers["BuildEnvironment"])
 10. Demo data needed: $($answers["NeedsDemoData"])
 11. Solution output type: $($answers["SolutionType"])
+12. Solution (new/existing): $($answers["SolutionChoice"]) -- $($answers["SolutionName"])
+13. Publisher prefix (new/existing): $($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
 "@
 
 $specContent = @"
@@ -165,6 +198,10 @@ $($answers["Users"])
 ## Required Data Entities
 $($answers["DataEntities"])
 
+### Table Strategy
+- **Approach**: $($answers["TableChoice"])
+- **Guidance**: See \`docs/standard-dataverse-tables.md\` for which tables are out-of-box vs custom.
+
 ## Required Experience and Artifacts
 $($answers["ArtifactsNeeded"])
 
@@ -180,6 +217,10 @@ $($answers["NeedsDemoData"])
 ## Solution Packaging Decision
 $($answers["SolutionType"])
 
+## Solution and Publisher
+- Solution: $($answers["SolutionName"]) ($($answers["SolutionChoice"]))
+- Publisher prefix: $($answers["PublisherPrefix"]) ($($answers["PrefixChoice"]))
+
 ## Acceptance Criteria
 - The scenario is clear and approved.
 - Required entities and artifacts are identified.
@@ -194,6 +235,8 @@ $planContent = @"
 - Platform area: $($answers["PlatformArea"])
 - Environment: $($answers["BuildEnvironment"])
 - Solution type: $($answers["SolutionType"])
+- Solution unique name: $($answers["SolutionName"]) ($($answers["SolutionChoice"]))
+- Publisher prefix: $($answers["PublisherPrefix"]) ($($answers["PrefixChoice"]))
 
 ## Proposed Workstreams
 1. Discovery review and approval
@@ -208,6 +251,7 @@ $planContent = @"
 - Confirm environment availability and permissions.
 - Confirm entity scope and artifact count.
 - Confirm whether demo data must be scripted or manual.
+- Confirm which entities are standard (out-of-box) and which are custom (to be created).
 
 ## Validation Plan
 - Verify artifacts in Maker portal.
@@ -224,11 +268,15 @@ $tasksContent = @"
 - [ ] Finalize `spec.md`
 - [ ] Finalize `plan.md`
 - [ ] Approve build environment and permissions
+- [ ] Review standard table reference: `docs/standard-dataverse-tables.md`
+- [ ] Classify tables as standard or custom for: $($answers["DataEntities"])
+- [ ] Define custom table schemas and payloads
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
 - [ ] Decide demo data approach: $($answers["NeedsDemoData"])
+- [ ] Confirm solution name '$($answers["SolutionName"])' and publisher prefix '$($answers["PublisherPrefix"])' with stakeholder
 - [ ] Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`
-- [ ] Run `pwsh ./scripts/bootstrap/10-auth-connect.ps1`
+- [ ] Run `pwsh ./scripts/bootstrap/10-auth-connect.ps1`  # validates solution + prefix via API
 - [ ] Build tables with `20-build-tables.ps1`
 - [ ] Build columns with `30-build-columns.ps1`
 - [ ] Build relationships with `40-build-relationships.ps1`
@@ -251,6 +299,7 @@ Write-Host "  $answersPath"
 Write-Host "  $specPath"
 Write-Host "  $planPath"
 Write-Host "  $tasksPath"
+Write-Host "  $envFilePath  (planning values for 10-auth-connect.ps1)"
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Review and refine the generated files."
