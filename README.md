@@ -17,6 +17,7 @@ A repo-agnostic starter kit for building Power Platform model-driven apps from V
 - [Key concepts](#key-concepts)
 - [How it works](#how-it-works)
 - [Getting started](#getting-started)
+- [Install Spec Kit tooling](#install-spec-kit-tooling)
 - [Build sequence](#build-sequence)
 - [Using VS Code chat and Claude Code](#using-vs-code-chat-and-claude-code)
 - [Solution lifecycle](#solution-lifecycle)
@@ -148,6 +149,60 @@ Done. Installed: 1  Skipped: 0
 ```
 
 This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
+
+---
+
+## Install Spec Kit tooling
+
+If you are looking for "Speck Kit" installation: this repo uses **Spec Kit** as a planning gate and includes the setup path already. There is no separate external installer required for basic use.
+
+Official upstream project:
+
+- https://github.com/github/spec-kit/
+- Docs: https://github.github.io/spec-kit/
+
+Use this setup so Spec Kit artifacts can be created consistently:
+
+1. Install repo skills (once per machine):
+
+```powershell
+pwsh ./scripts/bootstrap/01-install-skills.ps1
+```
+
+2. Start the guided planning flow (creates `spec.md`, `plan.md`, `tasks.md`):
+
+```powershell
+pwsh ./scripts/bootstrap/05-start-wizard.ps1
+```
+
+3. Optional chat-first path in VS Code Copilot Chat:
+
+```text
+/power-platform-demo-wizard
+```
+
+Optional: install the upstream Specify CLI from the official Spec Kit repo
+(recommended if you also want full Spec Kit CLI workflows outside this starter):
+
+Prerequisites from upstream: Python 3.11+, `uv` (recommended) or `pipx`, and Git.
+
+```powershell
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@vX.Y.Z
+```
+
+Then initialize Spec Kit in any project:
+
+```powershell
+specify init my-project --integration copilot
+```
+
+Replace `vX.Y.Z` with a released tag from:
+https://github.com/github/spec-kit/releases/latest
+
+Validation checkpoint:
+
+- `spec.md`, `plan.md`, and `tasks.md` exist in root or under `specs/<scenario-slug>/`.
+- The three files are reviewed and consistent before running scripts `20` to `60`.
 
 ---
 
@@ -373,5 +428,6 @@ power-platform-vscode-starter/
 | --- | --- |
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
+| [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables — helps you decide which to reuse and which to create |
 | [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
 | [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |
