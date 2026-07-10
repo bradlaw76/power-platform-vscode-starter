@@ -54,15 +54,20 @@ Ask and capture these answers before Step 1:
 4. What business problem does it solve?
 5. Who are the users?
 6. What data tables or entities are needed?
+6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)
 7. What screens, forms, views, pages, flows, or copilots are needed?
 8. What does a successful demo look like?
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+12. New solution or use an existing one? (new/existing)
+13. New publisher prefix or use an existing one? (new/existing)
 
 Exit criteria:
-- All questions answered.
+- All 14 questions answered (1-11 + 6b + 12 + 13).
 - Stakeholder confirms the answers are complete enough to draft `spec.md`.
+- For Q6b, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.
+- For Q12/Q13, solution name and publisher prefix are validated (script 10-auth-connect.ps1 will verify these exist or guide creation).
 
 Before Step 1:
 - Ensure the repo includes a standard bootstrap contract (`scripts/bootstrap/*`, `payloads/*`, `docs/onboarding.md`, `.vscode/extensions.json`).

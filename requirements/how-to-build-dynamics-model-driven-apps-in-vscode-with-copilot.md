@@ -46,27 +46,31 @@ Validation checkpoints:
 - Stop if any step fails; fix before continuing.
 - Do not skip planning artifacts.
 
-### 0B. Wizard discovery questions (required intake)
+### 0B. Wizard discovery questions (14 questions — required intake)
 
 Answer these before writing or changing metadata:
 
 1. What type of demo or app are you building?
-2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact
-  Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
+2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
 3. Who is the target audience?
 4. What business problem does it solve?
 5. Who are the users?
 6. What data tables or entities are needed?
+**6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)**
 7. What screens, forms, views, pages, flows, or copilots are needed?
 8. What does a successful demo look like?
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+**12. New solution or use an existing one? (new/existing)**
+**13. New publisher prefix or use an existing one? (new/existing)**
 
 Why this matters:
 
-- These answers become the source for `spec.md`, then `plan.md`, then
-  `tasks.md`.
+- These answers become the source for `spec.md`, then `plan.md`, then `tasks.md`.
+- Q6b ensures you reuse existing standard tables (Contact, Case, Product, etc.) instead of recreating them.
+- Q12/Q13 prevent accidental cross-project contamination by requiring unique solution names and prefixes.
+- Reference `docs/standard-dataverse-tables.md` to identify which tables are out-of-box vs. custom.
 
 ## 1. What You Are Building
 

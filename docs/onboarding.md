@@ -237,11 +237,26 @@ Before building anything, answer these questions in writing. This becomes your r
 8. What does a successful demo look like?
 9. What environment should it be built in?
 10. Does it need demo data?
+6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)
+
+7. What screens, forms, views, pages, flows, or copilots are needed?
+
+8. What does a successful demo look like?
+
+9. What environment should it be built in?
+
+10. Does it need demo data?
+
 11. Should the output be a managed or unmanaged solution?
+
+12. New solution or use an existing one? (new/existing)
+
+13. New publisher prefix or use an existing one? (new/existing)
 
 Validation checkpoint:
 
-- All 11 questions are answered and reviewed by the demo/app owner.
+- All 14 questions are answered and reviewed by the demo/app owner.
+- For Q6b, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
 
 ---
 
