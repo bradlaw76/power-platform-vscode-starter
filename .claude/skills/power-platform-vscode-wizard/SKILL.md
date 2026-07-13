@@ -74,6 +74,10 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 
 All scripts are idempotent — safe to rerun after fixing failures.
 
+Form-building instruction for agents:
+
+"Build starter forms from columns payloads, place the primary field plus payload fields, use display labels from payload metadata, patch existing Starter Main Form on reruns, skip non-starter Main forms, publish customizations, and print created/updated/skipped/failure counts."
+
 ## Solution Lifecycle
 
 ```powershell
