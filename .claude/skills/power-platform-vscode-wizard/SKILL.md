@@ -20,7 +20,7 @@ Spec Kit artifacts required before scripts 20–60:
 
 ## Discovery Questions (Run First)
 
-Ask and capture all 14 before any build work:
+Ask and capture all base discovery questions, then complete explicit entity mapping before any build work:
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -36,6 +36,11 @@ Ask and capture all 14 before any build work:
 11. Should the output be a managed or unmanaged solution?
 12. Should we create a new solution or use an existing one? If existing, what is the exact unique name?
 13. Should we create a new publisher prefix or use an existing one? If existing, what is the prefix (e.g. vafe, contoso)?
+14. Standard reused tables (display/logical names)
+15. Custom tables to create
+16. Standard fields to reuse
+17. Custom fields to add
+18. Relationships to create
 
 ## Ordered Build Flow
 
@@ -45,15 +50,17 @@ Follow this exact sequence — do not skip validation checkpoints:
 |------|--------|------------|
 | 0 | Clone repo, open in VS Code, install extensions | Extensions installed via `@recommended` |
 | 1 | Start wizard: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Discovery answers captured |
-| 2 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1` | All tools show PASS |
-| 3 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |
-| 4 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
-| 4.5 | **Validate solution + prefix** (`10-auth-connect.ps1` does this automatically) | Existing solution confirmed via `solutions?$filter=uniquename eq '<name>'`; existing prefix confirmed via `publishers?$filter=customizationprefix eq '<prefix>'`. Stop and fix if either is missing before running scripts 20–60. |
-| 5 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
-| 6 | Build in order (scripts 20–60) | Each script exits with zero failed count |
-| 7 | Verify in Maker portal | Tables, forms, views visible in target solution |
-| 8 | Export + unpack → commit → pack → import | See Solution Lifecycle below |
-| 9 | Document in `docs/build-log.md` | Teammate can rerun the process |
+| 2 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
+| 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | `demo-script.md` exists and matches the scenario story |
+| 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` | `demo-dry-run.md` captures rehearsal notes |
+| 5 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1` | All tools show PASS |
+| 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |
+| 6.5 | **Validate solution + prefix** (`10-auth-connect.ps1` does this automatically) | Existing solution confirmed via `solutions?$filter=uniquename eq '<name>'`; existing prefix confirmed via `publishers?$filter=customizationprefix eq '<prefix>'`. Stop and fix if either is missing before running scripts 20–60. |
+| 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
+| 8 | Build in order (scripts 20–60) | Each script exits with zero failed count |
+| 9 | Verify in Maker portal | Tables, forms, views visible in target solution |
+| 10 | Export + unpack → commit → pack → import | See Solution Lifecycle below |
+| 11 | Document in `docs/build-log.md` | Teammate can rerun the process |
 
 ## Build Scripts (Run in Order)
 
@@ -96,6 +103,10 @@ Three modes:
 - `.github/prompts/power-platform-demo-wizard.prompt.md` — slash prompt
 - `pwsh ./scripts/bootstrap/05-start-wizard.ps1` — terminal wizard
 
+Post-wizard demo helpers:
+- `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` — generate a single reviewable demo script
+- `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` — rehearse the script and capture edits
+
 Note:
 - `01-install-skills.ps1` installs this skill to your local Claude skills folder.
 - Skill availability depends on Claude session behavior and invocation context.
@@ -128,17 +139,19 @@ pwsh ./scripts/bootstrap/10-auth-connect.ps1 -ServicePrincipal
 - ✅ Packagable in managed solutions
 - ❌ Require your publisher prefix
 
-### Wizard handles this automatically
+### Planning-driven standard/custom handling
 
 1. **Question 6**: "What data tables or entities are needed?" — list all (e.g., "Contact, Case, Inspection")
 2. **Question 6b**: "Use standard tables, custom tables, or both?" — choose strategy
-3. **Script 20** (`20-build-tables.ps1`): Automatically skips standard tables and creates only custom ones
+3. **Explicit mapping block** in planning artifacts: standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships
+4. **Payload gate**: do not generate payloads until the explicit mapping block is complete and approved
+5. **Script 20** (`20-build-tables.ps1`): creates only entities present in table payloads; standard entities must not be in table payloads
 
 **Example**: If you list "Contact, Case, Incident, Product, Inspection" and choose "both":
-- ✅ Contact — skipped (exists)
-- ✅ Case/Incident — skipped (exist)
-- ✅ Product — skipped (exists)
-- ✅ Inspection — created as `<prefix>_inspection` (custom)
+- ✅ Contact -> `contact` (reused, not in table payloads)
+- ✅ Case/Incident -> `incident` (reused, not in table payloads)
+- ✅ Product -> `product` (reused, not in table payloads)
+- ✅ Inspection -> `<prefix>_inspection` (custom, included in table payloads)
 
 ## Common Mistakes
 

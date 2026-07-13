@@ -70,6 +70,85 @@ function ConvertTo-Slug {
     return $slug
 }
 
+function Resolve-StandardLogicalName {
+    param([string]$Name)
+
+    $key = ($Name ?? "").Trim().ToLower()
+    $map = @{
+        "account"     = "account"
+        "activity"    = "activitypointer"
+        "case"        = "incident"
+        "contact"     = "contact"
+        "incident"    = "incident"
+        "lead"        = "lead"
+        "opportunity" = "opportunity"
+        "product"     = "product"
+        "task"        = "task"
+    }
+
+    if ($map.ContainsKey($key)) { return $map[$key] }
+    return $key
+}
+
+function Convert-ToCustomLogicalName {
+    param(
+        [string]$Name,
+        [string]$Prefix
+    )
+
+    $normalizedPrefix = ($Prefix ?? "").Trim().ToLower()
+    $candidate = ($Name ?? "").Trim().ToLower()
+    if ([string]::IsNullOrWhiteSpace($candidate)) { return "" }
+
+    if ($candidate.Contains("_")) { return $candidate }
+    $candidate = [regex]::Replace($candidate, "[^a-z0-9]+", "")
+    if ([string]::IsNullOrWhiteSpace($candidate)) { return "" }
+
+    if ([string]::IsNullOrWhiteSpace($normalizedPrefix)) { return $candidate }
+    return "$normalizedPrefix`_$candidate"
+}
+
+function Format-StandardTableMapping {
+    param([string]$Input)
+
+    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+        return "- None"
+    }
+
+    $lines = @()
+    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    foreach ($item in $items) {
+        $logical = Resolve-StandardLogicalName $item
+        $lines += "- $item -> $logical"
+    }
+
+    if ($lines.Count -eq 0) { return "- None" }
+    return ($lines -join "`n")
+}
+
+function Format-CustomTableMapping {
+    param(
+        [string]$Input,
+        [string]$Prefix
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+        return "- None"
+    }
+
+    $lines = @()
+    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    foreach ($item in $items) {
+        $logical = Convert-ToCustomLogicalName -Name $item -Prefix $Prefix
+        if (-not [string]::IsNullOrWhiteSpace($logical)) {
+            $lines += "- $item -> $logical"
+        }
+    }
+
+    if ($lines.Count -eq 0) { return "- None" }
+    return ($lines -join "`n")
+}
+
 function Confirm-Overwrite {
     param([string[]]$Paths)
 
@@ -125,6 +204,15 @@ if ($prefixChoice -ieq "existing") {
     $answers["PublisherPrefix"] = Read-RequiredValue "    New prefix (3-8 lowercase letters, e.g. cto, demo)"
 }
 
+$answers["StandardTablesReused"] = Read-RequiredValue "14. Explicit mapping - standard tables to reuse (comma-separated display names or logical names; enter 'none' if none)" "none"
+$answers["CustomTablesToCreate"] = Read-RequiredValue "15. Explicit mapping - custom tables to create (comma-separated; enter 'none' if none)" "none"
+$answers["StandardFieldsReused"] = Read-RequiredValue "16. Explicit mapping - standard fields to reuse (table.field list; enter 'none' if none)" "none"
+$answers["CustomFieldsToAdd"] = Read-RequiredValue "17. Explicit mapping - custom fields to add (table.field list; enter 'none' if none)" "none"
+$answers["RelationshipsToCreate"] = Read-RequiredValue "18. Explicit mapping - relationships to create (referencing -> referenced; enter 'none' if none)" "none"
+
+$standardTableMapping = Format-StandardTableMapping -Input $answers["StandardTablesReused"]
+$customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
+
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
 
@@ -178,6 +266,23 @@ $answersContent = @"
 11. Solution output type: $($answers["SolutionType"])
 12. Solution (new/existing): $($answers["SolutionChoice"]) -- $($answers["SolutionName"])
 13. Publisher prefix (new/existing): $($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
+
+## Explicit Entity Mapping (Required Before Payloads)
+
+### Standard reused tables (display -> logical)
+$standardTableMapping
+
+### Custom tables to create (input -> generated logical)
+$customTableMapping
+
+### Standard fields reused
+- $($answers["StandardFieldsReused"])
+
+### Custom fields to add
+- $($answers["CustomFieldsToAdd"])
+
+### Relationships to create
+- $($answers["RelationshipsToCreate"])
 "@
 
 $specContent = @"
@@ -201,6 +306,28 @@ $($answers["DataEntities"])
 ### Table Strategy
 - **Approach**: $($answers["TableChoice"])
 - **Guidance**: See \`docs/standard-dataverse-tables.md\` for which tables are out-of-box vs custom.
+
+## Explicit Entity Mapping (Required)
+
+### Standard reused tables (display -> logical)
+$standardTableMapping
+
+### Custom tables to create (input -> generated logical)
+$customTableMapping
+
+### Standard fields reused
+- $($answers["StandardFieldsReused"])
+
+### Custom fields to add
+- $($answers["CustomFieldsToAdd"])
+
+### Relationships to create
+- $($answers["RelationshipsToCreate"])
+
+### Payload Generation Gate
+- Do not generate payloads until this mapping is complete and stakeholder-approved.
+- Do not include standard tables in table-creation payloads.
+- Reuse out-of-box fields unless a true custom field is required.
 
 ## Required Experience and Artifacts
 $($answers["ArtifactsNeeded"])
@@ -253,6 +380,26 @@ $planContent = @"
 - Confirm whether demo data must be scripted or manual.
 - Confirm which entities are standard (out-of-box) and which are custom (to be created).
 
+## Explicit Entity Mapping (Required Before Payloads)
+
+### Standard reused tables (display -> logical)
+$standardTableMapping
+
+### Custom tables to create (input -> generated logical)
+$customTableMapping
+
+### Standard fields reused
+- $($answers["StandardFieldsReused"])
+
+### Custom fields to add
+- $($answers["CustomFieldsToAdd"])
+
+### Relationships to create
+- $($answers["RelationshipsToCreate"])
+
+### Payload Readiness Rule
+- Payload generation is blocked until this mapping is complete and approved.
+
 ## Validation Plan
 - Verify artifacts in Maker portal.
 - Verify solution export/unpack succeeds.
@@ -269,7 +416,10 @@ $tasksContent = @"
 - [ ] Finalize `plan.md`
 - [ ] Approve build environment and permissions
 - [ ] Review standard table reference: `docs/standard-dataverse-tables.md`
-- [ ] Classify tables as standard or custom for: $($answers["DataEntities"])
+- [ ] Complete explicit entity mapping in spec/plan (standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships)
+- [ ] Map standard names to logical names (for example: Case -> incident, Contact -> contact) before payload design
+- [ ] Confirm table payloads include only true custom tables
+- [ ] Confirm out-of-box fields are reused unless custom fields are explicitly required
 - [ ] Define custom table schemas and payloads
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
@@ -303,5 +453,6 @@ Write-Host "  $envFilePath  (planning values for 10-auth-connect.ps1)"
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  1. Review and refine the generated files."
-Write-Host "  2. Get approval on scope and success criteria."
-Write-Host "  3. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
+Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
+Write-Host "  3. Get approval on scope, success criteria, and demo story."
+Write-Host "  4. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"

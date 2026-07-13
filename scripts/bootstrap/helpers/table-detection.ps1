@@ -5,7 +5,8 @@
 
 .DESCRIPTION
     Provides functions to classify tables as either standard (out-of-box) or custom (to be created).
-    This allows the build process to skip standard tables and only create custom ones.
+    Use this as a safety guard and validation helper after planning has explicitly mapped
+    standard reused tables vs custom tables to create.
 
 .EXAMPLE
     . ./scripts/bootstrap/helpers/table-detection.ps1

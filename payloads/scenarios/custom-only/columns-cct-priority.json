@@ -1,0 +1,22 @@
+{
+  "TableLogicalName": "earnint_priority",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "earnint_code",
+      "LogicalName": "earnint_code",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Code",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    }
+  ]
+}

@@ -63,12 +63,24 @@ foreach ($file in $payloads) {
         Write-Host "  SKIP $($file.Name) — missing TableLogicalName property" -ForegroundColor Yellow
         $skipped++; continue
     }
+    $tableName = $tableName.ToLower()
 
     Write-Host "  Table: $tableName" -ForegroundColor Cyan
     foreach ($col in $doc.Columns) {
-        $schema = $col.SchemaName
-        $logical = $schema.ToLower()
-        Write-Host "    $schema " -NoNewline
+        $schema  = $col.SchemaName
+        $logical = $col.LogicalName
+        if ([string]::IsNullOrWhiteSpace($logical) -and -not [string]::IsNullOrWhiteSpace($schema)) {
+            $logical = $schema
+        }
+
+        if ([string]::IsNullOrWhiteSpace($logical)) {
+            Write-Host "    SKIP (missing SchemaName/LogicalName)" -ForegroundColor Yellow
+            $skipped++
+            continue
+        }
+
+        $logical = $logical.ToLower()
+        Write-Host "    $logical " -NoNewline
 
         if (Test-ColumnExists $tableName $logical) {
             Write-Host "(exists — skipped)" -ForegroundColor DarkGray
@@ -76,6 +88,7 @@ foreach ($file in $payloads) {
         }
 
         try {
+            $col.LogicalName = $logical
             $body = $col | ConvertTo-Json -Depth 20 -Compress
             Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green

@@ -1,0 +1,23 @@
+{
+  "Relationships": [
+    {
+      "SchemaName": "earnint_incident_earnint_agent",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "earnint_incident_earnint_agent",
+        "ReferencedEntity": "earnint_agent",
+        "ReferencedAttribute": "earnint_agentid",
+        "ReferencingEntity": "incident",
+        "ReferencingAttribute": "earnint_agentid",
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    }
+  ]
+}

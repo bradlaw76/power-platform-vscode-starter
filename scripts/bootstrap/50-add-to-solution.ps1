@@ -1,12 +1,12 @@
 <#
 .SYNOPSIS
-    Adds all custom tables (EntityDefinitions) to the target solution.
+    Adds entities referenced by payload files to the target solution.
     Safe to rerun — adding an already-included component is a no-op.
 
 .PARAMETER EnvironmentUrl     Defaults to $env:DV_ENVIRONMENT_URL.
 .PARAMETER AccessToken        Defaults to $env:DV_TOKEN.
 .PARAMETER SolutionUniqueName Defaults to $env:DV_SOLUTION_NAME.
-.PARAMETER PublisherPrefix    Defaults to $env:DV_PUBLISHER_PREFIX.
+.PARAMETER PayloadsFolder     Folder containing table/column/relationship payloads. Defaults to ../../payloads.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/50-add-to-solution.ps1
@@ -17,7 +17,8 @@ param(
     [string]$EnvironmentUrl     = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken        = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
-    [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX
+    [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX,
+    [string]$PayloadsFolder     = ""
 )
 
 Set-StrictMode -Version Latest
@@ -32,11 +33,15 @@ if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     $PublisherPrefix    = $PublisherPrefix    -ne "" ? $PublisherPrefix    : $global:DV_PUBLISHER_PREFIX
 }
 
-foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName, $PublisherPrefix)) {
+foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName)) {
     if ([string]::IsNullOrWhiteSpace($v)) {
         Write-Host "Missing required values. Run 10-auth-connect.ps1 first." -ForegroundColor Red
         exit 1
     }
+}
+
+if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+    $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
 }
 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
@@ -47,11 +52,65 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
 }
 
+function Add-EntityName {
+    param(
+        [System.Collections.Generic.HashSet[string]]$Set,
+        [string]$Name
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($Name)) {
+        [void]$Set.Add($Name.ToLower())
+    }
+}
+
+function Get-PayloadEntityNames {
+    param([string]$Folder)
+
+    $names = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+
+    $tableFiles = @(Get-ChildItem -Path $Folder -Filter "table-*.json" -ErrorAction SilentlyContinue)
+    foreach ($file in $tableFiles) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $schemaName = $doc.EntityDefinition.SchemaName ?? $doc.SchemaName
+        Add-EntityName -Set $names -Name $schemaName
+    }
+
+    $columnFiles = @(Get-ChildItem -Path $Folder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
+    foreach ($file in $columnFiles) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        Add-EntityName -Set $names -Name $doc.TableLogicalName
+    }
+
+    $relationshipFiles = @(Get-ChildItem -Path $Folder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)
+    foreach ($file in $relationshipFiles) {
+        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $rels = @($doc.Relationships ?? $doc)
+        foreach ($rel in $rels) {
+            Add-EntityName -Set $names -Name ($rel.ReferencedEntity ?? $rel.RelationshipDefinition.ReferencedEntity)
+            Add-EntityName -Set $names -Name ($rel.ReferencingEntity ?? $rel.RelationshipDefinition.ReferencingEntity)
+            Add-EntityName -Set $names -Name ($rel.Entity1LogicalName ?? $rel.RelationshipDefinition.Entity1LogicalName)
+            Add-EntityName -Set $names -Name ($rel.Entity2LogicalName ?? $rel.RelationshipDefinition.Entity2LogicalName)
+        }
+    }
+
+    return @($names)
+}
+
+function Get-EntityDefinitionByLogicalName {
+    param([string]$LogicalName)
+
+    try {
+        return Invoke-Dv "Get" "EntityDefinitions(LogicalName='$LogicalName')?`$select=LogicalName,MetadataId"
+    } catch {
+        return $null
+    }
+}
+
 Write-Host ""
 Write-Host "=== Add to Solution ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
 Write-Host "  Solution:    $SolutionUniqueName"
-Write-Host "  Prefix:      $PublisherPrefix"
+Write-Host "  Payloads:    $PayloadsFolder"
 Write-Host ""
 
 # Verify solution exists
@@ -63,18 +122,30 @@ if ($null -eq $sol) {
 }
 Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 
-# Find all custom tables matching prefix
-$tables = (Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,MetadataId&`$filter=IsCustomEntity eq true").value
-$prefixed = @($tables | Where-Object { $_.LogicalName -like "$($PublisherPrefix)_*" })
-Write-Host "  Custom tables found: $($prefixed.Count)"
+$entityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
+if ($entityNames.Count -eq 0) {
+    Write-Host "No entity references were found in payload files under: $PayloadsFolder" -ForegroundColor Yellow
+    Write-Host "Add table/column/relationship payloads first, then rerun."
+    exit 0
+}
+
+Write-Host "  Payload-referenced entities found: $($entityNames.Count)"
 Write-Host ""
 
 $added = 0; $skipped = 0; $failed = 0
 # ComponentType 1 = Entity
-foreach ($t in $prefixed) {
-    Write-Host "  $($t.LogicalName) " -NoNewline
+foreach ($logicalName in $entityNames | Sort-Object) {
+    Write-Host "  $logicalName " -NoNewline
+
+    $entity = Get-EntityDefinitionByLogicalName -LogicalName $logicalName
+    if ($null -eq $entity -or [string]::IsNullOrWhiteSpace($entity.MetadataId)) {
+        Write-Host "(not found — skipped)" -ForegroundColor Yellow
+        $skipped++
+        continue
+    }
+
     try {
-        $body = @{ ComponentId = $t.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
+        $body = @{ ComponentId = $entity.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $true } | ConvertTo-Json -Compress
         Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
         Write-Host "(added)" -ForegroundColor Green
         $added++

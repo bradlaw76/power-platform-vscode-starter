@@ -20,14 +20,19 @@ Discovery questions to ask:
 4. What business problem does it solve?
 5. Who are the users?
 6. What data tables or entities are needed?
+6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)
 7. What screens, forms, views, pages, flows, or copilots are needed?
 8. What does a successful demo look like?
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+12. New solution or use an existing one? (new/existing)
+13. New publisher prefix or use an existing one? (new/existing)
+14. Explicit mapping: standard reused tables, custom tables to create, standard fields reused, custom fields to add, and relationships to create.
 
 Required output behavior:
 - Summarize answers clearly.
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
+- Require an explicit standard-vs-custom mapping section before payload generation.
 - Do not tell the user to run build scripts until planning is complete.
 - After planning, guide them through the exact bootstrap sequence.

@@ -131,14 +131,17 @@ This document lists the most commonly used **out-of-box (system) tables** in Dat
 
 ---
 
-## How the Wizard Handles This
+## Planning and Payload Rules
 
-When you run the wizard and answer **"What data tables or entities are needed?"**, the updated wizard will:
+When you run the wizard and answer **"What data tables or entities are needed?"**, planning must explicitly capture:
 
-1. Ask: **"Do you want to use standard Dataverse tables (Contact, Account, Case, etc.) or create new custom tables?"**
-2. If you choose **standard tables**: list them and ask which ones you'll use
-3. If you choose **custom tables**: ask what custom tables you need (will be created with your publisher prefix)
-4. If **both**: list which are standard (will be skipped in build) and which are custom (will be created in solution)
+1. Standard tables to reuse (display -> Dataverse logical name)
+2. Custom tables to create (with publisher prefix)
+3. Standard fields to reuse
+4. Custom fields to add
+5. Relationships to create (including standard/custom mixed links)
+
+Do not generate payloads until this mapping is complete and approved.
 
 **Example dialog**:
 ```
@@ -155,9 +158,10 @@ Custom tables to create in your solution:
 Proceed? (y/N): y
 ```
 
-Then script 20 (`20-build-tables.ps1`) will:
-- **Skip** Contact and Case (already exist)
-- **Create** only `cct_custominspection` in your solution
+Payload behavior:
+- `table-*.json`: include only true custom entities
+- `columns-*.json`: may target standard and custom entities
+- `relationships-*.json`: may link standard/custom or custom/custom entities
 
 ---
 

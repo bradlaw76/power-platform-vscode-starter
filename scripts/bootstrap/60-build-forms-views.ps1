@@ -14,7 +14,8 @@
 param(
     [string]$EnvironmentUrl  = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken     = $env:DV_TOKEN,
-    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX
+  [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
+  [string]$PayloadsFolder  = ""
 )
 
 Set-StrictMode -Version Latest
@@ -34,6 +35,12 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $PublisherPrefix)) {
     }
 }
 
+if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+  $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+}
+
+$normalizedPrefix = $PublisherPrefix.ToLower()
+
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
             "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
@@ -41,6 +48,29 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
 }
+
+  function Get-CustomEntitiesFromTablePayloads {
+    param(
+      [string]$Folder,
+      [string]$Prefix
+    )
+
+    $names = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    $tableFiles = @(Get-ChildItem -Path $Folder -Filter "table-*.json" -ErrorAction SilentlyContinue)
+
+    foreach ($file in $tableFiles) {
+      $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
+      $schemaName = ($doc.EntityDefinition.SchemaName ?? $doc.SchemaName)
+      if ([string]::IsNullOrWhiteSpace($schemaName)) { continue }
+      $logicalName = $schemaName.ToLower()
+
+      if ($logicalName -like "$Prefix`_*") {
+        [void]$names.Add($logicalName)
+      }
+    }
+
+    return @($names)
+  }
 
 function New-StarterFormXml([string]$PrimaryField) {
     return @"
@@ -97,11 +127,27 @@ function New-StarterViewLayoutXml([string]$PrimaryField) {
 Write-Host ""
 Write-Host "=== Build Forms and Views ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
-Write-Host "  Prefix:      $PublisherPrefix"
+Write-Host "  Prefix:      $normalizedPrefix"
+Write-Host "  Payloads:    $PayloadsFolder"
 Write-Host ""
 
-$tables = @((Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName,PrimaryNameAttribute,MetadataId&`$filter=IsCustomEntity eq true").value |
-    Where-Object { $_.LogicalName -like "$($PublisherPrefix)_*" })
+$payloadCustomEntities = @(Get-CustomEntitiesFromTablePayloads -Folder $PayloadsFolder -Prefix $normalizedPrefix)
+if ($payloadCustomEntities.Count -eq 0) {
+  Write-Host "  No custom entities found in table payloads. Nothing to generate." -ForegroundColor Yellow
+  exit 0
+}
+
+$tables = @()
+foreach ($logicalName in $payloadCustomEntities | Sort-Object) {
+  try {
+    $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$logicalName')?`$select=LogicalName,PrimaryNameAttribute,MetadataId,IsCustomEntity"
+    if ($entity.IsCustomEntity) {
+      $tables += $entity
+    }
+  } catch {
+    Write-Host "  $logicalName (not found — skipped)" -ForegroundColor Yellow
+  }
+}
 
 Write-Host "  Custom tables found: $($tables.Count)"
 Write-Host ""

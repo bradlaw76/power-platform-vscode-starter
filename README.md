@@ -69,7 +69,7 @@ No prior experience needed with VS Code terminals, Git branches, PAC CLI, or Dat
 
 ## How it works
 
-Three entry points — all leading to the same build sequence:
+Three entry points — all leading to the same planning and build sequence:
 
 | Entry point | How to start | Best for |
 | --- | --- | --- |
@@ -80,7 +80,7 @@ Three entry points — all leading to the same build sequence:
 All three paths converge on the same sequence:
 
 ```text
-Discovery → Spec Kit → Dataverse schema → App experience → Solution export → Git → Import
+Discovery → Spec Kit → Demo script → Dataverse schema → App experience → Solution export → Git → Import
 ```
 
 ---
@@ -266,6 +266,14 @@ Validation: `az account show` and `pac auth list` both return your profile and e
 > [!IMPORTANT]
 > Do not run build scripts until your planning files are complete and reviewed (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). This is a hard gate — building before planning creates rework.
 
+Optional but recommended before authentication and build scripts:
+
+```powershell
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+```
+
+This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates a single `demo-script.md` for review.
+
 Add payload files to `payloads/` before running scripts:
 
 | File pattern | Contents |
@@ -273,6 +281,20 @@ Add payload files to `payloads/` before running scripts:
 | `payloads/table-*.json` | Table definitions |
 | `payloads/columns-*.json` | Column definitions |
 | `payloads/relationships-*.json` | Lookup relationship definitions |
+
+Before payload generation, planning must include an explicit mapping section:
+
+- Standard reused tables (mapped to Dataverse logical names, e.g., Case -> incident)
+- Custom tables to create (generated with the selected publisher prefix)
+- Standard fields reused
+- Custom fields to add
+- Relationships to create
+
+Rules:
+
+- Never put standard entities (Contact, Account, Case/incident, Lead, Opportunity, Product, Task, Activity, etc.) in table-creation payloads.
+- Table payloads must contain only true custom entities.
+- Column and relationship payloads may target both standard and custom entities.
 
 Run build scripts in order:
 
@@ -287,6 +309,23 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 After each script: check that the failed count is zero before running the next. All scripts are idempotent — safe to rerun after fixing any failure.
 
 **After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
+
+Validation scenarios to run for every workflow change:
+
+1. Standard-only model:
+  - `table-*.json` includes no standard entities.
+  - No custom duplicates (for example, `<prefix>_case`, `<prefix>_contact`) are created.
+2. Custom-only model:
+  - All required entities are created with the chosen prefix in lowercase logical form.
+3. Mixed model:
+  - Standard entities are reused.
+  - Only true custom entities are created.
+  - Custom fields can be added to standard entities.
+  - Mixed relationships and payload-referenced solution assembly succeed.
+4. Uppercase prefix input:
+  - User can enter mixed/uppercase prefix input.
+  - Entity logical names and script filtering behave in lowercase consistently.
+  - Dry check command: `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "EaRnInT"`
 
 ---
 
@@ -307,9 +346,9 @@ After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill 
 ### How the entry points connect
 
 ```text
-Terminal wizard              → spec.md, plan.md, tasks.md → build scripts
-Copilot Chat                 → same planning artifacts     → build scripts
-Claude Code skill (available) → guides the entire flow     → inline help at each step
+Terminal wizard               → spec.md, plan.md, tasks.md → demo-script.md → build scripts
+Copilot Chat                  → same planning artifacts     → demo-script.md → build scripts
+Claude Code skill (available) → guides the entire flow      → inline help at each step
 ```
 
 ---
@@ -357,12 +396,14 @@ git push -u origin feature/<short-description>
 | `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
 | `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
 | `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
+| `06-demo-script-wizard.ps1` | Generate a scenario-aware `demo-script.md` for presenter review | No | Yes (prompts before overwrite) |
+| `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
 | `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
 | `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
-| `50-add-to-solution.ps1` | Add tables to the target solution | Yes | Yes |
-| `60-build-forms-views.ps1` | Create starter forms and views, publish customizations | Yes | Yes |
+| `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution (standard + custom as referenced) | Yes | Yes |
+| `60-build-forms-views.ps1` | Create starter forms and views for custom entities defined in table payloads, publish customizations | Yes | Yes |
 
 ---
 
@@ -397,8 +438,8 @@ power-platform-vscode-starter/
       20-build-tables.ps1          — Create tables from payloads/table-*.json
       30-build-columns.ps1         — Add columns from payloads/columns-*.json
       40-build-relationships.ps1   — Create lookups from payloads/relationships-*.json
-      50-add-to-solution.ps1       — Add tables to target solution
-      60-build-forms-views.ps1     — Create starter forms and views, publish all
+      50-add-to-solution.ps1       — Add payload-referenced entities to target solution
+      60-build-forms-views.ps1     — Create starter forms/views for payload-defined custom entities
 ```
 
 ---

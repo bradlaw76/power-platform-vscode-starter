@@ -165,6 +165,34 @@ Validation checkpoint:
 
 ---
 
+## Step 4B: Generate the Demo Script
+
+After the first wizard creates your scenario files, generate a single presenter script for review:
+
+```powershell
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+```
+
+What this step does:
+
+- Reads `spec.md` and `answers.md` from `specs/<scenario-slug>/`.
+- Suggests a generic business use case based on the scenario that was built.
+- Asks for the hero record, audience emphasis, timing, and presenter setup.
+- Generates `demo-script.md` and asks you to review it and request edits if needed.
+
+Optional rehearsal step:
+
+```powershell
+pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>
+```
+
+Validation checkpoint:
+
+- `demo-script.md` exists under `specs/<scenario-slug>/`.
+- The story, hero record, and talking points reflect the business problem and success criteria.
+
+---
+
 ## Step 5: Sign In and Configure
 
 ```powershell
@@ -233,30 +261,26 @@ Before building anything, answer these questions in writing. This becomes your r
 4. What business problem does it solve?
 5. Who are the users?
 6. What data tables or entities are needed?
-7. What screens, forms, views, pages, flows, or copilots are needed?
-8. What does a successful demo look like?
-9. What environment should it be built in?
-10. Does it need demo data?
 6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)
-
 7. What screens, forms, views, pages, flows, or copilots are needed?
-
 8. What does a successful demo look like?
-
 9. What environment should it be built in?
-
 10. Does it need demo data?
-
 11. Should the output be a managed or unmanaged solution?
-
 12. New solution or use an existing one? (new/existing)
-
 13. New publisher prefix or use an existing one? (new/existing)
 
 Validation checkpoint:
 
 - All 14 questions are answered and reviewed by the demo/app owner.
 - For Q6b, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
+- Add an explicit entity mapping block before payload work:
+- Standard reused tables (display -> logical)
+- Custom tables to create
+- Standard fields reused
+- Custom fields to add
+- Relationships to create
+- Do not generate payloads until this mapping block is complete and approved.
 
 ---
 
@@ -309,6 +333,12 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 ```
 
 All scripts are idempotent and safe to rerun.
+
+Payload rules for Step 10:
+
+- `table-*.json` must include only true custom entities.
+- Do not place standard entities (like `contact` or `incident`) in `table-*.json`.
+- `columns-*.json` and `relationships-*.json` can reference both standard and custom entities.
 
 Validation checkpoint after each script:
 

@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "earnint_priority",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Priority",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Priorities",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Custom priority entity",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

@@ -41,9 +41,30 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
 
 function Test-RelationshipExists([string]$SchemaName) {
     try {
-        Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName" | Out-Null
-        return $true
+        $resp = Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName"
+        return @($resp.value).Count -gt 0
     } catch { return $false }
+}
+
+function Normalize-RelationshipEntityNames($RelationshipObject) {
+    if ($null -eq $RelationshipObject) { return }
+
+    foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
+        $prop = $RelationshipObject.PSObject.Properties[$propName]
+        if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
+            $prop.Value = $prop.Value.ToLower()
+        }
+    }
+
+    $definition = $RelationshipObject.PSObject.Properties["RelationshipDefinition"]
+    if ($null -ne $definition -and $null -ne $definition.Value) {
+        foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
+            $prop = $definition.Value.PSObject.Properties[$propName]
+            if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
+                $prop.Value = $prop.Value.ToLower()
+            }
+        }
+    }
 }
 
 Write-Host ""
@@ -63,7 +84,13 @@ foreach ($file in $payloads) {
     $rels = @($doc.Relationships ?? $doc)
 
     foreach ($rel in $rels) {
+        Normalize-RelationshipEntityNames $rel
         $schema = $rel.SchemaName ?? $rel.RelationshipDefinition.SchemaName
+        if ([string]::IsNullOrWhiteSpace($schema)) {
+            Write-Host "  SKIP $($file.Name) — missing relationship SchemaName" -ForegroundColor Yellow
+            $skipped++
+            continue
+        }
         Write-Host "  $schema " -NoNewline
 
         if (Test-RelationshipExists $schema) {

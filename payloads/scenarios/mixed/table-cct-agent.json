@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "earnint_agent",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Agent",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Agents",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Custom support agent entity",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

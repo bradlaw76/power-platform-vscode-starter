@@ -51,6 +51,11 @@ if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
     $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
 }
 
+$tableDetectionHelper = Join-Path $PSScriptRoot "helpers\table-detection.ps1"
+if (Test-Path $tableDetectionHelper) {
+    . $tableDetectionHelper
+}
+
 # ── Helpers ────────────────────────────────────────────────────────────────
 function Invoke-Dv {
     param([string]$Method, [string]$Path, [string]$Body = "")
@@ -99,6 +104,13 @@ foreach ($file in $payloads) {
 
     $logical = $name.ToLower()
     Write-Host "  $name " -NoNewline
+
+    if (Get-Command Test-IsStandardTable -ErrorAction SilentlyContinue) {
+        if (Test-IsStandardTable $logical) {
+            Write-Host "(standard table in payload — skipped)" -ForegroundColor Yellow
+            $skipped++; continue
+        }
+    }
 
     if (Test-TableExists $logical) {
         Write-Host "(exists — skipped)" -ForegroundColor DarkGray
