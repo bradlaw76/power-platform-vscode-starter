@@ -90,7 +90,8 @@ Write-Host ""
 
 # ── Get bearer token ───────────────────────────────────────────────────────
 Write-Host "Acquiring Dataverse bearer token..."
-$token = az account get-access-token --resource $envUrl --query accessToken -o tsv
+$tokenResource = "$envUrl/"
+$token = az account get-access-token --resource $tokenResource --query accessToken -o tsv
 if ([string]::IsNullOrWhiteSpace($token)) {
     Write-Host "Failed to acquire token. Verify the environment URL matches exactly." -ForegroundColor Red
     exit 1
@@ -103,13 +104,81 @@ Write-Host "Creating Power Platform CLI auth profile..."
 pac auth create --url $envUrl | Out-Null
 pac auth list
 
+# ── Load any planning values written by 05-start-wizard.ps1 ─────────────────
+$_planEnvFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
+$plannedSolution = ""
+$plannedPrefix   = ""
+if (Test-Path $_planEnvFile) {
+    . $_planEnvFile
+    $plannedSolution = if ($env:DV_SOLUTION_NAME)    { $env:DV_SOLUTION_NAME }    else { "" }
+    $plannedPrefix   = if ($env:DV_PUBLISHER_PREFIX) { $env:DV_PUBLISHER_PREFIX } else { "" }
+}
+
+function Invoke-DvGet([string]$Path) {
+    $h = @{ "Authorization"="Bearer $token"; "Accept"="application/json"; "OData-Version"="4.0"; "OData-MaxVersion"="4.0" }
+    return Invoke-RestMethod -Method Get -Uri "$($envUrl.TrimEnd('/'))/api/data/v9.2/$Path" -Headers $h
+}
+
 # ── Collect build config ───────────────────────────────────────────────────
 Write-Host ""
 Write-Host "=== Build Configuration ===" -ForegroundColor Cyan
-$publisherName    = Read-Host "Publisher name (e.g. Contoso)"
-$publisherPrefix  = Read-Host "Publisher prefix (3-8 lowercase chars, no spaces, e.g. cto)"
-$solutionName     = Read-Host "Solution unique name (e.g. ContosoHRApp)"
-$solutionDisplay  = Read-Host "Solution display name (e.g. Contoso HR Application)"
+
+# Solution
+Write-Host ""
+$_solutionHint  = if ($plannedSolution) { " [$plannedSolution from wizard]" } else { "" }
+$solutionChoice = Read-Host "New solution or existing?$_solutionHint (new/existing)"
+if ([string]::IsNullOrWhiteSpace($solutionChoice)) { $solutionChoice = if ($plannedSolution) { "existing" } else { "new" } }
+
+if ($solutionChoice -ieq "existing") {
+    $solutionName = Read-Host "Existing solution unique name$(if ($plannedSolution) { \" [$plannedSolution]\" } else { \"\" })"
+    if ([string]::IsNullOrWhiteSpace($solutionName)) { $solutionName = $plannedSolution }
+    Write-Host "  Verifying solution '$solutionName'..." -NoNewline
+    $solCheck = Invoke-DvGet "solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,uniquename"
+    if ($solCheck.value.Count -eq 0) {
+        Write-Host " NOT FOUND" -ForegroundColor Red
+        Write-Host "Solution '$solutionName' does not exist in this environment." -ForegroundColor Red
+        Write-Host "Create it in Power Platform Maker portal first, then rerun this script." -ForegroundColor Yellow
+        exit 1
+    }
+    Write-Host " OK" -ForegroundColor Green
+} else {
+    $promptDefault = if ($plannedSolution) { " [$plannedSolution]" } else { "" }
+    $solutionName = Read-Host "New solution unique name (letters/numbers only, e.g. ContosoHRApp)$promptDefault"
+    if ([string]::IsNullOrWhiteSpace($solutionName)) { $solutionName = $plannedSolution }
+    $solCheck = Invoke-DvGet "solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,uniquename"
+    if ($solCheck.value.Count -gt 0) {
+        Write-Host "  Warning: solution '$solutionName' already exists in this environment." -ForegroundColor Yellow
+        $cont = Read-Host "  Add components to the existing solution? (y/N)"
+        if ($cont -notmatch '^(y|yes)$') { exit 1 }
+    }
+}
+$solutionDisplay = Read-Host "Solution display name (e.g. Contoso HR Application)"
+
+# Publisher prefix
+Write-Host ""
+$_prefixHint   = if ($plannedPrefix) { " [$plannedPrefix from wizard]" } else { "" }
+$prefixChoice  = Read-Host "New publisher prefix or existing?$_prefixHint (new/existing)"
+if ([string]::IsNullOrWhiteSpace($prefixChoice)) { $prefixChoice = if ($plannedPrefix) { "existing" } else { "new" } }
+
+if ($prefixChoice -ieq "existing") {
+    $publisherPrefix = Read-Host "Existing prefix (e.g. vafe, contoso)$(if ($plannedPrefix) { \" [$plannedPrefix]\" } else { \"\" })"
+    if ([string]::IsNullOrWhiteSpace($publisherPrefix)) { $publisherPrefix = $plannedPrefix }
+    Write-Host "  Verifying publisher prefix '$publisherPrefix'..." -NoNewline
+    $pubCheck = Invoke-DvGet "publishers?`$filter=customizationprefix eq '$publisherPrefix'&`$select=publisherid,uniquename,friendlyname,customizationprefix"
+    if ($pubCheck.value.Count -eq 0) {
+        Write-Host " NOT FOUND" -ForegroundColor Red
+        Write-Host "Publisher with prefix '$publisherPrefix' does not exist in this environment." -ForegroundColor Red
+        Write-Host "Create the publisher in Power Platform Maker portal first, then rerun this script." -ForegroundColor Yellow
+        exit 1
+    }
+    Write-Host " OK" -ForegroundColor Green
+    $publisherName = if ($pubCheck.value[0].friendlyname) { $pubCheck.value[0].friendlyname } else { $publisherPrefix }
+} else {
+    $prefixPromptDefault = if ($plannedPrefix) { " [$plannedPrefix]" } else { "" }
+    $publisherPrefix = Read-Host "New prefix (3-8 lowercase letters, e.g. cto, demo)$prefixPromptDefault"
+    if ([string]::IsNullOrWhiteSpace($publisherPrefix)) { $publisherPrefix = $plannedPrefix }
+    $publisherName = Read-Host "Publisher name (e.g. Contoso)"
+}
 
 # ── Write session env file ─────────────────────────────────────────────────
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"

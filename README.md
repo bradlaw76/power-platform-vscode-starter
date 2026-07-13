@@ -296,6 +296,15 @@ Rules:
 - Table payloads must contain only true custom entities.
 - Column and relationship payloads may target both standard and custom entities.
 
+Forms and labels rules:
+
+- `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for each custom table in `table-*.json`.
+- Primary name field is placed first, then payload-defined fields in payload order.
+- Visible labels use payload `DisplayName.LocalizedLabels` (language 1033 first, then first available).
+- Missing labels fall back to friendly title-case labels from logical names (prefix removed, underscores replaced with spaces).
+- If Starter Main Form exists, reruns patch its form XML to apply payload field/label changes.
+- If a non-starter Main form exists, starter form creation/update is skipped.
+
 Run build scripts in order:
 
 ```powershell
@@ -326,6 +335,11 @@ Validation scenarios to run for every workflow change:
   - User can enter mixed/uppercase prefix input.
   - Entity logical names and script filtering behave in lowercase consistently.
   - Dry check command: `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "EaRnInT"`
+5. Form-label and rerun behavior:
+  - New custom table forms show business labels (for example, `Reported Earnings`) rather than raw logical names.
+  - Rerunning after payload label updates patches Starter Main Form labels.
+  - Non-starter Main forms remain untouched.
+  - Repeated runs remain idempotent and do not create duplicate starter forms.
 
 ---
 
@@ -403,7 +417,7 @@ git push -u origin feature/<short-description>
 | `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
 | `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution (standard + custom as referenced) | Yes | Yes |
-| `60-build-forms-views.ps1` | Create starter forms and views for custom entities defined in table payloads, publish customizations | Yes | Yes |
+| `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
 
 ---
 
@@ -439,7 +453,7 @@ power-platform-vscode-starter/
       30-build-columns.ps1         — Add columns from payloads/columns-*.json
       40-build-relationships.ps1   — Create lookups from payloads/relationships-*.json
       50-add-to-solution.ps1       — Add payload-referenced entities to target solution
-      60-build-forms-views.ps1     — Create starter forms/views for payload-defined custom entities
+      60-build-forms-views.ps1     — Build payload-driven Starter Main Forms and Active views, then publish
 ```
 
 ---

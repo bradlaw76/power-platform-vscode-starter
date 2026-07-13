@@ -194,11 +194,15 @@ Build decisions:
 - Form density and sectioning strategy.
 - View filters for triage behavior.
 - Chart/dashboard baseline KPIs.
+- Starter form source strategy: payload-driven fields from `columns-*.json` plus primary name field first.
+- Label strategy: payload `DisplayName.LocalizedLabels` first; friendly logical-name fallback if labels are missing.
+- Rerun behavior: patch Starter Main Form, preserve non-starter Main forms.
 
 Exit criteria:
 - Sitemap draft approved.
 - Forms/views matrix complete.
 - Dashboard metric list signed off.
+- Form label behavior documented for create and rerun scenarios.
 
 Copilot prompt:
 "Draft a model-driven app sitemap and forms/views matrix aligned to task-centric workflows, including accessibility checkpoints."

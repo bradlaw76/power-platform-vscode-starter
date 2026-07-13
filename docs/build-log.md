@@ -17,8 +17,11 @@ Scripts Run (20,30,40,50,60):
 Tables (created/skipped/failed):
 Columns (created/skipped/failed):
 Relationships (created/skipped/failed):
-Forms (created/skipped/failed):
+Forms (created/updated/skipped/failed):
 Views (created/skipped/failed):
+Starter Main Form patched on rerun (yes/no):
+Non-starter Main forms preserved (yes/no):
+Business labels visible on starter form (yes/no):
 Solution Exported (yes/no):
 Solution Unpacked (yes/no):
 Solution Packed (yes/no):

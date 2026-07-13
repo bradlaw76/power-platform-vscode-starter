@@ -447,6 +447,17 @@ Expected output per step:
 - Clear non-zero exit code on failure
 - Build-log entry in `docs/build-log.md`
 
+Script 60 behavior baseline:
+
+- Build Starter Main Forms from `columns-*.json` payloads for payload-defined custom entities.
+- Place the primary name field first, then payload-defined fields in payload order.
+- Use field labels from payload `DisplayName.LocalizedLabels` (1033 first, then first available).
+- If payload labels are missing, derive friendly labels from logical names (remove prefix, replace underscores, title case).
+- Patch existing Starter Main Form XML on rerun when payload labels/fields change.
+- Do not overwrite non-starter Main forms.
+- Publish customizations after create/update.
+- Report script 60 counts as: forms created, forms updated, forms skipped, views created, failures.
+
 If your repo already has differently named scripts:
 
 - Keep the same execution order.

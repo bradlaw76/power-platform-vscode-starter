@@ -339,11 +339,16 @@ Payload rules for Step 10:
 - `table-*.json` must include only true custom entities.
 - Do not place standard entities (like `contact` or `incident`) in `table-*.json`.
 - `columns-*.json` and `relationships-*.json` can reference both standard and custom entities.
+- `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
+- Starter forms place the table primary name field first, then payload-defined fields in payload order.
+- Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
+- Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
 
 Validation checkpoint after each script:
 
 - Script exits without errors.
-- Created/skipped counts are printed.
+- Summary counts are printed.
+- For script 60, verify: forms created, forms updated, forms skipped, views created, failures.
 - If failed count is greater than zero, stop and fix before proceeding.
 
 ---
@@ -355,6 +360,7 @@ Open [Power Apps Maker](https://make.powerapps.com), select your environment, an
 - Tables appear under **Dataverse > Tables**.
 - Forms and views appear on each table.
 - Tables appear inside the target solution.
+- Starter Main Form labels display business-friendly names (not raw logical names) where payload labels exist.
 
 Validation checkpoint:
 
