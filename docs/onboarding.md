@@ -167,7 +167,7 @@ Validation checkpoint:
 
 ## Step 4B: Generate the Demo Script
 
-After the first wizard creates your scenario files, generate a single presenter script for review:
+After the first wizard creates your scenario files, generate the demo artifacts for both engineer and presenter:
 
 ```powershell
 pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
@@ -178,7 +178,8 @@ What this step does:
 - Reads `spec.md` and `answers.md` from `specs/<scenario-slug>/`.
 - Suggests a generic business use case based on the scenario that was built.
 - Asks for the hero record, audience emphasis, timing, and presenter setup.
-- Generates `demo-script.md` and asks you to review it and request edits if needed.
+- Generates `demo-walkthrough.md` (engineer runbook) and `demo-talk-track.md` (presenter script).
+- Writes `demo-script.md` as a compatibility copy of the talk track for existing tooling.
 
 Optional rehearsal step:
 
@@ -188,7 +189,7 @@ pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>
 
 Validation checkpoint:
 
-- `demo-script.md` exists under `specs/<scenario-slug>/`.
+- `demo-walkthrough.md` and `demo-talk-track.md` exist under `specs/<scenario-slug>/`.
 - The story, hero record, and talking points reflect the business problem and success criteria.
 
 ---

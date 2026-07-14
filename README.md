@@ -272,7 +272,11 @@ Optional but recommended before authentication and build scripts:
 pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
 ```
 
-This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates a single `demo-script.md` for review.
+This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates:
+
+- `demo-walkthrough.md` (engineer/operator runbook)
+- `demo-talk-track.md` (presenter narrative)
+- `demo-script.md` (compatibility copy of the talk track)
 
 Add payload files to `payloads/` before running scripts:
 
@@ -346,8 +350,8 @@ After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill 
 ### How the entry points connect
 
 ```text
-Terminal wizard               → spec.md, plan.md, tasks.md → demo-script.md → build scripts
-Copilot Chat                  → same planning artifacts     → demo-script.md → build scripts
+Terminal wizard               → spec.md, plan.md, tasks.md → demo-walkthrough.md + demo-talk-track.md → build scripts
+Copilot Chat                  → same planning artifacts     → demo-walkthrough.md + demo-talk-track.md → build scripts
 Claude Code skill (available) → guides the entire flow      → inline help at each step
 ```
 
@@ -403,7 +407,7 @@ Release and rollback references for this update bundle:
 | `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
 | `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
 | `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
-| `06-demo-script-wizard.ps1` | Generate a scenario-aware `demo-script.md` for presenter review | No | Yes (prompts before overwrite) |
+| `06-demo-script-wizard.ps1` | Generate scenario-aware `demo-walkthrough.md` and `demo-talk-track.md` (plus compatibility `demo-script.md`) | No | Yes (prompts before overwrite) |
 | `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
 | `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |

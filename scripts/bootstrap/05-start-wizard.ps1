@@ -289,11 +289,11 @@ $specContent = @"
 # spec.md
 
 ## Scenario Summary
-$($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["PlatformArea"]).
-
-## Problem Statement
+- [ ] Review 'answers.md' with stakeholder
+- [ ] Finalize 'spec.md'
+- [ ] Finalize 'plan.md'
 $($answers["BusinessProblem"])
-
+- [ ] Review standard table reference: 'docs/standard-dataverse-tables.md'
 ## Target Audience
 $($answers["TargetAudience"])
 
@@ -303,17 +303,17 @@ $($answers["Users"])
 ## Required Data Entities
 $($answers["DataEntities"])
 
-### Table Strategy
-- **Approach**: $($answers["TableChoice"])
-- **Guidance**: See \`docs/standard-dataverse-tables.md\` for which tables are out-of-box vs custom.
-
-## Explicit Entity Mapping (Required)
-
-### Standard reused tables (display -> logical)
+- [ ] Run 'pwsh ./scripts/bootstrap/00-prereq-check.ps1'
+- [ ] Run 'pwsh ./scripts/bootstrap/10-auth-connect.ps1'  # validates solution + prefix via API
+- [ ] Build tables with '20-build-tables.ps1'
+- [ ] Build columns with '30-build-columns.ps1'
+- [ ] Build relationships with '40-build-relationships.ps1'
+- [ ] Add components to solution with '50-add-to-solution.ps1'
+- [ ] Build starter forms/views with '60-build-forms-views.ps1'
 $standardTableMapping
 
 ### Custom tables to create (input -> generated logical)
-$customTableMapping
+- [ ] Update 'docs/build-log.md'
 
 ### Standard fields reused
 - $($answers["StandardFieldsReused"])
@@ -411,11 +411,12 @@ $tasksContent = @"
 # tasks.md
 
 ## Ordered Tasks
-- [ ] Review `answers.md` with stakeholder
-- [ ] Finalize `spec.md`
-- [ ] Finalize `plan.md`
+
+- [ ] Review 'answers.md' with stakeholder
+- [ ] Finalize 'spec.md'
+- [ ] Finalize 'plan.md'
 - [ ] Approve build environment and permissions
-- [ ] Review standard table reference: `docs/standard-dataverse-tables.md`
+- [ ] Review standard table reference: 'docs/standard-dataverse-tables.md'
 - [ ] Complete explicit entity mapping in spec/plan (standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships)
 - [ ] Map standard names to logical names (for example: Case -> incident, Contact -> contact) before payload design
 - [ ] Confirm table payloads include only true custom tables
@@ -425,17 +426,17 @@ $tasksContent = @"
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
 - [ ] Decide demo data approach: $($answers["NeedsDemoData"])
 - [ ] Confirm solution name '$($answers["SolutionName"])' and publisher prefix '$($answers["PublisherPrefix"])' with stakeholder
-- [ ] Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`
-- [ ] Run `pwsh ./scripts/bootstrap/10-auth-connect.ps1`  # validates solution + prefix via API
-- [ ] Build tables with `20-build-tables.ps1`
-- [ ] Build columns with `30-build-columns.ps1`
-- [ ] Build relationships with `40-build-relationships.ps1`
-- [ ] Add components to solution with `50-add-to-solution.ps1`
-- [ ] Build starter forms/views with `60-build-forms-views.ps1`
+- [ ] Run 'pwsh ./scripts/bootstrap/00-prereq-check.ps1'
+- [ ] Run 'pwsh ./scripts/bootstrap/10-auth-connect.ps1'  # validates solution + prefix via API
+- [ ] Build tables with '20-build-tables.ps1'
+- [ ] Build columns with '30-build-columns.ps1'
+- [ ] Build relationships with '40-build-relationships.ps1'
+- [ ] Add components to solution with '50-add-to-solution.ps1'
+- [ ] Build starter forms/views with '60-build-forms-views.ps1'
 - [ ] Export and unpack solution
 - [ ] Commit changes to git
 - [ ] Pack and import solution
-- [ ] Update `docs/build-log.md`
+- [ ] Update 'docs/build-log.md'
 "@
 
 Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
