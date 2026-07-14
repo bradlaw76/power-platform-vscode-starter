@@ -71,9 +71,33 @@ function Get-OptionalPropertyValue {
     return $prop.Value
 }
 
-function Is-LowercaseLogicalName([string]$value) {
+function Test-LowercaseLogicalName([string]$value) {
     if ([string]::IsNullOrWhiteSpace($value)) { return $false }
     return $value -cmatch '^[a-z0-9_]+$'
+}
+
+function Get-FriendlyFallbackLabel {
+    param(
+        [string]$LogicalName,
+        [string]$Prefix
+    )
+
+    if ([string]::IsNullOrWhiteSpace($LogicalName)) { return "" }
+
+    $value = $LogicalName.ToLower()
+    if (-not [string]::IsNullOrWhiteSpace($Prefix)) {
+        $normalized = $Prefix.ToLower() + "_"
+        if ($value.StartsWith($normalized)) {
+            $value = $value.Substring($normalized.Length)
+        }
+    }
+
+    $value = $value -replace "_", " "
+    $value = $value.Trim()
+    if ([string]::IsNullOrWhiteSpace($value)) { return "" }
+
+    $culture = [System.Globalization.CultureInfo]::GetCultureInfo("en-US")
+    return $culture.TextInfo.ToTitleCase($value)
 }
 
 $publisherPrefix = ""
@@ -153,7 +177,7 @@ if (-not (Test-Path $payloadsFolder)) {
                 Add-Error "[$($file.Name)] Standard table '$logical' must not be in table payloads."
             }
 
-            if (-not (Is-LowercaseLogicalName $logical)) {
+            if (-not (Test-LowercaseLogicalName $logical)) {
                 Add-Error "[$($file.Name)] Logical name '$schemaName' is not lowercase-safe."
             }
 
@@ -175,8 +199,50 @@ if (-not (Test-Path $payloadsFolder)) {
                 Add-Error "[$($file.Name)] Missing TableLogicalName."
                 continue
             }
-            if (-not (Is-LowercaseLogicalName $tableName)) {
+            if (-not (Test-LowercaseLogicalName $tableName)) {
                 Add-Error "[$($file.Name)] TableLogicalName '$tableName' should be lowercase logical format."
+            }
+
+            foreach ($col in @($doc.Columns)) {
+                $logical = Get-OptionalPropertyValue -Object $col -PropertyName "LogicalName"
+                if ([string]::IsNullOrWhiteSpace($logical)) {
+                    $logical = Get-OptionalPropertyValue -Object $col -PropertyName "SchemaName"
+                }
+
+                if ([string]::IsNullOrWhiteSpace($logical)) {
+                    Add-Error "[$($file.Name)] Column is missing LogicalName/SchemaName."
+                    continue
+                }
+
+                $logical = $logical.ToLower()
+                if (-not (Test-LowercaseLogicalName $logical)) {
+                    Add-Error "[$($file.Name)] Column logical name '$logical' should be lowercase logical format."
+                }
+
+                $displayName = Get-OptionalPropertyValue -Object $col -PropertyName "DisplayName"
+                $localized = @()
+                if ($null -ne $displayName) {
+                    $localizedProp = Get-OptionalPropertyValue -Object $displayName -PropertyName "LocalizedLabels"
+                    if ($null -ne $localizedProp) {
+                        $localized = @($localizedProp)
+                    }
+                }
+
+                $nonEmptyLabels = @($localized | Where-Object { -not [string]::IsNullOrWhiteSpace($_.Label) })
+                if ($nonEmptyLabels.Count -eq 0) {
+                    $fallback = Get-FriendlyFallbackLabel -LogicalName $logical -Prefix $publisherPrefix
+                    if ([string]::IsNullOrWhiteSpace($fallback)) {
+                        Add-Error "[$($file.Name)] Column '$logical' has no usable DisplayName label and no friendly fallback label."
+                    } else {
+                        Add-Warn "[$($file.Name)] Column '$logical' has no payload DisplayName label; form will use fallback '$fallback'."
+                    }
+                    continue
+                }
+
+                $label1033 = @($nonEmptyLabels | Where-Object { $_.LanguageCode -eq 1033 })
+                if ($label1033.Count -eq 0) {
+                    Add-Warn "[$($file.Name)] Column '$logical' has labels but none for language 1033; first available label will be used."
+                }
             }
         } catch {
             Add-Error "[$($file.Name)] Invalid JSON or parse error: $($_.Exception.Message)"
@@ -200,10 +266,10 @@ if (-not (Test-Path $payloadsFolder)) {
                     $refg = Get-OptionalPropertyValue -Object $relationshipDefinition -PropertyName "ReferencingEntity"
                 }
 
-                if (-not [string]::IsNullOrWhiteSpace($refd) -and -not (Is-LowercaseLogicalName $refd)) {
+                if (-not [string]::IsNullOrWhiteSpace($refd) -and -not (Test-LowercaseLogicalName $refd)) {
                     Add-Error "[$($file.Name)] ReferencedEntity '$refd' should be lowercase logical format."
                 }
-                if (-not [string]::IsNullOrWhiteSpace($refg) -and -not (Is-LowercaseLogicalName $refg)) {
+                if (-not [string]::IsNullOrWhiteSpace($refg) -and -not (Test-LowercaseLogicalName $refg)) {
                     Add-Error "[$($file.Name)] ReferencingEntity '$refg' should be lowercase logical format."
                 }
             }

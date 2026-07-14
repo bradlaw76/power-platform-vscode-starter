@@ -321,25 +321,11 @@ After each script: check that the failed count is zero before running the next. 
 
 Validation scenarios to run for every workflow change:
 
-1. Standard-only model:
-  - `table-*.json` includes no standard entities.
-  - No custom duplicates (for example, `<prefix>_case`, `<prefix>_contact`) are created.
-2. Custom-only model:
-  - All required entities are created with the chosen prefix in lowercase logical form.
-3. Mixed model:
-  - Standard entities are reused.
-  - Only true custom entities are created.
-  - Custom fields can be added to standard entities.
-  - Mixed relationships and payload-referenced solution assembly succeed.
-4. Uppercase prefix input:
-  - User can enter mixed/uppercase prefix input.
-  - Entity logical names and script filtering behave in lowercase consistently.
-  - Dry check command: `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "EaRnInT"`
-5. Form-label and rerun behavior:
-  - New custom table forms show business labels (for example, `Reported Earnings`) rather than raw logical names.
-  - Rerunning after payload label updates patches Starter Main Form labels.
-  - Non-starter Main forms remain untouched.
-  - Repeated runs remain idempotent and do not create duplicate starter forms.
+- Standard-only model: `table-*.json` includes no standard entities, and no custom duplicates (for example, `<prefix>_case`, `<prefix>_contact`) are created.
+- Custom-only model: all required entities are created with the chosen prefix in lowercase logical form.
+- Mixed model: standard entities are reused, only true custom entities are created, custom fields can be added to standard entities, and mixed relationships plus payload-referenced solution assembly succeed.
+- Uppercase prefix input: users can enter mixed/uppercase prefix input, entity logical names and script filtering behave in lowercase consistently, and the dry check command is `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "EaRnInT"`.
+- Form-label and rerun behavior: new custom table forms show business labels such as `Reported Earnings` rather than raw logical names, rerunning after payload label updates patches Starter Main Form labels, non-starter Main forms remain untouched, and repeated runs do not create duplicate starter forms.
 
 ---
 
@@ -400,6 +386,13 @@ git push -u origin feature/<short-description>
 ```
 
 `git status` must show a clean working tree after commit. Never commit `.env.ps1` — it contains tokens and is protected by `.gitignore`. Verify with `git status` before every commit.
+
+Release and rollback references for this update bundle:
+
+- Release tag: `payload-wizard-bundle-20260713`
+- Rollback tag: `rollback-before-all-20260713`
+- To consume this bundle from another repo, fetch tags from `origin` and cherry-pick or base your branch on the release tag.
+- To revert locally, use the rollback tag or `git revert` against the release commit if you want a non-destructive undo.
 
 ---
 

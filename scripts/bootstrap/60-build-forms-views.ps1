@@ -49,6 +49,29 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
 }
 
+  function Escape-XmlText([string]$Value) {
+    if ($null -eq $Value) { return "" }
+    return [System.Security.SecurityElement]::Escape($Value)
+  }
+
+  function Get-TableAttributeLogicalNameSet {
+    param([string]$TableLogical)
+
+    $set = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    try {
+      $resp = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$TableLogical')/Attributes?`$select=LogicalName"
+      foreach ($attr in @($resp.value)) {
+        if (-not [string]::IsNullOrWhiteSpace($attr.LogicalName)) {
+          [void]$set.Add($attr.LogicalName.ToLower())
+        }
+      }
+    } catch {
+      # Return what we have; caller handles empty set.
+    }
+
+    return $set
+  }
+
   function Get-CustomEntitiesFromTablePayloads {
     param(
       [string]$Folder,
@@ -177,7 +200,10 @@ function New-FieldCellXml {
         [int]$CellIndex
     )
 
-    return "<cell id=\"{00000000-0000-0000-0000-$('{0:d12}' -f $CellIndex)}\"><labels><label description=\"$FieldLabel\" languagecode=\"1033\"/></labels><control id=\"$FieldLogicalName\" classid=\"{4273EDBD-AC1D-40d3-9FB2-095C621B552D}\" datafieldname=\"$FieldLogicalName\" disabled=\"false\"/></cell>"
+    $cellSuffix = '{0:d12}' -f $CellIndex
+  $safeLabel = Escape-XmlText $FieldLabel
+  $safeField = Escape-XmlText $FieldLogicalName
+  return ('<cell id="{00000000-0000-0000-0000-{0}}"><labels><label description="{1}" languagecode="1033"/></labels><control id="{2}" classid="{4273EDBD-AC1D-40d3-9FB2-095C621B552D}" datafieldname="{2}" disabled="false"/></cell>' -f $cellSuffix, $safeLabel, $safeField)
 }
 
 function New-StarterFormXml {
@@ -195,7 +221,8 @@ function New-StarterFormXml {
             $right = New-FieldCellXml -FieldLogicalName $Fields[$i + 1].LogicalName -FieldLabel $Fields[$i + 1].Label -CellIndex $cellIndex
             $cellIndex++
         } else {
-            $right = "<cell id=\"{00000000-0000-0000-0000-$('{0:d12}' -f $cellIndex)}\" />"
+            $emptyCellSuffix = '{0:d12}' -f $cellIndex
+            $right = ('<cell id="{00000000-0000-0000-0000-{0}}" />' -f $emptyCellSuffix)
             $cellIndex++
         }
 
@@ -292,12 +319,34 @@ foreach ($t in $tables) {
 
     # ── Form (payload-driven) ─────────────────────────────────────────────
     try {
+      $attributeSet = Get-TableAttributeLogicalNameSet -TableLogical $logical
+      if ($attributeSet.Count -eq 0) {
+        Write-Host "    Form (FAILED: unable to read table attributes for '$logical')" -ForegroundColor Red
+        $failed++
+        continue
+      }
+
+      if (-not $attributeSet.Contains($primary.ToLower())) {
+        Write-Host "    Form (FAILED: primary field '$primary' not found on '$logical')" -ForegroundColor Red
+        $failed++
+        continue
+      }
+
       $primaryLabel = Get-PrimaryFieldLabel -TableLogical $logical -PrimaryField $primary -Prefix $normalizedPrefix
       $payloadFields = @(Get-PayloadFieldsForTable -Folder $PayloadsFolder -TableLogical $logical -Prefix $normalizedPrefix)
 
+      $validatedPayloadFields = New-Object System.Collections.Generic.List[object]
+      foreach ($f in $payloadFields) {
+        if ($attributeSet.Contains($f.LogicalName.ToLower())) {
+          $validatedPayloadFields.Add($f)
+        } else {
+          Write-Host "    Form field skipped (missing attribute on table): $($f.LogicalName)" -ForegroundColor Yellow
+        }
+      }
+
       $orderedFields = New-Object System.Collections.Generic.List[object]
       $orderedFields.Add([pscustomobject]@{ LogicalName = $primary; Label = $primaryLabel })
-      foreach ($f in $payloadFields) {
+      foreach ($f in $validatedPayloadFields) {
         if ($f.LogicalName -ne $primary) {
           $orderedFields.Add($f)
         }
@@ -305,7 +354,7 @@ foreach ($t in $tables) {
 
       $formXml = New-StarterFormXml -Fields @($orderedFields)
 
-      $existingForms = @((Invoke-Dv "Get" "systemforms?`$select=systemformid,name,type,formxml&`$filter=objecttypecode eq '$logical' and type eq 2").value)
+      $existingForms = @((Invoke-Dv "Get" "systemforms?`$select=formid,name,type,formxml&`$filter=objecttypecode eq '$logical' and type eq 2").value)
       $starterMainForm = @($existingForms | Where-Object { $_.name -eq "Starter Main Form" } | Select-Object -First 1)
       $nonStarterMainForms = @($existingForms | Where-Object { $_.name -ne "Starter Main Form" })
 
@@ -313,7 +362,7 @@ foreach ($t in $tables) {
         $starter = $starterMainForm[0]
         if ($starter.formxml -ne $formXml) {
           $patchBody = @{ formxml = $formXml } | ConvertTo-Json -Compress
-          Invoke-Dv "Patch" "systemforms($($starter.systemformid))" $patchBody | Out-Null
+          Invoke-Dv "Patch" "systemforms($($starter.formid))" $patchBody | Out-Null
           Write-Host "    Form (updated Starter Main Form)" -ForegroundColor Green
           $formsUpdated++
         } else {
