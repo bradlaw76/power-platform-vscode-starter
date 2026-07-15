@@ -61,6 +61,7 @@ Ask and capture all base discovery questions, then complete explicit entity mapp
 16. Standard fields to reuse
 17. Custom fields to add
 18. Relationships to create
+19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
 
 ## Ordered Build Flow
 
@@ -77,7 +78,7 @@ Follow this exact sequence — do not skip validation checkpoints:
 | 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |
 | 6.5 | **Validate solution + prefix** (`10-auth-connect.ps1` does this automatically) | Existing solution confirmed via `solutions?$filter=uniquename eq '<name>'`; existing prefix confirmed via `publishers?$filter=customizationprefix eq '<prefix>'`. Stop and fix if either is missing before running scripts 20–60. |
 | 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
-| 8 | Build in order (scripts 20–60) | Each script exits with zero failed count |
+| 8 | Build in order (scripts 20–60, plus optional 65 if Q19=yes) | Each script exits with zero failed count |
 | 9 | Verify in Maker portal | Tables, forms, views visible in target solution |
 | 10 | Export + unpack → commit → pack → import | See Solution Lifecycle below |
 | 11 | Document in `docs/build-log.md` | Teammate can rerun the process |
@@ -90,9 +91,13 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# Run only if Q19 answer was yes
+pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 All scripts are idempotent — safe to rerun after fixing failures.
+
+Script 65 generates 3 Dynamics-blue HTML reports (agent performance, supervisor oversight, executive KPI) from scenario design files and adds them to the solution as web resources. It skips silently when reports are disabled.
 
 Form-building instruction for agents:
 
