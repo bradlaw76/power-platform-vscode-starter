@@ -29,6 +29,7 @@ Discovery questions to ask:
 12. New solution or use an existing one? (new/existing)
 13. New publisher prefix or use an existing one? (new/existing)
 14. Explicit mapping: standard reused tables, custom tables to create, standard fields reused, custom fields to add, and relationships to create.
+19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
 
 Required output behavior:
 - Summarize answers clearly.
@@ -36,3 +37,5 @@ Required output behavior:
 - Require an explicit standard-vs-custom mapping section before payload generation.
 - Do not tell the user to run build scripts until planning is complete.
 - After planning, guide them through the exact bootstrap sequence.
+- Build steps include scripts 20, 30, 40, 50, 60 in order. If the user answered yes to question 19, include script 65 (`65-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 60.
+- Script 65 generates three Dynamics-blue HTML reports from scenario design files and adds them to the solution as web resources.
