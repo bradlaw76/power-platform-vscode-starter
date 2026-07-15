@@ -1,5 +1,7 @@
 # Onboarding Guide
 
+> **This is the authoritative bootstrap sequence for this repository.** All agents, chat prompts, and documentation defer to the step order defined here. If another document shows a different order, this file takes precedence.
+
 Use this document when setting up this repo for the first time in VS Code.
 
 This is the beginner-safe, step-by-step path for building Dynamics 365 and Power Platform demos/apps from VS Code.
@@ -157,6 +159,7 @@ What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
+- Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
 
 Validation checkpoint:
 
@@ -331,6 +334,8 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# Optional if report web resources were enabled in the wizard
+pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 All scripts are idempotent and safe to rerun.
@@ -344,6 +349,7 @@ Payload rules for Step 10:
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
+- If optional reports are enabled, `65-build-web-resources.ps1` generates and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
 
 Validation checkpoint after each script:
 

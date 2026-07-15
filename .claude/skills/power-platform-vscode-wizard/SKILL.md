@@ -18,6 +18,26 @@ Spec Kit artifacts required before scripts 20–60:
 - `plan.md` — how it will be built
 - `tasks.md` — ordered implementation work
 
+## Bootstrap Sequence Authority
+
+> **Single source of truth: `docs/onboarding.md`**
+
+Always follow the step order in `docs/onboarding.md`. If the user mentions README.md or another file with a different order, clarify: *"The authoritative bootstrap sequence is in docs/onboarding.md."*
+
+## Mid-Project Retrofit
+
+If a user already has a partial implementation ("I already built some tables", "I started this weeks ago"), do **not** restart from scratch.
+
+Reverse-engineer the discovery answers:
+1. Ask what tables or entities already exist.
+2. Ask what forms, views, or flows are already built.
+3. Ask for the current solution name and publisher prefix.
+4. Generate `spec.md` to reflect the **current state**.
+5. Use `plan.md` to capture only the **remaining work**.
+6. Run `06-demo-script-wizard.ps1` once the spec is ready to generate the demo story.
+
+This keeps Spec Kit relevant for brownfield projects, not just greenfield builds.
+
 ## Discovery Questions (Run First)
 
 Ask and capture all base discovery questions, then complete explicit entity mapping before any build work:
