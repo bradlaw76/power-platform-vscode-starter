@@ -317,11 +317,19 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# Optional if enabled in 05-start-wizard answers
+pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 After each script: check that the failed count is zero before running the next. All scripts are idempotent — safe to rerun after fixing any failure.
 
 **After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
+
+Optional report web resources:
+
+- `05-start-wizard.ps1` can capture a yes/no decision for optional HTML report web resources.
+- `65-build-web-resources.ps1` generates 3 scenario-driven Dynamics-blue reports (agent, supervisor, executive KPI).
+- The script upserts Dataverse HTML web resources and adds them to the selected solution.
 
 Validation scenarios to run for every workflow change:
 
@@ -415,6 +423,7 @@ Release and rollback references for this update bundle:
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
 | `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution (standard + custom as referenced) | Yes | Yes |
 | `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
+| `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
 
 ---
 
@@ -451,6 +460,7 @@ power-platform-vscode-starter/
       40-build-relationships.ps1   — Create lookups from payloads/relationships-*.json
       50-add-to-solution.ps1       — Add payload-referenced entities to target solution
       60-build-forms-views.ps1     — Build payload-driven Starter Main Forms and Active views, then publish
+      65-build-web-resources.ps1   — Generate optional scenario-driven HTML report web resources and add to solution
 ```
 
 ---

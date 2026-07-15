@@ -5,6 +5,7 @@
 .DESCRIPTION
     Performs static checks only (no Dataverse API calls):
     - Spec/plan explicit mapping section exists
+    - Optional report web resource settings are structurally valid in scenario answers
     - payloads/ exists and contains expected payload files
     - table payloads do not include known standard tables
     - custom entity logical names are lowercase and prefix-compliant
@@ -74,6 +75,13 @@ function Get-OptionalPropertyValue {
 function Test-LowercaseLogicalName([string]$value) {
     if ([string]::IsNullOrWhiteSpace($value)) { return $false }
     return $value -cmatch '^[a-z0-9_]+$'
+}
+
+function Test-TruthyValue {
+    param([string]$Value)
+
+    $normalized = ($Value ?? "").Trim().ToLower()
+    return @("yes", "y", "true", "1") -contains $normalized
 }
 
 function Get-FriendlyFallbackLabel {
@@ -276,6 +284,58 @@ if (-not (Test-Path $payloadsFolder)) {
         } catch {
             Add-Error "[$($file.Name)] Invalid JSON or parse error: $($_.Exception.Message)"
         }
+    }
+}
+
+# Validate optional report web resource settings in scenario answers files
+$answersFiles = @()
+if (Test-Path $specsFolder) {
+    $answersFiles = @(Get-ChildItem -Path $specsFolder -Filter "answers.md" -Recurse -ErrorAction SilentlyContinue)
+}
+
+if ($answersFiles.Count -eq 0) {
+    Add-Warn "No scenario answers.md files found under specs/. Optional report checks skipped."
+} else {
+    $reportEnabledCount = 0
+    foreach ($file in $answersFiles) {
+        try {
+            $text = Get-Content $file.FullName -Raw
+            $matchLine = [regex]::Match($text, '(?im)^19\.\s*Create optional HTML report web resources.*:\s*(.+)$')
+            $enabledRaw = if ($matchLine.Success) {
+                $matchLine.Groups[1].Value.Trim()
+            } else {
+                $enabledBlockMatch = [regex]::Match($text, '(?ims)^##\s+Optional Report Web Resources\s*\r?\n(.*?)(?=^##\s+|\z)')
+                if ($enabledBlockMatch.Success) {
+                    $inner = $enabledBlockMatch.Groups[1].Value
+                    [regex]::Match($inner, '(?im)^-\s*Enabled:\s*(.+)$').Groups[1].Value.Trim()
+                } else {
+                    ""
+                }
+            }
+
+            if ([string]::IsNullOrWhiteSpace($enabledRaw)) {
+                Add-Pass "[$($file.Name)] Optional report web resource flag not present (legacy scenario format)."
+                continue
+            }
+
+            if (Test-TruthyValue -Value $enabledRaw) {
+                $reportEnabledCount++
+                if ($text -notmatch '(?im)Executive summary KPI report') {
+                    Add-Error "[$($file.FullName)] Reports are enabled but executive KPI report definition was not found."
+                }
+                if ($text -notmatch '(?im)Dynamics blue') {
+                    Add-Warn "[$($file.FullName)] Reports are enabled but Dynamics blue theme text was not found."
+                }
+            } else {
+                Add-Pass "[$($file.Name)] Optional report web resources disabled (expected when not needed)."
+            }
+        } catch {
+            Add-Error "[$($file.FullName)] Failed optional report settings check: $($_.Exception.Message)"
+        }
+    }
+
+    if ($reportEnabledCount -gt 0) {
+        Add-Pass "Optional report web resources enabled for $reportEnabledCount scenario(s)."
     }
 }
 
