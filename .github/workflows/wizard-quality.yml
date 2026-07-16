@@ -25,3 +25,7 @@ jobs:
       - name: Run script order checks
         shell: pwsh
         run: ./scripts/ci/test-script-order.ps1
+
+      - name: Run script smoke checks
+        shell: pwsh
+        run: ./scripts/ci/test-script-smoke.ps1
