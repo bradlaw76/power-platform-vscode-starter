@@ -459,10 +459,16 @@ power-platform-vscode-starter/
   docs/
     onboarding.md             — Step-by-step setup guide for new builders
     build-log.md              — Log template for recording each build run
+    wizard-contract-v1.md     — Canonical workflow contract (discovery/planning/execution)
   payloads/                   — Add table-*.json, columns-*.json, relationships-*.json here
   requirements/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  — Full implementation playbook
     how-to-build-dynamics-model-driven-apps-wizard.md                  — Guided wizard and Spec Kit steps
+  scripts/
+    ci/
+      test-docs-consistency.ps1  — Guardrail: docs/prompt question-contract consistency
+      test-script-order.ps1      — Guardrail: docs/prompt script-order consistency
+      test-script-smoke.ps1      — Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
   scripts/
     bootstrap/
       00-prereq-check.ps1          — Verify tools are installed (no changes made)
@@ -475,6 +481,9 @@ power-platform-vscode-starter/
       50-add-to-solution.ps1       — Add payload-referenced entities to target solution
       60-build-forms-views.ps1     — Build payload-driven Starter Main Forms and Active views, then publish
       65-build-web-resources.ps1   — Generate optional scenario-driven HTML report web resources and add to solution
+        70-build-web-resources.ps1   — Canonical optional reporting module entrypoint (wrapper)
+      wizard.profile.json          — Project profile (required questions, modules, sequencing, conventions, gates)
+      MIGRATION.md                 — Upgrade guidance and compatibility expectations
 ```
 
 ---
@@ -504,6 +513,8 @@ power-platform-vscode-starter/
 | --- | --- |
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
+| [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md) | Canonical workflow contract for discovery, planning, and execution |
 | [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables — helps you decide which to reuse and which to create |
 | [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
 | [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |
+| [MIGRATION.md](MIGRATION.md) | Migration guidance for existing consumers moving to the contract/profile model |
