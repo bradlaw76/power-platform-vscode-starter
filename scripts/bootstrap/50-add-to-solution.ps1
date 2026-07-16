@@ -43,7 +43,13 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-    $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+    $PayloadsFolder = Join-Path $repoRoot "payloads"
+}
+
+if (-not (Test-Path $PayloadsFolder)) {
+    Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
+    Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
+    exit 1
 }
 
 if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {

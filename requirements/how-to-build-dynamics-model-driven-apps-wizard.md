@@ -60,14 +60,19 @@ Ask and capture these answers before Step 1:
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
-12. New solution or use an existing one? (new/existing)
-13. New publisher prefix or use an existing one? (new/existing)
+
+Optional extension blocks (profile-driven):
+- table-strategy (standard/custom and mapping)
+- solution-identity (new/existing solution and publisher prefix)
+- reporting (optional web resources)
+- retrofit (current-state and remaining-work intake)
 
 Exit criteria:
-- All 14 questions answered (1-11 + 6b + 12 + 13).
+- All 11 required questions answered.
+- Selected extension blocks completed.
 - Stakeholder confirms the answers are complete enough to draft `spec.md`.
-- For Q6b, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.
-- For Q12/Q13, solution name and publisher prefix are validated (script 10-auth-connect.ps1 will verify these exist or guide creation).
+- For table-strategy, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.
+- For solution-identity, solution name and publisher prefix are validated (script 10-auth-connect.ps1 will verify these exist or guide creation).
 
 Before Step 1:
 - Ensure the repo includes a standard bootstrap contract (`scripts/bootstrap/*`, `payloads/*`, `docs/onboarding.md`, `.vscode/extensions.json`).

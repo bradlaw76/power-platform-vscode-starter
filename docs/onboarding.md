@@ -257,7 +257,12 @@ Validation checkpoint:
 
 ## Step 7: Run Discovery Questions (Wizard Intake)
 
-Before building anything, answer these questions in writing. This becomes your requirement source.
+Before building anything, answer the **11 required** questions in writing. This becomes your requirement source.
+
+Canonical contract sources:
+
+- `docs/wizard-contract-v1.md`
+- `wizard.profile.json`
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -265,19 +270,24 @@ Before building anything, answer these questions in writing. This becomes your r
 4. What business problem does it solve?
 5. Who are the users?
 6. What data tables or entities are needed?
-6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)
 7. What screens, forms, views, pages, flows, or copilots are needed?
 8. What does a successful demo look like?
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
-12. New solution or use an existing one? (new/existing)
-13. New publisher prefix or use an existing one? (new/existing)
+
+Then complete optional extension blocks based on profile and project needs:
+
+- `table-strategy` (standard/custom strategy)
+- `solution-identity` (new/existing solution and publisher prefix)
+- `reporting` (optional web resources)
+- `retrofit` (current state + remaining work)
 
 Validation checkpoint:
 
-- All 14 questions are answered and reviewed by the demo/app owner.
-- For Q6b, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
+- All 11 required questions are answered and reviewed by the demo/app owner.
+- Selected extension blocks are complete.
+- For table-strategy, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
 - Add an explicit entity mapping block before payload work:
 - Standard reused tables (display -> logical)
 - Custom tables to create
@@ -334,8 +344,8 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
-# Optional if report web resources were enabled in the wizard
-pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+# Optional if report web resources were enabled by profile + planning
+pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 All scripts are idempotent and safe to rerun.
@@ -349,7 +359,7 @@ Payload rules for Step 10:
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
-- If optional reports are enabled, `65-build-web-resources.ps1` generates and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
+- If optional reports are enabled, `70-build-web-resources.ps1` runs the reporting module and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
 
 Validation checkpoint after each script:
 

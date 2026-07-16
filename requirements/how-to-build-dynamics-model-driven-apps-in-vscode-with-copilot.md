@@ -46,7 +46,7 @@ Validation checkpoints:
 - Stop if any step fails; fix before continuing.
 - Do not skip planning artifacts.
 
-### 0B. Wizard discovery questions (14 questions — required intake)
+### 0B. Wizard discovery questions (11 required + extension blocks)
 
 Answer these before writing or changing metadata:
 
@@ -62,14 +62,18 @@ Answer these before writing or changing metadata:
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
-**12. New solution or use an existing one? (new/existing)**
-**13. New publisher prefix or use an existing one? (new/existing)**
+
+Optional extension blocks (profile-driven):
+- table-strategy (standard/custom and mapping)
+- solution-identity (new/existing solution and publisher prefix)
+- reporting (optional web resources)
+- retrofit (current-state and remaining-work intake)
 
 Why this matters:
 
 - These answers become the source for `spec.md`, then `plan.md`, then `tasks.md`.
-- Q6b ensures you reuse existing standard tables (Contact, Case, Product, etc.) instead of recreating them.
-- Q12/Q13 prevent accidental cross-project contamination by requiring unique solution names and prefixes.
+- The table-strategy extension ensures you reuse existing standard tables (Contact, Case, Product, etc.) instead of recreating them.
+- The solution-identity extension prevents accidental cross-project contamination by requiring explicit solution names and prefixes.
 - Reference `docs/standard-dataverse-tables.md` to identify which tables are out-of-box vs. custom.
 
 ## 1. What You Are Building

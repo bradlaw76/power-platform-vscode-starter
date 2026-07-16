@@ -224,6 +224,11 @@ pwsh ./scripts/bootstrap/05-start-wizard.ps1
 
 The wizard asks 11 discovery questions and scaffolds `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`. Alternatively, use `/power-platform-demo-wizard` in VS Code Copilot Chat to go through the same discovery flow interactively.
 
+Canonical source for discovery/planning/execution contract:
+
+- `docs/wizard-contract-v1.md`
+- `wizard.profile.json`
+
 **Discovery questions:**
 
 1. What type of demo or app are you building?
@@ -237,6 +242,13 @@ The wizard asks 11 discovery questions and scaffolds `spec.md`, `plan.md`, and `
 9. What environment should it be built in?
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
+
+**Optional extension blocks (profile-driven):**
+
+- table strategy and explicit mapping
+- solution identity (new/existing solution + publisher prefix)
+- reporting module scope
+- retrofit mode (current state + remaining work)
 
 Exit criteria: all 11 answers captured and reviewed before moving to authentication.
 
@@ -317,8 +329,8 @@ pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
-# Optional if enabled in 05-start-wizard answers
-pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+# Optional if enabled by profile + planning selection
+pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 After each script: check that the failed count is zero before running the next. All scripts are idempotent — safe to rerun after fixing any failure.
@@ -327,8 +339,9 @@ After each script: check that the failed count is zero before running the next. 
 
 Optional report web resources:
 
-- `05-start-wizard.ps1` can capture a yes/no decision for optional HTML report web resources.
-- `65-build-web-resources.ps1` generates 3 scenario-driven Dynamics-blue reports (agent, supervisor, executive KPI).
+- `05-start-wizard.ps1` captures a yes/no decision for optional reporting module scope (when enabled in `wizard.profile.json`).
+- `70-build-web-resources.ps1` is the canonical optional module entrypoint.
+- `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
 - The script upserts Dataverse HTML web resources and adds them to the selected solution.
 
 Validation scenarios to run for every workflow change:
@@ -423,6 +436,7 @@ Release and rollback references for this update bundle:
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
 | `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution (standard + custom as referenced) | Yes | Yes |
 | `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
+| `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
 | `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
 
 ---

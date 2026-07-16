@@ -174,6 +174,34 @@ function Confirm-Overwrite {
 }
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$profilePath = Join-Path $repoRoot "wizard.profile.json"
+$contractPath = Join-Path $repoRoot "docs\wizard-contract-v1.md"
+$onboardingPath = Join-Path $repoRoot "docs\onboarding.md"
+$payloadPath = Join-Path $repoRoot "payloads"
+$reportsModuleEnabled = $true
+
+if (Test-Path $profilePath) {
+    try {
+        $profile = Get-Content -Path $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($null -ne $profile.execution.optionalModules."web-resources") {
+            $reportsModuleEnabled = [bool]$profile.execution.optionalModules."web-resources".enabled
+        }
+    } catch {
+        Write-Host "Failed to parse wizard.profile.json. Fix profile JSON before running the wizard." -ForegroundColor Red
+        Write-Host $_.Exception.Message -ForegroundColor Red
+        exit 1
+    }
+} else {
+    Write-Host "Warning: wizard.profile.json not found. Using default behavior." -ForegroundColor Yellow
+}
+
+foreach ($requiredPath in @($contractPath, $onboardingPath, $payloadPath)) {
+    if (-not (Test-Path $requiredPath)) {
+        Write-Host "Missing required contract path: $requiredPath" -ForegroundColor Red
+        Write-Host "Run startup validation and restore missing folders/files before continuing." -ForegroundColor Yellow
+        exit 1
+    }
+}
 
 Write-Host "" 
 Write-Host "=== Power Platform Demo Wizard ===" -ForegroundColor Cyan
@@ -208,7 +236,7 @@ if ($Retrofit) {
     $answers["BusinessProblem"] = Read-RequiredValue "4. What business problem is it solving? (based on current state)"
     $answers["Users"] = Read-RequiredValue "5. Who are the current users or user roles?"
     $answers["DataEntities"] = Read-RequiredValue "R1. What tables or entities have already been created? (comma-separated)"
-    $answers["TableChoice"] = Read-RequiredValue "R2. Which of those are standard Dataverse tables vs custom? (standard/custom/both)" "both"
+    $answers["TableChoice"] = Read-RequiredValue "E-table-strategy. Which of those are standard Dataverse tables vs custom? (standard/custom/both)" "both"
     $answers["ArtifactsNeeded"] = Read-RequiredValue "R3. What forms, views, flows, or copilots are currently built or in progress?"
     $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful demo of this app look like?"
     $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment is it currently built in?"
@@ -225,9 +253,9 @@ if ($Retrofit) {
     Write-Host ""
     Write-Host "Remaining work (leave blank or enter 'none' if fully built):" -ForegroundColor Cyan
     Write-Host ""
-    $answers["RemainingEntities"] = Read-RequiredValue "R4. Tables or entities still to create (enter 'none' if complete)" "none"
-    $answers["RemainingArtifacts"] = Read-RequiredValue "R5. Forms, views, flows, or copilots still to build (enter 'none' if complete)" "none"
-    $answers["RemainingWork"] = Read-RequiredValue "R6. Any other remaining work not covered above (enter 'none' if complete)" "none"
+    $answers["RemainingEntities"] = Read-RequiredValue "E-retrofit. Tables or entities still to create (enter 'none' if complete)" "none"
+    $answers["RemainingArtifacts"] = Read-RequiredValue "E-retrofit. Forms, views, flows, or copilots still to build (enter 'none' if complete)" "none"
+    $answers["RemainingWork"] = Read-RequiredValue "E-retrofit. Any other remaining work not covered above (enter 'none' if complete)" "none"
 } else {
     # --- Standard greenfield mode ---
     $answers["AppType"] = Read-RequiredValue "1. What type of demo or app are you building?"
@@ -236,14 +264,14 @@ if ($Retrofit) {
     $answers["BusinessProblem"] = Read-RequiredValue "4. What business problem does it solve?"
     $answers["Users"] = Read-RequiredValue "5. Who are the users?"
     $answers["DataEntities"] = Read-RequiredValue "6. What data tables or entities are needed?"
-    $answers["TableChoice"] = Read-RequiredValue "6b. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)" "both"
+    $answers["TableChoice"] = Read-RequiredValue "E-table-strategy. Use standard Dataverse tables (Contact, Account, Case, etc.) or create custom tables? (standard/custom/both)" "both"
     $answers["ArtifactsNeeded"] = Read-RequiredValue "7. What screens, forms, views, pages, flows, or copilots are needed?"
     $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful demo look like?"
     $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment should it be built in?"
     $answers["NeedsDemoData"] = Read-RequiredValue "10. Does it need demo data?" "Yes"
     $answers["SolutionType"] = Read-RequiredValue "11. Should the output be a managed or unmanaged solution?" "Unmanaged"
 
-    $solutionChoice = Read-RequiredValue "12. New solution or use an existing one? (new/existing)" "new"
+    $solutionChoice = Read-RequiredValue "E-solution-identity. New solution or use an existing one? (new/existing)" "new"
     $answers["SolutionChoice"] = $solutionChoice
     if ($solutionChoice -ieq "existing") {
         $answers["SolutionName"] = Read-RequiredValue "    Existing solution unique name"
@@ -251,7 +279,7 @@ if ($Retrofit) {
         $answers["SolutionName"] = Read-RequiredValue "    New solution unique name (no spaces, letters/numbers only, e.g. ContosoHRApp)"
     }
 
-    $prefixChoice = Read-RequiredValue "13. New publisher prefix or use an existing one? (new/existing)" "new"
+    $prefixChoice = Read-RequiredValue "E-solution-identity. New publisher prefix or use an existing one? (new/existing)" "new"
     $answers["PrefixChoice"] = $prefixChoice
     if ($prefixChoice -ieq "existing") {
         $answers["PublisherPrefix"] = Read-RequiredValue "    Existing prefix (e.g. vafe, contoso)"
@@ -264,19 +292,27 @@ if ($Retrofit) {
     Write-Host ""
     Write-Host "Entity mapping (based on what already exists):" -ForegroundColor Cyan
     Write-Host ""
-    $answers["StandardTablesReused"] = Read-RequiredValue "R7. Standard tables already reused (comma-separated display or logical names; enter 'none' if none)" "none"
-    $answers["CustomTablesToCreate"] = Read-RequiredValue "R8. Custom tables still to create (comma-separated; enter 'none' if all done)" "none"
-    $answers["StandardFieldsReused"] = Read-RequiredValue "R9. Standard fields already reused (table.field list; enter 'none' if none)" "none"
-    $answers["CustomFieldsToAdd"] = Read-RequiredValue "R10. Custom fields still to add (table.field list; enter 'none' if all done)" "none"
-    $answers["RelationshipsToCreate"] = Read-RequiredValue "R11. Relationships still to create (referencing -> referenced; enter 'none' if all done)" "none"
-    $answers["IncludeHtmlReports"] = Read-RequiredValue "R12. Create optional HTML report web resources (agent, supervisor, executive KPI)? (yes/no)" "no"
+    $answers["StandardTablesReused"] = Read-RequiredValue "E-table-mapping. Standard tables already reused (comma-separated display or logical names; enter 'none' if none)" "none"
+    $answers["CustomTablesToCreate"] = Read-RequiredValue "E-table-mapping. Custom tables still to create (comma-separated; enter 'none' if all done)" "none"
+    $answers["StandardFieldsReused"] = Read-RequiredValue "E-table-mapping. Standard fields already reused (table.field list; enter 'none' if none)" "none"
+    $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Custom fields still to add (table.field list; enter 'none' if all done)" "none"
+    $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Relationships still to create (referencing -> referenced; enter 'none' if all done)" "none"
+    if ($reportsModuleEnabled) {
+        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional HTML report web resources (agent, supervisor, executive KPI)? (yes/no)" "no"
+    } else {
+        $answers["IncludeHtmlReports"] = "no"
+    }
 } else {
-    $answers["StandardTablesReused"] = Read-RequiredValue "14. Explicit mapping - standard tables to reuse (comma-separated display names or logical names; enter 'none' if none)" "none"
-    $answers["CustomTablesToCreate"] = Read-RequiredValue "15. Explicit mapping - custom tables to create (comma-separated; enter 'none' if none)" "none"
-    $answers["StandardFieldsReused"] = Read-RequiredValue "16. Explicit mapping - standard fields to reuse (table.field list; enter 'none' if none)" "none"
-    $answers["CustomFieldsToAdd"] = Read-RequiredValue "17. Explicit mapping - custom fields to add (table.field list; enter 'none' if none)" "none"
-    $answers["RelationshipsToCreate"] = Read-RequiredValue "18. Explicit mapping - relationships to create (referencing -> referenced; enter 'none' if none)" "none"
-    $answers["IncludeHtmlReports"] = Read-RequiredValue "19. Create optional HTML report web resources (agent, supervisor, executive KPI)? (yes/no)" "no"
+    $answers["StandardTablesReused"] = Read-RequiredValue "E-table-mapping. Explicit mapping - standard tables to reuse (comma-separated display names or logical names; enter 'none' if none)" "none"
+    $answers["CustomTablesToCreate"] = Read-RequiredValue "E-table-mapping. Explicit mapping - custom tables to create (comma-separated; enter 'none' if none)" "none"
+    $answers["StandardFieldsReused"] = Read-RequiredValue "E-table-mapping. Explicit mapping - standard fields to reuse (table.field list; enter 'none' if none)" "none"
+    $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Explicit mapping - custom fields to add (table.field list; enter 'none' if none)" "none"
+    $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Explicit mapping - relationships to create (referencing -> referenced; enter 'none' if none)" "none"
+    if ($reportsModuleEnabled) {
+        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional HTML report web resources (agent, supervisor, executive KPI)? (yes/no)" "no"
+    } else {
+        $answers["IncludeHtmlReports"] = "no"
+    }
 }
 $answers["ReportTheme"] = "Dynamics blue"
 $answers["ReportSet"] = "Agent performance report; Supervisor oversight report; Executive summary KPI report"
@@ -318,26 +354,32 @@ if ($existingFiles.Count -gt 0 -and -not $Force) {
 $answersContent = @"
 # Discovery Answers
 
+## Contract
+- Contract: docs/wizard-contract-v1.md
+- Profile: wizard.profile.json
+
 ## Scenario
 - Name: $($answers["ScenarioName"])
 - Slug: $($answers["ScenarioSlug"])
 
-## Wizard Answers
+## Required Question Set (11)
 1. Type of demo/app: $($answers["AppType"])
 2. Platform area: $($answers["PlatformArea"])
 3. Target audience: $($answers["TargetAudience"])
 4. Business problem: $($answers["BusinessProblem"])
 5. Users: $($answers["Users"])
 6. Data entities: $($answers["DataEntities"])
-6b. Standard vs custom tables: $($answers["TableChoice"])
 7. Needed artifacts: $($answers["ArtifactsNeeded"])
 8. Success definition: $($answers["SuccessLooksLike"])
 9. Build environment: $($answers["BuildEnvironment"])
 10. Demo data needed: $($answers["NeedsDemoData"])
 11. Solution output type: $($answers["SolutionType"])
-12. Solution (new/existing): $($answers["SolutionChoice"]) -- $($answers["SolutionName"])
-13. Publisher prefix (new/existing): $($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
-19. Create optional HTML report web resources: $($answers["IncludeHtmlReports"])
+
+## Extension Blocks
+- table-strategy: $($answers["TableChoice"])
+- solution-identity: solution=$($answers["SolutionChoice"]) -- $($answers["SolutionName"]); prefix=$($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
+- reporting: $($answers["IncludeHtmlReports"])
+$(if ($Retrofit) { "- retrofit: enabled" } else { "- retrofit: disabled" })
 
 ## Optional Report Web Resources
 - Enabled: $($answers["IncludeHtmlReports"])
@@ -532,7 +574,7 @@ $tasksContent = @"
 - [ ] Build relationships with '40-build-relationships.ps1'
 - [ ] Add components to solution with '50-add-to-solution.ps1'
 - [ ] Build starter forms/views with '60-build-forms-views.ps1'
-- [ ] If reports are enabled, run '65-build-web-resources.ps1'
+- [ ] If reports are enabled, run '70-build-web-resources.ps1'
 - [ ] Export and unpack solution
 - [ ] Commit changes to git
 - [ ] Pack and import solution

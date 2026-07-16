@@ -21,6 +21,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
@@ -36,7 +38,13 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $PublisherPrefix)) {
 }
 
 if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-  $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+  $PayloadsFolder = Join-Path $repoRoot "payloads"
+}
+
+if (-not (Test-Path $PayloadsFolder)) {
+  Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
+  Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
+  exit 1
 }
 
 $normalizedPrefix = $PublisherPrefix.ToLower()
@@ -270,10 +278,14 @@ function New-StarterViewFetchXml([string]$TableLogical, [string]$PrimaryField) {
 "@
 }
 
-function New-StarterViewLayoutXml([string]$PrimaryField) {
+function New-StarterViewLayoutXml(
+    [string]$PrimaryField,
+    [string]$PrimaryIdField
+) {
+    $resolvedPrimaryId = if ([string]::IsNullOrWhiteSpace($PrimaryIdField)) { "$PrimaryField`id" } else { $PrimaryIdField }
     return @"
 <grid name="resultset" object="1" jump="$PrimaryField" select="1" icon="1" preview="1">
-  <row name="result" id="$($PrimaryField)id">
+  <row name="result" id="$resolvedPrimaryId">
     <cell name="$PrimaryField" width="300" />
     <cell name="createdon" width="150" />
     <cell name="modifiedon" width="150" />
@@ -298,7 +310,7 @@ if ($payloadCustomEntities.Count -eq 0) {
 $tables = @()
 foreach ($logicalName in $payloadCustomEntities | Sort-Object) {
   try {
-    $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$logicalName')?`$select=LogicalName,PrimaryNameAttribute,MetadataId,IsCustomEntity"
+    $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$logicalName')?`$select=LogicalName,PrimaryNameAttribute,PrimaryIdAttribute,MetadataId,IsCustomEntity"
     if ($entity.IsCustomEntity) {
       $tables += $entity
     }
@@ -315,6 +327,7 @@ $formsCreated = 0; $formsUpdated = 0; $formsSkipped = 0; $viewsCreated = 0; $fai
 foreach ($t in $tables) {
     $logical  = $t.LogicalName
     $primary  = $t.PrimaryNameAttribute
+    $primaryId = $t.PrimaryIdAttribute
     Write-Host "  $logical" -ForegroundColor Cyan
 
     # ── Form (payload-driven) ─────────────────────────────────────────────
@@ -396,7 +409,7 @@ foreach ($t in $tables) {
     } else {
         try {
             $fetchXml  = New-StarterViewFetchXml $logical $primary
-            $layoutXml = New-StarterViewLayoutXml $primary
+            $layoutXml = New-StarterViewLayoutXml $primary $primaryId
             $viewBody = @{
                 name               = "Active Records"
                 returnedtypecode   = $logical

@@ -1,0 +1,48 @@
+{
+  "profileVersion": "1.0",
+  "contractVersion": "1.0.0",
+  "discovery": {
+    "requiredQuestions": 11,
+    "optionalQuestionModules": {
+      "table-strategy": true,
+      "solution-identity": true,
+      "reporting": true,
+      "retrofit": true
+    }
+  },
+  "execution": {
+    "coreModules": [
+      "00-prereq-check.ps1",
+      "10-auth-connect.ps1",
+      "20-build-tables.ps1",
+      "30-build-columns.ps1",
+      "40-build-relationships.ps1",
+      "50-add-to-solution.ps1",
+      "60-build-forms-views.ps1"
+    ],
+    "optionalModules": {
+      "web-resources": {
+        "enabled": true,
+        "script": "65-build-web-resources.ps1"
+      },
+      "demo-script": {
+        "enabled": true,
+        "script": "06-demo-script-wizard.ps1"
+      },
+      "demo-dry-run": {
+        "enabled": true,
+        "script": "07-demo-dry-run.ps1"
+      }
+    }
+  },
+  "conventions": {
+    "payloadFolder": "payloads",
+    "scenarioFolder": "specs",
+    "bootstrapFolder": "scripts/bootstrap"
+  },
+  "validationGates": {
+    "requireSpecKitBeforeBuild": true,
+    "requireFolderContract": true,
+    "requireDocsContractConsistency": true
+  }
+}

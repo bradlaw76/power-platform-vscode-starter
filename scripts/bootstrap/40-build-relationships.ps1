@@ -20,6 +20,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
@@ -28,7 +30,13 @@ if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpa
     Write-Host "Run 10-auth-connect.ps1 first." -ForegroundColor Red; exit 1
 }
 if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-    $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+    $PayloadsFolder = Join-Path $repoRoot "payloads"
+}
+
+if (-not (Test-Path $PayloadsFolder)) {
+    Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
+    Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
+    exit 1
 }
 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
@@ -42,7 +50,10 @@ function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
 function Test-RelationshipExists([string]$SchemaName) {
     try {
         $resp = Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName"
-        return @($resp.value).Count -gt 0
+        $matches = @($resp.value | Where-Object {
+            -not [string]::IsNullOrWhiteSpace($_.SchemaName) -and $_.SchemaName.Equals($SchemaName, [System.StringComparison]::OrdinalIgnoreCase)
+        })
+        return $matches.Count -gt 0
     } catch { return $false }
 }
 
@@ -52,7 +63,7 @@ function Normalize-RelationshipEntityNames($RelationshipObject) {
     foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
         $prop = $RelationshipObject.PSObject.Properties[$propName]
         if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
-            $prop.Value = $prop.Value.ToLower()
+            $prop.Value = $prop.Value.Trim()
         }
     }
 
@@ -61,7 +72,7 @@ function Normalize-RelationshipEntityNames($RelationshipObject) {
         foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
             $prop = $definition.Value.PSObject.Properties[$propName]
             if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
-                $prop.Value = $prop.Value.ToLower()
+                $prop.Value = $prop.Value.Trim()
             }
         }
     }

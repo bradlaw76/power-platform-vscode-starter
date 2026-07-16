@@ -33,6 +33,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+
 # ── Load session env if not already set ───────────────────────────────────
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
@@ -48,7 +50,13 @@ if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpa
 }
 
 if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-    $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+    $PayloadsFolder = Join-Path $repoRoot "payloads"
+}
+
+if (-not (Test-Path $PayloadsFolder)) {
+    Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
+    Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
+    exit 1
 }
 
 $tableDetectionHelper = Join-Path $PSScriptRoot "helpers\table-detection.ps1"
@@ -73,8 +81,8 @@ function Invoke-Dv {
 
 function Test-TableExists([string]$LogicalName) {
     try {
-        Invoke-Dv "Get" "EntityDefinitions(LogicalName='$LogicalName')?`$select=LogicalName" | Out-Null
-        return $true
+        $resp = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$LogicalName')?`$select=LogicalName"
+        return (-not [string]::IsNullOrWhiteSpace($resp.LogicalName))
     } catch { return $false }
 }
 

@@ -20,6 +20,8 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
@@ -28,7 +30,13 @@ if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpa
     Write-Host "Run 10-auth-connect.ps1 first." -ForegroundColor Red; exit 1
 }
 if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-    $PayloadsFolder = Join-Path (Split-Path $PSScriptRoot -Parent) "payloads"
+    $PayloadsFolder = Join-Path $repoRoot "payloads"
+}
+
+if (-not (Test-Path $PayloadsFolder)) {
+    Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
+    Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
+    exit 1
 }
 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
@@ -63,7 +71,7 @@ foreach ($file in $payloads) {
         Write-Host "  SKIP $($file.Name) — missing TableLogicalName property" -ForegroundColor Yellow
         $skipped++; continue
     }
-    $tableName = $tableName.ToLower()
+    $tableName = $tableName.Trim()
 
     Write-Host "  Table: $tableName" -ForegroundColor Cyan
     foreach ($col in $doc.Columns) {
@@ -79,7 +87,7 @@ foreach ($file in $payloads) {
             continue
         }
 
-        $logical = $logical.ToLower()
+            $logical = $logical.Trim()
         Write-Host "    $logical " -NoNewline
 
         if (Test-ColumnExists $tableName $logical) {
@@ -88,7 +96,9 @@ foreach ($file in $payloads) {
         }
 
         try {
-            $col.LogicalName = $logical
+            if ([string]::IsNullOrWhiteSpace($col.LogicalName)) {
+                $col.LogicalName = $logical
+            }
             $body = $col | ConvertTo-Json -Depth 20 -Compress
             Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green
