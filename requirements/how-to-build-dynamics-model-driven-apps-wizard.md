@@ -214,6 +214,55 @@ Response template:
 - Views matrix:
 - Dashboard KPIs:
 
+## 4A. Report Scoping Wizard (Web Resources)
+
+Goal: Identify which tables require report surfaces and define report content before development begins.
+
+Mode-specific input:
+
+**Greenfield mode** (new app):
+- Ask the user to reference planned tables from `spec.md` and `tasks.md`.
+- Ask which of those tables are marked as critical or high-frequency in the workflow.
+
+**Retrofit mode** (existing implementation):
+- Ask the user to list tables already created in the current solution (from `spec.md` table inventory or Dataverse solution explorer).
+- Ask which existing tables require new report surfaces.
+
+Wizard questions:
+1. Which tables in your solution require report surfaces for supervisors, analysts, or executives?
+2. For each selected table, what report type is needed:
+   - **Case form web resource** (embedded iframe on record form)
+   - **Table dashboard KPI** (dashboard tile summarizing table data)
+   - **Queue or view-level summary** (view-level web resource or ribbon notification)
+3. For each report, what business decision should it support? (e.g., case escalation, agent performance review, SLA risk assessment)
+4. For each report, what fields are required:
+   - Status fields (e.g., status, status reason)
+   - Risk fields (e.g., severity, priority, SLA status)
+   - Recommendation fields (e.g., suggested action, next step)
+   - Date or SLA fields (e.g., created date, due date, resolved date)
+5. Should each report be table-level (summary across all records), record-level (detail on one record), or both?
+6. Who owns the report definition and validation in Dataverse? (Persona or team)
+7. If a table is marked critical in the workflow, must it have a report? (Blocker rule)
+
+Build decisions:
+- Report Mapping Table (artifact): `report-mappings.md` with one row per report, including logical name, report type, target placement, required fields, and owner.
+- Report Build Tasks (artifact): `tasks.md` entries for payload creation, HTML source, web resource build, placement verification, and data rendering validation.
+- Blocker rule: If a table is marked as critical and has no approved report decision, wizard flags this and blocks progression until resolved.
+
+Exit criteria:
+- Report Mapping Table completed and approved.
+- Each critical table has an explicit report type decision.
+- Each report has target form/dashboard/view placement confirmed.
+- Report field mapping validated against table schema.
+
+Copilot prompt:
+"Create a Report Mapping Table with one row per report, including table logical name, report surface name (form/dashboard/view), report type, target placement, required fields (status/risk/recommendation/date), owner (Dataverse record owner), and validation checklist."
+
+Response template:
+- Tables identified:
+- Report Mapping Table:
+- Validation gate sign-off:
+
 ## 5. Automation and Integration Wizard
 
 Goal: Place logic in the correct layer and define safe integration behavior.

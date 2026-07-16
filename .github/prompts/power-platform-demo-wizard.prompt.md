@@ -35,7 +35,11 @@ Required output behavior:
 - Summarize answers clearly.
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
 - Require an explicit standard-vs-custom mapping section before payload generation.
-- Do not tell the user to run build scripts until planning is complete.
-- After planning, guide them through the exact bootstrap sequence.
+- After planning, run a **report scoping step** based on created or planned tables (see Section 4A of how-to-build-dynamics-model-driven-apps-wizard.md).
+- Ask the user to identify which tables need reports and what report type each table needs (form web resource, dashboard KPI, or queue/view summary).
+- Generate a Report Mapping Table artifact (`report-mappings.md`) and convert it into implementation and validation tasks in `tasks.md`.
+- **Blocker rule**: If a table is marked critical in workflow but has no report decision, flag this and stop progression until resolved.
+- Do not tell the user to run build scripts until planning **and report scoping** are complete.
+- After planning and report scoping are approved, guide them through the exact bootstrap sequence.
 - Build steps include scripts 20, 30, 40, 50, 60 in order. If the user answered yes to question 19, include script 65 (`65-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 60.
 - Script 65 generates three Dynamics-blue HTML reports from scenario design files and adds them to the solution as web resources.
