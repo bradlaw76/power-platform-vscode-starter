@@ -21,12 +21,14 @@ if (-not (Test-Path $target)) {
     exit 1
 }
 
-& $target \
-    -ScenarioSlug $ScenarioSlug \
-    -EnvironmentUrl $EnvironmentUrl \
-    -AccessToken $AccessToken \
-    -SolutionUniqueName $SolutionUniqueName \
-    -PublisherPrefix $PublisherPrefix
+$splat = @{
+    ScenarioSlug       = $ScenarioSlug
+    EnvironmentUrl     = $EnvironmentUrl
+    AccessToken        = $AccessToken
+    SolutionUniqueName = $SolutionUniqueName
+    PublisherPrefix    = $PublisherPrefix
+}
+& $target @splat
 
 $webResourcesExitCode = $LASTEXITCODE
 if ($webResourcesExitCode -ne 0) {

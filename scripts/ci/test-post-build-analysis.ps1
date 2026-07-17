@@ -164,6 +164,58 @@ Line after marker.
     throw 'Generated summary did not include recommended next enhancements section.'
   }
 
+  # Test: missing optional inputs produce Not available instead of hard fail
+  $missingOutput = & pwsh -NoProfile -File $scriptPath `
+    -ScenarioSlug 'missing-inputs-nonexistent-slug' `
+    -PreviewOnly 2>&1
+
+  if ($LASTEXITCODE -ne 0) {
+    throw "Missing-inputs PreviewOnly run failed with exit code $LASTEXITCODE."
+  }
+
+  $missingText = ($missingOutput -join "`n")
+  if ($missingText -notmatch 'Not available') {
+    throw 'Missing-inputs run did not output Not available for absent spec/plan/tasks fields.'
+  }
+
+  # Test: alternate scenario slug succeeds (generic behavior, no scenario-specific hardcoding)
+  $altSpecPath = Join-Path $tempRoot 'alt-spec.md'
+  @"
+# Spec
+
+## Scenario Summary
+Generic alternate scenario summary.
+
+### Standard reused tables (display -> logical)
+- Account -> account
+
+### Custom tables to create (input -> generated logical)
+- Work Order -> alt_workorder
+
+## Required Experience and Artifacts
+Main form, active view
+"@ | Set-Content -Path $altSpecPath -Encoding UTF8
+
+  $altPlanPath = Join-Path $tempRoot 'alt-plan.md'
+  @"
+# Plan
+
+- Environment: https://alt-env.crm.dynamics.com
+- Solution type: Managed
+- Solution unique name: AltSolution
+- Publisher prefix: alt
+"@ | Set-Content -Path $altPlanPath -Encoding UTF8
+
+  & pwsh -NoProfile -File $scriptPath `
+    -ScenarioSlug 'alt-generic-scenario' `
+    -SpecPath $altSpecPath `
+    -PlanPath $altPlanPath `
+    -PreviewOnly
+
+  if ($LASTEXITCODE -ne 0) {
+    throw 'Alt-scenario slug test failed. Script may contain scenario-specific assumptions.'
+  }
+
   Write-Host 'Post-build analysis tests passed.' -ForegroundColor Green
 }
 finally {

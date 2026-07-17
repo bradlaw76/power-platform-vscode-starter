@@ -327,8 +327,10 @@ $payload = Get-AllPayloadFiles -PayloadRoot $resolvedPayloadRoot
 $standardReuseBlock = Get-MarkdownSection -Content $spec -Heading "Standard reused tables (display -> logical)"
 $customTablesBlock = Get-MarkdownSection -Content $spec -Heading "Custom tables to create (input -> generated logical)"
 $relationshipMappingBlock = Get-MarkdownSection -Content $spec -Heading "Relationships to create"
-$experienceLineMatch = [regex]::Match($spec, "(?im)^##\s+Required Experience and Artifacts\s*\r?\n(.+)$")
-$experienceLine = if ($experienceLineMatch.Success) { $experienceLineMatch.Groups[1].Value.Trim() } else { "" }
+$experienceBlockMatch = [regex]::Match($spec, "(?ms)^##\s+Required Experience and Artifacts\s*\r?\n(.*?)(?=^##\s+|\z)")
+$experienceLine = if ($experienceBlockMatch.Success) {
+    ($experienceBlockMatch.Groups[1].Value -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1).Trim()
+} else { "" }
 
 $standardTablesFromSpec = @(Get-BulletListValues -Block $standardReuseBlock)
 $customTablesFromSpec = @(Get-BulletListValues -Block $customTablesBlock)
@@ -505,7 +507,10 @@ if ($enhancements.Count -eq 0) {
     $enhancements.Add("Validate artifacts in Maker portal and close remaining tasks in tasks.md")
 }
 
-$scenarioSummary = [regex]::Match($spec, "(?im)^##\s+Scenario Summary\s*\r?\n(.+)$").Groups[1].Value.Trim()
+$scenarioSummaryBlockMatch = [regex]::Match($spec, "(?ms)^##\s+Scenario Summary\s*\r?\n(.*?)(?=^##\s+|\z)")
+$scenarioSummary = if ($scenarioSummaryBlockMatch.Success) {
+    ($scenarioSummaryBlockMatch.Groups[1].Value -split "`r?`n" | Where-Object { $_.Trim() } | Select-Object -First 1).Trim()
+} else { "" }
 $solutionType = Get-PlanMetadataValue -PlanContent $plan -Label "Solution type"
 $solutionUniqueName = Get-PlanMetadataValue -PlanContent $plan -Label "Solution unique name"
 $publisherPrefix = Get-PlanMetadataValue -PlanContent $plan -Label "Publisher prefix"

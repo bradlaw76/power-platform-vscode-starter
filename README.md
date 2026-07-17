@@ -3,7 +3,7 @@
 <img width="2172" height="724" alt="ChatGPT Image Jun 8, 2026, 03_05_25 PM" src="https://github.com/user-attachments/assets/97e80bbb-df45-41a2-9459-63976cac0d4d" />
 
 
-A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution ΓÇö without manual portal clicks.
+A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution -- without manual portal clicks.
 
 > [!IMPORTANT]
 > **Spec Kit planning is a mandatory gate.** Do not run build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The wizard helps you create them.
@@ -70,7 +70,7 @@ No prior experience needed with VS Code terminals, Git branches, PAC CLI, or Dat
 
 ## How it works
 
-Three entry points ΓÇö all leading to the same planning and build sequence:
+Three entry points -- all leading to the same planning and build sequence:
 
 | Entry point | How to start | Best for |
 | --- | --- | --- |
@@ -81,7 +81,7 @@ Three entry points ΓÇö all leading to the same planning and build sequence:
 All three paths converge on the same sequence:
 
 ```text
-Discovery ΓåÆ Spec Kit ΓåÆ Demo script ΓåÆ Dataverse schema ΓåÆ App experience ΓåÆ Solution export ΓåÆ Git ΓåÆ Import
+Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
 ```
 
 ---
@@ -261,7 +261,7 @@ Exit criteria: all 11 answers captured and reviewed before moving to authenticat
 pwsh ./scripts/bootstrap/10-auth-connect.ps1
 ```
 
-Prompts for environment URL, Azure tenant, publisher prefix, and solution names. Saves a local `.env.ps1` ΓÇö never committed (protected by `.gitignore`).
+Prompts for environment URL, Azure tenant, publisher prefix, and solution names. Saves a local `.env.ps1` -- never committed (protected by `.gitignore`).
 
 Additional auth modes:
 
@@ -277,7 +277,7 @@ Validation: `az account show` and `pac auth list` both return your profile and e
 ## Build sequence
 
 > [!IMPORTANT]
-> Do not run build scripts until your planning files are complete and reviewed (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). This is a hard gate ΓÇö building before planning creates rework.
+> Do not run build scripts until your planning files are complete and reviewed (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). This is a hard gate -- building before planning creates rework.
 
 Optional but recommended before authentication and build scripts:
 
@@ -336,7 +336,7 @@ pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 ```
 
-After each script: check that the failed count is zero before running the next. All scripts are idempotent ΓÇö safe to rerun after fixing any failure.
+After each script: check that the failed count is zero before running the next. All scripts are idempotent -- safe to rerun after fixing any failure.
 
 **After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
 
@@ -456,9 +456,9 @@ After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill 
 ### How the entry points connect
 
 ```text
-Terminal wizard               ΓåÆ spec.md, plan.md, tasks.md ΓåÆ demo-walkthrough.md + demo-talk-track.md ΓåÆ build scripts
-Copilot Chat                  ΓåÆ same planning artifacts     ΓåÆ demo-walkthrough.md + demo-talk-track.md ΓåÆ build scripts
-Claude Code skill (available) ΓåÆ guides the entire flow      ΓåÆ inline help at each step
+Terminal wizard               -> spec.md, plan.md, tasks.md -> demo-walkthrough.md + demo-talk-track.md -> build scripts
+Copilot Chat                  -> same planning artifacts     -> demo-walkthrough.md + demo-talk-track.md -> build scripts
+Claude Code skill (available) -> guides the entire flow      -> inline help at each step
 ```
 
 ---
@@ -495,7 +495,7 @@ git commit -m "Add <feature> Dataverse artifacts and docs"
 git push -u origin feature/<short-description>
 ```
 
-`git status` must show a clean working tree after commit. Never commit `.env.ps1` ΓÇö it contains tokens and is protected by `.gitignore`. Verify with `git status` before every commit.
+`git status` must show a clean working tree after commit. Never commit `.env.ps1` -- it contains tokens and is protected by `.gitignore`. Verify with `git status` before every commit.
 
 Release and rollback references for this update bundle:
 
@@ -534,43 +534,43 @@ power-platform-vscode-starter/
   .claude/
     skills/
       power-platform-vscode-wizard/
-        SKILL.md              ΓÇö Claude Code skill: wizard workflow, scripts, troubleshooting
+        SKILL.md              -- Claude Code skill: wizard workflow, scripts, troubleshooting
   .github/
-    copilot-instructions.md   ΓÇö Repo-wide Copilot Chat behavior and workflow guidance
+    copilot-instructions.md   -- Repo-wide Copilot Chat behavior and workflow guidance
     prompts/
-      power-platform-demo-wizard.prompt.md ΓÇö Slash prompt for guided chat-based wizard
+      power-platform-demo-wizard.prompt.md -- Slash prompt for guided chat-based wizard
   .vscode/
-    extensions.json           ΓÇö Recommended extensions (installs on first open)
-  .gitignore                  ΓÇö Protects .env.ps1 (tokens/secrets) from accidental commits
+    extensions.json           -- Recommended extensions (installs on first open)
+  .gitignore                  -- Protects .env.ps1 (tokens/secrets) from accidental commits
   docs/
-    onboarding.md             ΓÇö Step-by-step setup guide for new builders
-    build-log.md              ΓÇö Log template for recording each build run
-    wizard-contract-v1.md     ΓÇö Canonical workflow contract (discovery/planning/execution)
-  payloads/                   ΓÇö Add table-*.json, columns-*.json, relationships-*.json here
+    onboarding.md             -- Step-by-step setup guide for new builders
+    build-log.md              -- Log template for recording each build run
+    wizard-contract-v1.md     -- Canonical workflow contract (discovery/planning/execution)
+  payloads/                   -- Add table-*.json, columns-*.json, relationships-*.json here
   requirements/
-    how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  ΓÇö Full implementation playbook
-    how-to-build-dynamics-model-driven-apps-wizard.md                  ΓÇö Guided wizard and Spec Kit steps
+    how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
+    how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
   scripts/
     ci/
-      test-docs-consistency.ps1  ΓÇö Guardrail: docs/prompt question-contract consistency
-      test-script-order.ps1      ΓÇö Guardrail: docs/prompt script-order consistency
-      test-script-smoke.ps1      ΓÇö Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
+      test-docs-consistency.ps1  -- Guardrail: docs/prompt question-contract consistency
+      test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
+      test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
   scripts/
     bootstrap/
-      00-prereq-check.ps1          ΓÇö Verify tools are installed (no changes made)
-      01-install-skills.ps1        ΓÇö Copy Claude Code skills to ~/.claude/skills/
-      05-start-wizard.ps1          ΓÇö Discovery questions ΓåÆ Spec Kit starter files
-      10-auth-connect.ps1          ΓÇö Sign in, configure PAC auth, save session
-      20-build-tables.ps1          ΓÇö Create tables from payloads/table-*.json
-      30-build-columns.ps1         ΓÇö Add columns from payloads/columns-*.json
-      40-build-relationships.ps1   ΓÇö Create lookups from payloads/relationships-*.json
-      50-add-to-solution.ps1       ΓÇö Add payload-referenced entities to target solution
-      60-build-forms-views.ps1     ΓÇö Build payload-driven Starter Main Forms and Active views, then publish
-      65-build-web-resources.ps1   ΓÇö Generate optional scenario-driven HTML report web resources and add to solution
-      70-build-web-resources.ps1   ΓÇö Canonical optional reporting module entrypoint (wrapper)
-      80-post-build-analysis.ps1   ΓÇö Post-build summary generation and optional README update/commit prompts
-      wizard.profile.json          ΓÇö Project profile (required questions, modules, sequencing, conventions, gates)
-      MIGRATION.md                 ΓÇö Upgrade guidance and compatibility expectations
+      00-prereq-check.ps1          -- Verify tools are installed (no changes made)
+      01-install-skills.ps1        -- Copy Claude Code skills to ~/.claude/skills/
+      05-start-wizard.ps1          -- Discovery questions -> Spec Kit starter files
+      10-auth-connect.ps1          -- Sign in, configure PAC auth, save session
+      20-build-tables.ps1          -- Create tables from payloads/table-*.json
+      30-build-columns.ps1         -- Add columns from payloads/columns-*.json
+      40-build-relationships.ps1   -- Create lookups from payloads/relationships-*.json
+      50-add-to-solution.ps1       -- Add payload-referenced entities to target solution
+      60-build-forms-views.ps1     -- Build payload-driven Starter Main Forms and Active views, then publish
+      65-build-web-resources.ps1   -- Generate optional scenario-driven HTML report web resources and add to solution
+      70-build-web-resources.ps1   -- Canonical optional reporting module entrypoint (wrapper)
+      80-post-build-analysis.ps1   -- Post-build summary generation and optional README update/commit prompts
+      wizard.profile.json          -- Project profile (required questions, modules, sequencing, conventions, gates)
+      MIGRATION.md                 -- Upgrade guidance and compatibility expectations
 ```
 
 ---
@@ -580,13 +580,13 @@ power-platform-vscode-starter/
 | Symptom | Likely cause | Fix |
 | --- | --- | --- |
 | `pac` not found | CLI not installed or PATH not updated | `winget install Microsoft.PowerPlatformCLI`, close and reopen terminal |
-| 401 on every API call | Token resource URL mismatch | Rerun `10-auth-connect.ps1` ΓÇö no trailing slash on environment URL |
-| Token works then stops mid-run | Token expired (60ΓÇô90 min timeout) | Rerun `10-auth-connect.ps1` to refresh |
+| 401 on every API call | Token resource URL mismatch | Rerun `10-auth-connect.ps1` -- no trailing slash on environment URL |
+| Token works then stops mid-run | Token expired (60-90 min timeout) | Rerun `10-auth-connect.ps1` to refresh |
 | PAC errors after `az login` | PAC and Azure CLI are separate auth mechanisms | Run both `az login` and `pac auth create` |
 | Login opens wrong tenant | Multiple tenants on account | Pass `-tenantId` flag or rerun auth with explicit tenant |
 | Solution not found in script 50 | Solution does not exist in environment yet | Create solution in Maker portal, then rerun `50-add-to-solution.ps1` |
-| Build script fails midway | Any error during execution | Scripts are idempotent ΓÇö fix issue and rerun the same script |
-| `code` command not found | VS Code shell command not in PATH | Command palette ΓåÆ "Shell Command: Install 'code' command in PATH", restart terminal |
+| Build script fails midway | Any error during execution | Scripts are idempotent -- fix issue and rerun the same script |
+| `code` command not found | VS Code shell command not in PATH | Command palette -> "Shell Command: Install 'code' command in PATH", restart terminal |
 | `git push` rejected | Branch behind remote | `git pull --ff-only`, then push with `-u origin <branch>` |
 | `.env.ps1` accidentally staged | `.gitignore` changed or bypassed | `git rm --cached .env.ps1`, verify `.gitignore` includes `.env.ps1` |
 | Unpack fails | Wrong zip path or invalid export | Re-run export, verify zip exists in `out/`, then re-run unpack |
@@ -601,7 +601,7 @@ power-platform-vscode-starter/
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
 | [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md) | Canonical workflow contract for discovery, planning, and execution |
-| [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables ΓÇö helps you decide which to reuse and which to create |
+| [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables -- helps you decide which to reuse and which to create |
 | [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
 | [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |
 | [MIGRATION.md](MIGRATION.md) | Migration guidance for existing consumers moving to the contract/profile model |

@@ -25,4 +25,17 @@ if ($formsViews -notmatch '\$resolvedPrimaryId') {
   throw 'Forms/views layout does not use resolved primary id field.'
 }
 
+foreach ($scriptName in @('65-build-web-resources.ps1', '70-build-web-resources.ps1')) {
+  $parseErrors = $null
+  $parseTokens = $null
+  [System.Management.Automation.Language.Parser]::ParseFile(
+    (Join-Path $repoRoot "scripts/bootstrap/$scriptName"),
+    [ref]$parseTokens,
+    [ref]$parseErrors
+  ) | Out-Null
+  if ($parseErrors.Count -gt 0) {
+    throw "$scriptName has PowerShell parse errors: $(($parseErrors | ForEach-Object { $_.Message }) -join '; ')"
+  }
+}
+
 Write-Host 'Script smoke checks passed.' -ForegroundColor Green
