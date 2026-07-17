@@ -364,6 +364,8 @@ Payload rules for Step 10:
 - If optional reports are enabled, `70-build-web-resources.ps1` runs the reporting module and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
 - `80-post-build-analysis.ps1` provides an end-of-build preview summary and asks for explicit confirmation before updating README markers or running any git commit/push action.
 - For preview only, run: `pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly`
+- Optional overrides for generalized workflows: `-SpecPath`, `-PlanPath`, `-TasksPath`, `-PayloadFolder`, and `-ReadmePath`.
+- If inputs are missing, the generated summary prints `Not available` sections instead of failing.
 
 Validation checkpoint after each script:
 

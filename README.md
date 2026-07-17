@@ -362,13 +362,23 @@ It reads:
 - `scripts/payloads/webresource-*.json` and/or `payloads/webresource-*.json`
 - `README.md`
 
+Optional overrides for generalized workflows:
+
+- `-SpecPath`
+- `-PlanPath`
+- `-TasksPath`
+- `-PayloadFolder`
+- `-ReadmePath`
+
+If one or more inputs are missing, summary sections render `Not available` instead of failing.
+
 Interactive flow:
 
 - Prompt: `Update README generated summary section now? (y/N)`.
 - If yes: replace only the content between the generated summary markers.
 - Prompt: `Stage and commit README update now? (y/N)`.
 - If yes: show repository-target safety checks (`git rev-parse --show-toplevel`, `git remote -v`, `git branch --show-current`) and require explicit confirmation before commit/push.
-- Prompt: `Push to origin/main now? (y/N)` before any push.
+- Prompt: `Push to origin/<current-branch> now? (y/N)` before any push.
 
 Preview mode:
 

@@ -29,3 +29,7 @@ jobs:
       - name: Run script smoke checks
         shell: pwsh
         run: ./scripts/ci/test-script-smoke.ps1
+
+      - name: Run post-build analysis checks
+        shell: pwsh
+        run: ./scripts/ci/test-post-build-analysis.ps1
