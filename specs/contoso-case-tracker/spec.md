@@ -41,10 +41,16 @@ Case, Customer, Agent, Priority
 - incident (referencing) -> cct_agent (referenced)
 
 ## Required Experience and Artifacts
-Case form, active cases view, supervisor dashboard
+- **Case form**: fields for title, priority (lookup to cct_priority), assigned agent (lookup to cct_agent), customer (lookup to contact), and status
+- **Active cases view**: filtered to open/in-progress cases; sortable by priority and assigned agent
+- **Supervisor dashboard**: displays open case count, cases grouped by priority, and cases grouped by assigned agent
 
 ## Success Criteria
-Agent opens a case, fills the form, case appears in active view
+- Agent opens a case, fills in required fields (title, priority, assigned agent), and saves within 30 seconds
+- Saved case appears immediately in the Active Cases view without manual refresh
+- Supervisor dashboard displays: total open case count, case breakdown by priority level, and case breakdown by agent
+- Demo data is loaded: minimum 5 agents, 10 cases spanning all 3 priority levels
+- Solution exports cleanly, unpacks without errors, and reimports with all components intact
 
 ## Environment
 https://contoso-dev.crm.dynamics.com

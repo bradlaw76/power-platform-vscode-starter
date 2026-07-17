@@ -346,6 +346,8 @@ pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+# End-of-build summary analysis and optional README update/commit prompts
+pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 ```
 
 All scripts are idempotent and safe to rerun.
@@ -360,6 +362,8 @@ Payload rules for Step 10:
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
 - If optional reports are enabled, `70-build-web-resources.ps1` runs the reporting module and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
+- `80-post-build-analysis.ps1` provides an end-of-build preview summary and asks for explicit confirmation before updating README markers or running any git commit/push action.
+- For preview only, run: `pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly`
 
 Validation checkpoint after each script:
 

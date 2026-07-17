@@ -11,7 +11,7 @@
 1. Discovery review and approval
 2. Dataverse schema design
 3. Forms/views/pages/app experience design
-4. Flow/copilot automation design
+4. ~~Flow/copilot automation design~~ _(out of scope — no flows or copilot components are specified in spec.md)_
 5. Demo data planning
 6. Solution export/unpack/git workflow
 7. Validation and handoff
@@ -19,7 +19,7 @@
 ## Risks to Resolve
 - Confirm environment availability and permissions.
 - Confirm entity scope and artifact count.
-- Confirm whether demo data must be scripted or manual.
+- ~~Confirm whether demo data must be scripted or manual.~~ _(Resolved: demo data required; scripted approach — see tasks.md)_
 
 ## Explicit Entity Mapping (Required Before Payloads)
 

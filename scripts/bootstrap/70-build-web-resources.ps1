@@ -27,3 +27,26 @@ if (-not (Test-Path $target)) {
     -AccessToken $AccessToken \
     -SolutionUniqueName $SolutionUniqueName \
     -PublisherPrefix $PublisherPrefix
+
+$webResourcesExitCode = $LASTEXITCODE
+if ($webResourcesExitCode -ne 0) {
+    exit $webResourcesExitCode
+}
+
+$postBuildScript = Join-Path $PSScriptRoot "80-post-build-analysis.ps1"
+if (-not (Test-Path $postBuildScript)) {
+    Write-Host "Warning: post-build analysis script not found: $postBuildScript" -ForegroundColor Yellow
+    exit 0
+}
+
+try {
+    & $postBuildScript -ScenarioSlug $ScenarioSlug
+    $postBuildExitCode = $LASTEXITCODE
+    if ($postBuildExitCode -ne 0) {
+        Write-Host "Warning: 80-post-build-analysis.ps1 failed with exit code $postBuildExitCode. Prior build steps completed successfully." -ForegroundColor Yellow
+    }
+} catch {
+    Write-Host "Warning: 80-post-build-analysis.ps1 failed: $($_.Exception.Message). Prior build steps completed successfully." -ForegroundColor Yellow
+}
+
+exit 0

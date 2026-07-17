@@ -71,3 +71,4 @@ Complete this before implementation:
 - Maker portal verification complete: yes/no
 - Required tasks from `tasks.md` complete: yes/no
 - Known issues captured with owner/date: yes/no
+- README generated build summary reviewed/updated: yes/no
