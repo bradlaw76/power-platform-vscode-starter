@@ -376,6 +376,7 @@ Payload rules for Step 10:
 - Use `pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1` to summarize completion/drop-off by run.
 - Use `pwsh ./scripts/bootstrap/82-build-progress-report.ps1` to generate an HTML dashboard in `.wizard-metrics/build-progress-report.html`.
 - Re-run `82-build-progress-report.ps1` after new work to refresh the dashboard from the latest telemetry events.
+- Open the latest dashboard directly from docs: [Wizard Progress Report](../.wizard-metrics/build-progress-report.html).
 
 Validation checkpoint after each script:
 

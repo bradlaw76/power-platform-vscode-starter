@@ -417,6 +417,13 @@ Outputs:
 - `.wizard-metrics/build-progress-data.json` (analytics snapshot)
 - `.wizard-metrics/build-progress-report.html` (self-contained dashboard)
 
+Open the report:
+
+- [Wizard Progress Report](.wizard-metrics/build-progress-report.html)
+- [Wizard Progress Data (JSON)](.wizard-metrics/build-progress-data.json)
+
+Note: these links are local workspace artifacts. Run `pwsh ./scripts/bootstrap/82-build-progress-report.ps1` first if the files do not exist yet.
+
 Update model:
 
 - New work appends events to `.wizard-metrics/events.jsonl`.
