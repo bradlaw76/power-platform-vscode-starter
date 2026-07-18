@@ -35,6 +35,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "06-demo-script-wizard.ps1"
+}
+
 function Read-RequiredValue {
     param(
         [string]$Prompt,
@@ -482,6 +489,9 @@ if ($existingFiles.Count -gt 0 -and -not $Force) {
     if (-not (Confirm-Overwrite -Paths $existingFiles)) {
         Write-Host ""
         Write-Host "No files were changed." -ForegroundColor Yellow
+        if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+            Complete-WizardStepTelemetry -Message "Demo script generation cancelled by user."
+        }
         exit 0
     }
 }
@@ -691,3 +701,6 @@ Write-Host "  $demoScriptPath (compatibility copy of talk track)"
 Write-Host ""
 Write-Host "Next step:" -ForegroundColor Cyan
 Write-Host "  Review demo-walkthrough.md (engineer) and demo-talk-track.md (presenter) and ask for edits if you want different story, pacing, or emphasis."
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Demo script artifacts generated."
+}

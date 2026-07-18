@@ -39,6 +39,12 @@ if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
     $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 }
 
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $RepoRoot -StepName "15-dry-validate.ps1"
+}
+
 $payloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
     Join-Path $RepoRoot "payloads"
 } else {
@@ -349,5 +355,13 @@ foreach ($e in $errors) { Write-Host "ERROR $e" -ForegroundColor Red }
 Write-Host ""
 Write-Host "Summary: PASS=$($passes.Count) WARN=$($warnings.Count) ERROR=$($errors.Count)"
 
-if ($errors.Count -gt 0) { exit 1 }
+if ($errors.Count -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Dry validation found errors."
+    }
+    exit 1
+}
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Dry validation passed."
+}
 exit 0

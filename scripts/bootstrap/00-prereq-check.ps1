@@ -14,6 +14,13 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Continue"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "00-prereq-check.ps1"
+}
+
 $results = [System.Collections.Generic.List[PSCustomObject]]::new()
 
 function Test-Tool {
@@ -53,7 +60,13 @@ if ($failed.Count -gt 0) {
     Write-Host "  Azure CLI:            winget install Microsoft.AzureCLI"
     Write-Host "  Power Platform CLI:   winget install Microsoft.PowerPlatformCLI"
     Write-Host "  Git:                  winget install Git.Git"
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Missing required tools."
+    }
     exit 1
 }
 
 Write-Host "All prerequisites passed." -ForegroundColor Green
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Prerequisite check passed."
+}

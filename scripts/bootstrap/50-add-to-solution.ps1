@@ -26,6 +26,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "50-add-to-solution.ps1"
+}
+
 $envFile = Join-Path $repoRoot ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
@@ -223,6 +229,9 @@ $reportWebResourceNames = @(Get-ReportWebResourceNames -RepoRoot $repoRoot -Scen
 if ($entityNames.Count -eq 0 -and $reportWebResourceNames.Count -eq 0) {
     Write-Host "No payload entity references or report web resources were discovered." -ForegroundColor Yellow
     Write-Host "Add table/column/relationship payloads or generate report web resources first, then rerun."
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "No payload-defined entities or report web resources found."
+    }
     exit 0
 }
 
@@ -289,7 +298,15 @@ if ($reportWebResourceNames.Count -gt 0) {
 
 Write-Host ""
 Write-Host "Solution components — added: $added  skipped: $skipped  failed: $failed"
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Add-to-solution failed for one or more components."
+    }
+    exit 1
+}
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/60-build-forms-views.ps1"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Solution component add completed."
+}
 

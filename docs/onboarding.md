@@ -348,6 +348,10 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 # End-of-build summary analysis and optional README update/commit prompts
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
+# Build a run matrix from disclosed step events
+pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
+# Build an HTML dashboard from telemetry analytics
+pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 ```
 
 All scripts are idempotent and safe to rerun.
@@ -366,6 +370,12 @@ Payload rules for Step 10:
 - For preview only, run: `pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly`
 - Optional overrides for generalized workflows: `-SpecPath`, `-PlanPath`, `-TasksPath`, `-PayloadFolder`, and `-ReadmePath`.
 - If inputs are missing, the generated summary prints `Not available` sections instead of failing.
+- Bootstrap scripts disclose local step-progress telemetry and write events to `.wizard-metrics/events.jsonl`.
+- Events include run ID, step code, status, and timestamps only; they do not include user name, machine name, email, or access tokens.
+- Set `WIZARD_METRICS_OPTOUT=1` before running a script if you want to disable local telemetry for that session.
+- Use `pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1` to summarize completion/drop-off by run.
+- Use `pwsh ./scripts/bootstrap/82-build-progress-report.ps1` to generate an HTML dashboard in `.wizard-metrics/build-progress-report.html`.
+- Re-run `82-build-progress-report.ps1` after new work to refresh the dashboard from the latest telemetry events.
 
 Validation checkpoint after each script:
 

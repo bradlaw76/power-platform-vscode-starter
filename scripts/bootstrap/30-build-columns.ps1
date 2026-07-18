@@ -21,6 +21,11 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "30-build-columns.ps1"
+}
 
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
@@ -59,7 +64,11 @@ Write-Host ""
 
 $payloads = @(Get-ChildItem -Path $PayloadsFolder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
 if ($payloads.Count -eq 0) {
-    Write-Host "No columns-*.json found in: $PayloadsFolder" -ForegroundColor Yellow; exit 0
+    Write-Host "No columns-*.json found in: $PayloadsFolder" -ForegroundColor Yellow
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "No column payloads found."
+    }
+    exit 0
 }
 
 $created = 0; $skipped = 0; $failed = 0
@@ -112,7 +121,15 @@ foreach ($file in $payloads) {
 
 Write-Host ""
 Write-Host "Columns — created: $created  skipped: $skipped  failed: $failed"
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Column build failed for one or more payloads."
+    }
+    exit 1
+}
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/40-build-relationships.ps1"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Column build completed."
+}
 

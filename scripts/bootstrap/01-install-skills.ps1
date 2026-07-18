@@ -22,6 +22,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "01-install-skills.ps1"
+}
+
 $skillsSource = Join-Path $repoRoot ".claude\skills"
 $skillsDest   = Join-Path $HOME ".claude\skills"
 
@@ -33,6 +39,9 @@ Write-Host ""
 
 if (-not (Test-Path $skillsSource)) {
     Write-Host "No skills found in repo at $skillsSource. Nothing to install." -ForegroundColor Yellow
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "No skills folder found."
+    }
     exit 0
 }
 
@@ -64,3 +73,6 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  Skills are now available in Claude Code on this machine."
 Write-Host "  Start a new Claude Code session and run the wizard skill:"
 Write-Host "  /power-platform-vscode-wizard"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Skills installed."
+}

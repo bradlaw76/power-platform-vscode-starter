@@ -33,6 +33,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "10-auth-connect.ps1"
+}
+
 Write-Host ""
 Write-Host "=== Auth Connect ===" -ForegroundColor Cyan
 Write-Host "This script will sign you in and save your environment settings."
@@ -205,4 +212,7 @@ Write-Host "Session config saved to: $envFile" -ForegroundColor Green
 Write-Host "All bootstrap scripts will load this automatically."
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/20-build-tables.ps1"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Authentication and environment configuration saved."
+}
 

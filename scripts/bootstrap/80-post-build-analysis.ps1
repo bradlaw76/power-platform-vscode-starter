@@ -45,6 +45,12 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "80-post-build-analysis.ps1"
+}
+
 $specsRoot = Join-Path $repoRoot "specs"
 
 function Read-YesNo {
@@ -597,11 +603,17 @@ Write-Host "--- End Preview ---" -ForegroundColor Cyan
 
 if ($PreviewOnly) {
     Write-Host "PreviewOnly mode: README and git actions were skipped." -ForegroundColor Yellow
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "Post-build summary preview generated." -FinalizeRun
+    }
     exit 0
 }
 
 if ([string]::IsNullOrWhiteSpace($resolvedReadmePath)) {
     Write-Host "README not found. Skipping README and git actions." -ForegroundColor Yellow
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "Post-build summary generated without README update." -FinalizeRun
+    }
     exit 0
 }
 
@@ -660,4 +672,7 @@ if ($updateReadme) {
     Write-Host "README update skipped by user." -ForegroundColor Yellow
 }
 
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Post-build summary completed." -FinalizeRun
+}
 exit 0

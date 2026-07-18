@@ -34,6 +34,11 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "20-build-tables.ps1"
+}
 
 # ── Load session env if not already set ───────────────────────────────────
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
@@ -97,6 +102,9 @@ $payloads = @(Get-ChildItem -Path $PayloadsFolder -Filter "table-*.json" -ErrorA
 if ($payloads.Count -eq 0) {
     Write-Host "No table-*.json files found in: $PayloadsFolder" -ForegroundColor Yellow
     Write-Host "Create at least one table payload file and rerun."
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "No table payloads found."
+    }
     exit 0
 }
 
@@ -137,7 +145,15 @@ foreach ($file in $payloads) {
 
 Write-Host ""
 Write-Host "Tables — created: $created  skipped: $skipped  failed: $failed"
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Table build failed for one or more payloads."
+    }
+    exit 1
+}
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/30-build-columns.ps1"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Table build completed."
+}
 

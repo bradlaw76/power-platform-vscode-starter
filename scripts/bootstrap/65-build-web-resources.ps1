@@ -388,6 +388,12 @@ $artifactChips
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $specsRoot = Join-Path $repoRoot "specs"
 
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "65-build-web-resources.ps1"
+}
+
 $envFile = Join-Path $repoRoot ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
@@ -449,6 +455,9 @@ if ($includeReports -ne "yes" -and $includeReports -ne "y" -and $includeReports 
     Write-Host ""
     Write-Host "=== Build Report Web Resources ===" -ForegroundColor Cyan
     Write-Host "Scenario '$ScenarioSlug' has optional reports disabled. Nothing to generate." -ForegroundColor Yellow
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message "Optional report web resources disabled for scenario."
+    }
     exit 0
 }
 
@@ -562,5 +571,13 @@ Write-Host "Reports generated — created: $created  updated: $updated  failed: 
 Write-Host "Solution components — added: $addedToSolution  skipped: $skippedSolution"
 Write-Host "Output folder: $outputFolder"
 
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+        Register-WizardStepFailure -Message "Web resource build failed for one or more reports."
+    }
+    exit 1
+}
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Web resource build completed."
+}
 exit 0

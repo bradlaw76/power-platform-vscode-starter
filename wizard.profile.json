@@ -33,6 +33,30 @@
         "enabled": true,
         "script": "07-demo-dry-run.ps1"
       }
+    },
+    "telemetry": {
+      "enabled": true,
+      "disclosed": true,
+      "capturesPersonalIdentifiers": false,
+      "localFolder": ".wizard-metrics",
+      "optOutEnvironmentVariable": "WIZARD_METRICS_OPTOUT",
+      "matrixScript": "81-build-progress-matrix.ps1",
+      "estimatedMinutesSavedByStep": {
+        "00": 5,
+        "01": 8,
+        "05": 20,
+        "06": 12,
+        "07": 8,
+        "10": 20,
+        "15": 10,
+        "20": 25,
+        "30": 20,
+        "40": 20,
+        "50": 15,
+        "60": 30,
+        "65": 20,
+        "80": 10
+      }
     }
   },
   "conventions": {

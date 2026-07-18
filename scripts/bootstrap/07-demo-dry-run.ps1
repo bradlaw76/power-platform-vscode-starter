@@ -45,6 +45,12 @@ function Confirm-Overwrite {
 }
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "07-demo-dry-run.ps1"
+}
+
 $specsRoot = Join-Path $repoRoot "specs"
 
 if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
@@ -69,6 +75,9 @@ if (-not (Test-Path $demoScriptPath)) {
 if ((Test-Path $dryRunPath) -and -not $Force) {
     if (-not (Confirm-Overwrite -Path $dryRunPath)) {
         Write-Host "No files were changed." -ForegroundColor Yellow
+        if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+            Complete-WizardStepTelemetry -Message "Dry run cancelled by user."
+        }
         exit 0
     }
 }
@@ -116,3 +125,6 @@ $notes.Add("- Requested edit: $nextEdit")
 Set-Content -Path $dryRunPath -Value ($notes -join [Environment]::NewLine) -Encoding UTF8
 
 Write-Host "Dry-run notes written to: $dryRunPath" -ForegroundColor Green
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Dry-run notes captured."
+}

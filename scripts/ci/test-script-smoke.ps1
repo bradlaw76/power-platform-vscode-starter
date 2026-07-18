@@ -25,7 +25,7 @@ if ($formsViews -notmatch '\$resolvedPrimaryId') {
   throw 'Forms/views layout does not use resolved primary id field.'
 }
 
-foreach ($scriptName in @('65-build-web-resources.ps1', '70-build-web-resources.ps1')) {
+foreach ($scriptName in @('65-build-web-resources.ps1', '70-build-web-resources.ps1', '80-post-build-analysis.ps1', '81-build-progress-matrix.ps1', '82-build-progress-report.ps1', 'helpers/wizard-telemetry.ps1')) {
   $parseErrors = $null
   $parseTokens = $null
   [System.Management.Automation.Language.Parser]::ParseFile(

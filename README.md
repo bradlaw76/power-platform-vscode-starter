@@ -2,7 +2,6 @@
 
 <img width="2172" height="724" alt="ChatGPT Image Jun 8, 2026, 03_05_25 PM" src="https://github.com/user-attachments/assets/97e80bbb-df45-41a2-9459-63976cac0d4d" />
 
-
 A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution -- without manual portal clicks.
 
 > [!IMPORTANT]
@@ -83,6 +82,8 @@ All three paths converge on the same sequence:
 ```text
 Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
 ```
+
+Disclosed local usage metrics are available for wizard runs. Bootstrap scripts log non-identifying step progress to `.wizard-metrics/events.jsonl`, print a telemetry notice when they do so, and support opt-out with `WIZARD_METRICS_OPTOUT=1`.
 
 ---
 
@@ -334,6 +335,10 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 # End-of-build analysis
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
+# Generate a progress matrix from disclosed step events
+pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
+# Generate an HTML analytics dashboard from telemetry
+pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 ```
 
 After each script: check that the failed count is zero before running the next. All scripts are idempotent -- safe to rerun after fixing any failure.
@@ -346,6 +351,13 @@ Optional report web resources:
 - `70-build-web-resources.ps1` is the canonical optional module entrypoint.
 - `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
 - The script upserts Dataverse HTML web resources and adds them to the selected solution.
+
+Wizard step metrics:
+
+- Bootstrap scripts disclose local step-progress telemetry and write events to `.wizard-metrics/events.jsonl`.
+- Events include run ID, step code, status, and timestamps only; they do not include user name, machine name, email, or access tokens.
+- Use `pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1` to generate a run matrix showing which steps each user/run completed or dropped off on.
+- Set `WIZARD_METRICS_OPTOUT=1` before running a script if you want to disable local telemetry for that session.
 
 ## End-of-Build Analysis
 
@@ -385,6 +397,31 @@ Preview mode:
 ```powershell
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 ```
+
+Progress matrix:
+
+```powershell
+pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
+```
+
+Default output is written to `.wizard-metrics/build-progress-matrix.md`.
+
+HTML progress dashboard:
+
+```powershell
+pwsh ./scripts/bootstrap/82-build-progress-report.ps1
+```
+
+Outputs:
+
+- `.wizard-metrics/build-progress-data.json` (analytics snapshot)
+- `.wizard-metrics/build-progress-report.html` (self-contained dashboard)
+
+Update model:
+
+- New work appends events to `.wizard-metrics/events.jsonl`.
+- Re-run `82-build-progress-report.ps1` to refresh JSON + HTML from latest events.
+- If you only want to re-render HTML from existing JSON, use: `pwsh ./scripts/bootstrap/82-build-progress-report.ps1 -SkipRefresh`.
 
 BEGIN GENERATED BUILD SUMMARY
 ### Scenario and solution metadata
@@ -524,6 +561,8 @@ Release and rollback references for this update bundle:
 | `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
 | `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
 | `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
+| `81-build-progress-matrix.ps1` | Summarize disclosed wizard telemetry into a per-run step matrix | No | Yes |
+| `82-build-progress-report.ps1` | Generate a local HTML dashboard from wizard telemetry analytics | No | Yes |
 
 ---
 
@@ -541,7 +580,7 @@ power-platform-vscode-starter/
       power-platform-demo-wizard.prompt.md -- Slash prompt for guided chat-based wizard
   .vscode/
     extensions.json           -- Recommended extensions (installs on first open)
-  .gitignore                  -- Protects .env.ps1 (tokens/secrets) from accidental commits
+  .gitignore                  -- Protects .env.ps1 and .wizard-metrics/ from accidental commits
   docs/
     onboarding.md             -- Step-by-step setup guide for new builders
     build-log.md              -- Log template for recording each build run
@@ -569,6 +608,9 @@ power-platform-vscode-starter/
       65-build-web-resources.ps1   -- Generate optional scenario-driven HTML report web resources and add to solution
       70-build-web-resources.ps1   -- Canonical optional reporting module entrypoint (wrapper)
       80-post-build-analysis.ps1   -- Post-build summary generation and optional README update/commit prompts
+      81-build-progress-matrix.ps1 -- Build a run matrix from disclosed wizard telemetry events
+      82-build-progress-report.ps1 -- Build an HTML dashboard from wizard telemetry analytics
+      helpers/wizard-telemetry.ps1 -- Shared local telemetry helper for bootstrap steps
       wizard.profile.json          -- Project profile (required questions, modules, sequencing, conventions, gates)
       MIGRATION.md                 -- Upgrade guidance and compatibility expectations
 ```
@@ -605,6 +647,3 @@ power-platform-vscode-starter/
 | [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
 | [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |
 | [MIGRATION.md](MIGRATION.md) | Migration guidance for existing consumers moving to the contract/profile model |
-
-
-

@@ -2,6 +2,9 @@
 # NEVER commit this file.
 .env.ps1
 
+# Local disclosed wizard telemetry output.
+.wizard-metrics/
+
 # VS Code workspace settings (machine-local)
 .vscode/settings.json
 

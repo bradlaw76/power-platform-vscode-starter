@@ -45,6 +45,13 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+    . $telemetryHelper
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "05-start-wizard.ps1"
+}
+
 function Read-RequiredValue {
     param(
         [string]$Prompt,
@@ -173,7 +180,6 @@ function Confirm-Overwrite {
     return $answer -match '^(y|yes)$'
 }
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $profilePath = Join-Path $repoRoot "wizard.profile.json"
 $contractPath = Join-Path $repoRoot "docs\wizard-contract-v1.md"
 $onboardingPath = Join-Path $repoRoot "docs\onboarding.md"
@@ -606,4 +612,7 @@ if ($Retrofit) {
     Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
     Write-Host "  3. Get approval on scope, success criteria, and demo story."
     Write-Host "  4. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
+}
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+    Complete-WizardStepTelemetry -Message "Wizard files generated."
 }

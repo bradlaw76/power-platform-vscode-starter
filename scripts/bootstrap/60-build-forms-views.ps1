@@ -22,6 +22,11 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
+if (Test-Path $telemetryHelper) {
+  . $telemetryHelper
+  Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "60-build-forms-views.ps1"
+}
 
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
@@ -304,6 +309,9 @@ Write-Host ""
 $payloadCustomEntities = @(Get-CustomEntitiesFromTablePayloads -Folder $PayloadsFolder -Prefix $normalizedPrefix)
 if ($payloadCustomEntities.Count -eq 0) {
   Write-Host "  No custom entities found in table payloads. Nothing to generate." -ForegroundColor Yellow
+  if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+      Complete-WizardStepTelemetry -Message "No custom entities found for forms/views build."
+  }
   exit 0
 }
 
@@ -440,8 +448,16 @@ try {
 
 Write-Host ""
 Write-Host "Forms created: $formsCreated  Forms updated: $formsUpdated  Forms skipped: $formsSkipped  Views created: $viewsCreated  Failures: $failed"
-if ($failed -gt 0) { exit 1 }
+if ($failed -gt 0) {
+  if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+    Register-WizardStepFailure -Message "Forms/views build failed for one or more tables."
+  }
+  exit 1
+}
 Write-Host ""
 Write-Host "Build complete. Verify in Power Apps Maker at:"
 Write-Host "  https://make.powerapps.com"
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+  Complete-WizardStepTelemetry -Message "Forms/views build completed."
+}
 
