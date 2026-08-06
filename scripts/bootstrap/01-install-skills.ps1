@@ -1,4 +1,55 @@
 <#
+=============================================================================
+COMPONENT:    Install Claude Code Skills
+FILE:         scripts/bootstrap/01-install-skills.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | VS Code | Claude Code Skills
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Copies repo-hosted Claude Code skills into the local user skills directory so
+future sessions can invoke the Power Platform wizard skill without manual file
+copying.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          repo .claude/skills folder and local HOME directory
+- Outputs:         installed skill folders under ~/.claude/skills
+- Dependencies:    helpers/wizard-telemetry.ps1, Copy-Item, New-Item
+- Side Effects:    writes to the local user skills directory
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Run from a cloned copy of this repository.
+2. Local file system write access to ~/.claude/skills.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Missing source skills folder exits cleanly without failure.
+✔ Existing destination folders are overwritten safely on rerun.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Do not require Dataverse authentication for local skill installation.
+- Preserve rerunnable behavior when copying skill folders.
+- Keep the script safe to run on any machine with this repository.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Installs Claude Code skills from this repo into the local user skills directory.
     Safe to run at any time. Does not require authentication or Dataverse access.
@@ -73,6 +124,11 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  Skills are now available in Claude Code on this machine."
 Write-Host "  Start a new Claude Code session and run the wizard skill:"
 Write-Host "  /power-platform-vscode-wizard"
+Write-Host ""
+Write-Host "VS Code Copilot Chat users:" -ForegroundColor Cyan
+Write-Host "  This repo also includes a shared skill at .github/skills/power-platform-wizard-init"
+Write-Host "  Invoke it in Copilot Chat with:"
+Write-Host "  /power-platform-wizard-init"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Skills installed."
 }

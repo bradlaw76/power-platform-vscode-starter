@@ -4,6 +4,8 @@
 
 Use this document when setting up this repo for the first time in VS Code.
 
+Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
+
 This is the beginner-safe, step-by-step path for building Dynamics 365 and Power Platform demos/apps from VS Code.
 
 Important process rule:
@@ -60,6 +62,7 @@ Validation checkpoint:
 
 - Script prints `INSTALLED power-platform-vscode-wizard`.
 - You only need to run this once per machine. Re-running is safe (it overwrites with the latest version).
+- Repo-shared Copilot Chat skill is available at `.github/skills/power-platform-wizard-init` and can be invoked with `/power-platform-wizard-init`.
 
 ---
 
@@ -148,18 +151,21 @@ Common mistake:
 
 ---
 
-## Step 4A: Start the Wizard in Chat or Terminal
+## Step 4A: Start with the Shared Skill (Primary) or Direct Wizard Paths
 
 You can start the repository wizard in either of these ways:
 
-- VS Code chat prompt: run `/power-platform-demo-wizard` in Copilot Chat.
+- VS Code shared skill (primary): run `/power-platform-wizard-init` in Copilot Chat for guided path selection (chat or terminal) and progress monitoring.
+- VS Code chat prompt (direct wizard path): run `/power-platform-demo-wizard` in Copilot Chat.
 - Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`.
 
 What each option does:
 
+- Shared skill: guides path selection, enforces planning gates, and can monitor progress from telemetry.
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
 - Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
+- Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
 Validation checkpoint:
 
@@ -234,6 +240,8 @@ Validation checkpoint:
 - `az account show` returns your user and tenant.
 - `pac auth list` shows a profile for your environment.
 - `.env.ps1` exists in the repo root.
+- Default the solution choice to `new` unless you intentionally need to reuse an existing solution.
+- If the new solution name already exists, stop and enter a unique name rather than continuing with a reused solution.
 
 ---
 
@@ -339,11 +347,14 @@ Validation checkpoint:
 Run each script in sequence. Each one tells you the next step on completion.
 
 ```powershell
+pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
+pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 # End-of-build summary analysis and optional README update/commit prompts
@@ -361,7 +372,14 @@ Payload rules for Step 10:
 - `table-*.json` must include only true custom entities.
 - Do not place standard entities (like `contact` or `incident`) in `table-*.json`.
 - `columns-*.json` and `relationships-*.json` can reference both standard and custom entities.
+- `50-add-to-solution.ps1` derives the expected table set from payload references and fails before adding components if the target solution already contains foreign tables.
+- `50-add-to-solution.ps1` also produces a contamination scan artifact that classifies expected, wizard-managed foreign, and manual or legacy solution contents before more components are added.
+- Override that guard only when reuse is intentional: `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
+- To inspect or remove foreign tables from an unmanaged solution, run `pwsh ./scripts/bootstrap/55-prune-foreign-tables.ps1`.
+- `55-build-business-process-flows.ps1` reads `process-*.json` only when the scenario explicitly defines a BPF, validates stage fields and relationships against repo artifacts, upserts the wizard-managed process definition, and writes a BPF build report.
 - `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
+- `60-build-forms-views.ps1` applies form and view quality gates and writes population artifacts for both surfaces.
+- `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
@@ -384,6 +402,7 @@ Validation checkpoint after each script:
 - Summary counts are printed.
 - For script 60, verify: forms created, forms updated, forms skipped, views created, failures.
 - If failed count is greater than zero, stop and fix before proceeding.
+- If `50-add-to-solution.ps1` reports foreign tables, use the dry run first and follow [docs/solution-isolation-runbook.md](solution-isolation-runbook.md) before rerunning the build.
 
 ---
 
@@ -473,6 +492,44 @@ Validation checkpoint:
 
 ---
 
+## Step 16: (Optional) Submit Feedback to GitHub
+
+Help improve the wizard by reporting bugs or requesting enhancements.
+
+```powershell
+pwsh ./scripts/bootstrap/83-submit-feedback.ps1 -ScenarioSlug <scenario-slug>
+```
+
+What this does:
+
+- Prompts you to choose feedback type: Bug report or Enhancement request.
+- Auto-populates GitHub Issue with build context (scenario, tables, columns, forms, views, etc.).
+- Tries the GitHub CLI (`gh`) first with browser preview (user reviews before submitting).
+- Falls back to opening a pre-filled GitHub Issue URL if `gh` is not available.
+- All submission paths require human review — no silent/automatic issue creation.
+- Writes telemetry to `.wizard-metrics/events.jsonl` for tracking.
+
+Examples:
+
+```powershell
+# Interactive — asks for scenario and feedback type
+pwsh ./scripts/bootstrap/83-submit-feedback.ps1
+
+# Submit a bug for a known scenario
+pwsh ./scripts/bootstrap/83-submit-feedback.ps1 -ScenarioSlug contoso-case-tracker -FeedbackType Bug
+
+# Submit an enhancement request
+pwsh ./scripts/bootstrap/83-submit-feedback.ps1 -ScenarioSlug contoso-case-tracker -FeedbackType Enhancement
+```
+
+Validation checkpoint:
+
+- Feedback form opens in browser or GitHub CLI.
+- You can review and edit the pre-filled context before submitting.
+- Issue is created in the GitHub repo after your review.
+
+---
+
 ## Common Issues
 
 | Symptom | Likely Cause | Fix |
@@ -492,6 +549,7 @@ Validation checkpoint:
 
 ## Related Documents
 
+- Visual walkthrough page: `docs/wizard-walkthrough.html`
 - Root overview and quick start: `README.md`
 - Full implementation playbook: `requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md`
 - Guided wizard and discovery prompts: `requirements/how-to-build-dynamics-model-driven-apps-wizard.md`

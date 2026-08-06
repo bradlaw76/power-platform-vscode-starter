@@ -15,6 +15,7 @@ A repo-agnostic starter kit for building Power Platform model-driven apps from V
 - [Who this is for](#who-this-is-for)
 - [Key concepts](#key-concepts)
 - [How it works](#how-it-works)
+- [Visual walkthrough](docs/wizard-walkthrough.html)
 - [Getting started](#getting-started)
 - [Install Spec Kit tooling](#install-spec-kit-tooling)
 - [Build sequence](#build-sequence)
@@ -69,12 +70,15 @@ No prior experience needed with VS Code terminals, Git branches, PAC CLI, or Dat
 
 ## How it works
 
-Three entry points -- all leading to the same planning and build sequence:
+Primary entry point is the VS Code shared skill. Direct wizard routes remain supported and lead to the same planning/build sequence:
+
+Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html).
 
 | Entry point | How to start | Best for |
 | --- | --- | --- |
+| **VS Code shared skill (primary)** | `/power-platform-wizard-init` in Copilot Chat | Guided chat-or-terminal kickoff plus progress monitoring |
+| **VS Code Copilot Chat (direct wizard path)** | `/power-platform-demo-wizard` in Copilot Chat | Direct chat-first planning and Spec Kit generation |
 | **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Answer discovery questions interactively, scaffold planning files |
-| **VS Code Copilot Chat** | `/power-platform-demo-wizard` in Copilot Chat | Chat-first planning and Spec Kit generation |
 | **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
 
 All three paths converge on the same sequence:
@@ -152,6 +156,8 @@ Done. Installed: 1  Skipped: 0
 
 This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
 
+For VS Code Copilot Chat users, this repo also includes a shared skill at `.github/skills/power-platform-wizard-init` that can be invoked as `/power-platform-wizard-init` without running the installer.
+
 ---
 
 ## Install Spec Kit tooling
@@ -218,13 +224,25 @@ All tools must show **PASS** before continuing. Install any that show **FAIL** u
 
 ---
 
-### 5. Run the discovery wizard
+### 5. Run the discovery kickoff (primary: shared skill)
+
+Primary path:
+
+```text
+/power-platform-wizard-init
+```
+
+Direct wizard alternatives (still supported):
 
 ```powershell
 pwsh ./scripts/bootstrap/05-start-wizard.ps1
 ```
 
-The wizard asks 11 discovery questions and scaffolds `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`. Alternatively, use `/power-platform-demo-wizard` in VS Code Copilot Chat to go through the same discovery flow interactively.
+```text
+/power-platform-demo-wizard
+```
+
+All paths capture the same 11 discovery questions and scaffold `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`.
 
 Canonical source for discovery/planning/execution contract:
 
@@ -263,6 +281,12 @@ pwsh ./scripts/bootstrap/10-auth-connect.ps1
 ```
 
 Prompts for environment URL, Azure tenant, publisher prefix, and solution names. Saves a local `.env.ps1` -- never committed (protected by `.gitignore`).
+
+Solution safety rules in this step:
+
+- The default path is `new` solution creation.
+- Reusing an existing solution requires explicitly choosing `existing`.
+- If you choose `new` and the solution unique name already exists, the script stops so you can enter a unique name instead of reusing the old solution by accident.
 
 Additional auth modes:
 
@@ -326,11 +350,14 @@ Forms and labels rules:
 Run build scripts in order:
 
 ```powershell
+pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
+pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if enabled by profile + planning selection
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 # End-of-build analysis
@@ -342,6 +369,18 @@ pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 ```
 
 After each script: check that the failed count is zero before running the next. All scripts are idempotent -- safe to rerun after fixing any failure.
+
+Solution isolation behavior:
+
+- `50-add-to-solution.ps1` derives the expected table set from payload references and fails fast if the target solution already contains foreign table components.
+- `50-add-to-solution.ps1` also writes a contamination scan artifact covering expected components, wizard-managed foreign artifacts, and manual or legacy artifacts in the solution.
+- Strict mode is on by default. Override only for intentional reuse with `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
+- To review or remove foreign tables from an existing unmanaged solution, use `pwsh ./scripts/bootstrap/55-prune-foreign-tables.ps1`.
+- `55-build-business-process-flows.ps1` only creates a Business Process Flow when the scenario has an explicit `process-*.json` definition and the referenced entities, fields, and relationships are already justified by the repo artifacts.
+- If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
+- `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
+- `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
+- See [docs/solution-isolation-runbook.md](docs/solution-isolation-runbook.md) for the clean-build, detection, and cleanup flows.
 
 **After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
 
@@ -363,6 +402,8 @@ Wizard step metrics:
 
 `80-post-build-analysis.ps1` produces a concise end-of-build summary and prints a preview before any write action.
 
+It also generates a build mind map artifact for wizard-driven builds, visualizing what was created and how entities relate.
+
 It reads:
 
 - `specs/<scenario>/spec.md`
@@ -381,8 +422,14 @@ Optional overrides for generalized workflows:
 - `-TasksPath`
 - `-PayloadFolder`
 - `-ReadmePath`
+- `-MindMapOutputPath`
 
 If one or more inputs are missing, summary sections render `Not available` instead of failing.
+
+Generated mind map artifacts:
+
+- `.wizard-metrics/artifacts/analysis/build-mind-map.md` (Mermaid graph)
+- `.wizard-metrics/artifacts/analysis/build-mind-map.json` (structured data)
 
 Interactive flow:
 
@@ -416,6 +463,8 @@ Outputs:
 
 - `.wizard-metrics/build-progress-data.json` (analytics snapshot)
 - `.wizard-metrics/build-progress-report.html` (self-contained dashboard)
+- `.wizard-metrics/artifacts/analysis/build-mind-map.md` (build relationship mind map)
+- `.wizard-metrics/artifacts/analysis/build-mind-map.json` (mind map source data)
 
 Open the report:
 
@@ -488,6 +537,7 @@ Validation scenarios to run for every workflow change:
 ### Copilot Chat prompts
 
 ```text
+/power-platform-wizard-init path=terminal mode=full
 /power-platform-demo-wizard Create a Dynamics 365 Customer Service demo for case triage
 Walk me through this repo like a beginner wizard
 Ask me the discovery questions one at a time and help me write spec.md, plan.md, and tasks.md
@@ -497,9 +547,15 @@ Ask me the discovery questions one at a time and help me write spec.md, plan.md,
 
 After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill is installed on this machine and available in Claude Code sessions. The skill provides the full wizard workflow, validation checkpoints, script reference, solution lifecycle commands, and troubleshooting.
 
+### VS Code shared skill
+
+This repo includes `.github/skills/power-platform-wizard-init`. In Copilot Chat, invoke `/power-platform-wizard-init` to choose chat or terminal kickoff, enforce planning gates, and monitor progress from existing telemetry.
+
 ### How the entry points connect
 
 ```text
+VS Code shared skill (primary) -> path selection + progress monitoring -> same planning artifacts -> build scripts
+Direct wizard routes            -> same planning artifacts              -> build scripts
 Terminal wizard               -> spec.md, plan.md, tasks.md -> demo-walkthrough.md + demo-talk-track.md -> build scripts
 Copilot Chat                  -> same planning artifacts     -> demo-walkthrough.md + demo-talk-track.md -> build scripts
 Claude Code skill (available) -> guides the entire flow      -> inline help at each step
@@ -560,11 +616,14 @@ Release and rollback references for this update bundle:
 | `06-demo-script-wizard.ps1` | Generate scenario-aware `demo-walkthrough.md` and `demo-talk-track.md` (plus compatibility `demo-script.md`) | No | Yes (prompts before overwrite) |
 | `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
 | `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
+| `15-dry-validate.ps1` | Validate planning artifacts, payload prerequisites, optional report/BPF/app inputs, and emit contract artifacts before mutation | No | Yes |
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
 | `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
-| `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution (standard + custom as referenced) | Yes | Yes |
+| `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution, scan for contamination, and emit solution scan artifacts | Yes | Yes |
+| `55-build-business-process-flows.ps1` | Validate optional `process-*.json` definitions, upsert wizard-managed Business Process Flows, add them to the target solution, and emit a BPF build report | Yes | Yes |
 | `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
+| `62-build-app-module.ps1` | Create or update the scenario-aware model-driven app shell, attach intended components, and validate the resulting app | Yes | Yes |
 | `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
 | `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
 | `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
@@ -583,6 +642,10 @@ power-platform-vscode-starter/
         SKILL.md              -- Claude Code skill: wizard workflow, scripts, troubleshooting
   .github/
     copilot-instructions.md   -- Repo-wide Copilot Chat behavior and workflow guidance
+    skills/
+      power-platform-wizard-init/
+        SKILL.md              -- Shared Copilot skill: dual-path wizard kickoff + progress monitoring
+        references/progress-monitoring.md -- Telemetry-based status guidance
     prompts/
       power-platform-demo-wizard.prompt.md -- Slash prompt for guided chat-based wizard
   .vscode/
@@ -607,11 +670,14 @@ power-platform-vscode-starter/
       01-install-skills.ps1        -- Copy Claude Code skills to ~/.claude/skills/
       05-start-wizard.ps1          -- Discovery questions -> Spec Kit starter files
       10-auth-connect.ps1          -- Sign in, configure PAC auth, save session
+      15-dry-validate.ps1         -- Validate planning artifacts and payload prerequisites before mutation
       20-build-tables.ps1          -- Create tables from payloads/table-*.json
       30-build-columns.ps1         -- Add columns from payloads/columns-*.json
       40-build-relationships.ps1   -- Create lookups from payloads/relationships-*.json
       50-add-to-solution.ps1       -- Add payload-referenced entities to target solution
+      55-build-business-process-flows.ps1 -- Validate and build optional Business Process Flows
       60-build-forms-views.ps1     -- Build payload-driven Starter Main Forms and Active views, then publish
+      62-build-app-module.ps1      -- Create or update the scenario-aware model-driven app shell
       65-build-web-resources.ps1   -- Generate optional scenario-driven HTML report web resources and add to solution
       70-build-web-resources.ps1   -- Canonical optional reporting module entrypoint (wrapper)
       80-post-build-analysis.ps1   -- Post-build summary generation and optional README update/commit prompts
@@ -634,6 +700,8 @@ power-platform-vscode-starter/
 | PAC errors after `az login` | PAC and Azure CLI are separate auth mechanisms | Run both `az login` and `pac auth create` |
 | Login opens wrong tenant | Multiple tenants on account | Pass `-tenantId` flag or rerun auth with explicit tenant |
 | Solution not found in script 50 | Solution does not exist in environment yet | Create solution in Maker portal, then rerun `50-add-to-solution.ps1` |
+| BPF build skipped | No `process-*.json` exists or the scenario has no clear staged progression | Leave BPF disabled or add a complete process definition with stages, fields, and criteria |
+| BPF validation failed | Stage fields, primary entity, or cross-table relationships are missing or ambiguous | Fix `process-*.json`, explicit field mappings in planning artifacts, or the missing relationship payloads, then rerun `55-build-business-process-flows.ps1` |
 | Build script fails midway | Any error during execution | Scripts are idempotent -- fix issue and rerun the same script |
 | `code` command not found | VS Code shell command not in PATH | Command palette -> "Shell Command: Install 'code' command in PATH", restart terminal |
 | `git push` rejected | Branch behind remote | `git pull --ff-only`, then push with `-u origin <branch>` |
@@ -648,6 +716,7 @@ power-platform-vscode-starter/
 | Document | Purpose |
 | --- | --- |
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
+| [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html) | Full visual walkthrough with direct links to skill entry points, scripts, and runbooks |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
 | [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md) | Canonical workflow contract for discovery, planning, and execution |
 | [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables -- helps you decide which to reuse and which to create |
