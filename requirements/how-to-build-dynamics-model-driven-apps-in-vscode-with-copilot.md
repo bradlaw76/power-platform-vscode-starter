@@ -17,6 +17,8 @@ Companion wizard:
 - Use Sections 12-14 as release gates and handoff criteria.
 - Treat this as a baseline playbook and add domain-specific requirements in separate docs.
 
+For this repository, the primary wizard entry is `/power-platform-wizard-init` in Copilot Chat. It guides the choice between chat and terminal intake, preserves the required planning gates, and supports telemetry-based progress monitoring. The direct chat prompt and terminal wizard remain valid alternatives. Use `docs/wizard-walkthrough.html` for the visual end-to-end guide.
+
 Required process gate:
 
 - Spec Kit planning is mandatory before implementation.
@@ -68,12 +70,21 @@ Optional extension blocks (profile-driven):
 - solution-identity (new/existing solution and publisher prefix)
 - reporting (optional web resources)
 - retrofit (current-state and remaining-work intake)
+- source-control (target-repository preflight, scenario branch, traceability, checkpoint commits, discovered validation/CI, PR handoff, and merge strategy)
+- user-tasks (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
+- demo-data (conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision)
+
+The source-control block applies throughout whatever app or demo the end user is creating. Use `requirements/GithubInstructions_General.md` as the engineering standard. Inspect the target repository before implementation, record the plan in scenario artifacts, commit only coherent validated checkpoints, and reserve approved push/PR verification for handoff.
 
 Why this matters:
 
 - These answers become the source for `spec.md`, then `plan.md`, then `tasks.md`.
 - The table-strategy extension ensures you reuse existing standard tables (Contact, Case, Product, etc.) instead of recreating them.
 - The solution-identity extension prevents accidental cross-project contamination by requiring explicit solution names and prefixes.
+- User-task intake drives task-oriented forms, views, navigation, automation, and validation rather than producing a generic build checklist.
+- Relationship intake records cardinality, requiredness, existing/new status, cascade behavior, and the task or surface each relationship supports.
+- When demo data is enabled, `demo-data-plan.json` records the approved target tables, counts, hero records and their demo purpose, and bounded Task activity choices. Standard reused tables require an explicit create/reuse decision and are never seeded implicitly. Task activities default to the latest 10 eligible parent records and only target every record when `all` is explicitly approved.
+- Demo-data discovery is planning-only until a separate idempotent seeding execution module is approved.
 - Reference `docs/standard-dataverse-tables.md` to identify which tables are out-of-box vs. custom.
 
 ## 1. What You Are Building

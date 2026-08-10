@@ -1,4 +1,56 @@
 <#
+=============================================================================
+COMPONENT:    Start Wizard
+FILE:         scripts/bootstrap/05-start-wizard.ps1
+VERSION:      0.2.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-08-09
+ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Runs the interactive discovery wizard that captures scenario answers and
+scaffolds scenario-level planning artifacts before any build scripts run.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          user discovery answers and scenario slug information
+- Outputs:         answers.md, spec.md, plan.md, and tasks.md artifacts
+- Dependencies:    repo planning conventions and helper telemetry script
+- Side Effects:    writes planning files under specs/<scenario-slug>
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Run after the user is ready to answer discovery questions.
+2. Use the repo's planning-first workflow from docs/onboarding.md.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ New scenarios produce planning artifacts in the expected folder.
+✔ Retrofit scenarios capture current state before remaining work.
+✔ Source-control intake is read-only and persists scenario lifecycle decisions.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+v0.2.0  2026-08-09  Added profile-driven source-control preflight and planning.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Do not bypass the planning gate before implementation scripts.
+- Keep discovery outputs aligned with repo docs and prompts.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Runs an interactive repository wizard for a new Power Platform or Dynamics
     365 demo/app idea and scaffolds Spec Kit starter files.
@@ -27,6 +79,14 @@
     discovery, and generates spec.md reflecting what exists plus plan.md for
     remaining work.
 
+.PARAMETER AnswersFile
+    Optional JSON file containing an ordered array of answers for unattended
+    acceptance testing.
+
+.PARAMETER WorkspaceRoot
+    Optional repository root used for isolated acceptance testing. Defaults to
+    the repository containing this script.
+
 .EXAMPLE
     pwsh ./scripts/bootstrap/05-start-wizard.ps1
 
@@ -39,17 +99,49 @@
 
 param(
     [switch]$Force,
-    [switch]$Retrofit
+    [switch]$Retrofit,
+    [string]$AnswersFile,
+    [string]$WorkspaceRoot
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
+    Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+} else {
+    [System.IO.Path]::GetFullPath($WorkspaceRoot)
+}
+$scriptedAnswers = $null
+$scriptedAnswerIndex = 0
+if (-not [string]::IsNullOrWhiteSpace($AnswersFile)) {
+    if (-not (Test-Path -LiteralPath $AnswersFile -PathType Leaf)) {
+        throw "Answers file not found: $AnswersFile"
+    }
+
+    $loadedAnswers = @(Get-Content -LiteralPath $AnswersFile -Raw -Encoding UTF8 | ConvertFrom-Json)
+    $scriptedAnswers = @($loadedAnswers | ForEach-Object { [string]$_ })
+}
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
     Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "05-start-wizard.ps1"
+}
+
+function Read-WizardInput {
+    param([string]$Prompt)
+
+    if ($null -eq $scriptedAnswers) {
+        return Read-Host $Prompt
+    }
+
+    if ($scriptedAnswerIndex -ge $scriptedAnswers.Count) {
+        throw "Scripted answers exhausted at prompt: $Prompt"
+    }
+
+    $value = $scriptedAnswers[$scriptedAnswerIndex]
+    $script:scriptedAnswerIndex++
+    return $value
 }
 
 function Read-RequiredValue {
@@ -60,10 +152,10 @@ function Read-RequiredValue {
 
     while ($true) {
         $value = if ([string]::IsNullOrWhiteSpace($Default)) {
-            Read-Host $Prompt
+            Read-WizardInput $Prompt
         }
         else {
-            Read-Host "$Prompt [$Default]"
+            Read-WizardInput "$Prompt [$Default]"
         }
 
         if ([string]::IsNullOrWhiteSpace($value)) {
@@ -88,6 +180,38 @@ function ConvertTo-Slug {
         return "new-scenario"
     }
     return $slug
+}
+
+function Get-SourceControlPreflight {
+    param([string]$RepositoryRoot)
+
+    $gitCommand = Get-Command git -ErrorAction SilentlyContinue
+    if ($null -eq $gitCommand) {
+        return [ordered]@{ Available = $false }
+    }
+
+    $topLevel = (& git -C $RepositoryRoot rev-parse --show-toplevel 2>$null)
+    if ($LASTEXITCODE -ne 0) {
+        return [ordered]@{ Available = $false }
+    }
+
+    $branch = ((& git -C $RepositoryRoot branch --show-current 2>$null) -join "`n").Trim()
+    $remote = ((& git -C $RepositoryRoot remote get-url origin 2>$null) -join "`n").Trim()
+    $status = @(& git -C $RepositoryRoot status --short 2>$null)
+    $recentCommit = ((& git -C $RepositoryRoot log -1 --oneline 2>$null) -join "`n").Trim()
+    $defaultBranchRef = ((& git -C $RepositoryRoot symbolic-ref refs/remotes/origin/HEAD 2>$null) -join "`n").Trim()
+    $defaultBranch = if ($defaultBranchRef -match '^refs/remotes/origin/(.+)$') { $Matches[1] } else { "unknown" }
+
+    return [ordered]@{
+        Available     = $true
+        TopLevel      = (($topLevel -join "`n").Trim())
+        Branch        = $branch
+        DefaultBranch = $defaultBranch
+        Remote        = $remote
+        Dirty         = ($status.Count -gt 0)
+        ChangedCount  = $status.Count
+        RecentCommit  = $recentCommit
+    }
 }
 
 function Resolve-StandardLogicalName {
@@ -176,8 +300,170 @@ function Confirm-Overwrite {
     Write-Host "The following files already exist and would be overwritten:" -ForegroundColor Yellow
     $Paths | ForEach-Object { Write-Host "  $_" }
     Write-Host "" 
-    $answer = Read-Host "Overwrite these files? (y/N)"
+    $answer = Read-WizardInput "Overwrite these files? (y/N)"
     return $answer -match '^(y|yes)$'
+}
+
+function Read-BooleanChoice {
+    param(
+        [string]$Prompt,
+        [bool]$Default = $false
+    )
+
+    $defaultText = if ($Default) { "yes" } else { "no" }
+    while ($true) {
+        $value = Read-WizardInput "$Prompt [$defaultText]"
+        if ([string]::IsNullOrWhiteSpace($value)) {
+            return $Default
+        }
+
+        switch ($value.Trim().ToLowerInvariant()) {
+            'y' { return $true }
+            'yes' { return $true }
+            'true' { return $true }
+            '1' { return $true }
+            'n' { return $false }
+            'no' { return $false }
+            'false' { return $false }
+            '0' { return $false }
+        }
+
+        Write-Host "Enter yes or no." -ForegroundColor Yellow
+    }
+}
+
+function Read-PositiveInt {
+    param(
+        [string]$Prompt,
+        [int]$Minimum = 1,
+        [int]$Default = 1
+    )
+
+    while ($true) {
+        $value = Read-WizardInput "$Prompt [$Default]"
+        if ([string]::IsNullOrWhiteSpace($value)) {
+            return $Default
+        }
+
+        $parsed = 0
+        if ([int]::TryParse($value.Trim(), [ref]$parsed) -and $parsed -ge $Minimum) {
+            return $parsed
+        }
+
+        Write-Host "Enter a whole number greater than or equal to $Minimum." -ForegroundColor Yellow
+    }
+}
+
+function Split-ListValues {
+    param([string]$Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) {
+        return @()
+    }
+
+    return @($Value -split '[,;\r\n]+' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+}
+
+function Format-BulletList {
+    param(
+        [string]$Input,
+        [string]$NoneValue = "- None"
+    )
+
+    $items = @(Split-ListValues -Value $Input)
+    if ($items.Count -eq 0 -or ($items.Count -eq 1 -and $items[0].ToLowerInvariant() -eq 'none')) {
+        return $NoneValue
+    }
+
+    return (($items | ForEach-Object { "- $_" }) -join "`n")
+}
+
+function Format-BpfStageBullets {
+    param([array]$Stages)
+
+    if ($null -eq $Stages -or $Stages.Count -eq 0) {
+        return "- None"
+    }
+
+    $lines = New-Object System.Collections.Generic.List[string]
+    foreach ($stage in @($Stages | Sort-Object Order)) {
+        $requiredFields = if ($stage.RequiredFields.Count -gt 0) { $stage.RequiredFields -join ', ' } else { 'None' }
+        $relationship = if ([string]::IsNullOrWhiteSpace($stage.RelationshipLogicalName)) { 'None' } else { $stage.RelationshipLogicalName }
+        $lines.Add("- Stage $($stage.Order): $($stage.StageName) [entity=$($stage.EntityLogicalName); fields=$requiredFields; relationship=$relationship]") | Out-Null
+        $lines.Add("  - Entry criteria: $($stage.EntryCriteria)") | Out-Null
+        $lines.Add("  - Exit criteria: $($stage.ExitCriteria)") | Out-Null
+    }
+
+    return ($lines -join "`n")
+}
+
+function Read-BpfDiscovery {
+    param(
+        [string]$ScenarioName,
+        [string]$ScenarioSlug
+    )
+
+    $enabled = Read-BooleanChoice -Prompt "E-bpf. Does this scenario need a Business Process Flow?" -Default:$false
+    if (-not $enabled) {
+        return [ordered]@{
+            Enabled                      = $false
+            BusinessProcessFlowName      = ""
+            PrimaryProcessEntity         = ""
+            FailIfBpfDefinitionIncomplete = $true
+            PreferUpdateExistingBpf      = $true
+            CrossTableProgression        = $false
+            TargetFormName               = ""
+            StageDefinitions             = @()
+        }
+    }
+
+    Write-Host ""
+    Write-Host "Business Process Flow discovery (only for scenarios with a real staged lifecycle)." -ForegroundColor Cyan
+
+    $processName = Read-RequiredValue "    BPF display name" "$ScenarioName Process"
+    $primaryEntity = Read-RequiredValue "    Primary entity / process root logical name (for example: incident)"
+    $targetFormName = Read-RequiredValue "    Target Main form name for the process (for example: Information or Starter Main Form)"
+    $failIfIncomplete = Read-BooleanChoice -Prompt "    Fail the build if the BPF definition is incomplete?" -Default:$true
+    $preferUpdate = Read-BooleanChoice -Prompt "    Prefer update over duplicate create when a wizard-managed BPF already exists?" -Default:$true
+    $crossTable = Read-BooleanChoice -Prompt "    Does the process require cross-table progression?" -Default:$false
+    $stageCount = Read-PositiveInt -Prompt "    Number of BPF stages" -Minimum 2 -Default 4
+
+    $stages = New-Object System.Collections.Generic.List[object]
+    for ($index = 1; $index -le $stageCount; $index++) {
+        Write-Host ""
+        Write-Host "    Stage $index" -ForegroundColor Cyan
+        $stageName = Read-RequiredValue "      Stage name"
+        $defaultEntity = if ($index -eq 1) { $primaryEntity } else { $primaryEntity }
+        $stageEntity = Read-RequiredValue "      Stage entity logical name" $defaultEntity
+        $requiredFields = Split-ListValues (Read-RequiredValue "      Required fields for this stage (comma-separated logical names)")
+        $entryCriteria = Read-RequiredValue "      Stage entry criteria"
+        $exitCriteria = Read-RequiredValue "      Stage exit criteria"
+        $relationshipLogicalName = ""
+        if ($crossTable -or $stageEntity.Trim().ToLowerInvariant() -ne $primaryEntity.Trim().ToLowerInvariant()) {
+            $relationshipLogicalName = Read-RequiredValue "      Supporting relationship logical name (required for cross-table stages)"
+        }
+
+        $stages.Add([pscustomobject]@{
+            Order                  = $index
+            StageName              = $stageName
+            EntityLogicalName      = $stageEntity.Trim().ToLowerInvariant()
+            RequiredFields         = @($requiredFields | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ })
+            EntryCriteria          = $entryCriteria
+            ExitCriteria           = $exitCriteria
+            RelationshipLogicalName = $relationshipLogicalName.Trim().ToLowerInvariant()
+        }) | Out-Null
+    }
+
+    return [ordered]@{
+        Enabled                       = $true
+        BusinessProcessFlowName       = $processName
+        PrimaryProcessEntity          = $primaryEntity.Trim().ToLowerInvariant()
+        FailIfBpfDefinitionIncomplete = $failIfIncomplete
+        PreferUpdateExistingBpf       = $preferUpdate
+        CrossTableProgression         = $crossTable
+        TargetFormName                = $targetFormName
+        StageDefinitions              = @($stages)
+    }
 }
 
 $profilePath = Join-Path $repoRoot "wizard.profile.json"
@@ -185,12 +471,24 @@ $contractPath = Join-Path $repoRoot "docs\wizard-contract-v1.md"
 $onboardingPath = Join-Path $repoRoot "docs\onboarding.md"
 $payloadPath = Join-Path $repoRoot "payloads"
 $reportsModuleEnabled = $true
+$bpfModuleEnabled = $true
+$sourceControlModuleEnabled = $true
+$sourceControlBranchPattern = "feature/<scenario-slug>"
 
 if (Test-Path $profilePath) {
     try {
         $profile = Get-Content -Path $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($null -ne $profile.execution.optionalModules."web-resources") {
             $reportsModuleEnabled = [bool]$profile.execution.optionalModules."web-resources".enabled
+        }
+        if ($null -ne $profile.discovery.optionalQuestionModules."business-process-flow") {
+            $bpfModuleEnabled = [bool]$profile.discovery.optionalQuestionModules."business-process-flow"
+        }
+        if ($null -ne $profile.discovery.optionalQuestionModules."source-control") {
+            $sourceControlModuleEnabled = [bool]$profile.discovery.optionalQuestionModules."source-control"
+        }
+        if ($null -ne $profile.sourceControl.branchPattern) {
+            $sourceControlBranchPattern = [string]$profile.sourceControl.branchPattern
         }
     } catch {
         Write-Host "Failed to parse wizard.profile.json. Fix profile JSON before running the wizard." -ForegroundColor Red
@@ -229,6 +527,43 @@ $scenarioSlug = Read-RequiredValue "Scenario folder slug" $scenarioSlugDefault
 $answers = [ordered]@{}
 $answers["ScenarioName"] = $scenarioName
 $answers["ScenarioSlug"] = $scenarioSlug
+
+if ($sourceControlModuleEnabled) {
+    $gitPreflight = Get-SourceControlPreflight -RepositoryRoot $repoRoot
+    Write-Host ""
+    Write-Host "Source-control preflight (read-only):" -ForegroundColor Cyan
+    if ($gitPreflight.Available) {
+        Write-Host "  Repository: $($gitPreflight.TopLevel)"
+        Write-Host "  Remote: $($gitPreflight.Remote)"
+        Write-Host "  Current branch: $($gitPreflight.Branch)"
+        Write-Host "  Default branch: $($gitPreflight.DefaultBranch)"
+        Write-Host "  Recent commit: $($gitPreflight.RecentCommit)"
+        Write-Host "  Working tree changes: $($gitPreflight.ChangedCount)"
+        if ($gitPreflight.Dirty) {
+            Write-Host "  Existing changes detected. The wizard will not stage, discard, or commit them during intake." -ForegroundColor Yellow
+        }
+        if ($gitPreflight.Branch -eq $gitPreflight.DefaultBranch) {
+            Write-Host "  A scenario branch is required before implementation begins." -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "  Git repository details are unavailable. Resolve this before implementation begins." -ForegroundColor Yellow
+    }
+
+    $defaultScenarioBranch = $sourceControlBranchPattern.Replace("<scenario-slug>", $scenarioSlug)
+    $answers["SourceControlBranch"] = Read-RequiredValue "E-source-control. Scenario branch name" $defaultScenarioBranch
+    $answers["SourceControlWorkItem"] = Read-RequiredValue "E-source-control. Related issue/spec/work item (enter 'none' if not applicable)" "specs/$scenarioSlug"
+    $answers["SourceControlCheckpoints"] = Read-RequiredValue "E-source-control. Commit strategy (checkpoints/final-only)" "checkpoints"
+    $answers["SourceControlCiChecks"] = Read-RequiredValue "E-source-control. Required validation or CI checks (comma-separated)" "applicable repo CI tests"
+    $answers["SourceControlPullRequest"] = Read-RequiredValue "E-source-control. Push branch and prepare a pull request at handoff? (yes/no)" "yes"
+    $answers["SourceControlMergeStrategy"] = Read-RequiredValue "E-source-control. Merge strategy (squash/merge/rebase/team-default)" "team-default"
+} else {
+    $answers["SourceControlBranch"] = "not configured"
+    $answers["SourceControlWorkItem"] = "none"
+    $answers["SourceControlCheckpoints"] = "final-only"
+    $answers["SourceControlCiChecks"] = "applicable repo CI tests"
+    $answers["SourceControlPullRequest"] = "no"
+    $answers["SourceControlMergeStrategy"] = "team-default"
+}
 
 if ($Retrofit) {
     # --- Retrofit mode: ask for current state, not greenfield intent ---
@@ -308,6 +643,11 @@ if ($Retrofit) {
     } else {
         $answers["IncludeHtmlReports"] = "no"
     }
+    if ($bpfModuleEnabled) {
+        $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
+    } else {
+        $bpf = [ordered]@{ Enabled = $false; BusinessProcessFlowName = ""; PrimaryProcessEntity = ""; FailIfBpfDefinitionIncomplete = $true; PreferUpdateExistingBpf = $true; CrossTableProgression = $false; TargetFormName = ""; StageDefinitions = @() }
+    }
 } else {
     $answers["StandardTablesReused"] = Read-RequiredValue "E-table-mapping. Explicit mapping - standard tables to reuse (comma-separated display names or logical names; enter 'none' if none)" "none"
     $answers["CustomTablesToCreate"] = Read-RequiredValue "E-table-mapping. Explicit mapping - custom tables to create (comma-separated; enter 'none' if none)" "none"
@@ -319,7 +659,81 @@ if ($Retrofit) {
     } else {
         $answers["IncludeHtmlReports"] = "no"
     }
+    if ($bpfModuleEnabled) {
+        $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
+    } else {
+        $bpf = [ordered]@{ Enabled = $false; BusinessProcessFlowName = ""; PrimaryProcessEntity = ""; FailIfBpfDefinitionIncomplete = $true; PreferUpdateExistingBpf = $true; CrossTableProgression = $false; TargetFormName = ""; StageDefinitions = @() }
+    }
 }
+
+$answers["UserTaskDefinitions"] = Read-RequiredValue "E-user-tasks. Top user tasks (persona | task | frequency | entry table/view | outcome; semicolon-separated)"
+$answers["UserTaskOwnership"] = Read-RequiredValue "E-user-tasks. Task ownership and done definitions (task | owner | done definition; semicolon-separated)"
+
+if ($answers["RelationshipsToCreate"].Trim().ToLowerInvariant() -ne "none") {
+    $answers["RelationshipRequirements"] = Read-RequiredValue "E-table-mapping. Relationship decisions (referencing -> referenced | cardinality | required/optional | existing/new | cascade behavior | supporting task/surface; semicolon-separated)"
+} else {
+    $answers["RelationshipRequirements"] = "none"
+}
+
+if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$') {
+    Write-Host ""
+    Write-Host "Demo data planning (planning only; this wizard does not create Dataverse rows)." -ForegroundColor Cyan
+    $answers["DemoDataScope"] = Read-RequiredValue "E-demo-data. Seed all scenario-created custom tables or selected tables? (all-created/selected)" "all-created"
+    $defaultDemoDataTables = if ($answers["DemoDataScope"] -ieq "all-created") { $answers["CustomTablesToCreate"] } else { "" }
+    $answers["DemoDataTables"] = Read-RequiredValue "E-demo-data. Tables to receive records (comma-separated)" $defaultDemoDataTables
+    $answers["DemoDataStandardTableStrategy"] = Read-RequiredValue "E-demo-data. Standard reused table strategy (table=create/reuse-existing/both; semicolon-separated; enter 'none' if not targeted)" "none"
+    $answers["DemoDataRecordCounts"] = Read-RequiredValue "E-demo-data. Record count per table (table=count; semicolon-separated)"
+    $answers["DemoDataScenarios"] = Read-RequiredValue "E-demo-data. Business scenarios and lifecycle states the records must cover"
+    $answers["DemoDataHeroRecords"] = Read-RequiredValue "E-demo-data. Hero records for demos (table | count | scenario/purpose; semicolon-separated; enter 'none' if not needed)" "none"
+    $answers["DemoDataRelationshipDistribution"] = Read-RequiredValue "E-demo-data. Related-record distribution (for example: Case=10; Review=1-3 per Case)" "none"
+    $answers["DemoDataCreateTasks"] = Read-RequiredValue "E-demo-data. Create related Dataverse Task activity records? (yes/no)" "no"
+    if ($answers["DemoDataCreateTasks"] -match '^(?i:y|yes|true|1)$') {
+        $answers["DemoDataTaskParentTables"] = Read-RequiredValue "E-demo-data. Parent tables whose records receive Task activities (comma-separated)" $answers["DemoDataTables"]
+        $answers["DemoDataTaskScope"] = Read-RequiredValue "E-demo-data. Which parent records receive tasks? (latest/all/selected)" "latest"
+        $answers["DemoDataTaskSourceRecordLimit"] = Read-RequiredValue "E-demo-data. Maximum parent records per table that receive tasks" "10"
+        $answers["DemoDataTaskOrderBy"] = Read-RequiredValue "E-demo-data. Field and direction used to identify the latest records" "createdon desc"
+        $answers["DemoDataTasksPerRecord"] = Read-RequiredValue "E-demo-data. Number of Task activities per selected parent record" "1"
+    } else {
+        $answers["DemoDataTaskParentTables"] = "none"
+        $answers["DemoDataTaskScope"] = "none"
+        $answers["DemoDataTaskSourceRecordLimit"] = "0"
+        $answers["DemoDataTaskOrderBy"] = "none"
+        $answers["DemoDataTasksPerRecord"] = "0"
+    }
+    $answers["DemoDataMethod"] = Read-RequiredValue "E-demo-data. Creation method (scripted/manual/import)" "scripted"
+    $answers["DemoDataRerunBehavior"] = Read-RequiredValue "E-demo-data. Rerun behavior (upsert/replace/fail-if-present)" "upsert"
+    $answers["DemoDataSourceTag"] = Read-RequiredValue "E-demo-data. Source tag used to identify wizard-owned records" $scenarioSlug
+    $answers["DemoDataPrivacyConstraints"] = Read-RequiredValue "E-demo-data. Synthetic-data/privacy constraints" "synthetic data only; no personal or production data"
+    $answers["DemoDataCleanup"] = Read-RequiredValue "E-demo-data. Generate cleanup/reset instructions? (yes/no)" "yes"
+} else {
+    $answers["DemoDataScope"] = "none"
+    $answers["DemoDataTables"] = "none"
+    $answers["DemoDataStandardTableStrategy"] = "none"
+    $answers["DemoDataRecordCounts"] = "none"
+    $answers["DemoDataScenarios"] = "none"
+    $answers["DemoDataHeroRecords"] = "none"
+    $answers["DemoDataRelationshipDistribution"] = "none"
+    $answers["DemoDataCreateTasks"] = "no"
+    $answers["DemoDataTaskParentTables"] = "none"
+    $answers["DemoDataTaskScope"] = "none"
+    $answers["DemoDataTaskSourceRecordLimit"] = "0"
+    $answers["DemoDataTaskOrderBy"] = "none"
+    $answers["DemoDataTasksPerRecord"] = "0"
+    $answers["DemoDataMethod"] = "none"
+    $answers["DemoDataRerunBehavior"] = "none"
+    $answers["DemoDataSourceTag"] = "none"
+    $answers["DemoDataPrivacyConstraints"] = "none"
+    $answers["DemoDataCleanup"] = "no"
+}
+
+$answers["EnableBusinessProcessFlow"] = if ($bpf.Enabled) { "yes" } else { "no" }
+$answers["BusinessProcessFlowName"] = $bpf.BusinessProcessFlowName
+$answers["PrimaryProcessEntity"] = $bpf.PrimaryProcessEntity
+$answers["FailIfBpfDefinitionIncomplete"] = if ($bpf.FailIfBpfDefinitionIncomplete) { "yes" } else { "no" }
+$answers["PreferUpdateExistingBpf"] = if ($bpf.PreferUpdateExistingBpf) { "yes" } else { "no" }
+$answers["BpfCrossTableProgression"] = if ($bpf.CrossTableProgression) { "yes" } else { "no" }
+$answers["BpfTargetFormName"] = $bpf.TargetFormName
+$answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = "Dynamics blue"
 $answers["ReportSet"] = "Agent performance report; Supervisor oversight report; Executive summary KPI report"
 
@@ -346,8 +760,105 @@ $answersPath = Join-Path $scenarioFolder "answers.md"
 $specPath = Join-Path $scenarioFolder "spec.md"
 $planPath = Join-Path $scenarioFolder "plan.md"
 $tasksPath = Join-Path $scenarioFolder "tasks.md"
+$demoDataPlanPath = Join-Path $scenarioFolder "demo-data-plan.json"
+$scenarioPayloadFolder = Join-Path (Join-Path $repoRoot "payloads\scenarios") $scenarioSlug
+$bpfPayloadPath = Join-Path $scenarioPayloadFolder "process-$scenarioSlug.json"
+
+$standardFieldsList = Format-BulletList -Input $answers["StandardFieldsReused"]
+$customFieldsList = Format-BulletList -Input $answers["CustomFieldsToAdd"]
+$relationshipList = Format-BulletList -Input $answers["RelationshipsToCreate"]
+$bpfStagesMarkdown = Format-BpfStageBullets -Stages @($answers["BpfStageDefinitions"])
+$bpfPayloadObject = if ($bpf.Enabled) {
+    [ordered]@{
+        Enabled                       = $true
+        BusinessProcessFlowName       = $bpf.BusinessProcessFlowName
+        PrimaryProcessEntity          = $bpf.PrimaryProcessEntity
+        FailIfBpfDefinitionIncomplete = $bpf.FailIfBpfDefinitionIncomplete
+        PreferUpdateExistingBpf       = $bpf.PreferUpdateExistingBpf
+        CrossTableProgression         = $bpf.CrossTableProgression
+        FormIntegration               = [ordered]@{
+            TargetFormName   = $bpf.TargetFormName
+            RequireMainForm  = $true
+        }
+        StageDefinitions              = @($bpf.StageDefinitions | ForEach-Object {
+            [ordered]@{
+                Order                  = $_.Order
+                StageName              = $_.StageName
+                EntityLogicalName      = $_.EntityLogicalName
+                RequiredFields         = @($_.RequiredFields)
+                EntryCriteria          = $_.EntryCriteria
+                ExitCriteria           = $_.ExitCriteria
+                RelationshipLogicalName = $_.RelationshipLogicalName
+            }
+        })
+    }
+} else {
+    $null
+}
+$bpfPayloadJson = if ($null -ne $bpfPayloadObject) { $bpfPayloadObject | ConvertTo-Json -Depth 10 } else { "" }
+$demoDataPlanObject = if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$') {
+    [ordered]@{
+        Enabled                 = $true
+        Scope                   = $answers["DemoDataScope"]
+        Tables                  = @(Split-ListValues -Value $answers["DemoDataTables"])
+        StandardTableStrategy   = $answers["DemoDataStandardTableStrategy"]
+        RecordCounts            = $answers["DemoDataRecordCounts"]
+        Scenarios               = $answers["DemoDataScenarios"]
+        HeroRecords             = $answers["DemoDataHeroRecords"]
+        RelationshipDistribution = $answers["DemoDataRelationshipDistribution"]
+        TaskGeneration          = [ordered]@{
+            Enabled                 = ($answers["DemoDataCreateTasks"] -match '^(?i:y|yes|true|1)$')
+            ParentTables            = @(Split-ListValues -Value $answers["DemoDataTaskParentTables"])
+            Scope                   = $answers["DemoDataTaskScope"]
+            SourceRecordLimit       = [int]$answers["DemoDataTaskSourceRecordLimit"]
+            OrderBy                 = $answers["DemoDataTaskOrderBy"]
+            TasksPerRecord          = [int]$answers["DemoDataTasksPerRecord"]
+        }
+        Method                  = $answers["DemoDataMethod"]
+        RerunBehavior           = $answers["DemoDataRerunBehavior"]
+        SourceTag               = $answers["DemoDataSourceTag"]
+        PrivacyConstraints      = $answers["DemoDataPrivacyConstraints"]
+        GenerateCleanup        = ($answers["DemoDataCleanup"] -match '^(?i:y|yes|true|1)$')
+    }
+} else {
+    $null
+}
+$demoDataPlanJson = if ($null -ne $demoDataPlanObject) { $demoDataPlanObject | ConvertTo-Json -Depth 5 } else { "" }
+
+$bpfSummaryBlock = if ($bpf.Enabled) {
+@"
+## Optional Business Process Flow
+- Enabled: yes
+- Name: $($bpf.BusinessProcessFlowName)
+- Primary entity: $($bpf.PrimaryProcessEntity)
+- Target Main form: $($bpf.TargetFormName)
+- Cross-table progression: $($answers["BpfCrossTableProgression"])
+- Fail if incomplete: $($answers["FailIfBpfDefinitionIncomplete"])
+- Prefer update existing: $($answers["PreferUpdateExistingBpf"])
+
+### BPF Stage Definitions
+$bpfStagesMarkdown
+
+### BPF Payload Draft
+```json
+$bpfPayloadJson
+```
+"@
+} else {
+@"
+## Optional Business Process Flow
+- Enabled: no
+- Reason to skip: No staged lifecycle was captured during discovery.
+"@
+}
 
 $targetFiles = @($answersPath, $specPath, $planPath, $tasksPath)
+if ($null -ne $demoDataPlanObject) {
+    $targetFiles += $demoDataPlanPath
+}
+if ($bpf.Enabled) {
+    $targetFiles += $bpfPayloadPath
+}
 $existingFiles = @($targetFiles | Where-Object { Test-Path $_ })
 if ($existingFiles.Count -gt 0 -and -not $Force) {
     if (-not (Confirm-Overwrite -Paths $existingFiles)) {
@@ -382,10 +893,22 @@ $answersContent = @"
 11. Solution output type: $($answers["SolutionType"])
 
 ## Extension Blocks
+- business-process-flow: enabled=$($answers["EnableBusinessProcessFlow"]) ; primary=$($answers["PrimaryProcessEntity"]) ; name=$($answers["BusinessProcessFlowName"])
 - table-strategy: $($answers["TableChoice"])
 - solution-identity: solution=$($answers["SolutionChoice"]) -- $($answers["SolutionName"]); prefix=$($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
 - reporting: $($answers["IncludeHtmlReports"])
+- source-control: branch=$($answers["SourceControlBranch"]); commits=$($answers["SourceControlCheckpoints"]); pull-request=$($answers["SourceControlPullRequest"])
 $(if ($Retrofit) { "- retrofit: enabled" } else { "- retrofit: disabled" })
+
+## Source Control Plan
+- Standards: requirements/GithubInstructions_General.md
+- Scenario branch: $($answers["SourceControlBranch"])
+- Related work: $($answers["SourceControlWorkItem"])
+- Commit strategy: $($answers["SourceControlCheckpoints"])
+- Required validation/CI: $($answers["SourceControlCiChecks"])
+- Pull request handoff: $($answers["SourceControlPullRequest"])
+- Merge strategy: $($answers["SourceControlMergeStrategy"])
+- Safety: inspect status and diff, stage explicit files, validate before commit, and require approval before commit or push.
 
 ## Optional Report Web Resources
 - Enabled: $($answers["IncludeHtmlReports"])
@@ -402,13 +925,42 @@ $standardTableMapping
 $customTableMapping
 
 ### Standard fields reused
-- $($answers["StandardFieldsReused"])
+$standardFieldsList
 
 ### Custom fields to add
-- $($answers["CustomFieldsToAdd"])
+$customFieldsList
 
 ### Relationships to create
-- $($answers["RelationshipsToCreate"])
+$relationshipList
+
+### Relationship decisions
+$($answers["RelationshipRequirements"])
+
+## User Task Plan
+- Task definitions: $($answers["UserTaskDefinitions"])
+- Ownership and done definitions: $($answers["UserTaskOwnership"])
+
+## Demo Data Plan
+- Enabled: $($answers["NeedsDemoData"])
+- Scope: $($answers["DemoDataScope"])
+- Tables: $($answers["DemoDataTables"])
+- Standard reused table strategy: $($answers["DemoDataStandardTableStrategy"])
+- Record counts: $($answers["DemoDataRecordCounts"])
+- Scenarios and lifecycle states: $($answers["DemoDataScenarios"])
+- Hero records: $($answers["DemoDataHeroRecords"])
+- Related-record distribution: $($answers["DemoDataRelationshipDistribution"])
+- Create Task activities: $($answers["DemoDataCreateTasks"])
+- Task parent tables: $($answers["DemoDataTaskParentTables"])
+- Task scope and source-record limit: $($answers["DemoDataTaskScope"]) -- $($answers["DemoDataTaskSourceRecordLimit"])
+- Task ordering: $($answers["DemoDataTaskOrderBy"])
+- Tasks per selected record: $($answers["DemoDataTasksPerRecord"])
+- Creation method: $($answers["DemoDataMethod"])
+- Rerun behavior: $($answers["DemoDataRerunBehavior"])
+- Source tag: $($answers["DemoDataSourceTag"])
+- Privacy constraints: $($answers["DemoDataPrivacyConstraints"])
+- Cleanup/reset instructions: $($answers["DemoDataCleanup"])
+
+$bpfSummaryBlock
 "@
 
 $retrofitLabel = if ($Retrofit) { " [RETROFIT — reflects current state]" } else { "" }
@@ -445,13 +997,16 @@ $standardTableMapping
 $customTableMapping
 
 ### Standard fields reused
-- $($answers["StandardFieldsReused"])
+$standardFieldsList
 
 ### Custom fields to add
-- $($answers["CustomFieldsToAdd"])
+$customFieldsList
 
 ### Relationships to create
-- $($answers["RelationshipsToCreate"])
+$relationshipList
+
+### Relationship decisions
+$($answers["RelationshipRequirements"])
 
 ### Payload Generation Gate
 - Do not generate payloads until this mapping is complete and stakeholder-approved.
@@ -463,6 +1018,39 @@ $customTableMapping
 - Report set: $($answers["ReportSet"])
 - Visual style: $($answers["ReportTheme"]) tokens with icon-backed KPI cards.
 - Integration scope: Create HTML web resources and add them to solution (no automatic form-tab insertion).
+
+## User Tasks
+- Task definitions: $($answers["UserTaskDefinitions"])
+- Ownership and done definitions: $($answers["UserTaskOwnership"])
+
+## Demo Data Requirements
+- Enabled: $($answers["NeedsDemoData"])
+- Scope and target tables: $($answers["DemoDataScope"]) -- $($answers["DemoDataTables"])
+- Standard reused table strategy: $($answers["DemoDataStandardTableStrategy"])
+- Record counts: $($answers["DemoDataRecordCounts"])
+- Required scenarios/states: $($answers["DemoDataScenarios"])
+- Hero records: $($answers["DemoDataHeroRecords"])
+- Relationship distribution: $($answers["DemoDataRelationshipDistribution"])
+- Task activity generation: $($answers["DemoDataCreateTasks"]) -- $($answers["DemoDataTaskScope"]) $($answers["DemoDataTaskSourceRecordLimit"]) records per table, ordered by $($answers["DemoDataTaskOrderBy"])
+- Synthetic-data/privacy rule: $($answers["DemoDataPrivacyConstraints"])
+
+## Optional Business Process Flow
+- Enabled: $($answers["EnableBusinessProcessFlow"])
+- Process name: $($answers["BusinessProcessFlowName"])
+- Primary entity: $($answers["PrimaryProcessEntity"])
+- Target Main form: $($answers["BpfTargetFormName"])
+- Cross-table progression: $($answers["BpfCrossTableProgression"])
+- Fail if definition incomplete: $($answers["FailIfBpfDefinitionIncomplete"])
+- Prefer update existing: $($answers["PreferUpdateExistingBpf"])
+
+### BPF Stage Definitions
+$bpfStagesMarkdown
+
+### BPF Generation Gate
+- Build a BPF only when the scenario has a real staged lifecycle and the repo contains a matching `process-*.json` definition.
+- Every stage must declare required fields, entry criteria, and exit criteria.
+- Every cross-table stage must name the supporting relationship payload that justifies the transition.
+- If the scenario is CRUD-only, leave BPF disabled and skip generation.
 
 ## Required Experience and Artifacts
 $($answers["ArtifactsNeeded"])
@@ -512,13 +1100,47 @@ $(if ($Retrofit) { @"
 "@ })
 ## Proposed Workstreams
 1. Discovery review and approval
-2. Dataverse schema design
-3. Forms/views/pages/app experience design
-4. Flow/copilot automation design
-5. Demo data planning
-6. Solution export/unpack/git workflow
-7. Optional report web resource design and generation
-8. Validation and handoff
+2. Source-control preflight and scenario branch confirmation
+3. Dataverse schema design
+4. Forms/views/pages/app experience design
+5. Flow/copilot automation design
+6. Demo data planning
+7. Solution export/unpack and Git checkpoint workflow
+8. Optional report web resource design and generation
+9. Validation, pull request preparation, and handoff
+
+## User Task Implementation Plan
+- Task definitions: $($answers["UserTaskDefinitions"])
+- Owners and done definitions: $($answers["UserTaskOwnership"])
+
+## Demo Data Implementation Plan
+- Scope: $($answers["DemoDataScope"])
+- Target tables: $($answers["DemoDataTables"])
+- Standard reused table strategy: $($answers["DemoDataStandardTableStrategy"])
+- Counts: $($answers["DemoDataRecordCounts"])
+- Scenarios and states: $($answers["DemoDataScenarios"])
+- Hero records: $($answers["DemoDataHeroRecords"])
+- Parent/child distribution: $($answers["DemoDataRelationshipDistribution"])
+- Create Task activities: $($answers["DemoDataCreateTasks"])
+- Task parent tables: $($answers["DemoDataTaskParentTables"])
+- Task scope and source-record limit: $($answers["DemoDataTaskScope"]) -- $($answers["DemoDataTaskSourceRecordLimit"])
+- Task ordering and count: $($answers["DemoDataTaskOrderBy"]) -- $($answers["DemoDataTasksPerRecord"]) per selected record
+- Method: $($answers["DemoDataMethod"])
+- Rerun behavior: $($answers["DemoDataRerunBehavior"])
+- Source tag: $($answers["DemoDataSourceTag"])
+- Privacy constraints: $($answers["DemoDataPrivacyConstraints"])
+- Cleanup/reset instructions: $($answers["DemoDataCleanup"])
+- Gate: data creation cannot begin until table counts, hero records, relationship distribution, bounded Task activity scope, and synthetic-data constraints are approved.
+
+## Source Control Plan
+- Standards: `requirements/GithubInstructions_General.md`
+- Scenario branch: $($answers["SourceControlBranch"])
+- Related work: $($answers["SourceControlWorkItem"])
+- Commit strategy: $($answers["SourceControlCheckpoints"])
+- Required validation/CI: $($answers["SourceControlCiChecks"])
+- Pull request handoff: $($answers["SourceControlPullRequest"])
+- Merge strategy: $($answers["SourceControlMergeStrategy"])
+- Keep remote operations human-approved and verify the remote commit after push.
 
 ## Risks to Resolve
 - Confirm environment availability and permissions.
@@ -535,16 +1157,33 @@ $standardTableMapping
 $customTableMapping
 
 ### Standard fields reused
-- $($answers["StandardFieldsReused"])
+$standardFieldsList
 
 ### Custom fields to add
-- $($answers["CustomFieldsToAdd"])
+$customFieldsList
 
 ### Relationships to create
-- $($answers["RelationshipsToCreate"])
+$relationshipList
 
 ### Payload Readiness Rule
 - Payload generation is blocked until this mapping is complete and approved.
+
+## Optional Business Process Flow Plan
+- Enabled: $($answers["EnableBusinessProcessFlow"])
+- Build order dependency: run `55-build-business-process-flows.ps1` after `50-add-to-solution.ps1` and before `60-build-forms-views.ps1`.
+- Process definition payload: `payloads/scenarios/$scenarioSlug/process-$scenarioSlug.json`
+- Primary entity: $($answers["PrimaryProcessEntity"])
+- Target Main form: $($answers["BpfTargetFormName"])
+- Cross-table progression: $($answers["BpfCrossTableProgression"])
+
+### Planned stages
+$bpfStagesMarkdown
+
+### BPF failure rules
+- Fail if the primary entity is ambiguous or missing.
+- Fail if any required stage field is missing from payload or explicit field mapping artifacts.
+- Fail if any cross-table step is unsupported by a relationship payload.
+- Skip BPF if the scenario does not define a real business progression.
 
 ## Validation Plan
 - Verify artifacts in Maker portal.
@@ -552,6 +1191,7 @@ $customTableMapping
 - Verify git changes are reviewable.
 - Verify import into target environment succeeds.
 - If reports are enabled, verify three HTML web resources are created and visible in solution.
+- If BPF is enabled, verify the BPF build report matches the created Dataverse process metadata and the process is added only to the selected solution.
 "@
 
 $tasksContent = @"
@@ -562,16 +1202,27 @@ $tasksContent = @"
 - [ ] Review 'answers.md' with stakeholder
 - [ ] Finalize 'spec.md'
 - [ ] Finalize 'plan.md'
+- [ ] Review source-control standards in 'requirements/GithubInstructions_General.md'
+- [ ] Confirm repository, remote, current/default branch, working-tree state, recent history, and applicable validation commands
+- [ ] Create or switch to scenario branch '$($answers["SourceControlBranch"])' before implementation; do not absorb unrelated working-tree changes
 - [ ] Approve build environment and permissions
 - [ ] Review standard table reference: 'docs/standard-dataverse-tables.md'
 - [ ] Complete explicit entity mapping in spec/plan (standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships)
+- [ ] Validate relationship cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface: $($answers["RelationshipRequirements"])
+- [ ] Convert approved user tasks into app work with named owners and done definitions: $($answers["UserTaskOwnership"])
 - [ ] Map standard names to logical names (for example: Case -> incident, Contact -> contact) before payload design
 - [ ] Confirm table payloads include only true custom tables
 - [ ] Confirm out-of-box fields are reused unless custom fields are explicitly required
 - [ ] Define custom table schemas and payloads
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
-- [ ] Decide demo data approach: $($answers["NeedsDemoData"])
+- [ ] Confirm whether this scenario has a true staged lifecycle requiring a Business Process Flow
+- [ ] If BPF is enabled, finalize `process-$scenarioSlug.json` with stage order, required fields, entry criteria, exit criteria, and cross-table relationships
+- [ ] Approve demo data table scope and record counts: $($answers["DemoDataTables"]) -- $($answers["DemoDataRecordCounts"])
+- [ ] Approve explicit create/reuse-existing/both decisions for standard reused tables: $($answers["DemoDataStandardTableStrategy"])
+- [ ] Approve hero records: $($answers["DemoDataHeroRecords"])
+- [ ] Approve bounded Task activity generation: $($answers["DemoDataCreateTasks"]) -- parents $($answers["DemoDataTaskParentTables"]), scope $($answers["DemoDataTaskScope"]), limit $($answers["DemoDataTaskSourceRecordLimit"]), order $($answers["DemoDataTaskOrderBy"]), tasks per record $($answers["DemoDataTasksPerRecord"])
+- [ ] Approve demo data scenarios, relationship distribution, rerun behavior, source tagging, privacy constraints, and cleanup plan
 - [ ] Confirm solution name '$($answers["SolutionName"])' and publisher prefix '$($answers["PublisherPrefix"])' with stakeholder
 - [ ] Run 'pwsh ./scripts/bootstrap/00-prereq-check.ps1'
 - [ ] Run 'pwsh ./scripts/bootstrap/10-auth-connect.ps1'  # validates solution + prefix via API
@@ -579,10 +1230,13 @@ $tasksContent = @"
 - [ ] Build columns with '30-build-columns.ps1'
 - [ ] Build relationships with '40-build-relationships.ps1'
 - [ ] Add components to solution with '50-add-to-solution.ps1'
+- [ ] If BPF is enabled, run '55-build-business-process-flows.ps1' and review the generated BPF build report
 - [ ] Build starter forms/views with '60-build-forms-views.ps1'
 - [ ] If reports are enabled, run '70-build-web-resources.ps1'
+- [ ] At each approved checkpoint, inspect `git status` and `git diff`, run applicable validation, stage explicit files, and use a typed imperative commit message
 - [ ] Export and unpack solution
-- [ ] Commit changes to git
+- [ ] Create the final implementation commit after reviewing staged files and validation evidence
+- [ ] Push only after approval, verify the remote branch contains the local commit, and prepare the pull request when enabled
 - [ ] Pack and import solution
 - [ ] Update 'docs/build-log.md'
 "@
@@ -591,6 +1245,13 @@ Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
 Set-Content -Path $specPath -Value $specContent -Encoding UTF8
 Set-Content -Path $planPath -Value $planContent -Encoding UTF8
 Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
+if ($null -ne $demoDataPlanObject) {
+    Set-Content -Path $demoDataPlanPath -Value $demoDataPlanJson -Encoding UTF8
+}
+if ($bpf.Enabled) {
+    New-Item -ItemType Directory -Path $scenarioPayloadFolder -Force | Out-Null
+    Set-Content -Path $bpfPayloadPath -Value $bpfPayloadJson -Encoding UTF8
+}
 
 Write-Host ""
 Write-Host "Wizard output created:" -ForegroundColor Green
@@ -598,6 +1259,12 @@ Write-Host "  $answersPath"
 Write-Host "  $specPath"
 Write-Host "  $planPath"
 Write-Host "  $tasksPath"
+if ($null -ne $demoDataPlanObject) {
+    Write-Host "  $demoDataPlanPath"
+}
+if ($bpf.Enabled) {
+    Write-Host "  $bpfPayloadPath"
+}
 Write-Host "  $envFilePath  (planning values for 10-auth-connect.ps1)"
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan

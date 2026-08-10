@@ -1,24 +1,63 @@
 {
-  "profileVersion": "1.0",
-  "contractVersion": "1.0.0",
+  "profileVersion": "1.1",
+  "contractVersion": "1.1.0",
   "discovery": {
-    "requiredQuestions": 11,
+    "requiredQuestions": 18,
+    "coreQuestions": 11,
+    "architectureIntakeQuestions": 7,
+    "architectureIntakeRequired": true,
     "optionalQuestionModules": {
+      "business-process-flow": true,
       "table-strategy": true,
       "solution-identity": true,
       "reporting": true,
-      "retrofit": true
+      "retrofit": true,
+      "source-control": true,
+      "user-tasks": true,
+      "demo-data": true
     }
+  },
+  "sourceControl": {
+    "enabled": true,
+    "branchPattern": "feature/<scenario-slug>",
+    "checkpointCommits": true,
+    "explicitFileStaging": true,
+    "validateBeforeCommit": true,
+    "requireApprovalBeforeCommit": true,
+    "requireApprovalBeforePush": true,
+    "requireRemoteVerificationAfterPush": true,
+    "pullRequestHandoff": true
+  },
+  "architectureIntent": {
+    "required": true,
+    "gateBeforeDiscovery": true,
+    "questions": [
+      "tableStrategy: oob-only | custom-only | hybrid",
+      "formStrategy: update-in-place | create-new-forms (only when oob tables used)",
+      "entryPointTable: logical name of first screen table",
+      "entryPointLandingView: logical name of default landing view",
+      "reviewApp: create-or-update | skip"
+    ]
   },
   "execution": {
     "coreModules": [
       "00-prereq-check.ps1",
       "10-auth-connect.ps1",
+      "15-dry-validate.ps1",
       "20-build-tables.ps1",
       "30-build-columns.ps1",
       "40-build-relationships.ps1",
       "50-add-to-solution.ps1",
-      "60-build-forms-views.ps1"
+      "55-build-business-process-flows.ps1",
+      "60-build-forms-views.ps1",
+      "62-build-app-module.ps1"
+    ],
+    "mandatoryPostBuildSteps": [
+      "solution-inventory-collect",
+      "solution-inventory-sync",
+      "solution-membership-report",
+      "publish",
+      "80-post-build-analysis.ps1"
     ],
     "optionalModules": {
       "web-resources": {
@@ -53,20 +92,79 @@
         "30": 20,
         "40": 20,
         "50": 15,
+        "55": 18,
         "60": 30,
         "65": 20,
         "80": 10
       }
     }
   },
+  "reliability": {
+    "idempotentScripts": true,
+    "payloadAsSourceOfTruth": true,
+    "businessLabelsOnForms": true,
+    "publishAfterMetadataUpdate": true,
+    "tokenRefreshOn401": true,
+    "exponentialBackoffOn429": true
+  },
+  "solutionInventory": {
+    "enabled": true,
+    "mandatory": true,
+    "artifactCategories": [
+      "tables",
+      "columns",
+      "relationships",
+      "forms",
+      "views",
+      "model-driven-apps",
+      "sitemap-updates",
+      "web-resources"
+    ],
+    "optionalCategories": [
+      "dashboards",
+      "charts",
+      "flows"
+    ],
+    "persistLogicalNamesAndIds": true,
+    "membershipReportRequired": true,
+    "blockExportOnMembershipFailure": true
+  },
+  "reviewApp": {
+    "mandatory": true,
+    "createOrUpdateEveryRun": true,
+    "mustIncludeAllRunArtifacts": true,
+    "entryPointRequired": true,
+    "landingViewRequired": true,
+    "publishAfterUpdate": true,
+    "usabilityValidationRequired": true
+  },
+  "formStrategy": {
+    "oobNoModification": "create-new-forms-on-oob-tables",
+    "oobUpdateInPlace": "update-selected-oob-forms-only",
+    "postUpdateOptimization": {
+      "enforceSectionLabels": true,
+      "enforceBusinessLabels": true,
+      "removeLegacySectionsFromPriorRuns": true,
+      "validateFormXmlAfterUpdate": true
+    }
+  },
+  "validationGates": {
+    "requireArchitectureIntentBeforeBuild": true,
+    "requireSpecKitBeforeBuild": true,
+    "requireFolderContract": true,
+    "requireDocsContractConsistency": true,
+    "postBuildChecks": [
+      "fields-exist-on-target-tables",
+      "intended-forms-exist-with-correct-labels",
+      "app-navigation-contains-entry-points",
+      "target-solution-contains-required-components"
+    ],
+    "runSummaryRequired": true,
+    "buildLogUpdateRequired": true
+  },
   "conventions": {
     "payloadFolder": "payloads",
     "scenarioFolder": "specs",
     "bootstrapFolder": "scripts/bootstrap"
-  },
-  "validationGates": {
-    "requireSpecKitBeforeBuild": true,
-    "requireFolderContract": true,
-    "requireDocsContractConsistency": true
   }
 }

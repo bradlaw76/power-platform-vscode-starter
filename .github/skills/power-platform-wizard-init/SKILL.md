@@ -34,6 +34,9 @@ This skill does not modify core wizard scripts.
 
 1. Confirm target repo
 - Verify the user wants to run in the current workspace repository.
+- Apply `requirements/GithubInstructions_General.md` to the app or demo being created.
+- Run a read-only preflight for repository root, remote, current/default branch, working-tree state, recent history, existing tooling, and applicable validation commands.
+- Do not create a branch, stage files, commit, or push during intake.
 
 2. Select the start path first
 - Chat path: `/power-platform-demo-wizard`
@@ -56,14 +59,29 @@ This skill does not modify core wizard scripts.
 - Greenfield: define scope, mappings, and target solution identity.
 - Retrofit: inventory what already exists first, then define only remaining work.
 
-6. Enforce hard gates before build scripts
+6. Capture task, relationship, and demo-data planning
+- Record top user tasks as persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
+- For each relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
+- If demo data is enabled, choose all scenario-created custom tables or selected tables, confirm the resolved tables, and capture per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision.
+- If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not plan tasks for every record unless the user explicitly selects all.
+- Generate `demo-data-plan.json` when enabled. This stage plans data only and must not create Dataverse rows.
+
+7. Capture the source-control extension block when enabled
+- Scenario branch (default: `feature/<scenario-slug>`)
+- Related issue, spec, or work item
+- Checkpoint or final-only commit strategy
+- Validation and CI commands discovered from the target repository
+- Pull request handoff and merge strategy
+- Persist these decisions in `answers.md`, `plan.md`, and `tasks.md`.
+
+8. Enforce hard gates before build scripts
 - Planning artifacts must be complete and aligned before any mutation scripts:
   - `spec.md`
   - `plan.md`
   - `tasks.md`
 - Do not recommend scripts `20+` before the planning gate passes.
 
-7. Monitor progress using existing telemetry (no script changes)
+9. Monitor progress using existing telemetry (no script changes)
 - Primary signal: `.wizard-metrics/events.jsonl`
 - Event statuses: `Started`, `Completed`, `Failed`
 - Optional summaries:
@@ -71,7 +89,7 @@ This skill does not modify core wizard scripts.
   - `pwsh ./scripts/bootstrap/82-build-progress-report.ps1`
 - If telemetry is opted out (`WIZARD_METRICS_OPTOUT=1`), use artifact-based checks instead.
 
-8. End every run with a deterministic output contract
+10. End every run with a deterministic output contract
 - Selected path
 - Current gate status
 - Current or failed step
@@ -83,6 +101,9 @@ This skill does not modify core wizard scripts.
 - Keep chat and terminal paths equivalent in gate enforcement.
 - Treat unresolved intake, missing solution identity, failed prereqs, or failed auth as hard stops.
 - Never bypass planning to jump straight to build scripts.
+- Keep unrelated working-tree changes untouched.
+- Require explicit approval before commit and separate approval before push.
+- After push, verify that the remote branch contains the local commit before reporting success.
 
 ## Progress Commands
 
@@ -109,6 +130,7 @@ pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 - [Onboarding sequence](../../../docs/onboarding.md)
 - [Wizard contract](../../../docs/wizard-contract-v1.md)
 - [Wizard profile](../../../wizard.profile.json)
+- [GitHub engineering standards](../../../requirements/GithubInstructions_General.md)
 - [Start wizard script](../../../scripts/bootstrap/05-start-wizard.ps1)
 - [Telemetry helper](../../../scripts/bootstrap/helpers/wizard-telemetry.ps1)
 - [Progress matrix](../../../scripts/bootstrap/81-build-progress-matrix.ps1)

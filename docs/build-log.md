@@ -9,7 +9,7 @@ Use this to document what was planned, built, validated, and promoted.
 Record wizard version changes here so you can trace which behavior applied to each build.
 
 | Date | Version | Change Summary |
-|------|---------|----------------|
+| ---- | ------- | -------------- |
 | 2026-07-13 | v1.2 | Added Q6b (standard vs custom tables), Q12 (new/existing solution), Q13 (new/existing prefix). Total: 14 discovery questions. |
 | 2026-07-13 | v1.3 | Added `06-demo-script-wizard.ps1` (post-scenario demo script generator) and `07-demo-dry-run.ps1` (rehearsal helper). |
 | 2026-07-15 | v1.4 | Added mid-project retrofit support: wizard can reverse-engineer spec from partial builds. `docs/onboarding.md` designated authoritative bootstrap sequence. |
@@ -44,6 +44,14 @@ Scripts Run (20,30,40,50,60):
 Tables (created/skipped/failed):
 Columns (created/skipped/failed):
 Relationships (created/skipped/failed):
+Demo Data Planned (yes/no):
+Demo Data Target Tables / Counts:
+Demo Data Hero Records / Purpose:
+Demo Data Task Activity Scope / Parent Limit / Ordering:
+Demo Data Method / Rerun Behavior:
+Demo Data Source Tag / Privacy Rule:
+Demo Data Created (yes/no/not implemented):
+Demo Data Cleanup Verified (yes/no/not applicable):
 Forms (created/updated/skipped/failed):
 Views (created/skipped/failed):
 Starter Main Form patched on rerun (yes/no):
@@ -53,6 +61,16 @@ Solution Exported (yes/no):
 Solution Unpacked (yes/no):
 Solution Packed (yes/no):
 Solution Imported (yes/no):
+BPF Report Present (yes/no):
+BPF Status (pass/fail/skipped):
+BPF Active Verified (yes/no):
+BPF In Solution Verified (yes/no):
+BPF App Linked (yes/no/pending):
+BPF Stage Count / Threshold:
+BPF Condition Count / Threshold:
+BPF Step Count / Threshold:
+BPF Branch Predicate Summary Recorded (yes/no):
+BPF Retry or Lock Handling Notes:
 Git Branch:
 Commit ID:
 Notes:

@@ -63,6 +63,16 @@ Ask and capture all base discovery questions, then complete explicit entity mapp
 18. Relationships to create
 19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
 
+After entity mapping, also capture:
+- Top user tasks: persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
+- Relationship decisions: cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
+- When demo data is enabled: all-created vs selected table scope, resolved tables, per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, rerun behavior, source tag, synthetic-data/privacy constraints, and cleanup/reset decision.
+- If Dataverse Task activities are requested: eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never target every record unless the user explicitly selects all.
+
+Generate `demo-data-plan.json` for approved demo-data planning. This does not authorize or execute Dataverse row creation.
+
+When the `source-control` module is enabled, also inspect the target repository read-only and capture the scenario branch, related issue/spec, checkpoint strategy, validation/CI discovered from that repository, pull request handoff, and merge strategy. Apply `requirements/GithubInstructions_General.md` throughout whatever app or demo the end user is creating. Do not stage, commit, or push during intake.
+
 ## Ordered Build Flow
 
 Follow this exact sequence — do not skip validation checkpoints:
@@ -70,7 +80,7 @@ Follow this exact sequence — do not skip validation checkpoints:
 | Step | Action | Validation |
 |------|--------|------------|
 | 0 | Clone repo, open in VS Code, install extensions | Extensions installed via `@recommended` |
-| 1 | Start wizard: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Discovery answers captured |
+| 1 | Start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose chat or terminal intake; direct terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Discovery answers and source-control plan captured |
 | 2 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
 | 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | `demo-script.md` exists and matches the scenario story |
 | 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` | `demo-dry-run.md` captures rehearsal notes |
@@ -80,7 +90,7 @@ Follow this exact sequence — do not skip validation checkpoints:
 | 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
 | 8 | Build in order (scripts 20–60, plus optional 65 if Q19=yes) | Each script exits with zero failed count |
 | 9 | Verify in Maker portal | Tables, forms, views visible in target solution |
-| 10 | Export + unpack → commit → pack → import | See Solution Lifecycle below |
+| 10 | Export + unpack → validated final commit → approved push/PR handoff → pack → import | See Solution Lifecycle below |
 | 11 | Document in `docs/build-log.md` | Teammate can rerun the process |
 
 ## Build Scripts (Run in Order)
@@ -122,15 +132,22 @@ pac solution import --path "./out/<SolutionName>_unmanaged_new.zip"
 ## VS Code Chat Entry Points
 
 ```
+/power-platform-wizard-init
 /power-platform-demo-wizard Create a Dynamics 365 Customer Service demo for case triage
 Walk me through this repo like a beginner wizard
 Ask me the discovery questions one at a time and help me write spec.md, plan.md, and tasks.md
 ```
 
-Three modes:
+The shared Copilot skill is the primary entry point. It selects chat or terminal intake, enforces the planning gate, and can monitor progress from existing telemetry. Direct chat and terminal wizard paths remain supported.
+
+Source control follows the generated scenario, not just maintenance of this starter repository. Use coherent planning, metadata, experience, validation, and final unpacked-solution checkpoints. Before each commit, inspect status/diff, run applicable discovered validation, stage explicit files, and obtain approval. Push requires separate approval and remote commit verification.
+
+Available entry points:
+- `.github/skills/power-platform-wizard-init/SKILL.md` — primary shared Copilot skill
 - `.github/copilot-instructions.md` — repo-wide chat behavior
 - `.github/prompts/power-platform-demo-wizard.prompt.md` — slash prompt
 - `pwsh ./scripts/bootstrap/05-start-wizard.ps1` — terminal wizard
+- `docs/wizard-walkthrough.html` — visual, end-to-end walkthrough
 
 Post-wizard demo helpers:
 - `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` — generate a single reviewable demo script

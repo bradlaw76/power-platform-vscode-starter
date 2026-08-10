@@ -1,5 +1,8 @@
 name: Wizard Quality
 
+permissions:
+  contents: read
+
 on:
   push:
     branches: [ main ]
@@ -29,6 +32,10 @@ jobs:
       - name: Run script smoke checks
         shell: pwsh
         run: ./scripts/ci/test-script-smoke.ps1
+
+      - name: Run wizard source-control acceptance checks
+        shell: pwsh
+        run: ./scripts/ci/test-wizard-source-control-acceptance.ps1
 
       - name: Run post-build analysis checks
         shell: pwsh

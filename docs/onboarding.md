@@ -290,6 +290,10 @@ Then complete optional extension blocks based on profile and project needs:
 - `solution-identity` (new/existing solution and publisher prefix)
 - `reporting` (optional web resources)
 - `retrofit` (current state + remaining work)
+- `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
+- `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
+- `user-tasks` (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
+- `demo-data` (when enabled: all-created or selected table scope, resolved tables, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision)
 
 Validation checkpoint:
 
@@ -303,6 +307,15 @@ Validation checkpoint:
 - Custom fields to add
 - Relationships to create
 - Do not generate payloads until this mapping block is complete and approved.
+- For every planned relationship, record cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
+- Capture top user tasks with named owners and done definitions before designing forms, views, navigation, or automation.
+- If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.
+- If Task activities are enabled, approve parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not target every record unless `all` is explicitly approved.
+- Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, relationship distribution, idempotent rerun, source-tagging, and cleanup decisions.
+- Demo-data intake is planning-only; no Dataverse rows are created by `05-start-wizard.ps1`.
+- Review `requirements/GithubInstructions_General.md` and record how source control will support the app or demo being created.
+- Confirm the target repository, remote, current/default branch, existing working-tree changes, recent history, existing tooling, and applicable validation commands.
+- Keep intake read-only: do not create a branch, stage files, commit, or push while discovery is in progress.
 
 ---
 
@@ -320,6 +333,7 @@ If you used the terminal wizard, review the generated files under `specs/<scenar
 Validation checkpoint:
 
 - `spec.md`, `plan.md`, and `tasks.md` are complete and consistent.
+- `demo-data-plan.json` exists and is approved when demo data is enabled.
 - No build scripts are run before this checkpoint.
 
 ---
@@ -339,6 +353,21 @@ Validation checkpoint:
 
 - Every requirement maps to one or more implementation tasks.
 - Each task has an owner and a done definition.
+
+### Source-control lifecycle for this scenario
+
+Before implementation, create or switch to the approved scenario branch from the generated `plan.md`. Preserve unrelated local changes.
+
+Use coherent checkpoints as the app or demo progresses, such as planning, Dataverse schema, forms/views/app assembly, validation, and final unpacked solution source. At each selected checkpoint:
+
+1. Inspect `git status` and `git diff`.
+2. Run the applicable validation commands discovered from this repository.
+3. Stage explicit intended files rather than using `git add .`.
+4. Review `git diff --staged` and confirm no secrets, local configuration, generated junk, or unrelated files are included.
+5. Use a typed imperative commit message, for example `feat: add case triage metadata`.
+6. Obtain explicit approval before committing.
+
+Commit and push are distinct approvals. Push verification and pull request preparation happen during final handoff.
 
 ---
 
@@ -377,6 +406,10 @@ Payload rules for Step 10:
 - Override that guard only when reuse is intentional: `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
 - To inspect or remove foreign tables from an unmanaged solution, run `pwsh ./scripts/bootstrap/55-prune-foreign-tables.ps1`.
 - `55-build-business-process-flows.ps1` reads `process-*.json` only when the scenario explicitly defines a BPF, validates stage fields and relationships against repo artifacts, upserts the wizard-managed process definition, and writes a BPF build report.
+- BPF completion is not satisfied by Active state alone or solution membership alone; use the BPF runbook completion criteria (validation PASS with thresholds, app linkage, and stage/condition/step evidence).
+- For BPF field updates, treat `clientdata`, `uidata`, and `xaml` as a consistency set; do not update a single surface in isolation.
+- If BPF branch logic is ambiguous at any point, stop and clarify before changing Dataverse metadata.
+- If BPF patching reports invalid attributes, identify exact offending names before retrying. Use longest-first replacement ordering for field-name replacements.
 - `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
 - `60-build-forms-views.ps1` applies form and view quality gates and writes population artifacts for both surfaces.
 - `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
@@ -442,16 +475,27 @@ Validation checkpoint:
 ## Step 13: Commit Changes to Git
 
 ```powershell
-git checkout -b feature/<short-description>
-git status
-git add .
-git commit -m "Add feature solution updates"
-git push -u origin feature/<short-description>
+git branch --show-current
+git status --short
+git diff
+git add <explicit-file-or-folder> [...]
+git diff --staged
+pwsh ./scripts/ci/<applicable-test>.ps1
+git commit -m "feat: add <scenario> solution updates"
+git push -u origin feature/<scenario-slug>
+git rev-parse HEAD
+git rev-parse origin/feature/<scenario-slug>
 ```
+
+Use commands already supported by the repository. The test command above is a placeholder to replace with the validation discovered during preflight; do not invent a command.
+
+Before commit and again before push, obtain explicit approval. After push, the two commit IDs must match before reporting that the change is available remotely. Prepare a pull request with summary, reason, validation, impact, and the related scenario spec.
 
 Validation checkpoint:
 
 - `git status` reports a clean working tree after commit.
+- The remote branch commit matches the local commit after push.
+- The handoff clearly states whether work is local, committed, pushed, in a pull request, merged, released, or deployed.
 
 Common mistakes:
 

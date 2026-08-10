@@ -8,6 +8,8 @@ Audience: Teams that want a guided, question-first process from idea to release
 
 This document is designed as a facilitation wizard.
 
+For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
+
 - Ask each question block in order.
 - Capture answers directly in the response template under each step.
 - Do not move to the next step until the exit criteria are met.
@@ -66,6 +68,7 @@ Optional extension blocks (profile-driven):
 - solution-identity (new/existing solution and publisher prefix)
 - reporting (optional web resources)
 - retrofit (current-state and remaining-work intake)
+- source-control (read-only target-repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
 
 Exit criteria:
 - All 11 required questions answered.
@@ -73,6 +76,7 @@ Exit criteria:
 - Stakeholder confirms the answers are complete enough to draft `spec.md`.
 - For table-strategy, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.
 - For solution-identity, solution name and publisher prefix are validated (script 10-auth-connect.ps1 will verify these exist or guide creation).
+- For source-control, apply `requirements/GithubInstructions_General.md` throughout the app or demo lifecycle. Record the plan in scenario artifacts; do not stage, commit, or push during intake.
 
 Before Step 1:
 - Ensure the repo includes a standard bootstrap contract (`scripts/bootstrap/*`, `payloads/*`, `docs/onboarding.md`, `.vscode/extensions.json`).
@@ -182,6 +186,42 @@ Response template:
 - Relationship map:
 - Status model:
 - Data classification:
+
+## 3A. User Task, Relationship, and Demo Data Wizard
+
+Goal: Turn the approved schema into testable user work and relationship-aware synthetic data planning.
+
+Ask the user:
+1. What are the top user tasks by persona, frequency, entry table/view, and expected outcome?
+2. Who owns each implementation task and what is its done definition?
+3. For each relationship, what are the referencing/referenced tables, cardinality, requiredness, existing/new status, cascade behavior, and supporting task or surface?
+4. If demo data is enabled, should it cover all scenario-created custom tables or selected tables?
+5. What exact tables receive data and how many records should each receive?
+6. For standard reused tables, should records be created, existing rows reused, or both?
+7. Which business scenarios and lifecycle states must the records cover?
+8. Which records are hero records, how many are needed per table, and what demo scenario or purpose does each support?
+9. What parent/child distribution is required across relationships?
+10. Should related Dataverse Task activities be created? If yes, which parent tables qualify, should tasks target the latest, all, or selected parent records, what is the source-record limit (default 10 for latest), which field determines recency, and how many tasks are created per selected record?
+11. Should creation be scripted, manual, or imported, and should reruns upsert, replace, or fail when rows exist?
+12. What source tag identifies wizard-owned rows, what synthetic-data/privacy constraints apply, and should cleanup/reset instructions be generated?
+
+Build decisions:
+- Task-to-artifact traceability for forms, views, navigation, BPF, automation, and validation.
+- Parent-before-child data ordering based on approved relationships.
+- Explicit record-count plan per table; do not implicitly seed standard reused tables.
+- Named hero records tied to specific demo scenarios or walkthrough purposes.
+- Bounded Task activity generation; default to the latest 10 eligible parent records and require explicit approval for `all`.
+- Idempotent rerun and cleanup strategy using a scenario source tag.
+- Synthetic data only unless an approved policy explicitly allows another source.
+
+Exit criteria:
+- User tasks have owners and done definitions.
+- Relationship decisions are complete and approved.
+- When demo data is enabled, `demo-data-plan.json` includes table scope, counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup decision.
+- This planning stage creates no Dataverse rows.
+
+Copilot prompt:
+"Create a task and demo-data plan from the approved Dataverse schema, including relationship-aware insertion order, per-table counts, named hero records, bounded Dataverse Task activity generation, synthetic-data constraints, idempotent rerun behavior, source tagging, cleanup, owners, and done definitions."
 
 ## 4. App Experience Wizard (Model-Driven Layer)
 

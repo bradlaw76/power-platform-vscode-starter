@@ -10,6 +10,7 @@ Use this behavior:
 - Ask discovery questions one at a time unless the user asks for a batch.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
+- Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
 - Treat Spec Kit as mandatory before implementation.
 - Help the user move from idea -> discovery answers -> `spec.md` -> `plan.md` -> `tasks.md` -> build steps -> export/unpack -> git -> pack/import -> documentation.
@@ -28,20 +29,33 @@ Required Question Set (11):
 11. Should the output be a managed or unmanaged solution?
 
 Optional extension blocks (profile-driven):
+- business-process-flow: optional staged lifecycle intake for Business Process Flows
 - table-strategy: standard/custom strategy + mapping
 - solution-identity: new/existing solution and publisher prefix
 - reporting: optional web resources scope
 - retrofit: current-state and remaining-work capture
+- source-control: read-only repository preflight, scenario branch, related work, checkpoint strategy, discovered validation/CI, pull request handoff, and merge strategy
+- user-tasks: persona, task, frequency, entry table/view, expected outcome, owner, and done definition
+- demo-data: when Q10 is yes, table scope, per-table counts, scenarios/states, hero records, related-record distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision
 
 Required output behavior:
 - Summarize answers clearly.
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
+- Before implementation, inspect the target repository, remote, current/default branch, working tree, recent history, existing tooling, and applicable validation commands. Do not guess commands or absorb unrelated changes.
+- Record the source-control plan in the generated scenario artifacts. Use meaningful commits as the user's app or demo reaches coherent planning, metadata, experience, validation, and handoff checkpoints.
+- Before each commit, inspect status/diff, run applicable discovered validation, stage explicit intended files, and ask for approval. Require separate approval before push, then verify the remote commit and prepare a pull request when selected.
 - Require an explicit standard-vs-custom mapping section before payload generation.
+- Capture the top user tasks and persist their owners and done definitions into `spec.md`, `plan.md`, and `tasks.md`.
+- For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
+- When demo data is enabled, ask whether to target all scenario-created custom tables or selected tables, show the resolved table list, require per-table record counts, and identify any hero records with their demo purpose. Never seed standard reused tables implicitly.
+- If Task activities are requested, ask for eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never apply tasks to every record unless the user explicitly selects all.
+- Persist approved seed decisions to `demo-data-plan.json`. Treat this as planning only; do not create Dataverse records until a separate seeding execution module is approved.
 - After planning, run a **report scoping step** based on created or planned tables (see Section 4A of how-to-build-dynamics-model-driven-apps-wizard.md).
 - Ask the user to identify which tables need reports and what report type each table needs (form web resource, dashboard KPI, or queue/view summary).
 - Generate a Report Mapping Table artifact (`report-mappings.md`) and convert it into implementation and validation tasks in `tasks.md`.
 - **Blocker rule**: If a table is marked critical in workflow but has no report decision, flag this and stop progression until resolved.
+- If the scenario has a real staged lifecycle, offer the optional business-process-flow block and capture: whether BPF is needed, process root, stage order, required stage fields, entry/exit criteria, and cross-table progression.
 - Do not tell the user to run build scripts until planning **and report scoping** are complete.
 - After planning and report scoping are approved, guide them through the exact bootstrap sequence.
-- Build steps include scripts `00-prereq-check.ps1`, `10-auth-connect.ps1`, `20-build-tables.ps1`, `30-build-columns.ps1`, `40-build-relationships.ps1`, `50-add-to-solution.ps1`, and `60-build-forms-views.ps1` in order. If reporting is enabled in profile + planning, include script 70 (`70-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 60.
+- Build steps include scripts `00-prereq-check.ps1`, `10-auth-connect.ps1`, `15-dry-validate.ps1`, `20-build-tables.ps1`, `30-build-columns.ps1`, `40-build-relationships.ps1`, `50-add-to-solution.ps1`, `55-build-business-process-flows.ps1`, `60-build-forms-views.ps1`, and `62-build-app-module.ps1` in order. Script 55 safely skips when BPF is not enabled or when the scenario does not justify it. Script 62 safely skips when app module wiring is not enabled for the scenario. If reporting is enabled in profile + planning, include script 70 (`70-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 62.
 - Script 70 is the optional reporting module entrypoint and calls script 65 to generate three Dynamics-blue HTML reports from scenario design files and add them to the solution.
