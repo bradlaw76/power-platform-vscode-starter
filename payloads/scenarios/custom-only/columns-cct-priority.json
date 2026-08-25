@@ -1,10 +1,10 @@
 {
-  "TableLogicalName": "earnint_priority",
+  "TableLogicalName": "cct_priority",
   "Columns": [
     {
       "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
-      "SchemaName": "earnint_code",
-      "LogicalName": "earnint_code",
+      "SchemaName": "cct_code",
+      "LogicalName": "cct_code",
       "DisplayName": {
         "LocalizedLabels": [
           {

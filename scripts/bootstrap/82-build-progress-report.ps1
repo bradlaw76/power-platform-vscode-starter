@@ -1,4 +1,55 @@
 <#
+=============================================================================
+COMPONENT:    Build Progress Report
+FILE:         scripts/bootstrap/82-build-progress-report.ps1
+VERSION:      0.2.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-28
+ENVIRONMENT:  PowerShell 7 | Build Reporting
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Generates a higher-level progress report from the repo's build and validation
+artifacts for stakeholder review.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          progress matrix data, metrics, and artifact summaries
+- Outputs:         consolidated progress report artifacts
+- Dependencies:    repo reporting artifacts and metrics helpers
+- Side Effects:    writes local report artifacts for review
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Progress matrix or related build artifacts must already exist.
+2. Scenario/build context must be available in the repo.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Existing build state produces a readable progress report.
+✔ Missing data results in explicit gaps rather than broken output.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+v0.2.0  2026-07-28  Added direct links to post-build artifact outputs, including the mind map.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep reporting derived from repo artifacts rather than assumed state.
+- Preserve reviewable output for stakeholder handoff.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Builds an HTML dashboard from wizard telemetry analytics.
 
@@ -213,6 +264,37 @@ $htmlTemplate = @'
       grid-template-columns: 1fr 1fr;
       gap: 14px;
     }
+    .artifact-list {
+      display: grid;
+      gap: 8px;
+    }
+    .artifact-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-size: 13px;
+      background: #fafcff;
+    }
+    .artifact-name {
+      color: var(--text);
+      font-weight: 600;
+    }
+    .artifact-link a {
+      color: var(--accent);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .artifact-link a:hover {
+      text-decoration: underline;
+    }
+    .artifact-missing {
+      color: var(--muted);
+      font-style: italic;
+    }
     @media (max-width: 960px) {
       .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .two { grid-template-columns: 1fr; }
@@ -257,6 +339,11 @@ $htmlTemplate = @'
       <h2>Runs</h2>
       <div class="scroll"><table id="runs"></table></div>
     </div>
+
+    <div class="panel">
+      <h2>Build Artifacts</h2>
+      <div class="artifact-list" id="artifact-links"></div>
+    </div>
   </div>
 
   <script id="report-data" type="application/json">__JSON_PAYLOAD__</script>
@@ -267,6 +354,12 @@ $htmlTemplate = @'
     const errors = data.errorCategoryCounts || {};
     const completionByDay = data.completionByDay || {};
     const stepDurationStats = Array.isArray(data.stepDurationStats) ? data.stepDurationStats : [];
+    const artifactLinks = [
+      { label: 'Progress Matrix (Markdown)', path: 'build-progress-matrix.md' },
+      { label: 'Progress Data (JSON)', path: 'build-progress-data.json' },
+      { label: 'Build Mind Map (Mermaid)', path: 'artifacts/analysis/build-mind-map.md' },
+      { label: 'Build Mind Map Data (JSON)', path: 'artifacts/analysis/build-mind-map.json' }
+    ];
 
     const toNum = (v) => {
       const n = Number(v);
@@ -326,6 +419,26 @@ $htmlTemplate = @'
 
     renderBars('dropoff-bars', dropOff);
     renderBars('error-bars', errors);
+
+    function renderArtifacts(hostId, links) {
+      const host = document.getElementById(hostId);
+      if (!host) {
+        return;
+      }
+
+      const rows = links.map(link => {
+        return `
+          <div class="artifact-row">
+            <span class="artifact-name">${link.label}</span>
+            <span class="artifact-link"><a href="${link.path}" target="_blank" rel="noopener noreferrer">Open</a></span>
+          </div>
+        `;
+      });
+
+      host.innerHTML = rows.join('');
+    }
+
+    renderArtifacts('artifact-links', artifactLinks);
 
     function renderTable(hostId, headers, rows) {
       const host = document.getElementById(hostId);

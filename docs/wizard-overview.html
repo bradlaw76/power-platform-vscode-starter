@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Power Platform VS Code Wizard — How It Works</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--cp-bg);
+      color: var(--cp-text);
+      line-height: 1.65;
+      min-height: 100vh;
+    }
+
+    /* ── HEADER ── */
+    header {
+      background: var(--cp-surface);
+      border-bottom: 1px solid var(--cp-border);
+      padding: 2rem 2.5rem 1.75rem;
+    }
+    .header-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+    .header-icon {
+      flex-shrink: 0;
+      width: 52px;
+      height: 52px;
+      background: var(--cp-accent);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-top: 2px;
+    }
+    .header-text h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: var(--cp-text);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+    .header-text p {
+      margin-top: 0.4rem;
+      color: var(--cp-text-muted);
+      font-size: 0.95rem;
+    }
+    .badge {
+      display: inline-block;
+      margin-top: 0.6rem;
+      padding: 0.2rem 0.65rem;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2.5rem 2rem 4rem;
+    }
+
+    section { margin-bottom: 3rem; }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--cp-text);
+      letter-spacing: -0.01em;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    h2 .section-num {
+      width: 26px;
+      height: 26px;
+      background: var(--cp-accent);
+      color: var(--cp-accent-fg);
+      border-radius: 50%;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* ── QUICK OVERVIEW BULLETS ── */
+    .overview-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 0.5rem;
+    }
+    .overview-item {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    .overview-item .oi-num {
+      flex-shrink: 0;
+      width: 22px;
+      height: 22px;
+      background: var(--cp-accent-soft);
+      color: var(--cp-accent);
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .overview-item .oi-text {
+      font-size: 0.88rem;
+      color: var(--cp-text);
+    }
+    .overview-item .oi-text strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.1rem;
+    }
+    .overview-item .oi-text span {
+      color: var(--cp-text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* ── STEP CARDS ── */
+    .steps { display: flex; flex-direction: column; gap: 1rem; }
+
+    .step-card {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.15s ease;
+    }
+    .step-card:hover { box-shadow: var(--cp-shadow); }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .step-badge {
+      flex-shrink: 0;
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      background: var(--cp-surface-soft);
+    }
+    .step-header-text { flex: 1; }
+    .step-header-text .step-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--cp-accent);
+      margin-bottom: 0.1rem;
+    }
+    .step-header-text .step-title {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--cp-text);
+    }
+    .step-header-text .step-file {
+      font-size: 0.78rem;
+      color: var(--cp-text-muted);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      margin-top: 0.15rem;
+    }
+    .step-arrow {
+      flex-shrink: 0;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+      transition: transform 0.2s ease;
+    }
+    .step-card.open .step-arrow { transform: rotate(180deg); }
+
+    .step-body {
+      display: none;
+      padding: 0 1.25rem 1.25rem;
+      border-top: 1px solid var(--cp-border);
+    }
+    .step-card.open .step-body { display: block; }
+
+    .step-body p {
+      font-size: 0.9rem;
+      color: var(--cp-text-muted);
+      margin-top: 0.9rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+    }
+    @media (max-width: 600px) { .detail-grid { grid-template-columns: 1fr; } }
+
+    .detail-pill {
+      background: var(--cp-surface-soft);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.82rem;
+    }
+    .detail-pill .dp-label {
+      font-size: 0.68rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cp-text-soft);
+      margin-bottom: 0.25rem;
+    }
+    .detail-pill .dp-val {
+      color: var(--cp-text);
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.8rem;
+    }
+
+    .gate-note {
+      margin-top: 0.9rem;
+      padding: 0.7rem 0.9rem;
+      border-radius: 8px;
+      font-size: 0.83rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+    .gate-note.warning { background: rgba(245, 158, 11, 0.1); color: #92400e; border: 1px solid rgba(245,158,11,0.3); }
+    .gate-note.info    { background: var(--cp-accent-soft); color: var(--cp-accent); border: 1px solid rgba(177,31,75,0.2); }
+    .gate-note.success { background: rgba(22, 163, 74, 0.08); color: #166534; border: 1px solid rgba(22,163,74,0.25); }
+    html[data-theme="dark"] .gate-note.warning { color: #fbbf24; }
+    html[data-theme="dark"] .gate-note.success { color: #4ade80; }
+
+    /* ── METRICS TABLE ── */
+    .metrics-intro {
+      font-size: 0.9rem;
+      color: var(--cp-text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.6;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.9rem;
+      margin-bottom: 1.5rem;
+    }
+    .metric-card {
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 12px;
+      padding: 1.1rem 1rem;
+      text-align: center;
+    }
+    .metric-card .mc-icon { font-size: 1.6rem; margin-bottom: 0.4rem; }
+    .metric-card .mc-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cp-text-muted);
+      margin-bottom: 0.3rem;
+    }
+    .metric-card .mc-desc {
+      font-size: 0.82rem;
+      color: var(--cp-text-soft);
+      line-height: 1.4;
+    }
+    .metric-card.accent-card { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+    .metric-card.accent-card .mc-label { color: var(--cp-accent); }
+
+    .metrics-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+    }
+    .metrics-table thead tr {
+      background: var(--cp-surface-soft);
+      border-bottom: 2px solid var(--cp-border-strong);
+    }
+    .metrics-table th {
+      text-align: left;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--cp-text-muted);
+    }
+    .metrics-table td {
+      padding: 0.65rem 0.9rem;
+      border-bottom: 1px solid var(--cp-border);
+      color: var(--cp-text);
+      vertical-align: top;
+    }
+    .metrics-table tr:last-child td { border-bottom: none; }
+    .metrics-table tr:hover td { background: var(--cp-highlight); }
+    .metrics-table td code {
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 0.78rem;
+      background: var(--cp-surface-soft);
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+      color: var(--cp-accent);
+    }
+    .metrics-table td .tag {
+      display: inline-block;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .tag.auto { background: rgba(22,163,74,0.1); color: var(--cp-success); }
+    .tag.manual { background: rgba(245,158,11,0.1); color: var(--cp-warning); }
+
+    /* ── FLOW DIAGRAM ── */
+    .flow {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0;
+      margin: 1rem 0 0.5rem;
+    }
+    .flow-node {
+      background: var(--cp-surface);
+      border: 1.5px solid var(--cp-border);
+      border-radius: 8px;
+      padding: 0.45rem 0.8rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--cp-text);
+      white-space: nowrap;
+    }
+    .flow-node.active { border-color: var(--cp-accent); color: var(--cp-accent); background: var(--cp-accent-soft); }
+    .flow-arrow {
+      color: var(--cp-border-strong);
+      font-size: 1rem;
+      padding: 0 0.35rem;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem 2rem 2rem;
+      color: var(--cp-text-muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--cp-border);
+    }
+
+    /* ── THEME TOGGLE ── */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1rem;
+      background: var(--cp-surface);
+      border: 1px solid var(--cp-border);
+      border-radius: 8px;
+      padding: 0.4rem 0.7rem;
+      font-size: 0.8rem;
+      color: var(--cp-text-muted);
+      cursor: pointer;
+      z-index: 100;
+    }
+    .theme-toggle:hover { background: var(--cp-surface-soft); }
+
+    /* ── COPILOT SECTION ── */
+    .copilot-banner {
+      background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%);
+      border-radius: 14px;
+      padding: 1.6rem 1.75rem;
+      color: #fff;
+      margin-bottom: 2.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .copilot-banner::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+    }
+    .copilot-banner::after {
+      content: '';
+      position: absolute;
+      bottom: -30px; left: 60px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .copilot-banner-top {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.1rem;
+    }
+    .copilot-logo {
+      width: 46px; height: 46px;
+      background: rgba(255,255,255,0.18);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+    .copilot-banner-top h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+      letter-spacing: -0.01em;
+    }
+    .copilot-banner-top h2 .section-num {
+      background: rgba(255,255,255,0.25);
+      color: #fff;
+    }
+    .copilot-banner-top p {
+      font-size: 0.83rem;
+      color: rgba(255,255,255,0.75);
+      margin-top: 0.2rem;
+    }
+    .copilot-roles {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.1rem;
+      position: relative;
+      z-index: 1;
+    }
+    .copilot-role-card {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      padding: 0.85rem 1rem;
+      backdrop-filter: blur(4px);
+    }
+    .copilot-role-card .crc-title {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+    .copilot-role-card .crc-desc {
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.78);
+      line-height: 1.45;
+    }
+    .copilot-note {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.65);
+      border-top: 1px solid rgba(255,255,255,0.15);
+      padding-top: 0.8rem;
+      position: relative;
+      z-index: 1;
+    }
+    .copilot-note strong { color: rgba(255,255,255,0.9); }
+    html[data-theme="dark"] .copilot-banner {
+      background: linear-gradient(135deg, #1a4f7a 0%, #0d3354 100%);
+    }
+  </style>
+</head>
+<body>
+
+<button class="theme-toggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌓</button>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="header-icon">⚡</div>
+    <div class="header-text">
+      <h1>Power Platform VS Code Wizard</h1>
+      <p>A guided, planning-first workflow for building Dynamics 365 and Power Platform demos from VS Code</p>
+      <span class="badge">Bootstrap Sequence Guide</span>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- COPILOT ROLE SECTION -->
+  <div class="copilot-banner">
+    <div class="copilot-banner-top">
+      <div class="copilot-logo">🤖</div>
+      <div>
+        <h2><span class="section-num" style="display:inline-flex;margin-right:0.5rem;">✦</span>GitHub Copilot's Role in This Wizard</h2>
+        <p>Copilot is the primary interface for running this wizard — not just a code helper</p>
+      </div>
+    </div>
+    <div class="copilot-roles">
+      <div class="copilot-role-card">
+        <div class="crc-title">🧙 Discovery Facilitator</div>
+        <div class="crc-desc">Copilot Chat runs the planning wizard interactively — asking one discovery question at a time, explaining unfamiliar concepts (PAC CLI, Dataverse, solutions), and guiding you through the 13-question sequence before any build scripts run.</div>
+      </div>
+      <div class="copilot-role-card">
+        <div class="crc-title">📄 Artifact Generator</div>
+        <div class="crc-desc">After collecting answers, Copilot scaffolds <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">spec.md</code>, <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">plan.md</code>, <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">tasks.md</code>, and <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">answers.md</code> — mapping entity names, applying publisher prefixes, and structuring the Spec Kit planning files that gate every build.</div>
+      </div>
+      <div class="copilot-role-card">
+        <div class="crc-title">🔁 Retrofit Handler</div>
+        <div class="crc-desc">For mid-project work, Copilot reverse-engineers your current state — asking what tables, forms, and flows already exist — then generates a spec that reflects reality and a plan covering only what remains.</div>
+      </div>
+      <div class="copilot-role-card">
+        <div class="crc-title">🛡️ Planning Gate Enforcer</div>
+        <div class="crc-desc">Copilot enforces the hard rule: build scripts do not run until <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">spec.md</code> and <code style="background:rgba(255,255,255,0.15);padding:0.1rem 0.3rem;border-radius:4px;font-size:0.75rem;">plan.md</code> are reviewed. It will not suggest running scripts 20–62 before planning is approved.</div>
+      </div>
+      <div class="copilot-role-card">
+        <div class="crc-title">🧪 Script Companion</div>
+        <div class="crc-desc">During the build sequence, Copilot explains each script's purpose, surfaces validation checkpoints, interprets PAC CLI output, and helps diagnose failures — acting as a pair programmer familiar with every step of the bootstrap sequence.</div>
+      </div>
+      <div class="copilot-role-card">
+        <div class="crc-title">📚 Skill-Powered Context</div>
+          <div class="crc-desc">The repo-shared <strong>power-platform-wizard-init</strong> skill is the primary Copilot entry point. It selects a chat or terminal route, enforces the planning gate, and reads existing progress telemetry. The optional <strong>power-platform-vscode-wizard</strong> Claude skill remains available after running <code>01-install-skills.ps1</code>.</div>
+      </div>
+    </div>
+    <div class="copilot-note">
+      <strong>How to invoke it:</strong> Open GitHub Copilot Chat in VS Code and run <code>/power-platform-wizard-init</code> for the primary guided start. It lets you choose chat or terminal intake and can monitor progress. Direct alternatives remain supported: <code>/power-platform-demo-wizard</code> for chat-first intake, or <code>pwsh ./scripts/bootstrap/05-start-wizard.ps1</code> for terminal intake. See the <a href="wizard-walkthrough.html">full visual walkthrough</a> for the complete sequence.
+    </div>
+  </div>
+
+  <!-- SECTION 1: Quick Overview -->
+  <section>
+    <h2><span class="section-num">1</span> What It Does — At a Glance</h2>
+    <div class="overview-grid">
+      <div class="overview-item">
+        <div class="oi-num">00</div>
+        <div class="oi-text"><strong>Prereq Check</strong><span>Verifies PAC CLI, PowerShell 7, and VS Code extensions are installed</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">05</div>
+        <div class="oi-text"><strong>Discovery Wizard</strong><span>Captures required and profile-driven intake, then scaffolds planning and report-mapping artifacts</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">10</div>
+        <div class="oi-text"><strong>Auth &amp; Connect</strong><span>Authenticates to Power Platform and selects the target environment</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">15</div>
+        <div class="oi-text"><strong>Dry Validate</strong><span>Pre-flight check of payloads and entity mappings before any writes</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">20–40</div>
+        <div class="oi-text"><strong>Build Tables, Columns &amp; Relationships</strong><span>Creates Dataverse entities and fields from JSON payloads</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">50–62</div>
+        <div class="oi-text"><strong>Solution, Forms &amp; App Module</strong><span>Adds artifacts to a solution, builds forms/views, and generates the app</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">65–70</div>
+        <div class="oi-text"><strong>Web Resources</strong><span>Deploys HTML/JS/CSS web resources into the solution</span></div>
+      </div>
+      <div class="overview-item">
+        <div class="oi-num">80–82</div>
+        <div class="oi-text"><strong>Analysis &amp; Reporting</strong><span>Post-build validation, progress matrix, and HTML dashboard</span></div>
+      </div>
+    </div>
+
+    <!-- Flow diagram -->
+    <div class="flow">
+      <div class="flow-node">Plan</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Auth</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Validate</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Build</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Solution</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Export</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Report</div>
+    </div>
+  </section>
+
+  <!-- SECTION 2: Step-by-Step -->
+  <section>
+    <h2><span class="section-num">2</span> Step-by-Step Breakdown</h2>
+    <div class="steps" id="steps"></div>
+  </section>
+
+  <!-- SECTION 3: Metrics -->
+  <section>
+    <h2><span class="section-num">3</span> Metrics &amp; Telemetry Tracked</h2>
+    <p class="metrics-intro">
+      The wizard emits telemetry events to <code>.wizard-metrics/events.jsonl</code> throughout the build sequence.
+      Scripts <strong>81</strong> and <strong>82</strong> consume these events to produce a progress matrix and an HTML dashboard.
+      All telemetry is local — nothing is sent to external services.
+    </p>
+
+    <div class="metrics-grid">
+      <div class="metric-card accent-card">
+        <div class="mc-icon">📄</div>
+        <div class="mc-label">Event Log</div>
+        <div class="mc-desc">One JSONL record per step — step name, timestamp, status, and run ID</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-icon">📊</div>
+        <div class="mc-label">Progress Matrix</div>
+        <div class="mc-desc">Which steps each build run reached or completed, grouped by run ID</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-icon">🔍</div>
+        <div class="mc-label">Artifact Validation</div>
+        <div class="mc-desc">Post-build check comparing expected vs. actual Dataverse artifacts</div>
+      </div>
+      <div class="metric-card">
+        <div class="mc-icon">📈</div>
+        <div class="mc-label">HTML Dashboard</div>
+        <div class="mc-desc">Self-contained report generated by script 82 for stakeholder review</div>
+      </div>
+    </div>
+
+    <table class="metrics-table">
+      <thead>
+        <tr>
+          <th>Metric / Event</th>
+          <th>Where stored</th>
+          <th>Captured by</th>
+          <th>Collection</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Step name &amp; timestamp</strong><br><small>Which bootstrap step ran and when</small></td>
+          <td><code>.wizard-metrics/events.jsonl</code></td>
+          <td>All bootstrap scripts via <code>wizard-telemetry.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Step status</strong><br><small>Started / Completed / Failed</small></td>
+          <td><code>.wizard-metrics/events.jsonl</code></td>
+          <td>All bootstrap scripts via <code>wizard-telemetry.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Run ID</strong><br><small>Groups all events from a single wizard session</small></td>
+          <td><code>.wizard-metrics/events.jsonl</code></td>
+          <td>Initialized at first script call; propagated automatically</td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Scenario slug</strong><br><small>Which scenario the run targeted</small></td>
+          <td><code>.wizard-metrics/events.jsonl</code></td>
+          <td>Passed by each script as a parameter</td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Tables created</strong><br><small>List of Dataverse table logical names provisioned</small></td>
+          <td>Script 20 output + post-build analysis</td>
+          <td><code>80-post-build-analysis.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Columns added</strong><br><small>Count and names of custom fields added</small></td>
+          <td>Script 30 output + post-build analysis</td>
+          <td><code>80-post-build-analysis.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Relationships created</strong><br><small>Lookup/relationship logical names provisioned</small></td>
+          <td>Script 40 output + post-build analysis</td>
+          <td><code>80-post-build-analysis.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Solution export status</strong><br><small>Whether solution exported cleanly and unpacked without errors</small></td>
+          <td>Post-build analysis markdown</td>
+          <td><code>80-post-build-analysis.ps1</code></td>
+          <td><span class="tag manual">Manual trigger</span></td>
+        </tr>
+        <tr>
+          <td><strong>Build contract compliance</strong><br><small>Expected spec artifacts vs. what was actually built</small></td>
+          <td>Post-build analysis markdown</td>
+          <td><code>80-post-build-analysis.ps1</code></td>
+          <td><span class="tag manual">Manual trigger</span></td>
+        </tr>
+        <tr>
+          <td><strong>Progress matrix</strong><br><small>Step completion heatmap across multiple runs</small></td>
+          <td><code>.wizard-metrics/build-progress-matrix.*</code></td>
+          <td><code>81-build-progress-matrix.ps1</code></td>
+          <td><span class="tag manual">Manual trigger</span></td>
+        </tr>
+        <tr>
+          <td><strong>HTML progress report</strong><br><small>Visual dashboard for stakeholder review</small></td>
+          <td><code>.wizard-metrics/build-progress-report.html</code></td>
+          <td><code>82-build-progress-report.ps1</code></td>
+          <td><span class="tag manual">Manual trigger</span></td>
+        </tr>
+        <tr>
+          <td><strong>Discovery answers</strong><br><small>Required architecture, discovery, and selected extension responses</small></td>
+          <td><code>specs/&lt;slug&gt;/answers.md</code></td>
+          <td><code>05-start-wizard.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+        <tr>
+          <td><strong>Report mappings</strong><br><small>Explicit no-report decision or approved mappings for critical tables</small></td>
+          <td><code>specs/&lt;slug&gt;/report-mappings.md</code></td>
+          <td><code>05-start-wizard.ps1</code></td>
+          <td><span class="tag auto">Automatic</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+<footer>
+  Power Platform VS Code Wizard &mdash; <strong>docs/onboarding.md</strong> is the authoritative bootstrap sequence &mdash; v0.1.0
+</footer>
+
+<script>
+  const STEPS = [
+    {
+      num: "00",
+      icon: "🔍",
+      label: "Prerequisites",
+      title: "Prereq Check",
+      file: "scripts/bootstrap/00-prereq-check.ps1",
+      desc: "The first script you run before anything else. It verifies that all required tools are installed and configured correctly on your machine. Nothing else in the wizard will work reliably without passing this gate.",
+      inputs: "Local machine environment",
+      outputs: "Pass / fail report with remediation hints",
+      gate: { type: "warning", text: "Hard gate — do not continue until all prereqs pass. Missing tools will cause cryptic failures downstream." },
+      checks: ["PAC CLI installed and on PATH", "PowerShell 7+ available", "VS Code with recommended extensions installed", "Git configured"]
+    },
+    {
+      num: "01",
+      icon: "🧩",
+      label: "Skills Install",
+      title: "Install Claude Skills (run once per machine)",
+      file: "scripts/bootstrap/01-install-skills.ps1",
+      desc: "Copies wizard skill files from the repo's .claude/skills/ folder to ~/.claude/skills/ so the Power Platform wizard skill is available in every Claude Code session on this machine. Only needs to run once.",
+      inputs: ".claude/skills/ in repo root",
+      outputs: "Skill files installed to ~/.claude/skills/",
+      gate: { type: "info", text: "One-time setup. Re-running is safe — it overwrites with the latest version." },
+      checks: ["Copies skill SKILL.md and supporting files", "Prints INSTALLED power-platform-vscode-wizard on success"]
+    },
+    {
+      num: "05",
+      icon: "🧙",
+      label: "Planning Gate",
+      title: "Discovery Wizard",
+      file: "scripts/bootstrap/05-start-wizard.ps1",
+      desc: "The heart of the planning phase. Runs interactively and captures required architecture, discovery, and profile-driven extension answers. It maps entity names to Dataverse logical names automatically (e.g. 'Case' → 'incident'), applies your publisher prefix to custom tables (e.g. 'Agent' → 'cct_agent'), and writes reviewable planning artifacts. Report scoping records an explicit no-report decision or requires approved mappings for every critical table. A -Retrofit flag handles mid-project scenarios where you already have partial implementation.",
+      inputs: "Interactive user answers",
+      outputs: "answers.md, spec.md, plan.md, tasks.md, report-mappings.md, and conditional demo-data/BPF artifacts under specs/<slug>/",
+      gate: { type: "warning", text: "Hard gate — build scripts 20–62 must NOT run until planning and report scoping are reviewed and approved." },
+      checks: ["Scenario name → slug conversion", "Standard table auto-mapping (Case → incident, Contact → contact, etc.)", "Custom table prefix application (Agent → cct_agent)", "Entry table resolves against explicit mappings or retrofit inventory", "Landing view has a create-or-verify action", "Critical report tables mapped or reports explicitly disabled", "BPF discovery if needed", "Retrofit mode for mid-project scenarios", "Overwrites prompt if files already exist"]
+    },
+    {
+      num: "10",
+      icon: "🔐",
+      label: "Authentication",
+      title: "Auth &amp; Connect",
+      file: "scripts/bootstrap/10-auth-connect.ps1",
+      desc: "Authenticates your PAC CLI session to Power Platform and connects to the correct Dataverse environment. You'll be prompted for the environment URL if it isn't already configured. All subsequent build scripts depend on this authenticated session.",
+      inputs: "Environment URL (from spec.md or prompt)",
+      outputs: "Active PAC CLI authenticated session",
+      gate: { type: "info", text: "Run after planning is approved. Environment URL should match what was recorded in answers.md." },
+      checks: ["pac auth create", "pac org select", "Connection verification against environment URL"]
+    },
+    {
+      num: "15",
+      icon: "✅",
+      label: "Dry Run",
+      title: "Dry Validate",
+      file: "scripts/bootstrap/15-dry-validate.ps1",
+      desc: "A pre-flight check that validates your JSON payloads, entity names, and publisher prefix before any Dataverse writes happen. Surfaces schema errors, missing required fields, and naming conflicts so you can fix them without rolling back real changes.",
+      inputs: "payloads/scenarios/<slug>/ JSON files, answers.md",
+      outputs: "Validation report — pass or list of issues",
+      gate: { type: "warning", text: "Do not proceed to script 20 if validation fails. Fix payload JSON errors first." },
+      checks: ["JSON schema validation for table/column/relationship payloads", "Publisher prefix consistency check", "Logical name conflict detection", "Required field presence verification"]
+    },
+    {
+      num: "20",
+      icon: "🗄️",
+      label: "Build Step",
+      title: "Build Tables",
+      file: "scripts/bootstrap/20-build-tables.ps1",
+      desc: "Reads table definitions from the scenario's JSON payload and provisions them in Dataverse using PAC CLI. Handles both standard table reuse (adding columns to incident, contact, etc.) and full custom table creation with the publisher prefix.",
+      inputs: "payloads/scenarios/<slug>/table-*.json",
+      outputs: "Dataverse tables provisioned in target environment",
+      gate: { type: "success", text: "Validate in Maker portal after this step before continuing to column creation." },
+      checks: ["Resolves standard vs. custom table intent", "Applies publisher prefix to custom tables", "Skips already-existing tables gracefully", "Emits telemetry event on completion"]
+    },
+    {
+      num: "30",
+      icon: "🏷️",
+      label: "Build Step",
+      title: "Build Columns",
+      file: "scripts/bootstrap/30-build-columns.ps1",
+      desc: "Adds custom columns (fields) to both standard and custom tables. Column definitions are loaded from JSON payloads. Field types, display names, required levels, and schema names are all driven by the payload — no hardcoding.",
+      inputs: "payloads/scenarios/<slug>/columns-*.json",
+      outputs: "Columns added to target tables in Dataverse",
+      gate: { type: "success", text: "Confirm field visibility and types in the Maker portal before proceeding." },
+      checks: ["Adds columns to both standard and custom tables", "Validates data type mappings", "Handles lookup column dependencies", "Emits telemetry event on completion"]
+    },
+    {
+      num: "40",
+      icon: "🔗",
+      label: "Build Step",
+      title: "Build Relationships",
+      file: "scripts/bootstrap/40-build-relationships.ps1",
+      desc: "Creates lookup relationships between tables based on the relationships payload. Handles the referenced (parent) and referencing (child) direction correctly. This step is order-dependent — tables must exist before relationships can be created.",
+      inputs: "payloads/scenarios/<slug>/relationships-*.json",
+      outputs: "Lookup relationships created in Dataverse",
+      gate: { type: "success", text: "Verify relationships appear correctly in the Maker portal table editor." },
+      checks: ["Relationship direction enforcement", "Validates referenced tables exist before creating lookups", "Schema name generation with publisher prefix", "Emits telemetry event on completion"]
+    },
+    {
+      num: "50",
+      icon: "📦",
+      label: "Build Step",
+      title: "Add to Solution",
+      file: "scripts/bootstrap/50-add-to-solution.ps1",
+      desc: "Creates or selects the target solution and adds all provisioned tables, columns, and relationships into it. The solution name and publisher were captured during the wizard discovery step. All subsequent artifacts (forms, views, app module) will be scoped to this solution.",
+      inputs: "Solution name and publisher prefix from answers.md",
+      outputs: "Solution created; all tables/columns added",
+      gate: { type: "info", text: "Solution should be visible in the Maker portal under Solutions before continuing." },
+      checks: ["Creates solution if it doesn't exist", "Adds all custom tables and columns to solution", "Validates publisher prefix matches", "Emits telemetry event on completion"]
+    },
+    {
+      num: "55",
+      icon: "🔄",
+      label: "Build Step (Optional)",
+      title: "Business Process Flows",
+      file: "scripts/bootstrap/55-build-business-process-flows.ps1",
+      desc: "Only runs if the wizard discovery step enabled BPF. Creates a staged Business Process Flow on the primary entity with the stage definitions, entry/exit criteria, and required fields captured during discovery. Skipped automatically if BPF was not selected.",
+      inputs: "BPF definition from answers.md / spec.md",
+      outputs: "Business Process Flow published in Dataverse",
+      gate: { type: "info", text: "Only required for scenarios with a real staged lifecycle (e.g. lead qualification, case escalation)." },
+      checks: ["Validates BPF stage definitions are complete", "Creates stages with required fields and relationship links", "Publishes BPF to target entity", "Emits telemetry event on completion"]
+    },
+    {
+      num: "60",
+      icon: "📝",
+      label: "Build Step",
+      title: "Build Forms &amp; Views",
+      file: "scripts/bootstrap/60-build-forms-views.ps1",
+      desc: "Generates the main form and key views for the primary entity. The case form gets lookup fields for priority and assigned agent, plus standard fields. The active cases view is filtered and sorted per the spec. Uses PAC CLI and XML/JSON definitions rather than manual Maker portal clicks.",
+      inputs: "spec.md artifact definitions, column logical names",
+      outputs: "Forms and views deployed to solution",
+      gate: { type: "success", text: "Open the app in Maker portal and verify the form fields and view columns match the spec." },
+      checks: ["Adds lookup columns to form", "Sets column order and sections", "Creates filtered view for active records", "Publishes customizations after build"]
+    },
+    {
+      num: "62",
+      icon: "📱",
+      label: "Build Step",
+      title: "Build App Module",
+      file: "scripts/bootstrap/62-build-app-module.ps1",
+      desc: "Creates the Model-driven app module itself — the container that end users actually open. Adds the primary entity's sitemap entry, navigation groups, and dashboard reference. Publishes the app so it appears in the environment's app list.",
+      inputs: "App name from spec.md, solution context",
+      outputs: "Published Model-driven app in solution",
+      gate: { type: "success", text: "Launch the app from the environment's app list to verify it opens and shows the correct navigation." },
+      checks: ["Creates app module with correct display name", "Configures sitemap with entity nodes", "Adds dashboard if defined in spec", "Publishes app and adds to solution"]
+    },
+    {
+      num: "65–70",
+      icon: "🌐",
+      label: "Build Step (Optional)",
+      title: "Build Web Resources",
+      file: "scripts/bootstrap/65-build-web-resources.ps1 / 70-build-web-resources.ps1",
+      desc: "Deploys HTML, JavaScript, and CSS web resources into the solution. Used for custom dashboards, live progress reports, and embedded views that go beyond standard Dataverse forms and views. Scripts 65 and 70 handle different stages of the web resource pipeline.",
+      inputs: "Web resource source files from the repo",
+      outputs: "Web resources registered in the solution",
+      gate: { type: "info", text: "Only required for scenarios that specify a custom web resource dashboard or embedded UI." },
+      checks: ["Registers web resource names with publisher prefix", "Uploads HTML/JS/CSS content", "Adds resources to solution", "Emits telemetry event on completion"]
+    },
+    {
+      num: "80",
+      icon: "🔬",
+      label: "Analysis",
+      title: "Post-Build Analysis",
+      file: "scripts/bootstrap/80-post-build-analysis.ps1",
+      desc: "Reads the build artifacts and compares them against the spec to produce a post-build analysis report. Surfaces any contract mismatches — tables that were expected but not created, fields that are missing, or relationships that failed. Produces a markdown summary, a Mermaid build mind map, and optionally updates README markers.",
+      inputs: "Build artifacts, spec.md, payload files",
+      outputs: "Post-build summary plus mind-map artifacts under .wizard-metrics/",
+      gate: { type: "info", text: "Run before export. Resolve any contract failures before packaging the solution." },
+      checks: ["Compares spec entities vs. provisioned entities", "Validates expected columns exist", "Checks relationship presence", "Generates Mermaid mind map for stakeholder visualization", "Surfaces solution export readiness"]
+    },
+    {
+      num: "81",
+      icon: "📊",
+      label: "Reporting",
+      title: "Build Progress Matrix",
+      file: "scripts/bootstrap/81-build-progress-matrix.ps1",
+      desc: "Reads the telemetry event log and generates a progress matrix — a step-vs-run grid showing which steps each build run completed. Useful for tracking multiple iterations of a build, identifying where runs stalled, and verifying full-sequence coverage.",
+      inputs: ".wizard-metrics/events.jsonl",
+      outputs: "Progress matrix artifact (text + optional JSON)",
+      gate: null,
+      checks: ["Groups events by run ID", "Maps step names to matrix columns", "Marks completed vs. skipped vs. failed steps", "Outputs JSON for script 82 to consume"]
+    },
+    {
+      num: "82",
+      icon: "📈",
+      label: "Reporting",
+      title: "Build Progress Report (HTML Dashboard)",
+      file: "scripts/bootstrap/82-build-progress-report.ps1",
+      desc: "The final reporting step. Consumes the JSON output from script 81 and renders a self-contained HTML dashboard summarizing all build runs, step completion rates, and artifact status. The dashboard now includes direct links to generated build artifacts, including the Mermaid build mind map. The HTML file can be opened in any browser and shared with stakeholders without any server setup.",
+      inputs: "Progress matrix JSON from script 81",
+      outputs: ".wizard-metrics/build-progress-report.html",
+      gate: { type: "info", text: "Open the HTML file in your browser to review the full build history and share with stakeholders." },
+      checks: ["Self-contained HTML — no external dependencies", "Step completion heatmap per run", "Artifact counts (tables, columns, relationships)", "Direct links to post-build artifacts including the build mind map"]
+    }
+  ];
+
+  function renderSteps() {
+    const container = document.getElementById('steps');
+    STEPS.forEach((s, i) => {
+      const card = document.createElement('div');
+      card.className = 'step-card';
+      card.dataset.index = i;
+
+      const gateHtml = s.gate ? `
+        <div class="gate-note ${s.gate.type}">
+          <span>${s.gate.type === 'warning' ? '⚠️' : s.gate.type === 'success' ? '✅' : 'ℹ️'}</span>
+          <span>${s.gate.text}</span>
+        </div>` : '';
+
+      const checksHtml = s.checks.map(c => `<li style="font-size:0.82rem;color:var(--cp-text-muted);margin:0.25rem 0;">${c}</li>`).join('');
+
+      card.innerHTML = `
+        <div class="step-header" onclick="toggleStep(${i})">
+          <div class="step-badge">${s.icon}</div>
+          <div class="step-header-text">
+            <div class="step-label">Step ${s.num} &mdash; ${s.label}</div>
+            <div class="step-title">${s.title}</div>
+            <div class="step-file">${s.file}</div>
+          </div>
+          <div class="step-arrow">▼</div>
+        </div>
+        <div class="step-body">
+          <p>${s.desc}</p>
+          <div class="detail-grid">
+            <div class="detail-pill"><div class="dp-label">Inputs</div><div class="dp-val">${s.inputs}</div></div>
+            <div class="detail-pill"><div class="dp-label">Outputs</div><div class="dp-val">${s.outputs}</div></div>
+          </div>
+          ${gateHtml}
+          <ul style="margin-top:0.9rem;padding-left:1.2rem;">${checksHtml}</ul>
+        </div>`;
+
+      container.appendChild(card);
+    });
+  }
+
+  function toggleStep(i) {
+    const card = document.querySelector(`.step-card[data-index="${i}"]`);
+    card.classList.toggle('open');
+  }
+
+  function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    document.documentElement.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
+  }
+
+  renderSteps();
+</script>
+
+</body>
+</html>

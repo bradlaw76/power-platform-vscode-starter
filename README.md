@@ -1,6 +1,6 @@
 # Power Platform VS Code Starter
 
-<img width="2172" height="724" alt="ChatGPT Image Jun 8, 2026, 03_05_25 PM" src="https://github.com/user-attachments/assets/97e80bbb-df45-41a2-9459-63976cac0d4d" />
+![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
 
 A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution -- without manual portal clicks.
 
@@ -9,8 +9,45 @@ A repo-agnostic starter kit for building Power Platform model-driven apps from V
 
 ---
 
+## Start here
+
+If Git, VS Code, and Copilot Chat are already available, use this single guided start:
+
+```powershell
+git clone https://github.com/bradlaw76/power-platform-vscode-starter
+cd power-platform-vscode-starter
+code .
+```
+
+When the folder opens in VS Code, open Copilot Chat and enter:
+
+```text
+/power-platform-wizard-init
+```
+
+If the slash command is not shown, enter this instead:
+
+```text
+Start the Power Platform wizard in this repository.
+```
+
+If `git` or `code` is not recognized, use the [first-time machine setup](#1-install-required-tools) below. You can also use GitHub's **Code > Download ZIP**, extract the folder, and open it with **File > Open Folder** in VS Code.
+
+You do not need to work out the setup order first. Before the discovery wizard asks about your app, Copilot will:
+
+1. Confirm that it is working in the repository you intended.
+2. Inspect the repository and working tree without modifying tracked project files.
+3. Run the non-destructive prerequisite check for VS Code, PowerShell 7, Azure CLI, Power Platform CLI (PAC CLI), and Git.
+4. Explain any missing setup and help resolve it.
+5. Ask whether this is a new build or retrofit of existing work, then whether to continue in chat or the terminal.
+
+This initial setup writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`. It does **not** sign in to Power Platform, create or change Dataverse resources, run build scripts, commit, or push. After setup passes, the wizard starts discovery and prepares the required Spec Kit planning files: `spec.md`, `plan.md`, and `tasks.md`.
+
+---
+
 ## Table of Contents
 
+- [Start here](#start-here)
 - [What this repo is for](#what-this-repo-is-for)
 - [Who this is for](#who-this-is-for)
 - [Key concepts](#key-concepts)
@@ -34,7 +71,7 @@ A repo-agnostic starter kit for building Power Platform model-driven apps from V
 
 Use this starter when you want to:
 
-- Build Dynamics 365 or Power Platform demos and apps from VS Code
+- Build standalone model-driven Power Apps or extend Dynamics 365 from VS Code
 - Replace manual portal clicks with repeatable, source-controlled scripts
 - Plan work with Spec Kit artifacts before writing any metadata
 - Package and promote results as a Power Platform solution across environments
@@ -47,7 +84,7 @@ Use this starter when you want to:
 
 | You are... | This repo gives you... |
 | --- | --- |
-| A first-time Dynamics builder new to VS Code | A step-by-step wizard with no assumed knowledge |
+| A first-time model-driven app builder new to VS Code | A step-by-step wizard with no assumed knowledge |
 | A team that wants scripted, repeatable builds | Idempotent bootstrap scripts for every build phase |
 | A repo needing a consistent onboarding contract | A single `docs/onboarding.md` any new person can follow in under an hour |
 
@@ -92,6 +129,8 @@ Disclosed local usage metrics are available for wizard runs. Bootstrap scripts l
 ---
 
 ## Getting started
+
+The recommended path is the guided start above: open the repository and enter `/power-platform-wizard-init`. The sections below are the detailed manual setup reference. You can use them directly, or let the init skill walk through them and explain each result.
 
 ### 1. Install required tools
 
@@ -242,12 +281,20 @@ pwsh ./scripts/bootstrap/05-start-wizard.ps1
 /power-platform-demo-wizard
 ```
 
-All paths capture the same 11 discovery questions and scaffold `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`.
+All paths capture the same architecture profile and 11 core discovery questions, then scaffold `spec.md`, `plan.md`, and `tasks.md` under `specs/<scenario-slug>/`.
 
 Canonical source for discovery/planning/execution contract:
 
 - `docs/wizard-contract-v1.md`
 - `wizard.profile.json`
+
+**Application profiles (selected before discovery):**
+
+- `standalone-model-driven`: a normal Power Apps model-driven app, usually built from custom tables, with neutral operational report labels.
+- `dynamics-sales-extension`, `dynamics-customer-service-extension`, or `dynamics-field-service-extension`: an extension that can reuse standard Dynamics tables and either create dedicated forms or update selected forms in place.
+- `generic-dataverse-solution`: Dataverse components packaged in a solution with the same explicit app contract.
+
+Every new profile-based run records its table/form strategy, primary entry-point table, named landing view, required app artifacts, and navigation group. The wizard creates or updates the model-driven review app on every run. App assembly places the entry-point table first in an app-aware sitemap and attaches the requested view; it does not change that table's environment-wide default view.
 
 **Discovery questions:**
 
@@ -375,7 +422,7 @@ Solution isolation behavior:
 - `50-add-to-solution.ps1` derives the expected table set from payload references and fails fast if the target solution already contains foreign table components.
 - `50-add-to-solution.ps1` also writes a contamination scan artifact covering expected components, wizard-managed foreign artifacts, and manual or legacy artifacts in the solution.
 - Strict mode is on by default. Override only for intentional reuse with `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
-- To review or remove foreign tables from an existing unmanaged solution, use `pwsh ./scripts/bootstrap/55-prune-foreign-tables.ps1`.
+- To review or remove foreign tables from an existing unmanaged solution, use `pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1`.
 - `55-build-business-process-flows.ps1` only creates a Business Process Flow when the scenario has an explicit `process-*.json` definition and the referenced entities, fields, and relationships are already justified by the repo artifacts.
 - If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
 - `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
@@ -494,15 +541,13 @@ BEGIN GENERATED BUILD SUMMARY
 - Custom tables:
   - Agent -> cct_agent
   - Customer -> cct_customer
-  - earnint_agent
-  - earnint_priority
   - Priority -> cct_priority
 
 ### Relationship map
 - incident (referencing) -> cct_agent (referenced)
 - incident (referencing) -> cct_priority (referenced)
 - incident (referencing) -> contact (referenced)
-- incident.earnint_agentid -> earnint_agent (earnint_incident_earnint_agent)
+- incident.cct_agentid -> cct_agent (cct_incident_cct_agent)
 
 ### Forms and views created or updated
 - Case form
@@ -527,8 +572,8 @@ Validation scenarios to run for every workflow change:
 - Standard-only model: `table-*.json` includes no standard entities, and no custom duplicates (for example, `<prefix>_case`, `<prefix>_contact`) are created.
 - Custom-only model: all required entities are created with the chosen prefix in lowercase logical form.
 - Mixed model: standard entities are reused, only true custom entities are created, custom fields can be added to standard entities, and mixed relationships plus payload-referenced solution assembly succeed.
-- Uppercase prefix input: users can enter mixed/uppercase prefix input, entity logical names and script filtering behave in lowercase consistently, and the dry check command is `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "EaRnInT"`.
-- Form-label and rerun behavior: new custom table forms show business labels such as `Reported Earnings` rather than raw logical names, rerunning after payload label updates patches Starter Main Form labels, non-starter Main forms remain untouched, and repeated runs do not create duplicate starter forms.
+- Uppercase prefix input: users can enter mixed/uppercase prefix input, entity logical names and script filtering behave in lowercase consistently, and the dry check command is `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "CcT"`.
+- Form-label and rerun behavior: new custom table forms show business labels such as `Priority Code` rather than raw logical names, rerunning after payload label updates patches Starter Main Form labels, non-starter Main forms remain untouched, and repeated runs do not create duplicate starter forms.
 
 ---
 

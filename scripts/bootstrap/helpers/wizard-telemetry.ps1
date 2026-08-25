@@ -1,3 +1,53 @@
+<#
+=============================================================================
+COMPONENT:    Wizard Telemetry Helper
+FILE:         scripts/bootstrap/helpers/wizard-telemetry.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Local Wizard Telemetry
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Provides shared local telemetry functions for bootstrap scripts so step progress
+can be recorded consistently when telemetry is enabled.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            helper module
+- Inputs:          repo root, step names, environment opt-out state
+- Outputs:         telemetry events and helper context for callers
+- Dependencies:    PowerShell runtime and local file-system access
+- Side Effects:    writes local telemetry events when not opted out
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Load this helper only from repo-owned automation steps.
+2. Honor the WIZARD_METRICS_OPTOUT environment variable.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Enabled telemetry writes step events to the expected artifact file.
+✔ Opted-out sessions skip telemetry writes cleanly.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep telemetry non-identifying and local to the repo artifacts.
+- Respect opt-out settings on every call path.
+- Update this header when the helper contract materially changes.
+=============================================================================
+#>
+
 Set-StrictMode -Version Latest
 
 $script:WizardTelemetryContext = $null
@@ -25,8 +75,9 @@ function Get-WizardTelemetryCatalog {
         [pscustomobject]@{ StepKey = '40-build-relationships'; StepCode = '40'; StepOrder = 9; DisplayName = 'Relationships'; ScriptNames = @('40-build-relationships.ps1') }
         [pscustomobject]@{ StepKey = '50-add-to-solution'; StepCode = '50'; StepOrder = 10; DisplayName = 'Solution'; ScriptNames = @('50-add-to-solution.ps1') }
         [pscustomobject]@{ StepKey = '60-build-forms-views'; StepCode = '60'; StepOrder = 11; DisplayName = 'Forms/Views'; ScriptNames = @('60-build-forms-views.ps1') }
-        [pscustomobject]@{ StepKey = '65-build-web-resources'; StepCode = '65'; StepOrder = 12; DisplayName = 'Web Resources'; ScriptNames = @('65-build-web-resources.ps1', '70-build-web-resources.ps1') }
-        [pscustomobject]@{ StepKey = '80-post-build-analysis'; StepCode = '80'; StepOrder = 13; DisplayName = 'Summary'; ScriptNames = @('80-post-build-analysis.ps1') }
+        [pscustomobject]@{ StepKey = '62-build-app-module'; StepCode = '62'; StepOrder = 12; DisplayName = 'App Module'; ScriptNames = @('62-build-app-module.ps1') }
+        [pscustomobject]@{ StepKey = '65-build-web-resources'; StepCode = '65'; StepOrder = 13; DisplayName = 'Web Resources'; ScriptNames = @('65-build-web-resources.ps1', '70-build-web-resources.ps1') }
+        [pscustomobject]@{ StepKey = '80-post-build-analysis'; StepCode = '80'; StepOrder = 14; DisplayName = 'Summary'; ScriptNames = @('80-post-build-analysis.ps1') }
     )
 }
 

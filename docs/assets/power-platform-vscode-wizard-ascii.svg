@@ -1,0 +1,163 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2172" height="724" viewBox="0 0 2172 724" role="img" aria-labelledby="title description">
+  <title id="title">Power Platform VS Code Wizard ASCII workflow</title>
+  <desc id="description">A colorized terminal-style ASCII diagram showing eight stages from guided setup through target promotion.</desc>
+  <defs>
+    <linearGradient id="terminal" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#061016"/>
+      <stop offset="1" stop-color="#020608"/>
+    </linearGradient>
+    <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+      <path d="M0 3.5H4" stroke="#d9f4ea" stroke-opacity="0.025"/>
+    </pattern>
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .mono { font-family: "Cascadia Mono", "IBM Plex Mono", Consolas, monospace; letter-spacing: 0; }
+      .box { fill: #071219; stroke-width: 2; }
+      .corner { font-size: 20px; font-weight: 700; }
+      .heading { font-size: 21px; font-weight: 700; }
+      .body { fill: #c5d8d2; font-size: 15px; }
+      .meta { font-size: 13px; font-weight: 700; }
+      .flow { fill: none; stroke: #58716a; stroke-width: 2; stroke-dasharray: 7 7; }
+    </style>
+  </defs>
+
+  <rect width="2172" height="724" fill="url(#terminal)"/>
+  <rect width="2172" height="724" fill="url(#scanlines)"/>
+  <rect x="18" y="18" width="2136" height="688" fill="none" stroke="#264038" stroke-width="2"/>
+
+  <g class="mono">
+    <text x="55" y="72" fill="#46e6b0" font-size="19">brad@power-platform:~/wizard$</text>
+    <text x="388" y="72" fill="#f2f8f5" font-size="42" font-weight="700" filter="url(#glow)">POWER_PLATFORM_VS_CODE_WIZARD</text>
+    <text x="389" y="108" fill="#88a69c" font-size="17">--mode guided  --planning required  --operations idempotent  --validation strict</text>
+    <g transform="translate(1710 45)">
+      <rect width="395" height="67" fill="#071219" stroke="#264038"/>
+      <text x="17" y="27" fill="#88a69c" font-size="14">SYSTEM STATUS</text>
+      <text x="17" y="51" fill="#46e6b0" font-size="16">[ READY ]</text>
+      <text x="127" y="51" fill="#f6c85f" font-size="14">8 STAGES / 3 GATES</text>
+    </g>
+  </g>
+
+  <g class="mono">
+    <g transform="translate(43 151)" style="color:#53d8fb">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[01] START</text>
+      <text x="17" y="66" class="body">Guided setup</text>
+      <text x="17" y="92" class="body">&gt; confirm repository</text>
+      <text x="17" y="116" class="body">&gt; check prerequisites</text>
+      <text x="17" y="140" class="body">&gt; choose chat or terminal</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#24464f"/>
+      <text x="27" y="182" class="meta" fill="currentColor">CMD /power-platform-wizard-init</text>
+      <text x="17" y="209" class="meta" fill="currentColor">OUT READY FOR DISCOVERY</text>
+    </g>
+
+    <g transform="translate(578 151)" style="color:#3ddc97">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[02] DISCOVER</text>
+      <text x="17" y="66" class="body">Define the work</text>
+      <text x="17" y="92" class="body">&gt; new build or retrofit</text>
+      <text x="17" y="116" class="body">&gt; architecture intent</text>
+      <text x="17" y="140" class="body">&gt; users, tasks, entry point</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#244c3e"/>
+      <text x="27" y="182" class="meta" fill="currentColor">OUT answers.md + solution identity</text>
+      <text x="17" y="209" class="meta" fill="currentColor">GATE INTAKE CONFIRMED</text>
+    </g>
+
+    <g transform="translate(1113 151)" style="color:#f6c85f">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[03] PLAN</text>
+      <text x="17" y="66" class="body">Specify before build</text>
+      <text x="17" y="92" class="body">&gt; requirements and scope</text>
+      <text x="17" y="116" class="body">&gt; technical approach</text>
+      <text x="17" y="140" class="body">&gt; ordered tasks + acceptance</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#5b4d2a"/>
+      <text x="27" y="182" class="meta" fill="currentColor">OUT spec.md + plan.md + tasks.md</text>
+      <text x="17" y="209" class="meta" fill="currentColor">GATE APPROVED TO BUILD</text>
+    </g>
+
+    <g transform="translate(1648 151)" style="color:#ff9f43">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[04] BUILD</text>
+      <text x="17" y="66" class="body">Create the schema</text>
+      <text x="17" y="92" class="body">&gt; dry-validate payloads</text>
+      <text x="17" y="116" class="body">&gt; tables + columns</text>
+      <text x="17" y="140" class="body">&gt; relationships + reruns</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#5c3e26"/>
+      <text x="27" y="182" class="meta" fill="currentColor">RUN 15 -&gt; 20 -&gt; 30 -&gt; 40</text>
+      <text x="17" y="209" class="meta" fill="currentColor">OUT DATAVERSE READY</text>
+    </g>
+
+    <g transform="translate(1648 421)" style="color:#ff6b7a">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[05] ASSEMBLE</text>
+      <text x="17" y="66" class="body">Shape the experience</text>
+      <text x="17" y="92" class="body">&gt; BPF, forms + views</text>
+      <text x="17" y="116" class="body">&gt; review app + sitemap</text>
+      <text x="17" y="140" class="body">&gt; entry point + reports</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#62303a"/>
+      <text x="27" y="182" class="meta" fill="currentColor">RUN 50 -&gt; 55 -&gt; 60 -&gt; 62 -&gt; 70</text>
+      <text x="17" y="209" class="meta" fill="currentColor">OUT APP PUBLISHED</text>
+    </g>
+
+    <g transform="translate(1113 421)" style="color:#a78bfa">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[06] VERIFY</text>
+      <text x="17" y="66" class="body">Prove completeness</text>
+      <text x="17" y="92" class="body">&gt; inventory + solution sync</text>
+      <text x="17" y="116" class="body">&gt; membership report</text>
+      <text x="17" y="140" class="body">&gt; metadata + usability</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#4f4276"/>
+      <text x="27" y="182" class="meta" fill="currentColor">RUN 80 -&gt; 81 -&gt; 82</text>
+      <text x="17" y="209" class="meta" fill="currentColor">GATE EXPORT UNLOCKED</text>
+    </g>
+
+    <g transform="translate(578 421)" style="color:#60a5fa">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[07] PACKAGE</text>
+      <text x="17" y="66" class="body">Make it portable</text>
+      <text x="17" y="92" class="body">&gt; export + unpack solution</text>
+      <text x="17" y="116" class="body">&gt; review Git diff</text>
+      <text x="17" y="140" class="body">&gt; validate before commit</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#315779"/>
+      <text x="27" y="182" class="meta" fill="currentColor">RUN pac solution export / unpack</text>
+      <text x="17" y="209" class="meta" fill="currentColor">OUT SOURCE CONTROLLED</text>
+    </g>
+
+    <g transform="translate(43 421)" style="color:#35d0ba">
+      <rect class="box" width="480" height="214" stroke="currentColor"/>
+      <text x="-2" y="10" class="corner" fill="currentColor">+</text><text x="466" y="10" class="corner" fill="currentColor">+</text>
+      <text x="17" y="35" class="heading" fill="currentColor">[08] PROMOTE</text>
+      <text x="17" y="66" class="body">Ship with evidence</text>
+      <text x="17" y="92" class="body">&gt; pack + import solution</text>
+      <text x="17" y="116" class="body">&gt; validate target</text>
+      <text x="17" y="140" class="body">&gt; record build outcome</text>
+      <rect x="15" y="157" width="450" height="39" fill="#03090d" stroke="#28665e"/>
+      <text x="27" y="182" class="meta" fill="currentColor">RUN pac solution pack / import</text>
+      <text x="17" y="209" class="meta" fill="currentColor">OUT TARGET VERIFIED</text>
+    </g>
+
+    <text x="529" y="263" fill="#58716a" font-size="23">----&gt;</text>
+    <text x="1064" y="263" fill="#58716a" font-size="23">----&gt;</text>
+    <text x="1599" y="263" fill="#58716a" font-size="23">----&gt;</text>
+    <path class="flow" d="M2105 374v20h-39"/>
+    <text x="2053" y="404" fill="#58716a" font-size="23">&lt;----</text>
+    <text x="1599" y="533" fill="#58716a" font-size="23">&lt;----</text>
+    <text x="1064" y="533" fill="#58716a" font-size="23">&lt;----</text>
+    <text x="529" y="533" fill="#58716a" font-size="23">&lt;----</text>
+  </g>
+
+  <g class="mono">
+    <text x="44" y="677" fill="#46e6b0" font-size="16">SUCCESS</text>
+    <text x="134" y="677" fill="#88a69c" font-size="16">PLAN FIRST  |  BUILD SAFELY  |  PROMOTE REPEATABLY</text>
+    <text x="2105" y="677" text-anchor="end" fill="#88a69c" font-size="15">COPILOT-GUIDED  //  PAC CLI-POWERED  //  DATAVERSE-NATIVE  //  VERSIONED IN GIT</text>
+  </g>
+</svg>

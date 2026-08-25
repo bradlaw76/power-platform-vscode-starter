@@ -1,0 +1,14 @@
+{
+  "config": {
+    "MD012": false,
+    "MD013": false,
+    "MD022": false,
+    "MD032": false,
+    "MD034": false,
+    "MD036": false
+  },
+  "ignores": [
+    "node_modules/**",
+    "temp_copilot_complete_wizard.md"
+  ]
+}

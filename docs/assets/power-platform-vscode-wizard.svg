@@ -1,0 +1,240 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2172" height="724" viewBox="0 0 2172 724" role="img" aria-labelledby="title description">
+  <title id="title">Power Platform VS Code Wizard workflow</title>
+  <desc id="description">Eight color-coded stages from guided setup and discovery through planning, build, app assembly, verification, packaging, and promotion.</desc>
+  <defs>
+    <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07131d"/>
+      <stop offset="0.55" stop-color="#0b1d28"/>
+      <stop offset="1" stop-color="#09151e"/>
+    </linearGradient>
+    <pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse">
+      <path d="M 32 0 L 0 0 0 32" fill="none" stroke="#9fb3c2" stroke-opacity="0.055" stroke-width="1"/>
+    </pattern>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+    <style>
+      .mono { font-family: "Cascadia Code", "IBM Plex Mono", Consolas, monospace; letter-spacing: 0; }
+      .sans { font-family: Aptos, "Segoe UI", sans-serif; letter-spacing: 0; }
+      .card { fill: #0d202c; stroke-width: 2; }
+      .step { font-size: 17px; font-weight: 700; }
+      .card-title { fill: #f7fbff; font-size: 23px; font-weight: 700; }
+      .body { fill: #c8d6df; font-size: 15px; }
+      .command { fill: #eaf3f8; font-size: 14px; }
+      .arrow { fill: none; stroke: #8ea5b4; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+  </defs>
+
+  <rect width="2172" height="724" fill="url(#background)"/>
+  <rect width="2172" height="724" fill="url(#grid)"/>
+  <path d="M0 162 H2172" stroke="#29404f" stroke-width="1"/>
+  <path d="M0 650 H2172" stroke="#29404f" stroke-width="1"/>
+
+  <g transform="translate(72 48)">
+    <rect width="66" height="66" rx="8" fill="#53d8fb"/>
+    <path d="M18 19h30v8H26v12h17v8H26v12h-8z" fill="#07131d"/>
+    <path d="M48 35l10 9-10 9v-6H36v-6h12z" fill="#07131d"/>
+  </g>
+  <text x="164" y="79" class="sans" fill="#f7fbff" font-size="46" font-weight="750">Power Platform VS Code Wizard</text>
+  <text x="166" y="116" class="mono" fill="#9fb3c2" font-size="19">PLAN FIRST  /  BUILD SAFELY  /  PROMOTE REPEATABLY</text>
+  <g transform="translate(1540 55)">
+    <rect width="560" height="52" rx="6" fill="#0d202c" stroke="#29404f"/>
+    <circle cx="27" cy="26" r="6" fill="#53d8fb"/>
+    <text x="43" y="32" class="mono" fill="#c8d6df" font-size="15">GUIDED</text>
+    <circle cx="143" cy="26" r="6" fill="#3ddc97"/>
+    <text x="159" y="32" class="mono" fill="#c8d6df" font-size="15">SPEC-DRIVEN</text>
+    <circle cx="307" cy="26" r="6" fill="#f6c85f"/>
+    <text x="323" y="32" class="mono" fill="#c8d6df" font-size="15">IDEMPOTENT</text>
+    <circle cx="461" cy="26" r="6" fill="#ff7a59"/>
+    <text x="477" y="32" class="mono" fill="#c8d6df" font-size="15">VERIFIED</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <g transform="translate(42 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#53d8fb"/>
+      <rect width="246" height="7" rx="3" fill="#53d8fb"/>
+      <circle cx="31" cy="42" r="17" fill="#53d8fb"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">01</text>
+      <text x="59" y="49" class="sans card-title">START</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Guided setup</tspan>
+        <tspan x="22" dy="34">+ Confirm repository</tspan>
+        <tspan x="22" dy="27">+ Check prerequisites</tspan>
+        <tspan x="22" dy="27">+ Choose chat/terminal</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#285264"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">/power-platform-</tspan>
+        <tspan x="30" dy="22">wizard-init</tspan>
+        <tspan x="30" dy="27" fill="#53d8fb">00  -&gt; 05</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#53d8fb" font-size="13">NO CLOUD CHANGES</text>
+    </g>
+
+    <g transform="translate(305 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#3ddc97"/>
+      <rect width="246" height="7" rx="3" fill="#3ddc97"/>
+      <circle cx="31" cy="42" r="17" fill="#3ddc97"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">02</text>
+      <text x="59" y="49" class="sans card-title">DISCOVER</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Define the work</tspan>
+        <tspan x="22" dy="34">+ New build or retrofit</tspan>
+        <tspan x="22" dy="27">+ Architecture intent</tspan>
+        <tspan x="22" dy="27">+ Users + top tasks</tspan>
+        <tspan x="22" dy="27">+ Entry table + view</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#275a48"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">answers.md</tspan>
+        <tspan x="30" dy="22">solution identity</tspan>
+        <tspan x="30" dy="27" fill="#3ddc97">INTAKE CONFIRMED</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#3ddc97" font-size="13">DECISIONS CAPTURED</text>
+    </g>
+
+    <g transform="translate(568 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#f6c85f"/>
+      <rect width="246" height="7" rx="3" fill="#f6c85f"/>
+      <circle cx="31" cy="42" r="17" fill="#f6c85f"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">03</text>
+      <text x="59" y="49" class="sans card-title">PLAN</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Specify before build</tspan>
+        <tspan x="22" dy="34">+ Requirements + scope</tspan>
+        <tspan x="22" dy="27">+ Technical approach</tspan>
+        <tspan x="22" dy="27">+ Ordered tasks</tspan>
+        <tspan x="22" dy="27">+ Acceptance criteria</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#67582d"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">spec.md</tspan>
+        <tspan x="30" dy="22">plan.md  tasks.md</tspan>
+        <tspan x="30" dy="27" fill="#f6c85f">PLANNING GATE</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#f6c85f" font-size="13">APPROVED TO BUILD</text>
+    </g>
+
+    <g transform="translate(831 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#ff9f43"/>
+      <rect width="246" height="7" rx="3" fill="#ff9f43"/>
+      <circle cx="31" cy="42" r="17" fill="#ff9f43"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">04</text>
+      <text x="59" y="49" class="sans card-title">BUILD</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Create the schema</tspan>
+        <tspan x="22" dy="34">+ Dry-validate payloads</tspan>
+        <tspan x="22" dy="27">+ Tables + columns</tspan>
+        <tspan x="22" dy="27">+ Relationships</tspan>
+        <tspan x="22" dy="27">+ Rerun-safe operations</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#6b4930"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">15 dry validate</tspan>
+        <tspan x="30" dy="22">20 / 30 / 40</tspan>
+        <tspan x="30" dy="27" fill="#ff9f43">DATAVERSE READY</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#ff9f43" font-size="13">SCHEMA VERIFIED</text>
+    </g>
+
+    <g transform="translate(1094 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#ff6b7a"/>
+      <rect width="246" height="7" rx="3" fill="#ff6b7a"/>
+      <circle cx="31" cy="42" r="17" fill="#ff6b7a"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">05</text>
+      <text x="59" y="49" class="sans card-title">ASSEMBLE</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Shape the experience</tspan>
+        <tspan x="22" dy="34">+ BPF, forms + views</tspan>
+        <tspan x="22" dy="27">+ Review app + sitemap</tspan>
+        <tspan x="22" dy="27">+ Entry table + view</tspan>
+        <tspan x="22" dy="27">+ Optional reports</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#6a3741"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">50 / 55 / 60</tspan>
+        <tspan x="30" dy="22">62 / 70</tspan>
+        <tspan x="30" dy="27" fill="#ff6b7a">APP PUBLISHED</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#ff6b7a" font-size="13">WORKFLOW CONNECTED</text>
+    </g>
+
+    <g transform="translate(1357 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#a78bfa"/>
+      <rect width="246" height="7" rx="3" fill="#a78bfa"/>
+      <circle cx="31" cy="42" r="17" fill="#a78bfa"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">06</text>
+      <text x="59" y="49" class="sans card-title">VERIFY</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Prove completeness</tspan>
+        <tspan x="22" dy="34">+ Inventory + sync</tspan>
+        <tspan x="22" dy="27">+ Membership report</tspan>
+        <tspan x="22" dy="27">+ Metadata checks</tspan>
+        <tspan x="22" dy="27">+ App usability</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#554881"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">80 analysis</tspan>
+        <tspan x="30" dy="22">81 / 82 progress</tspan>
+        <tspan x="30" dy="27" fill="#a78bfa">ALL CHECKS PASS</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#a78bfa" font-size="13">EXPORT UNLOCKED</text>
+    </g>
+
+    <g transform="translate(1620 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#60a5fa"/>
+      <rect width="246" height="7" rx="3" fill="#60a5fa"/>
+      <circle cx="31" cy="42" r="17" fill="#60a5fa"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">07</text>
+      <text x="59" y="49" class="sans card-title">PACKAGE</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Make it portable</tspan>
+        <tspan x="22" dy="34">+ Export solution</tspan>
+        <tspan x="22" dy="27">+ Unpack source</tspan>
+        <tspan x="22" dy="27">+ Review Git diff</tspan>
+        <tspan x="22" dy="27">+ Pre-commit validation</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#365b7c"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">pac solution export</tspan>
+        <tspan x="30" dy="22">pac solution unpack</tspan>
+        <tspan x="30" dy="27" fill="#60a5fa">SOURCE CONTROLLED</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#60a5fa" font-size="13">READY FOR REVIEW</text>
+    </g>
+
+    <g transform="translate(1883 190)">
+      <rect class="card" width="246" height="406" rx="8" stroke="#35d0ba"/>
+      <rect width="246" height="7" rx="3" fill="#35d0ba"/>
+      <circle cx="31" cy="42" r="17" fill="#35d0ba"/>
+      <text x="31" y="48" text-anchor="middle" class="mono step" fill="#07131d">08</text>
+      <text x="59" y="49" class="sans card-title">PROMOTE</text>
+      <text x="22" y="86" class="mono body">
+        <tspan x="22" dy="0">Ship with evidence</tspan>
+        <tspan x="22" dy="34">+ Pack solution</tspan>
+        <tspan x="22" dy="27">+ Import to target</tspan>
+        <tspan x="22" dy="27">+ Validate environment</tspan>
+        <tspan x="22" dy="27">+ Record build outcome</tspan>
+      </text>
+      <rect x="18" y="286" width="210" height="82" rx="5" fill="#071720" stroke="#286a62"/>
+      <text x="30" y="315" class="mono command">
+        <tspan x="30" dy="0">pac solution pack</tspan>
+        <tspan x="30" dy="22">pac solution import</tspan>
+        <tspan x="30" dy="27" fill="#35d0ba">TARGET VERIFIED</tspan>
+      </text>
+      <text x="22" y="392" class="mono" fill="#35d0ba" font-size="13">BUILD DOCUMENTED</text>
+    </g>
+  </g>
+
+  <g aria-hidden="true">
+    <path class="arrow" d="M289 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M552 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M815 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M1078 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M1341 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M1604 393h14m-7-7 7 7-7 7"/>
+    <path class="arrow" d="M1867 393h14m-7-7 7 7-7 7"/>
+  </g>
+
+  <text x="1086" y="688" text-anchor="middle" class="mono" fill="#9fb3c2" font-size="17">COPILOT-GUIDED  +  PAC CLI-POWERED  +  DATAVERSE-NATIVE  +  VERSIONED IN GIT</text>
+</svg>

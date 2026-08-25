@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Build Web Resources Entry Point
+FILE:         scripts/bootstrap/70-build-web-resources.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Web Resources | Scenario Reporting
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Acts as the optional reporting entry point that orchestrates scenario web
+resource generation and solution packaging flow.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          scenario slug, reporting decisions, and repo context
+- Outputs:         generated report artifacts and run guidance
+- Dependencies:    65-build-web-resources.ps1 and scenario planning files
+- Side Effects:    writes report artifacts and may update solution context
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Reporting must be enabled for the selected scenario.
+2. Base metadata steps should already be complete.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Reporting-enabled scenarios dispatch to the report generator successfully.
+✔ Scenarios without reporting configuration skip safely.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep this script as an optional reporting entry point.
+- Preserve safe skip behavior when reporting is out of scope.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Compatibility wrapper for web resource generation.
 
@@ -12,7 +62,15 @@ param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
-    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX
+    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
+    [ValidateSet("live", "live-with-design-fallback", "static")]
+    [string]$ReportMode = "live-with-design-fallback",
+    [bool]$EnableLiveDataverseReports = $true,
+    [bool]$FailIfReportEntitiesMissing = $true,
+    [bool]$FailIfReportFieldsMissing = $true,
+    [bool]$IncludeDesignSummaryWhenNoData = $true,
+    [switch]$PreviewReportQueriesOnly,
+    [string]$MetadataSnapshotPath = ""
 )
 
 $target = Join-Path $PSScriptRoot "65-build-web-resources.ps1"
@@ -27,6 +85,13 @@ $splat = @{
     AccessToken        = $AccessToken
     SolutionUniqueName = $SolutionUniqueName
     PublisherPrefix    = $PublisherPrefix
+    ReportMode         = $ReportMode
+    EnableLiveDataverseReports = $EnableLiveDataverseReports
+    FailIfReportEntitiesMissing = $FailIfReportEntitiesMissing
+    FailIfReportFieldsMissing = $FailIfReportFieldsMissing
+    IncludeDesignSummaryWhenNoData = $IncludeDesignSummaryWhenNoData
+    PreviewReportQueriesOnly = $PreviewReportQueriesOnly
+    MetadataSnapshotPath = $MetadataSnapshotPath
 }
 & $target @splat
 

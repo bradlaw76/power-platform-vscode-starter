@@ -1,0 +1,576 @@
+<!--
+Component: Contoso Case Tracker 40-Minute Demo Companion
+Purpose: Presenter console derived from wizard discovery, Spec Kit, runbook, and talk-track artifacts.
+Source: specs/contoso-case-tracker and docs/onboarding.md
+Version: 1.0.0
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contoso Case Tracker - 40-Minute Demo Companion</title>
+  <script>
+    (() => {
+      const param = new URLSearchParams(window.location.search).get("clawpilotTheme");
+      const theme =
+        param || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+      document.documentElement.setAttribute("data-theme", theme);
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --cp-bg: #f7f4ef;
+      --cp-bg-elevated: #fcfbf8;
+      --cp-surface: #ffffff;
+      --cp-surface-soft: #f5f5f5;
+      --cp-border: #dedede;
+      --cp-border-strong: #919191;
+      --cp-text: #242424;
+      --cp-text-muted: #5c5c5c;
+      --cp-text-soft: #6f6f6f;
+      --cp-accent: #b11f4b;
+      --cp-accent-hover: #9a1a41;
+      --cp-accent-soft: rgba(177, 31, 75, 0.08);
+      --cp-accent-fg: #ffffff;
+      --cp-success: #16a34a;
+      --cp-danger: #dc2626;
+      --cp-warning: #f59e0b;
+      --cp-link: #0078d4;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.12);
+      --cp-overlay: rgba(255, 255, 255, 0.8);
+      --cp-panel: rgba(255, 255, 255, 0.86);
+      --cp-panel-strong: rgba(255, 255, 255, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.55);
+      --cp-highlight: rgba(177, 31, 75, 0.12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --cp-bg: #3d3b3a;
+      --cp-bg-elevated: #343231;
+      --cp-surface: #292929;
+      --cp-surface-soft: #2e2e2e;
+      --cp-border: #474747;
+      --cp-border-strong: #5f5f5f;
+      --cp-text: #dedede;
+      --cp-text-muted: #919191;
+      --cp-text-soft: #b0b0b0;
+      --cp-accent: #fd8ea1;
+      --cp-accent-hover: #fb7b91;
+      --cp-accent-soft: rgba(253, 142, 161, 0.14);
+      --cp-accent-fg: #1a1a1a;
+      --cp-success: #4ade80;
+      --cp-danger: #f87171;
+      --cp-warning: #fbbf24;
+      --cp-link: #4da6ff;
+      --cp-shadow: 0 18px 48px rgba(0, 0, 0, 0.32);
+      --cp-overlay: rgba(41, 41, 41, 0.88);
+      --cp-panel: rgba(41, 41, 41, 0.72);
+      --cp-panel-strong: rgba(41, 41, 41, 0.96);
+      --cp-sheen: rgba(255, 255, 255, 0.04);
+      --cp-highlight: rgba(253, 142, 161, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--cp-bg); color: var(--cp-text); font-family: "Segoe UI", Aptos, Calibri, -apple-system, BlinkMacSystemFont, sans-serif; }
+    button, input { font: inherit; }
+    button { color: inherit; }
+    svg { width: 18px; height: 18px; stroke: currentColor; stroke-width: 2; fill: none; stroke-linecap: round; stroke-linejoin: round; }
+    .app-shell { min-height: 100vh; font-size: calc(15px * var(--presenter-scale, 1)); }
+    .topbar { position: fixed; inset: 0 0 auto 0; min-height: 76px; z-index: 40; display: grid; grid-template-columns: minmax(280px, 1fr) auto auto; align-items: center; gap: 20px; padding: 10px 22px; background: var(--cp-panel-strong); border-bottom: 1px solid var(--cp-border); }
+    .brand-block, .header-metrics, .header-tools { display: flex; align-items: center; gap: 10px; }
+    .brand-mark { width: 38px; height: 38px; display: grid; place-items: center; color: var(--cp-accent-fg); background: var(--cp-accent); border-radius: .625rem; }
+    .brand-block h1 { margin: 1px 0 0; font-size: 1.05rem; line-height: 1.2; letter-spacing: 0; }
+    .eyebrow, .section-kicker, .orientation-band span, .callout span, .status-language span, .transition span, .reference-section header > span { font-size: .67rem; font-weight: 700; letter-spacing: .08em; color: var(--cp-text-muted); text-transform: uppercase; }
+    .icon-button { width: 36px; height: 36px; display: inline-grid; place-items: center; padding: 0; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); cursor: pointer; }
+    .icon-button:hover { border-color: var(--cp-border-strong); background: var(--cp-surface-soft); }
+    .danger-button:hover { color: var(--cp-danger); }
+    .primary-button, .secondary-button { min-height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border-radius: .625rem; border: 1px solid var(--cp-accent); font-weight: 700; cursor: pointer; }
+    .primary-button { color: var(--cp-accent-fg); background: var(--cp-accent); }
+    .primary-button:hover { background: var(--cp-accent-hover); }
+    .secondary-button { background: var(--cp-surface); color: var(--cp-text); border-color: var(--cp-border); }
+    .metric { display: flex; flex-direction: column; line-height: 1.1; }
+    .metric span, .timer-readout span { color: var(--cp-text-muted); font-size: .68rem; }
+    .metric strong { font-size: .94rem; }
+    .timer-readout { min-width: 116px; display: flex; align-items: center; gap: 8px; padding: 5px 10px; border-left: 1px solid var(--cp-border); }
+    .timer-readout div { display: flex; flex-direction: column; line-height: 1.05; }
+    .timer-readout strong { font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+    .timer-readout.overtime { color: var(--cp-danger); }
+    .time-progress { position: absolute; left: 0; right: 0; bottom: -1px; height: 3px; background: var(--cp-border); }
+    .time-progress span, .overall-progress span { display: block; height: 100%; background: var(--cp-accent); transition: width .25s ease; }
+    #timeProgress, #overallProgress { width: 0; }
+    .mobile-menu, .nav-close { display: none; }
+
+    .section-nav { position: fixed; top: 76px; bottom: 0; left: 0; z-index: 30; width: 292px; display: flex; flex-direction: column; background: var(--cp-bg-elevated); border-right: 1px solid var(--cp-border); }
+    .nav-heading { min-height: 65px; display: flex; align-items: center; justify-content: space-between; padding: 14px 16px 11px; }
+    .nav-heading div { display: flex; flex-direction: column; }
+    .nav-heading span { color: var(--cp-text-muted); font-size: .66rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .nav-heading strong { margin-top: 2px; font-size: .92rem; }
+    .overall-progress { height: 4px; background: var(--cp-border); }
+    .section-nav nav { flex: 1; overflow-y: auto; padding: 8px; }
+    .nav-item { width: 100%; display: flex; gap: 10px; align-items: center; padding: 8px; margin: 0 0 2px; text-align: left; border: 1px solid transparent; border-radius: .625rem; background: transparent; cursor: pointer; }
+    .nav-item:hover { background: var(--cp-surface-soft); }
+    .nav-item.current { border-color: var(--cp-accent); background: var(--cp-accent-soft); }
+    .nav-number { width: 28px; height: 28px; flex: 0 0 28px; display: grid; place-items: center; border: 1px solid var(--cp-border); border-radius: 50%; font-size: .7rem; font-weight: 700; color: var(--cp-text-muted); }
+    .nav-item.done .nav-number { color: var(--cp-accent-fg); background: var(--cp-success); border-color: var(--cp-success); }
+    .nav-copy { min-width: 0; display: flex; flex-direction: column; }
+    .nav-copy strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: .78rem; }
+    .nav-copy small { margin-top: 1px; color: var(--cp-text-muted); font-size: .66rem; }
+    .nav-footer { padding: 10px 14px 14px; border-top: 1px solid var(--cp-border); color: var(--cp-text-muted); font-size: .68rem; }
+    .nav-footer, .nav-footer div { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .nav-footer button { padding: 0; border: 0; color: var(--cp-link); background: transparent; cursor: pointer; font-size: .68rem; }
+
+    .presenter-main { max-width: 1500px; margin-left: 292px; padding: 100px 28px 80px; }
+    .orientation-band { min-height: 76px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 13px 18px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; }
+    .orientation-copy { display: flex; align-items: center; gap: 12px; }
+    .orientation-copy p { margin: 2px 0 0; color: var(--cp-text-muted); font-size: .78rem; }
+    .status-dot { width: 10px; height: 10px; flex: 0 0 10px; border-radius: 50%; background: var(--cp-warning); }
+    .active-marker { display: flex; flex-direction: column; text-align: right; }
+    .active-marker strong { margin-top: 2px; font-size: .82rem; }
+    .guardrail-strip { display: flex; align-items: flex-start; gap: 12px; margin: 12px 0 22px; padding: 12px 16px; color: var(--cp-text); background: var(--cp-accent-soft); border-left: 4px solid var(--cp-accent); }
+    .guardrail-strip svg { flex: 0 0 auto; color: var(--cp-accent); }
+    .guardrail-strip div { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+    .guardrail-strip span { position: relative; font-size: .75rem; }
+    .guardrail-strip span::before { content: ""; width: 4px; height: 4px; display: inline-block; margin: 0 7px 2px 0; border-radius: 50%; background: var(--cp-accent); }
+
+    .demo-section { scroll-margin-top: 92px; margin-bottom: 16px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; overflow: hidden; }
+    .demo-section.section-complete { border-color: var(--cp-success); }
+    .section-header { min-height: 118px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 16px; padding: 16px 18px; }
+    .section-check { cursor: pointer; }
+    .section-check input, .action-item input { position: absolute; opacity: 0; pointer-events: none; }
+    .section-check > span { width: 48px; height: 48px; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--cp-border-strong); color: var(--cp-text-muted); font-size: .9rem; font-weight: 800; }
+    .section-complete .section-check > span { color: var(--cp-accent-fg); background: var(--cp-success); border-color: var(--cp-success); }
+    .section-title-button { min-width: 0; padding: 0; text-align: left; border: 0; background: transparent; cursor: pointer; }
+    .section-title-button h2 { margin: 3px 0 4px; font-size: 1.35rem; line-height: 1.2; letter-spacing: 0; }
+    .section-title-button p { max-width: 840px; margin: 0; color: var(--cp-text-muted); font-size: .85rem; }
+    .section-header-meta { display: flex; align-items: center; gap: 10px; color: var(--cp-text-muted); font-size: .76rem; }
+    .section-header-meta .evidence { padding: 4px 7px; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface-soft); font-size: .65rem; font-weight: 700; text-transform: uppercase; }
+    .section-content { display: grid; grid-template-columns: minmax(320px, .85fr) minmax(440px, 1.15fr); gap: 28px; padding: 22px 24px 26px; border-top: 1px solid var(--cp-border); background: var(--cp-bg-elevated); }
+    .section-content[hidden] { display: none; }
+    .section-content h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 13px; color: var(--cp-text); font-size: .83rem; text-transform: uppercase; letter-spacing: .06em; }
+    .action-list { display: flex; flex-direction: column; gap: 7px; }
+    .action-item { position: relative; display: grid; grid-template-columns: 24px 1fr; align-items: start; gap: 9px; padding: 9px 10px; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); cursor: pointer; line-height: 1.4; font-size: .82rem; }
+    .action-item:hover { border-color: var(--cp-border-strong); }
+    .custom-check { width: 20px; height: 20px; display: grid; place-items: center; margin-top: 1px; border: 1px solid var(--cp-border-strong); border-radius: 5px; }
+    .action-done { color: var(--cp-text-muted); background: var(--cp-surface-soft); }
+    .action-done .custom-check { color: var(--cp-accent-fg); background: var(--cp-success); border-color: var(--cp-success); }
+    .action-done > span:last-child { text-decoration: line-through; }
+    .speaker-notes { border-left: 4px solid var(--cp-accent); }
+    .speaker-notes blockquote { margin: 0; padding: 0 0 12px 16px; color: var(--cp-text); line-height: 1.58; font-size: .9rem; }
+    .callout, .status-language, .transition { margin-top: 12px; padding: 11px 13px; border: 1px solid var(--cp-border); border-radius: .625rem; background: var(--cp-surface); }
+    .callout { border-left: 4px solid var(--cp-warning); }
+    .callout strong { display: block; margin-top: 3px; line-height: 1.45; font-size: .86rem; }
+    .status-language { border-left: 4px solid var(--cp-link); }
+    .transition { border-left: 4px solid var(--cp-accent); }
+    .status-language p, .transition p { margin: 3px 0 0; color: var(--cp-text-muted); font-size: .8rem; line-height: 1.45; }
+
+    .reference-section { margin-top: 38px; padding-top: 28px; border-top: 1px solid var(--cp-border); }
+    .reference-section header h2 { margin: 3px 0 3px; font-size: 1.35rem; letter-spacing: 0; }
+    .reference-section header p { margin: 0; color: var(--cp-text-muted); font-size: .84rem; }
+    .reference-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 18px; }
+    .reference-panel { padding: 18px; background: var(--cp-surface); border: 1px solid var(--cp-border); border-radius: 16px; }
+    .reference-panel h3 { margin: 0 0 12px; font-size: .95rem; }
+    .reference-panel details { padding: 9px 0; border-top: 1px solid var(--cp-border); }
+    .reference-panel details:first-of-type { border-top: 0; }
+    .reference-panel summary { cursor: pointer; font-weight: 700; font-size: .82rem; }
+    .reference-panel details p { margin: 7px 0 0; color: var(--cp-text-muted); font-size: .8rem; line-height: 1.5; }
+    .reference-panel ul { margin: 0; padding-left: 18px; }
+    .reference-panel li { margin-bottom: 10px; color: var(--cp-text-muted); font-size: .8rem; line-height: 1.45; }
+    code { font-family: Consolas, "Courier New", Courier, monospace; color: var(--cp-text); }
+
+    .nav-scrim, .modal-backdrop { position: fixed; inset: 0; z-index: 50; border: 0; background: var(--cp-overlay); }
+    .modal-backdrop { display: grid; place-items: center; padding: 20px; }
+    .modal-backdrop[hidden] { display: none; }
+    .reset-dialog { width: min(420px, 100%); padding: 24px; text-align: center; border: 1px solid var(--cp-border); border-radius: 16px; background: var(--cp-surface); box-shadow: var(--cp-shadow); }
+    .reset-dialog > svg { color: var(--cp-danger); }
+    .reset-dialog h2 { margin: 10px 0 5px; font-size: 1.15rem; }
+    .reset-dialog p { margin: 0; color: var(--cp-text-muted); font-size: .83rem; line-height: 1.5; }
+    .reset-dialog > div { display: flex; justify-content: center; gap: 9px; margin-top: 18px; }
+
+    @media (max-width: 1080px) {
+      .header-metrics { display: none; }
+      .topbar { grid-template-columns: 1fr auto; }
+      .section-content { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 820px) {
+      .app-shell { font-size: 15px; }
+      .topbar { min-height: 68px; padding: 8px 12px; }
+      .brand-block h1 { font-size: .9rem; }
+      .brand-block .eyebrow { display: none; }
+      .header-tools .icon-button:not(.mobile-menu), .header-tools .secondary-button { display: none; }
+      .mobile-menu { display: inline-grid; }
+      .section-nav { top: 0; width: min(320px, 86vw); z-index: 60; transform: translateX(-105%); transition: transform .2s ease; }
+      .section-nav.open { transform: translateX(0); }
+      .nav-close { display: inline-grid; }
+      .presenter-main { margin-left: 0; padding: 84px 12px 50px; }
+      .orientation-band { align-items: flex-start; }
+      .active-marker { display: none; }
+      .guardrail-strip div { display: block; }
+      .guardrail-strip span { display: block; margin-bottom: 5px; }
+      .section-header { grid-template-columns: auto 1fr; }
+      .section-header-meta { grid-column: 2; }
+      .section-content { padding: 18px 14px; }
+      .reference-grid { grid-template-columns: 1fr; }
+    }
+    @media print {
+      .topbar, .section-nav, .guardrail-strip, .section-check, .header-tools { display: none !important; }
+      .presenter-main { margin: 0; padding: 0; max-width: none; }
+      .demo-section, .reference-panel { break-inside: avoid; box-shadow: none; }
+      .section-content { display: grid !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-shell" id="appShell">
+    <header class="topbar">
+      <div class="brand-block">
+        <div class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4zM14 14h6v6h-6z" /></svg>
+        </div>
+        <div>
+          <div class="eyebrow">Power Platform VS Code Wizard</div>
+          <h1>Contoso Case Tracker - 40-Minute Demo Companion</h1>
+        </div>
+      </div>
+      <div class="header-metrics">
+        <div class="metric"><span>Run of show</span><strong>8 sections</strong></div>
+        <div class="metric"><span>Target</span><strong>40:00</strong></div>
+        <div class="timer-readout" id="timerReadout">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" /><path d="M12 9v4l2 2M9 2h6" /></svg>
+          <div><span>Elapsed</span><strong id="timerText">00:00</strong></div>
+        </div>
+      </div>
+      <div class="header-tools">
+        <button class="icon-button mobile-menu" id="menuButton" type="button" title="Open section menu" aria-label="Open section menu">
+          <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" /></svg>
+        </button>
+        <button class="primary-button" id="timerButton" type="button">
+          <svg viewBox="0 0 24 24" id="timerButtonIcon"><path d="m8 5 11 7-11 7z" /></svg>
+          <span id="timerButtonLabel">Start</span>
+        </button>
+        <button class="icon-button" id="scaleButton" type="button" title="Increase presenter text size" aria-label="Increase presenter text size">
+          <svg viewBox="0 0 24 24"><path d="M4 19 9 5h2l5 14M6 14h8M18 8h4M20 6v4" /></svg>
+        </button>
+        <button class="icon-button" id="themeButton" type="button" title="Toggle light or dark theme" aria-label="Toggle light or dark theme">
+          <svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 9 9c-4 2-9-1-9-6a9 9 0 0 1 0-3z" /></svg>
+        </button>
+        <button class="icon-button danger-button" id="resetButton" type="button" title="Reset rehearsal progress" aria-label="Reset rehearsal progress">
+          <svg viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" /></svg>
+        </button>
+        <div class="time-progress"><span id="timeProgress"></span></div>
+      </div>
+    </header>
+
+    <aside class="section-nav" id="sectionNav">
+      <div class="nav-heading">
+        <div><span>Presenter route</span><strong id="progressLabel">0 of 8 complete</strong></div>
+        <button class="icon-button nav-close" id="closeMenuButton" type="button" aria-label="Close section menu">
+          <svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" /></svg>
+        </button>
+      </div>
+      <div class="overall-progress"><span id="overallProgress"></span></div>
+      <nav id="navItems" aria-label="Demo sections"></nav>
+      <div class="nav-footer">
+        <div><span>State saved locally</span><button type="button" id="printButton">Print notes</button></div>
+      </div>
+    </aside>
+    <button class="nav-scrim" id="navScrim" type="button" aria-label="Close section menu" hidden></button>
+
+    <main class="presenter-main">
+      <section class="orientation-band" aria-label="Presenter orientation">
+        <div class="orientation-copy">
+          <span class="status-dot" aria-hidden="true"></span>
+          <div><span>Evidence posture</span><p>Planning is documented. Build, deployment, and rehearsal outcomes require live proof.</p></div>
+        </div>
+        <div class="active-marker"><span>Current section</span><strong id="activeSectionLabel">Opening and promise</strong></div>
+      </section>
+      <div class="guardrail-strip">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 21h20L12 3zM12 9v5M12 18h.01" /></svg>
+        <div>
+          <span>Say "planned" until the environment proves it</span>
+          <span>Use Case as the hero record</span>
+          <span>Keep standard and custom tables distinct</span>
+          <span>Never expose tokens, tenant data, or .env.ps1</span>
+        </div>
+      </div>
+
+      <div id="sections"></div>
+
+      <section class="reference-section" id="reference">
+        <header><span>Presenter reference</span><h2>Evidence, recovery, and source map</h2><p>Use these notes for rehearsal preparation and controlled pivots during the live session.</p></header>
+        <div class="reference-grid">
+          <article class="reference-panel">
+            <h3>Evidence status</h3>
+            <details open><summary>Documented and safe to state</summary><p>The business problem, audience, Case hero record, standard/custom entity mapping, required artifacts, success criteria, environment target, unmanaged solution decision, and ordered wizard process are recorded in scenario and repository documents.</p></details>
+            <details><summary>Planned but not yet evidenced</summary><p>Most tasks in <code>tasks.md</code> remain unchecked, including schema payloads, build scripts, dashboard, demo data, export/import, post-build analysis, and build-log completion.</p></details>
+            <details><summary>Rehearsal pending</summary><p><code>demo-dry-run.md</code> is aligned to Contoso Case Tracker but still records pending checks. Do not present it as a completed rehearsal record.</p></details>
+          </article>
+          <article class="reference-panel">
+            <h3>Source map</h3>
+            <ul>
+              <li><code>answers.md</code>: original wizard intake and solution choices.</li>
+              <li><code>spec.md</code>: business problem, entity mapping, artifacts, and measurable success.</li>
+              <li><code>plan.md</code>: implementation approach and validation plan.</li>
+              <li><code>tasks.md</code>: actual completion state and remaining work.</li>
+              <li><code>demo-talk-track.md</code>: five-minute business story expanded by this companion.</li>
+              <li><code>demo-walkthrough.md</code>: operator setup, live proof, and fallback guidance.</li>
+              <li><code>docs/onboarding.md</code>: authoritative bootstrap sequence.</li>
+            </ul>
+          </article>
+          <article class="reference-panel">
+            <h3>Live-demo recovery</h3>
+            <details open><summary>Environment or authentication fails</summary><p>Stay in VS Code. Show the planning artifacts and script boundaries, explain what authentication unlocks, and state that no deployment claim is being made.</p></details>
+            <details><summary>Case data is missing</summary><p>Use a prepared record if available. Otherwise show the Case form design and Active Cases definition, then label the record outcome as the next live validation.</p></details>
+            <details><summary>View or dashboard is unavailable</summary><p>Use solution inventory or scenario requirements as design evidence. Do not describe the surface as deployed until it is visible in the target environment.</p></details>
+          </article>
+          <article class="reference-panel">
+            <h3>Preflight checklist</h3>
+            <ul>
+              <li>Open VS Code, Copilot Chat, scenario files, terminal, Maker portal, app, and a prepared Case record.</li>
+              <li>Run a timed rehearsal and fix the scenario mismatch in <code>demo-dry-run.md</code>.</li>
+              <li>Confirm the target solution and publisher prefix before authentication.</li>
+              <li>Verify the Case form, Active Cases view, supervisor dashboard, and sample data before claiming success.</li>
+              <li>Keep a static screenshot or exported evidence package available for a controlled fallback.</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="resetModal" hidden>
+    <div class="reset-dialog" role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5" /></svg>
+      <h2 id="resetTitle">Reset this rehearsal?</h2>
+      <p>This clears completed actions, section progress, and elapsed time stored in this browser.</p>
+      <div><button class="secondary-button" id="cancelResetButton" type="button">Cancel</button><button class="primary-button" id="confirmResetButton" type="button">Reset</button></div>
+    </div>
+  </div>
+
+  <script>
+    const icons = {
+      actions: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" /></svg>',
+      notes: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v12H7l-3 3V4zM8 8h8M8 12h5" /></svg>',
+      clock: '<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>',
+      chevron: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>'
+    };
+
+    const demoSections = [
+      {
+        title: 'Opening and promise', duration: 3, evidence: 'Documented',
+        summary: 'Frame the business problem, the proof scenario, and what the audience should watch for.',
+        actions: ['Show the title and identify Customer support agents and supervisors as the audience.', 'State the problem: track and resolve customer support cases from intake to closure.', 'Set the success signal: create or update a Case, save within 30 seconds, and find it in Active Cases.', 'Preview the journey from natural-language intent to governed, testable solution artifacts.'],
+        script: 'Today I am showing two things at once. The business story is Contoso Case Tracker: a support agent needs to open a Case, capture priority, customer, and assigned agent, and see that work immediately in the active queue. The engineering story is how the Power Platform VS Code Wizard turns that intent into reviewable specifications, controlled build steps, and explicit validation. Watch for traceability: every artifact I show should connect back to a requirement, and every success claim should have evidence.',
+        callout: 'Do not open with scripts. Open with the support outcome and the proof the audience will see.',
+        status: 'Documented: audience, problem, hero record, required artifacts, and success measures are present in spec.md.',
+        transition: 'Let us start where every trustworthy build starts: the questions that define intent before anything is created.'
+      },
+      {
+        title: 'Guided wizard intake', duration: 5, evidence: 'Documented',
+        summary: 'Show how the wizard captures business, platform, environment, packaging, and demo decisions.',
+        actions: ['Open the Copilot Chat entry point and show /power-platform-wizard-init.', 'Open answers.md and highlight scenario, audience, users, entities, artifacts, and success definition.', 'Point out environment, unmanaged solution, new solution name, and new publisher prefix decisions.', 'Explain greenfield versus retrofit routing and why the wizard asks one discovery question at a time.'],
+        script: 'The wizard behaves as a facilitator rather than a command generator. It first confirms the repository and prerequisites, then asks whether this is a greenfield build or a retrofit. For Contoso, the captured intake identifies Dynamics 365 Customer Service, the support audience, four business entities, three required experiences, and a measurable demo outcome. It also records the target environment, solution packaging, solution unique name, and publisher prefix before authentication. That means the build is not guessing where components belong.',
+        callout: 'Keep .env.ps1 closed. Never reveal access tokens, tenant details, or local authentication state.',
+        status: 'Documented: answers.md contains the core wizard answers. Architecture-intent additions required by current guidance should be reconfirmed before a new build run.',
+        transition: 'Those answers become more valuable when ambiguous business names are resolved into an explicit Dataverse architecture.'
+      },
+      {
+        title: 'Architecture intent and mapping', duration: 5, evidence: 'Documented',
+        summary: 'Explain the standard/custom model and why explicit mapping prevents duplicate or incorrect tables.',
+        actions: ['Open the Explicit Entity Mapping block in spec.md.', 'Show Case -> incident and Contact -> contact as reused standard tables.', 'Show cct_customer, cct_agent, and cct_priority as planned custom tables.', 'Highlight reused fields, custom Case lookups, and the three planned relationships.', 'Connect the Case hero record to the required entry point and Active Cases landing view.'],
+        script: 'This mapping is the first technical control. Case is not recreated; it maps to the standard incident table. Contact is also reused. The scenario currently plans three custom tables under the cct prefix and two custom lookup fields on Case. The relationships make customer, priority, and assigned agent part of one coherent work surface. The practical benefit is that payload generation can create only true custom tables while extending standard Dynamics behavior where it already exists.',
+        callout: 'The current files list both Contact and a custom Customer table. Reconfirm the business role of cct_customer before generating payloads so the model does not duplicate Contact semantics.',
+        status: 'Documented design, not deployed proof. The current architecture category is hybrid: standard tables plus custom tables.',
+        transition: 'With the model made explicit, the repository can turn discovery into a planning gate that both humans and automation can inspect.'
+      },
+      {
+        title: 'Spec Kit planning gate', duration: 5, evidence: 'Mixed',
+        summary: 'Trace requirements through spec.md, plan.md, and tasks.md before showing any build action.',
+        actions: ['Open spec.md and point to measurable acceptance criteria.', 'Open plan.md and show workstreams, risks, payload readiness, and validation plan.', 'Open tasks.md and contrast completed mapping tasks with unchecked implementation tasks.', 'Explain that unchecked tasks are a control signal, not a presentation defect.', 'Show demo-talk-track.md as the generated five-minute business narrative this companion expands.'],
+        script: 'The planning gate has three jobs. The spec says what outcome is required. The plan says how the solution will be assembled and validated. The task list records what has actually been completed. Notice that mapping decisions are checked, while most build and deployment work remains unchecked. That distinction is important: the repository gives us a credible plan, but it does not let the presenter silently convert plans into completed facts. The generated five-minute talk track preserves the customer story; this companion adds the operator detail needed for a forty-minute demonstration.',
+        callout: 'Do not call planning complete until the stakeholder review, environment approval, payload definitions, report decision, and solution/prefix confirmation are resolved.',
+        status: 'Mixed: planning documents exist, but tasks.md shows unresolved planning and implementation work.',
+        transition: 'Once the gate is complete, the operator moves through a deterministic script sequence rather than a collection of ad hoc commands.'
+      },
+      {
+        title: 'Controlled build orchestration', duration: 7, evidence: 'Live proof required',
+        summary: 'Walk through the authoritative sequence, payload ownership, idempotence, and inventory controls.',
+        actions: ['Open docs/onboarding.md and identify it as the authoritative sequence.', 'Show prerequisite and authentication boundaries: 00, then 10 after planning.', 'Walk through scripts 15, 20, 30, 40, 50, 55, 60, and 62 in order.', 'Explain that payloads are the source of truth for schema, labels, and field order.', 'Call out rerun safety, token refresh on 401, backoff on 429, publish calls, and explicit app membership.', 'Show where inventory and final solution-membership reporting fit before export.'],
+        script: 'The build sequence is deliberately unsurprising. Prerequisites are checked first. Authentication validates the environment, solution, and publisher. Dry validation catches payload issues before mutation. Tables, columns, and relationships are then processed in dependency order. Components are synchronized to the selected solution, the app experience is assembled, and every metadata update ends with publish. These scripts are designed to be rerunnable, with authentication refresh and throttling resilience. Most importantly, the run must inventory created and updated artifacts, recheck solution membership, and stop export if required components are missing.',
+        callout: 'For this scenario, describe the sequence unless a validated environment is ready. tasks.md does not currently prove these scripts ran successfully.',
+        status: 'Live proof required: show zero-failure summaries, publish success, inventory IDs, and solution membership before describing the build as complete.',
+        transition: 'The scripts matter because of the user experience they produce. Now we move from build mechanics to the Case workflow.'
+      },
+      {
+        title: 'Case workflow and review app', duration: 6, evidence: 'Live proof required',
+        summary: 'Demonstrate the business experience using one live Case change and supervisor visibility.',
+        actions: ['Open the model-driven review app at the Case entry point and Active Cases landing view.', 'Open a prepared Case and identify title, customer, priority, assigned agent, and status.', 'Create or update one Case and start a 30-second mental checkpoint before saving.', 'Return to Active Cases and verify the saved record appears without manual refresh.', 'Open the supervisor dashboard and show open count, cases by priority, and cases by agent.', 'Relate every visible surface back to the scenario success criteria.'],
+        script: 'Here is the business proof. The agent starts in Active Cases, opens the Case form, and sees business labels rather than schema names. I will make one live change so this is not only prepared data. After save, the Case should appear immediately in the active workload. The supervisor view then answers three operational questions: how much work is open, where priority is concentrated, and how work is distributed by agent. The review app is also a build control because every app-addressable artifact from this run should be reachable from one published navigation structure.',
+        callout: 'Use at least one live change, but keep a prepared Case available. Never seed or modify standard reused tables implicitly.',
+        status: 'Live proof required: verify the app, entry table, landing view, form labels, 30-second save target, view refresh behavior, dashboard, and demo-data counts.',
+        transition: 'A convincing screen is not the final quality bar. The solution also has to be inspectable, portable, and reproducible.'
+      },
+      {
+        title: 'Validation and source control', duration: 5, evidence: 'Live proof required',
+        summary: 'Show how metadata checks, membership checks, export/unpack, and reviewable Git changes close the loop.',
+        actions: ['Show the expected 80-post-build-analysis and progress report outputs.', 'Verify fields, forms, views, app navigation, and target solution membership.', 'Show the build-log run summary fields and explain created/updated/skipped/failed counts.', 'Demonstrate export and unpack only after membership passes.', 'Show a focused Git diff of unpacked solution and scenario artifacts without committing or pushing.', 'Explain pack/import validation and the separate approval required for source-control actions.'],
+        script: 'Validation closes the traceability loop. Functional checks prove the fields and user surfaces exist. Inventory checks prove the selected solution contains the required components. The run summary records created, updated, skipped, and failed counts so a teammate can distinguish a clean rerun from an incomplete run. Only after membership passes do we export and unpack the solution into reviewable source. Git then becomes a review surface, not a substitute for Dataverse validation. Commit and push remain explicit, separately approved actions.',
+        callout: 'A clean script exit alone is insufficient. Require functional metadata checks, solution membership, app usability, and a recorded run summary.',
+        status: 'Live proof required: tasks.md currently leaves post-build analysis, build-log update, export/unpack, pack/import, and source-control work unchecked.',
+        transition: 'We can now close on what the audience saw, what is proven, and what remains the next responsible action.'
+      },
+      {
+        title: 'Outcome and next actions', duration: 4, evidence: 'Documented close',
+        summary: 'Reconnect the customer outcome to the governed workflow and state the evidence boundary plainly.',
+        actions: ['Restate the Case workflow and support-agent outcome.', 'Summarize the chain: intake -> mapping -> Spec Kit -> payloads -> build -> review app -> validation.', 'Distinguish what was documented from what was proven live in this session.', 'Name the next action: resolve open planning items, run a scenario-correct rehearsal, then execute and record validation.', 'Invite questions around architecture, operator workflow, or business experience.'],
+        script: 'To recap, Contoso Case Tracker gives the audience a simple business proof: an agent can capture the right Case information and supervisors can see active workload by priority and owner. The wizard makes that outcome governable by connecting discovery, explicit Dataverse mapping, Spec Kit planning, payload-driven scripts, a review app, and evidence-based validation. Today, the planning story is documented. Any build or runtime result I described as proven came from what we verified live; anything else remains planned. The next responsible step is to close the open planning decisions, run a Contoso-specific timed rehearsal, and record the build and validation evidence.',
+        callout: 'End with the evidence boundary. Credibility is stronger than claiming completion that tasks.md does not support.',
+        status: 'Close on measurable outcomes: save within 30 seconds, appear in Active Cases, show supervisor breakdowns, and preserve a portable solution.',
+        transition: 'Questions can now follow the same structure: business outcome, architecture decision, implementation evidence, or next action.'
+      }
+    ];
+
+    const storageKey = 'contoso-case-tracker-demo-companion-v1';
+    const defaultState = { completedSections: [], completedActions: {}, elapsed: 0, scale: 1, expanded: [0] };
+    let state = loadState();
+    let timerId = null;
+    let timerRunning = false;
+
+    function loadState() {
+      try { return { ...defaultState, ...JSON.parse(localStorage.getItem(storageKey) || '{}') }; }
+      catch { return { ...defaultState }; }
+    }
+    function saveState() { localStorage.setItem(storageKey, JSON.stringify(state)); }
+    function escapeHtml(value) { return value.replace(/[&<>'"]/g, character => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' })[character]); }
+    function sectionActionKey(sectionIndex, actionIndex) { return `${sectionIndex}-${actionIndex}`; }
+
+    function render() {
+      const nav = document.getElementById('navItems');
+      const sections = document.getElementById('sections');
+      nav.innerHTML = demoSections.map((section, index) => `
+        <button class="nav-item ${state.completedSections.includes(index) ? 'done' : ''}" type="button" data-nav="${index}">
+          <span class="nav-number">${state.completedSections.includes(index) ? '&#10003;' : String(index + 1).padStart(2, '0')}</span>
+          <span class="nav-copy"><strong>${escapeHtml(section.title)}</strong><small>${section.duration} min</small></span>
+        </button>`).join('');
+      sections.innerHTML = demoSections.map((section, index) => {
+        const complete = state.completedSections.includes(index);
+        const expanded = state.expanded.includes(index);
+        return `
+          <section class="demo-section ${complete ? 'section-complete' : ''}" id="section-${index}">
+            <div class="section-header">
+              <label class="section-check" title="Mark section complete">
+                <input type="checkbox" data-section-check="${index}" ${complete ? 'checked' : ''} />
+                <span>${complete ? '&#10003;' : String(index + 1).padStart(2, '0')}</span>
+              </label>
+              <button class="section-title-button" type="button" data-expand="${index}" aria-expanded="${expanded}">
+                <span class="section-kicker">Section ${index + 1}</span>
+                <h2>${escapeHtml(section.title)}</h2>
+                <p>${escapeHtml(section.summary)}</p>
+              </button>
+              <div class="section-header-meta"><span class="evidence">${escapeHtml(section.evidence)}</span>${icons.clock}<strong>${section.duration} min</strong>${icons.chevron}</div>
+            </div>
+            <div class="section-content" ${expanded ? '' : 'hidden'}>
+              <div>
+                <h3>${icons.actions} What to show</h3>
+                <div class="action-list">
+                  ${section.actions.map((action, actionIndex) => {
+                    const key = sectionActionKey(index, actionIndex);
+                    const done = Boolean(state.completedActions[key]);
+                    return `<label class="action-item ${done ? 'action-done' : ''}"><input type="checkbox" data-action="${key}" ${done ? 'checked' : ''} /><span class="custom-check">${done ? '&#10003;' : ''}</span><span>${escapeHtml(action)}</span></label>`;
+                  }).join('')}
+                </div>
+              </div>
+              <div>
+                <h3>${icons.notes} What to say</h3>
+                <div class="speaker-notes"><blockquote>${escapeHtml(section.script)}</blockquote></div>
+                <div class="callout"><span>Presenter caution</span><strong>${escapeHtml(section.callout)}</strong></div>
+                <div class="status-language"><span>Status language</span><p>${escapeHtml(section.status)}</p></div>
+                <div class="transition"><span>Transition</span><p>${escapeHtml(section.transition)}</p></div>
+              </div>
+            </div>
+          </section>`;
+      }).join('');
+      bindDynamicEvents();
+      updateProgress();
+      document.getElementById('appShell').style.setProperty('--presenter-scale', state.scale);
+    }
+
+    function bindDynamicEvents() {
+      document.querySelectorAll('[data-nav]').forEach(button => button.addEventListener('click', () => {
+        const index = Number(button.dataset.nav);
+        if (!state.expanded.includes(index)) state.expanded.push(index);
+        saveState(); render();
+        document.getElementById(`section-${index}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        closeNav();
+      }));
+      document.querySelectorAll('[data-expand]').forEach(button => button.addEventListener('click', () => {
+        const index = Number(button.dataset.expand);
+        state.expanded = state.expanded.includes(index) ? state.expanded.filter(value => value !== index) : [...state.expanded, index];
+        saveState(); render();
+      }));
+      document.querySelectorAll('[data-section-check]').forEach(input => input.addEventListener('change', () => {
+        const index = Number(input.dataset.sectionCheck);
+        state.completedSections = input.checked ? [...new Set([...state.completedSections, index])] : state.completedSections.filter(value => value !== index);
+        saveState(); render();
+      }));
+      document.querySelectorAll('[data-action]').forEach(input => input.addEventListener('change', () => {
+        state.completedActions[input.dataset.action] = input.checked;
+        saveState(); render();
+      }));
+    }
+
+    function updateProgress() {
+      const count = state.completedSections.length;
+      const percent = (count / demoSections.length) * 100;
+      document.getElementById('progressLabel').textContent = `${count} of ${demoSections.length} complete`;
+      document.getElementById('overallProgress').style.width = `${percent}%`;
+      updateActiveSection();
+    }
+    function updateActiveSection() {
+      const remaining = demoSections.findIndex((_, index) => !state.completedSections.includes(index));
+      const activeIndex = remaining === -1 ? demoSections.length - 1 : remaining;
+      document.getElementById('activeSectionLabel').textContent = demoSections[activeIndex].title;
+      document.querySelectorAll('.nav-item').forEach((item, index) => item.classList.toggle('current', index === activeIndex));
+    }
+    function updateTimer() {
+      const minutes = Math.floor(state.elapsed / 60);
+      const seconds = state.elapsed % 60;
+      document.getElementById('timerText').textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      document.getElementById('timeProgress').style.width = `${Math.min((state.elapsed / 2400) * 100, 100)}%`;
+      document.getElementById('timerReadout').classList.toggle('overtime', state.elapsed > 2400);
+    }
+    function toggleTimer() {
+      timerRunning = !timerRunning;
+      document.getElementById('timerButtonLabel').textContent = timerRunning ? 'Pause' : 'Start';
+      document.getElementById('timerButtonIcon').innerHTML = timerRunning ? '<path d="M8 5v14M16 5v14" />' : '<path d="m8 5 11 7-11 7z" />';
+      if (timerRunning) {
+        timerId = window.setInterval(() => { state.elapsed += 1; saveState(); updateTimer(); }, 1000);
+      } else {
+        window.clearInterval(timerId);
+      }
+    }
+    function openNav() { document.getElementById('sectionNav').classList.add('open'); document.getElementById('navScrim').hidden = false; }
+    function closeNav() { document.getElementById('sectionNav').classList.remove('open'); document.getElementById('navScrim').hidden = true; }
+
+    document.getElementById('timerButton').addEventListener('click', toggleTimer);
+    document.getElementById('scaleButton').addEventListener('click', () => { state.scale = state.scale >= 1.2 ? 1 : Number((state.scale + .1).toFixed(1)); saveState(); render(); });
+    document.getElementById('themeButton').addEventListener('click', () => { const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark'; document.documentElement.dataset.theme = next; });
+    document.getElementById('resetButton').addEventListener('click', () => { document.getElementById('resetModal').hidden = false; });
+    document.getElementById('cancelResetButton').addEventListener('click', () => { document.getElementById('resetModal').hidden = true; });
+    document.getElementById('confirmResetButton').addEventListener('click', () => {
+      window.clearInterval(timerId); timerRunning = false; state = { ...defaultState, completedSections: [], completedActions: {}, expanded: [0] };
+      saveState(); document.getElementById('resetModal').hidden = true; document.getElementById('timerButtonLabel').textContent = 'Start'; updateTimer(); render();
+    });
+    document.getElementById('menuButton').addEventListener('click', openNav);
+    document.getElementById('closeMenuButton').addEventListener('click', closeNav);
+    document.getElementById('navScrim').addEventListener('click', closeNav);
+    document.getElementById('printButton').addEventListener('click', () => window.print());
+    window.addEventListener('beforeunload', saveState);
+
+    render();
+    updateTimer();
+  </script>
+</body>
+</html>

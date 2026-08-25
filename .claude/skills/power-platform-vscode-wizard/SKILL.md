@@ -55,7 +55,7 @@ Ask and capture all base discovery questions, then complete explicit entity mapp
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
 12. Should we create a new solution or use an existing one? If existing, what is the exact unique name?
-13. Should we create a new publisher prefix or use an existing one? If existing, what is the prefix (e.g. vafe, contoso)?
+13. Should we create a new publisher prefix or use an existing one? If existing, what is the prefix (e.g. cct, fabrikam)?
 14. Standard reused tables (display/logical names)
 15. Custom tables to create
 16. Standard fields to reuse
@@ -63,13 +63,18 @@ Ask and capture all base discovery questions, then complete explicit entity mapp
 18. Relationships to create
 19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
 
+If question 19 is yes, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. If question 19 is no, preserve that explicit no-report decision in `report-mappings.md`.
+
 After entity mapping, also capture:
+- Validate the primary entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Record a landing-view action (`create-or-update-named-view` or `verify-existing-saved-query`) and require authenticated saved-query resolution before app assembly.
 - Top user tasks: persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
 - Relationship decisions: cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
 - When demo data is enabled: all-created vs selected table scope, resolved tables, per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, rerun behavior, source tag, synthetic-data/privacy constraints, and cleanup/reset decision.
 - If Dataverse Task activities are requested: eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never target every record unless the user explicitly selects all.
 
 Generate `demo-data-plan.json` for approved demo-data planning. This does not authorize or execute Dataverse row creation.
+
+Generate `report-mappings.md` for every run. Report payload and HTML implementation must not begin until the mapping is approved and its table, field, and placement references are validated.
 
 When the `source-control` module is enabled, also inspect the target repository read-only and capture the scenario branch, related issue/spec, checkpoint strategy, validation/CI discovered from that repository, pull request handoff, and merge strategy. Apply `requirements/GithubInstructions_General.md` throughout whatever app or demo the end user is creating. Do not stage, commit, or push during intake.
 

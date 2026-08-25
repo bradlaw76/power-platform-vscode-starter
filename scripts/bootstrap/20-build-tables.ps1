@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Build Tables
+FILE:         scripts/bootstrap/20-build-tables.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Web API
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Creates the custom Dataverse tables required by the approved scenario mapping
+while avoiding standard out-of-box entities.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          approved table payloads and explicit entity mapping
+- Outputs:         created custom tables and build artifacts
+- Dependencies:    Dataverse Web API, table-detection helper, planning files
+- Side Effects:    creates Dataverse metadata and local telemetry/artifacts
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Explicit entity mapping must be complete in spec.md and plan.md.
+2. Environment authentication must already be valid.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Custom tables are created from payloads successfully.
+✔ Standard reused tables are excluded from create operations.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Never attempt to create standard Dataverse tables.
+- Keep reruns safe for already-created metadata where supported.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Creates Dataverse tables from JSON payload files.
     Safe to rerun — skips tables that already exist.
@@ -40,12 +90,26 @@ if (Test-Path $telemetryHelper) {
     Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "20-build-tables.ps1"
 }
 
+$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
+if (Test-Path $hardeningHelper) {
+    . $hardeningHelper
+}
+
 # ── Load session env if not already set ───────────────────────────────────
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
     $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
     $AccessToken    = $global:DV_TOKEN
+}
+
+$scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
+    Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
+} else { $null }
+$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
+$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
+if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
 
 if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpace($AccessToken)) {
@@ -115,6 +179,9 @@ foreach ($file in $payloads) {
     $name    = $payload.EntityDefinition.SchemaName ?? $payload.SchemaName
     if ([string]::IsNullOrWhiteSpace($name)) {
         Write-Host "  SKIP  $($file.Name) — could not determine SchemaName" -ForegroundColor Yellow
+        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $file.Name -Status 'skipped' -Step '20-build-tables.ps1' -Details @{ reason = 'missing schema name'; payload = $file.Name } | Out-Null
+        }
         $skipped++; continue
     }
 
@@ -124,21 +191,33 @@ foreach ($file in $payloads) {
     if (Get-Command Test-IsStandardTable -ErrorAction SilentlyContinue) {
         if (Test-IsStandardTable $logical) {
             Write-Host "(standard table in payload — skipped)" -ForegroundColor Yellow
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $logical -Status 'skipped' -Step '20-build-tables.ps1' -Details @{ reason = 'standard table payload'; payload = $file.Name } | Out-Null
+            }
             $skipped++; continue
         }
     }
 
     if (Test-TableExists $logical) {
         Write-Host "(exists — skipped)" -ForegroundColor DarkGray
+        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $logical -Status 'skipped' -Step '20-build-tables.ps1' -Details @{ reason = 'already exists'; payload = $file.Name } | Out-Null
+        }
         $skipped++; continue
     }
 
     try {
         Invoke-Dv "Post" "EntityDefinitions" (Get-Content $file.FullName -Raw) | Out-Null
         Write-Host "(created)" -ForegroundColor Green
+        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $logical -Status 'created' -Step '20-build-tables.ps1' -Details @{ payload = $file.Name } | Out-Null
+        }
         $created++
     } catch {
         Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $logical -Status 'failed' -Step '20-build-tables.ps1' -Details @{ payload = $file.Name; error = $_.Exception.Message } | Out-Null
+        }
         $failed++
     }
 }

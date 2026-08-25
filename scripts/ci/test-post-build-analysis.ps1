@@ -164,6 +164,37 @@ Line after marker.
     throw 'Generated summary did not include recommended next enhancements section.'
   }
 
+  $mindMapPath = Join-Path $repoRoot '.wizard-metrics/artifacts/analysis/build-mind-map.md'
+  $mindMapJsonPath = Join-Path $repoRoot '.wizard-metrics/artifacts/analysis/build-mind-map.json'
+  if (-not (Test-Path $mindMapPath)) {
+    throw 'Expected post-build analysis to generate a Mermaid mind map markdown artifact.'
+  }
+  if (-not (Test-Path $mindMapJsonPath)) {
+    throw 'Expected post-build analysis to generate a mind map JSON artifact.'
+  }
+
+  $mindMap = Get-Content -Path $mindMapPath -Raw -Encoding UTF8
+  if ($mindMap -notmatch [regex]::Escape('# Build Mind Map')) {
+    throw 'Mind map markdown did not contain the expected heading.'
+  }
+  if ($mindMap -notmatch [regex]::Escape('Scenario: unit-test-scenario')) {
+    throw 'Mind map markdown did not include the scenario slug.'
+  }
+  if ($mindMap -notmatch [regex]::Escape('graph TD')) {
+    throw 'Mind map markdown did not include Mermaid graph content.'
+  }
+  if ($mindMap -notmatch [regex]::Escape('tst_accountnote.tst_contactid -> contact (tst_contact_tst_accountnote)')) {
+    throw 'Mind map markdown did not include the expected relationship mapping.'
+  }
+
+  $mindMapJson = Get-Content -Path $mindMapJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  if ("$($mindMapJson.scenarioSlug)" -ne 'unit-test-scenario') {
+    throw 'Mind map JSON did not capture the expected scenario slug.'
+  }
+  if (@($mindMapJson.relationships).Count -lt 1) {
+    throw 'Mind map JSON did not include relationship entries.'
+  }
+
   # Test: missing optional inputs produce Not available instead of hard fail
   $missingOutput = & pwsh -NoProfile -File $scriptPath `
     -ScenarioSlug 'missing-inputs-nonexistent-slug' `

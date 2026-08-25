@@ -1,0 +1,187 @@
+name: Dataverse Integration
+
+permissions:
+  contents: read
+
+on:
+  workflow_dispatch:
+    inputs:
+      disposable_environment_confirmation:
+        description: 'Type I_CONFIRM_DISPOSABLE_ENVIRONMENT exactly. This workflow mutates Dataverse.'
+        required: true
+        type: string
+      scenario_slug:
+        description: 'Existing scenario slug under specs/ and payloads/scenarios/'
+        required: true
+        type: string
+
+concurrency:
+  group: dataverse-integration-${{ inputs.scenario_slug }}
+  cancel-in-progress: false
+
+jobs:
+  disposable-environment-gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - name: Require exact disposable-environment confirmation
+        shell: pwsh
+        env:
+          CONFIRMATION: ${{ inputs.disposable_environment_confirmation }}
+        run: |
+          if ($env:CONFIRMATION -cne 'I_CONFIRM_DISPOSABLE_ENVIRONMENT') {
+            throw 'Refusing to run: disposable_environment_confirmation must exactly equal I_CONFIRM_DISPOSABLE_ENVIRONMENT.'
+          }
+
+  integration:
+    needs: disposable-environment-gate
+    if: ${{ inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      WIZARD_METRICS_OPTOUT: '1'
+      SCENARIO_SLUG: ${{ inputs.scenario_slug }}
+      DV_ENVIRONMENT_URL: ${{ secrets.DATAVERSE_ENVIRONMENT_URL }}
+      AZURE_TENANT_ID: ${{ secrets.DATAVERSE_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.DATAVERSE_CLIENT_ID }}
+      AZURE_CLIENT_SECRET: ${{ secrets.DATAVERSE_CLIENT_SECRET }}
+      DV_SOLUTION_NAME: ${{ secrets.DATAVERSE_SOLUTION_UNIQUE_NAME }}
+      DV_PUBLISHER_PREFIX: ${{ secrets.DATAVERSE_PUBLISHER_PREFIX }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+
+      - name: Validate required secrets and scenario paths
+        shell: pwsh
+        run: |
+          foreach ($name in @(
+            'DV_ENVIRONMENT_URL',
+            'AZURE_TENANT_ID',
+            'AZURE_CLIENT_ID',
+            'AZURE_CLIENT_SECRET',
+            'DV_SOLUTION_NAME',
+            'DV_PUBLISHER_PREFIX'
+          )) {
+            if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) {
+              throw "Required integration secret is unavailable: $name"
+            }
+          }
+          if ($env:SCENARIO_SLUG -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+            throw 'scenario_slug must contain lowercase letters, digits, and single hyphens only.'
+          }
+          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          $specFolder = Join-Path 'specs' $env:SCENARIO_SLUG
+          if (-not (Test-Path -LiteralPath $payloadFolder -PathType Container)) { throw "Missing payload folder: $payloadFolder" }
+          if (-not (Test-Path -LiteralPath $specFolder -PathType Container)) { throw "Missing spec folder: $specFolder" }
+
+      - name: Install PAC CLI
+        shell: pwsh
+        run: |
+          if (-not (Get-Command pac -ErrorAction SilentlyContinue)) {
+            dotnet tool install --global Microsoft.PowerApps.CLI.Tool
+          }
+          pac --version
+
+      - name: Authenticate service principal
+        shell: pwsh
+        run: |
+          az login --service-principal --username $env:AZURE_CLIENT_ID --password $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID --allow-no-subscriptions --output none
+          $token = az account get-access-token --resource $env:DV_ENVIRONMENT_URL --query accessToken --output tsv
+          if ([string]::IsNullOrWhiteSpace($token)) { throw 'Azure CLI did not return a Dataverse access token.' }
+          Write-Output "::add-mask::$token"
+          "DV_TOKEN=$token" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          pac auth create --name dataverse-integration --environment $env:DV_ENVIRONMENT_URL --applicationId $env:AZURE_CLIENT_ID --clientSecret $env:AZURE_CLIENT_SECRET --tenant $env:AZURE_TENANT_ID
+
+      - name: Preview static build contract
+        shell: pwsh
+        run: |
+          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          ./scripts/bootstrap/15-dry-validate.ps1 -ScenarioSlug $env:SCENARIO_SLUG -PayloadsFolder $payloadFolder -PublisherPrefixOverride $env:DV_PUBLISHER_PREFIX -PreviewOnly $true
+
+      - name: Build twice to verify idempotency
+        shell: pwsh
+        run: |
+          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          foreach ($pass in 1..2) {
+            Write-Host "Starting Dataverse build pass $pass of 2."
+            ./scripts/bootstrap/20-build-tables.ps1 -PayloadsFolder $payloadFolder
+            ./scripts/bootstrap/30-build-columns.ps1 -PayloadsFolder $payloadFolder
+            ./scripts/bootstrap/40-build-relationships.ps1 -PayloadsFolder $payloadFolder
+            ./scripts/bootstrap/50-add-to-solution.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
+            ./scripts/bootstrap/55-build-business-process-flows.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
+            ./scripts/bootstrap/60-build-forms-views.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
+            ./scripts/bootstrap/62-build-app-module.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
+          }
+
+      - name: Verify inventory and post-build validation
+        shell: pwsh
+        run: |
+          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          ./scripts/bootstrap/50-add-to-solution.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
+          ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug $env:SCENARIO_SLUG -PayloadFolder $payloadFolder -PreviewOnly
+
+      - name: Export and verify solution
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Path out -Force | Out-Null
+          $zipPath = Join-Path 'out' "$($env:DV_SOLUTION_NAME)_unmanaged.zip"
+          pac solution export --name $env:DV_SOLUTION_NAME --path $zipPath --managed false --overwrite
+          if (-not (Test-Path -LiteralPath $zipPath -PathType Leaf)) { throw "Solution export was not created: $zipPath" }
+          if ((Get-Item -LiteralPath $zipPath).Length -le 0) { throw "Solution export is empty: $zipPath" }
+
+      - name: Prepare sanitized validation artifacts
+        if: ${{ always() && inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
+        shell: pwsh
+        run: |
+          $artifactRoot = New-Item -ItemType Directory -Path integration-artifacts -Force
+          $redactions = @(
+            $env:DV_ENVIRONMENT_URL,
+            $env:AZURE_TENANT_ID,
+            $env:AZURE_CLIENT_ID,
+            $env:AZURE_CLIENT_SECRET,
+            $env:DV_TOKEN
+          ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+          $reportRoots = @('.wizard-metrics/artifacts', (Join-Path 'specs' $env:SCENARIO_SLUG))
+          foreach ($root in $reportRoots) {
+            if (-not (Test-Path -LiteralPath $root)) { continue }
+            foreach ($file in Get-ChildItem -LiteralPath $root -File -Recurse -Include '*.json', '*.md', '*.html') {
+              $relativePath = [IO.Path]::GetRelativePath('.', $file.FullName)
+              $targetPath = Join-Path $artifactRoot.FullName $relativePath
+              New-Item -ItemType Directory -Path (Split-Path $targetPath -Parent) -Force | Out-Null
+              $content = Get-Content -LiteralPath $file.FullName -Raw
+              foreach ($value in $redactions) { $content = $content.Replace($value, '[REDACTED]') }
+              Set-Content -LiteralPath $targetPath -Value $content -Encoding UTF8
+            }
+          }
+          $zipPath = Join-Path 'out' "$($env:DV_SOLUTION_NAME)_unmanaged.zip"
+          if (Test-Path -LiteralPath $zipPath) {
+            $zip = Get-Item -LiteralPath $zipPath
+            $hash = Get-FileHash -LiteralPath $zipPath -Algorithm SHA256
+            [ordered]@{
+              ExportVerified = $true
+              ExportBytes = $zip.Length
+              ExportSha256 = $hash.Hash
+              RawExportUploaded = $false
+            } | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $artifactRoot.FullName 'export-verification.json') -Encoding UTF8
+          }
+
+      - name: Upload sanitized validation artifacts
+        if: ${{ always() && inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: dataverse-integration-${{ inputs.scenario_slug }}-${{ github.run_id }}
+          path: integration-artifacts
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Clean runner-local credentials and raw export
+        if: ${{ always() && inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
+        shell: pwsh
+        run: |
+          Remove-Item -LiteralPath '.env.ps1' -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath 'out' -Recurse -Force -ErrorAction SilentlyContinue
+          pac auth clear 2>$null
+          az logout
+          Write-Host 'Runner-local credentials and raw export removed. No Dataverse deletion was attempted.'

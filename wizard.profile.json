@@ -1,6 +1,13 @@
 {
   "profileVersion": "1.1",
-  "contractVersion": "1.1.0",
+  "contractVersion": "1.4.0",
+  "applicationProfiles": [
+    "standalone-model-driven",
+    "dynamics-sales-extension",
+    "dynamics-customer-service-extension",
+    "dynamics-field-service-extension",
+    "generic-dataverse-solution"
+  ],
   "discovery": {
     "requiredQuestions": 18,
     "coreQuestions": 11,
@@ -35,8 +42,8 @@
       "tableStrategy: oob-only | custom-only | hybrid",
       "formStrategy: update-in-place | create-new-forms (only when oob tables used)",
       "entryPointTable: logical name of first screen table",
-      "entryPointLandingView: logical name of default landing view",
-      "reviewApp: create-or-update | skip"
+      "entryPointLandingView: saved-query name to resolve and attach",
+      "reviewApp: create-or-update (required)"
     ]
   },
   "execution": {
@@ -150,7 +157,10 @@
   },
   "validationGates": {
     "requireArchitectureIntentBeforeBuild": true,
+    "requireEntryPointResolutionBeforeBuild": true,
+    "requireLandingViewPlanBeforeBuild": true,
     "requireSpecKitBeforeBuild": true,
+    "requireReportScopingBeforeBuild": true,
     "requireFolderContract": true,
     "requireDocsContractConsistency": true,
     "postBuildChecks": [

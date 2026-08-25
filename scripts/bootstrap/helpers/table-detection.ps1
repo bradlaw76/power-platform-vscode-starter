@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Table Detection Helper
+FILE:         scripts/bootstrap/helpers/table-detection.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Table Classification
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Provides shared logic for distinguishing standard Dataverse tables from custom
+tables so build steps avoid creating out-of-box entities.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            helper module
+- Inputs:          logical names, display names, and optional publisher prefix
+- Outputs:         normalized table classifications and helper return values
+- Dependencies:    PowerShell runtime and repo entity mapping conventions
+- Side Effects:    none beyond helper return values
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Load this helper from scripts that reason about table scope.
+2. Use it alongside approved entity mappings from planning artifacts.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Standard logical names classify as reused tables.
+✔ Custom names classify as create targets correctly.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Never misclassify standard tables as create targets.
+- Keep normalization logic stable across reruns.
+- Update this header when the helper contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Helper module: detects standard Dataverse tables and separates them from custom ones.
     Used by scripts to avoid creating tables that already exist as out-of-box entities.

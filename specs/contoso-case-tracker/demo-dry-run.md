@@ -1,18 +1,18 @@
-# Demo Dry Run: Earnings Integrity
+# Demo Dry Run: Contoso Case Tracker
 
 ## Rehearsal Summary
-- Step: Frame the risk and objective
+- Step: Frame the customer support objective
   Status: pending
-  Note: Confirm opening message aligns with stakeholder language for discrepancy risk.
+  Note: Confirm the opening message explains the case-tracking problem in stakeholder language.
 - Step: Open and update the case record
   Status: pending
-  Note: Validate custom earnings fields are visible with friendly labels on the case form.
-- Step: Add discrepancy and evidence artifacts
+  Note: Validate priority and assigned-agent fields are visible with friendly labels on the case form.
+- Step: Save and locate the case
   Status: pending
-  Note: Verify seed data supports a clear before-and-after discrepancy amount story.
-- Step: Record findings and recommended disposition
+  Note: Verify the updated case appears in the Active Cases view within the expected time.
+- Step: Review supervisor workload
   Status: pending
-  Note: Ensure disposition options are explained in analyst terms, not technical metadata terms.
+  Note: Confirm the dashboard shows open cases grouped by priority and assigned agent.
 - Step: Close with controls and next actions
   Status: pending
   Note: End with one concrete supervisor action and one measurable success statement.

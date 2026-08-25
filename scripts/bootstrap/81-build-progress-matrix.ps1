@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Build Progress Matrix
+FILE:         scripts/bootstrap/81-build-progress-matrix.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Build Reporting
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Builds a progress matrix summarizing scenario execution status across planning,
+build, and validation checkpoints.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          wizard metrics, artifacts, and planning status data
+- Outputs:         progress matrix artifacts and summary output
+- Dependencies:    repo metrics/artifact layout and reporting logic
+- Side Effects:    writes progress-reporting artifacts locally
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Wizard metrics or build artifacts must already exist.
+2. Scenario context must be resolvable from the current repo state.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Existing artifacts produce a readable progress matrix.
+✔ Missing artifacts are represented clearly rather than causing silent drift.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep the matrix derived from actual build state.
+- Preserve stable output shape for downstream review.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Builds a run matrix from disclosed wizard step telemetry events.
 

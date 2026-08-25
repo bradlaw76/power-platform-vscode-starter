@@ -1,4 +1,55 @@
 <#
+=============================================================================
+COMPONENT:    Auth Connect
+FILE:         scripts/bootstrap/10-auth-connect.ps1
+VERSION:      0.2.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Azure CLI | Power Platform CLI | Dataverse Web API
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Connects the local session to the target Power Platform environment and
+validates solution identity inputs before build steps mutate Dataverse.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          environment URL, auth context, solution identity details
+- Outputs:         validated connection state and solution/prefix guidance
+- Dependencies:    PAC CLI, Azure auth context, repo helper scripts
+- Side Effects:    authenticates against environment services when needed
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Complete the local prerequisite check first.
+2. Use the intended environment URL and solution identity values.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Valid environment access succeeds and prints connection guidance.
+✔ Invalid or conflicting solution identity values are blocked clearly.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+v0.2.0  2026-08-10  Added profile-aware reused-table capability discovery.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Do not proceed silently when environment or identity validation fails.
+- Keep connection checks aligned with the planning artifacts.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Interactive sign-in helper. Authenticates to Azure and Power Platform,
     acquires a Dataverse bearer token, and saves environment values to a
@@ -27,7 +78,8 @@
 
 param(
     [switch]$UseDeviceCode,
-    [switch]$ServicePrincipal
+    [switch]$ServicePrincipal,
+    [string]$ScenarioSlug = ''
 )
 
 Set-StrictMode -Version Latest
@@ -126,21 +178,113 @@ function Invoke-DvGet([string]$Path) {
     return Invoke-RestMethod -Method Get -Uri "$($envUrl.TrimEnd('/'))/api/data/v9.2/$Path" -Headers $h
 }
 
+function Get-ReusedScenarioTables {
+    param(
+        [string]$RepositoryRoot,
+        [string]$Slug
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Slug)) { return @() }
+    $answersPath = Join-Path $RepositoryRoot "specs/$Slug/answers.md"
+    if (-not (Test-Path $answersPath)) { return @() }
+
+    $answersText = Get-Content $answersPath -Raw
+    $tableStrategy = [regex]::Match($answersText, '(?im)^-\s*Table Strategy:\s*(.+)$').Groups[1].Value.Trim().ToLowerInvariant()
+    if (@('oob-only', 'hybrid') -notcontains $tableStrategy) { return @() }
+
+    $payloadRoot = Join-Path $RepositoryRoot 'payloads'
+    $createdTables = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($file in @(Get-ChildItem $payloadRoot -Filter 'table-*.json' -ErrorAction SilentlyContinue)) {
+        $document = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $schemaName = if ($null -ne $document.EntityDefinition) { $document.EntityDefinition.SchemaName } else { $document.SchemaName }
+        if (-not [string]::IsNullOrWhiteSpace($schemaName)) { [void]$createdTables.Add($schemaName.ToLowerInvariant()) }
+    }
+
+    $reusedTables = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    foreach ($file in @(Get-ChildItem $payloadRoot -Filter 'columns-*.json' -ErrorAction SilentlyContinue)) {
+        $document = Get-Content $file.FullName -Raw | ConvertFrom-Json
+        $tableName = [string]$document.TableLogicalName
+        if (-not [string]::IsNullOrWhiteSpace($tableName) -and -not $createdTables.Contains($tableName)) {
+            [void]$reusedTables.Add($tableName.ToLowerInvariant())
+        }
+    }
+    return @($reusedTables | Sort-Object)
+}
+
+function Test-ReusedScenarioTables {
+    param(
+        [string]$RepositoryRoot,
+        [string]$Slug
+    )
+
+    $tables = @(Get-ReusedScenarioTables -RepositoryRoot $RepositoryRoot -Slug $Slug)
+    if ($tables.Count -eq 0) { return }
+
+    Write-Host ""
+    Write-Host "Verifying reused Dataverse tables for scenario '$Slug'..." -ForegroundColor Cyan
+    $results = foreach ($table in $tables) {
+        try {
+            $safeTable = $table.Replace("'", "''")
+            $metadata = Invoke-DvGet "EntityDefinitions(LogicalName='$safeTable')?`$select=LogicalName,DisplayName,IsCustomEntity"
+            Write-Host "  ${table}: available" -ForegroundColor Green
+            [pscustomobject]@{ logicalName = $table; available = $true; isCustomEntity = [bool]$metadata.IsCustomEntity; error = '' }
+        } catch {
+            Write-Host "  ${table}: unavailable" -ForegroundColor Red
+            [pscustomobject]@{ logicalName = $table; available = $false; isCustomEntity = $null; error = $_.Exception.Message }
+        }
+    }
+
+    $reportRoot = Join-Path $RepositoryRoot '.wizard-metrics/artifacts/environment'
+    New-Item -ItemType Directory -Path $reportRoot -Force | Out-Null
+    [ordered]@{ scenarioSlug = $Slug; checkedAtUtc = [DateTime]::UtcNow.ToString('o'); reusedTables = @($results) } |
+        ConvertTo-Json -Depth 6 | Set-Content -Path (Join-Path $reportRoot 'table-capabilities.json') -Encoding UTF8
+
+    $missing = @($results | Where-Object { -not $_.available })
+    if ($missing.Count -gt 0) {
+        throw "The environment is missing required reused table(s): $(@($missing.logicalName) -join ', '). Install the required Dynamics app or revise the table strategy before build."
+    }
+}
+
+Test-ReusedScenarioTables -RepositoryRoot $repoRoot -Slug $ScenarioSlug
+
+function Read-ChoiceValue {
+    param(
+        [string]$Prompt,
+        [string]$Default
+    )
+
+    $value = Read-Host "$Prompt [$Default]"
+    if ([string]::IsNullOrWhiteSpace($value)) {
+        return $Default
+    }
+
+    return $value.Trim().ToLowerInvariant()
+}
+
 # ── Collect build config ───────────────────────────────────────────────────
 Write-Host ""
 Write-Host "=== Build Configuration ===" -ForegroundColor Cyan
 
 # Solution
 Write-Host ""
-$_solutionHint  = if ($plannedSolution) { " [$plannedSolution from wizard]" } else { "" }
-$solutionChoice = Read-Host "New solution or existing?$_solutionHint (new/existing)"
-if ([string]::IsNullOrWhiteSpace($solutionChoice)) { $solutionChoice = if ($plannedSolution) { "existing" } else { "new" } }
+$plannedSolutionHint = if ($plannedSolution) { " (planned unique name: $plannedSolution)" } else { "" }
+$solutionChoice = Read-ChoiceValue -Prompt "New solution or existing?$plannedSolutionHint (new/existing)" -Default "new"
+if (@('new', 'existing') -notcontains $solutionChoice) {
+    Write-Host "Choose 'new' or 'existing'. Existing reuse is allowed only when you explicitly choose 'existing'." -ForegroundColor Red
+    exit 1
+}
 
+$_existingSolutionDisplay = ""
 if ($solutionChoice -ieq "existing") {
-    $solutionName = Read-Host "Existing solution unique name$(if ($plannedSolution) { \" [$plannedSolution]\" } else { \"\" })"
+    $plannedSolutionDefault = if ($plannedSolution) { " [$plannedSolution]" } else { "" }
+    $solutionName = Read-Host "Existing solution unique name$plannedSolutionDefault"
     if ([string]::IsNullOrWhiteSpace($solutionName)) { $solutionName = $plannedSolution }
+    if ([string]::IsNullOrWhiteSpace($solutionName)) {
+        Write-Host "An existing solution unique name is required." -ForegroundColor Red
+        exit 1
+    }
     Write-Host "  Verifying solution '$solutionName'..." -NoNewline
-    $solCheck = Invoke-DvGet "solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,uniquename"
+    $solCheck = Invoke-DvGet "solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,uniquename,friendlyname"
     if ($solCheck.value.Count -eq 0) {
         Write-Host " NOT FOUND" -ForegroundColor Red
         Write-Host "Solution '$solutionName' does not exist in this environment." -ForegroundColor Red
@@ -148,18 +292,31 @@ if ($solutionChoice -ieq "existing") {
         exit 1
     }
     Write-Host " OK" -ForegroundColor Green
+    $_existingSolutionDisplay = "$($solCheck.value[0].friendlyname)"
 } else {
     $promptDefault = if ($plannedSolution) { " [$plannedSolution]" } else { "" }
     $solutionName = Read-Host "New solution unique name (letters/numbers only, e.g. ContosoHRApp)$promptDefault"
     if ([string]::IsNullOrWhiteSpace($solutionName)) { $solutionName = $plannedSolution }
+    if ([string]::IsNullOrWhiteSpace($solutionName)) {
+        Write-Host "A new solution unique name is required." -ForegroundColor Red
+        exit 1
+    }
     $solCheck = Invoke-DvGet "solutions?`$filter=uniquename eq '$solutionName'&`$select=solutionid,uniquename"
     if ($solCheck.value.Count -gt 0) {
-        Write-Host "  Warning: solution '$solutionName' already exists in this environment." -ForegroundColor Yellow
-        $cont = Read-Host "  Add components to the existing solution? (y/N)"
-        if ($cont -notmatch '^(y|yes)$') { exit 1 }
+        Write-Host "  ERROR: solution '$solutionName' already exists in this environment." -ForegroundColor Red
+        Write-Host "Choose a unique name for a new solution, or rerun this script and explicitly select 'existing' if reuse is intentional." -ForegroundColor Yellow
+        exit 1
     }
 }
-$solutionDisplay = Read-Host "Solution display name (e.g. Contoso HR Application)"
+$solutionDisplayPrompt = if ([string]::IsNullOrWhiteSpace($_existingSolutionDisplay)) {
+    "Solution display name (e.g. Contoso HR Application)"
+} else {
+    "Solution display name (e.g. Contoso HR Application) [$_existingSolutionDisplay]"
+}
+$solutionDisplay = Read-Host $solutionDisplayPrompt
+if ([string]::IsNullOrWhiteSpace($solutionDisplay)) {
+    $solutionDisplay = $_existingSolutionDisplay
+}
 
 # Publisher prefix
 Write-Host ""
@@ -168,7 +325,8 @@ $prefixChoice  = Read-Host "New publisher prefix or existing?$_prefixHint (new/e
 if ([string]::IsNullOrWhiteSpace($prefixChoice)) { $prefixChoice = if ($plannedPrefix) { "existing" } else { "new" } }
 
 if ($prefixChoice -ieq "existing") {
-    $publisherPrefix = Read-Host "Existing prefix (e.g. vafe, contoso)$(if ($plannedPrefix) { \" [$plannedPrefix]\" } else { \"\" })"
+    $plannedPrefixDefault = if ($plannedPrefix) { " [$plannedPrefix]" } else { "" }
+    $publisherPrefix = Read-Host "Existing prefix (e.g. cct, fabrikam)$plannedPrefixDefault"
     if ([string]::IsNullOrWhiteSpace($publisherPrefix)) { $publisherPrefix = $plannedPrefix }
     Write-Host "  Verifying publisher prefix '$publisherPrefix'..." -NoNewline
     $pubCheck = Invoke-DvGet "publishers?`$filter=customizationprefix eq '$publisherPrefix'&`$select=publisherid,uniquename,friendlyname,customizationprefix"

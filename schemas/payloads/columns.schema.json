@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://power-platform-vscode-starter.local/schemas/payloads/columns.schema.json",
+  "title": "Dataverse columns payload",
+  "type": "object",
+  "required": [
+    "TableLogicalName",
+    "Columns"
+  ],
+  "properties": {
+    "TableLogicalName": {
+      "$ref": "#/definitions/logicalName"
+    },
+    "Columns": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "@odata.type",
+          "SchemaName",
+          "DisplayName",
+          "RequiredLevel"
+        ],
+        "properties": {
+          "@odata.type": {
+            "type": "string",
+            "pattern": "^Microsoft\\.Dynamics\\.CRM\\.[A-Za-z]+AttributeMetadata$"
+          },
+          "SchemaName": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "LogicalName": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "DisplayName": {
+            "$ref": "#/definitions/label"
+          },
+          "Description": {
+            "$ref": "#/definitions/label"
+          },
+          "RequiredLevel": {
+            "type": "object",
+            "required": [
+              "Value"
+            ],
+            "properties": {
+              "Value": {
+                "type": "string",
+                "enum": [
+                  "None",
+                  "SystemRequired",
+                  "ApplicationRequired",
+                  "Recommended"
+                ]
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "additionalProperties": true
+      }
+    }
+  },
+  "additionalProperties": true,
+  "definitions": {
+    "logicalName": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "label": {
+      "type": "object",
+      "required": [
+        "LocalizedLabels"
+      ],
+      "properties": {
+        "LocalizedLabels": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": [
+              "Label",
+              "LanguageCode"
+            ],
+            "properties": {
+              "Label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "LanguageCode": {
+                "type": "integer",
+                "minimum": 1
+              }
+            },
+            "additionalProperties": true
+          }
+        }
+      },
+      "additionalProperties": true
+    }
+  }
+}

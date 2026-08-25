@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Prerequisite Check
+FILE:         scripts/bootstrap/00-prereq-check.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | VS Code | PAC CLI | Azure CLI
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Verifies the local toolchain needed for the repo workflow before any planning
+or build step runs.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          local developer toolchain and repo context
+- Outputs:         PASS/FAIL console summary and optional telemetry events
+- Dependencies:    helper telemetry script and local CLI executables
+- Side Effects:    no environment changes; telemetry file updates when enabled
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Run from a cloned copy of this repository.
+2. Ensure PowerShell can execute local scripts.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Installed tools report PASS with version output.
+✔ Missing tools report FAIL without aborting the summary.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep the check read-only and safe on any developer machine.
+- Preserve clear PASS/FAIL output for each required tool.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Verifies all required tools are installed and accessible before starting a build.
     Safe to run at any time. Makes no changes to any environment.

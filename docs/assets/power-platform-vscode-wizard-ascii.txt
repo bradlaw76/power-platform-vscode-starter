@@ -1,0 +1,22 @@
++------------------------------+    +------------------------------+    +------------------------------+    +------------------------------+
+| [01] START                   |--->| [02] DISCOVER                |--->| [03] PLAN                    |--->| [04] BUILD                   |
+| Guided setup                 |    | Define the work              |    | Specify before build         |    | Create the schema            |
+| > confirm repository         |    | > new build or retrofit      |    | > requirements and scope     |    | > dry-validate payloads      |
+| > check prerequisites        |    | > architecture intent        |    | > technical approach         |    | > tables and columns         |
+| > choose chat or terminal    |    | > users and top tasks        |    | > ordered tasks              |    | > relationships              |
+| CMD /power-platform-wizard-  |    | OUT answers.md               |    | OUT spec.md plan.md tasks.md |    | RUN 15 -> 20 -> 30 -> 40    |
+|     init                     |    | GATE intake confirmed        |    | GATE approved to build       |    | OUT Dataverse ready          |
++------------------------------+    +------------------------------+    +------------------------------+    +------------------------------+
+                                                                                                                                    |
+                                                                                                                                    v
++------------------------------+    +------------------------------+    +------------------------------+    +------------------------------+
+| [08] PROMOTE                 |<---| [07] PACKAGE                 |<---| [06] VERIFY                  |<---| [05] ASSEMBLE                |
+| Ship with evidence           |    | Make it portable             |    | Prove completeness           |    | Shape the experience         |
+| > pack and import solution   |    | > export and unpack          |    | > inventory and sync         |    | > BPF, forms, and views      |
+| > validate target            |    | > review Git diff            |    | > membership report          |    | > review app and sitemap     |
+| > record build outcome       |    | > validate before commit     |    | > metadata and usability     |    | > entry table and view       |
+| RUN pac solution import      |    | RUN pac solution export      |    | RUN 80 -> 81 -> 82          |    | RUN 50 -> 55 -> 60 -> 62    |
+| OUT target verified          |    | OUT source controlled        |    | GATE export unlocked         |    | OUT app published            |
++------------------------------+    +------------------------------+    +------------------------------+    +------------------------------+
+
+PLAN FIRST  |  BUILD SAFELY  |  PROMOTE REPEATABLY  |  COPILOT-GUIDED  |  PAC CLI-POWERED  |  DATAVERSE-NATIVE  |  VERSIONED IN GIT

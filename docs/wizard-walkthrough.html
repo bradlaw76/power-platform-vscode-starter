@@ -365,7 +365,7 @@
           </div>
           <div class="start-option">
             <strong>Direct terminal path</strong>
-            Run <span class="mono">pwsh ./scripts/bootstrap/05-start-wizard.ps1</span> for interactive CLI intake.
+            Run <span class="mono">pwsh ./scripts/bootstrap/05-start-wizard.ps1</span> for a new build or add <span class="mono">-Retrofit</span> for existing work. Both paths generate <span class="mono">report-mappings.md</span> and block unmapped critical report tables.
           </div>
         </div>
       </article>
@@ -517,7 +517,9 @@ pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug &lt;scenario-s
           <ul>
             <li>Run each script only after the previous step exits cleanly.</li>
             <li>If solution contamination appears at step 50, use the isolation runbook.</li>
+            <li>For step 55, apply mandatory BPF reliability gates: explicit stage and branch design, deterministic validation PASS thresholds, and verified app linkage (workflow component type 29) before declaring done.</li>
             <li>Runbook: <a href="solution-isolation-runbook.md">docs/solution-isolation-runbook.md</a></li>
+            <li>BPF runbook: <a href="bpf-operator-runbook.md">docs/bpf-operator-runbook.md</a></li>
           </ul>
         </div>
       </details>

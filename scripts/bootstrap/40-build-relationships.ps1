@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Build Relationships
+FILE:         scripts/bootstrap/40-build-relationships.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Web API
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Creates the approved Dataverse relationships between standard and custom tables
+using payload-driven metadata operations.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          relationship payloads and approved entity mapping
+- Outputs:         created relationships and build artifacts
+- Dependencies:    Dataverse Web API, planning files, repo helpers
+- Side Effects:    mutates Dataverse relationship metadata and telemetry data
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Referenced tables must already exist or be reusable.
+2. Relationship payloads must match the approved scenario mapping.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Approved relationships are created successfully.
+✔ Existence checks prevent false positives and duplicate creation.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Preserve accurate existence checks before creating relationships.
+- Keep standard/custom mapping aligned with planning artifacts.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Creates lookup relationships between Dataverse tables from a relationships-*.json
     payload file. Safe to rerun — skips relationships that already exist.
@@ -27,9 +77,22 @@ if (Test-Path $telemetryHelper) {
     Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "40-build-relationships.ps1"
 }
 
+$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
+if (Test-Path $hardeningHelper) {
+    . $hardeningHelper
+}
+
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
+}
+$scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
+    Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
+} else { $null }
+$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
+$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
+if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
 if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpace($AccessToken)) {
     Write-Host "Run 10-auth-connect.ps1 first." -ForegroundColor Red; exit 1
@@ -108,6 +171,9 @@ foreach ($file in $payloads) {
         $schema = $rel.SchemaName ?? $rel.RelationshipDefinition.SchemaName
         if ([string]::IsNullOrWhiteSpace($schema)) {
             Write-Host "  SKIP $($file.Name) — missing relationship SchemaName" -ForegroundColor Yellow
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $file.Name -Status 'skipped' -Step '40-build-relationships.ps1' -Details @{ reason = 'missing schema name'; payload = $file.Name } | Out-Null
+            }
             $skipped++
             continue
         }
@@ -115,6 +181,9 @@ foreach ($file in $payloads) {
 
         if (Test-RelationshipExists $schema) {
             Write-Host "(exists — skipped)" -ForegroundColor DarkGray
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'skipped' -Step '40-build-relationships.ps1' -Details @{ reason = 'already exists'; payload = $file.Name } | Out-Null
+            }
             $skipped++; continue
         }
 
@@ -122,9 +191,15 @@ foreach ($file in $payloads) {
             $body = ($rel | ConvertTo-Json -Depth 20 -Compress)
             Invoke-Dv "Post" "RelationshipDefinitions" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'created' -Step '40-build-relationships.ps1' -Details @{ payload = $file.Name } | Out-Null
+            }
             $created++
         } catch {
             Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'failed' -Step '40-build-relationships.ps1' -Details @{ payload = $file.Name; error = $_.Exception.Message } | Out-Null
+            }
             $failed++
         }
     }

@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Dry Validate
+FILE:         scripts/bootstrap/15-dry-validate.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Metadata Validation
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Runs pre-build validation checks against planning artifacts and environment
+inputs before any Dataverse metadata creation begins.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          planning files, payload assumptions, and environment values
+- Outputs:         validation pass/fail feedback and readiness artifacts
+- Dependencies:    repo helpers, planning files, and validation logic
+- Side Effects:    writes validation artifacts and telemetry when enabled
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Planning artifacts must exist and be internally consistent.
+2. Auth and solution identity should already be validated.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Valid planning context passes readiness checks.
+✔ Missing mappings or contract drift fail before build steps run.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Preserve the planning gate before metadata changes.
+- Fail fast on contract mismatches that would cause build rework.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Runs local dry validation for standard/custom Dataverse modeling rules.
 
@@ -29,7 +79,14 @@
 param(
     [string]$RepoRoot = "",
     [string]$PayloadsFolder = "",
-    [string]$PublisherPrefixOverride = ""
+    [string]$PublisherPrefixOverride = "",
+    [string]$ScenarioSlug = "",
+    [bool]$EnableBuildContractValidation = $true,
+    [bool]$EnableArtifactManifest = $true,
+    [bool]$EnableAppModuleWiring = $true,
+    [bool]$StrictMode = $true,
+    [bool]$FastMode = $false,
+    [bool]$PreviewOnly = $false
 )
 
 Set-StrictMode -Version Latest
@@ -43,6 +100,11 @@ $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
     Initialize-WizardStepTelemetry -RepoRoot $RepoRoot -StepName "15-dry-validate.ps1"
+}
+
+$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
+if (Test-Path $hardeningHelper) {
+    . $hardeningHelper
 }
 
 $payloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
@@ -326,11 +388,19 @@ if ($answersFiles.Count -eq 0) {
 
             if (Test-TruthyValue -Value $enabledRaw) {
                 $reportEnabledCount++
-                if ($text -notmatch '(?im)Executive summary KPI report') {
-                    Add-Error "[$($file.FullName)] Reports are enabled but executive KPI report definition was not found."
-                }
-                if ($text -notmatch '(?im)Dynamics blue') {
-                    Add-Warn "[$($file.FullName)] Reports are enabled but Dynamics blue theme text was not found."
+                $optionalBlockMatch = [regex]::Match($text, '(?ims)^##\s+Optional Report Web Resources\s*\r?\n(.*?)(?=^##\s+|\z)')
+                if (-not $optionalBlockMatch.Success) {
+                    Add-Warn "[$($file.FullName)] Reports are enabled but the optional report configuration block was not found."
+                } else {
+                    $optionalText = $optionalBlockMatch.Groups[1].Value
+                    $selectedReports = [regex]::Match($optionalText, '(?im)^-\s*(Selected Reports|Report set):\s*(.+)$').Groups[2].Value.Trim()
+                    if ([string]::IsNullOrWhiteSpace($selectedReports)) {
+                        Add-Warn "[$($file.FullName)] Reports are enabled but no selected report set was recorded."
+                    }
+                    $reportMode = [regex]::Match($optionalText, '(?im)^-\s*Report Mode:\s*(.+)$').Groups[1].Value.Trim()
+                    if (-not [string]::IsNullOrWhiteSpace($reportMode) -and @('live', 'live-with-design-fallback', 'static') -notcontains $reportMode.ToLowerInvariant()) {
+                        Add-Error "[$($file.FullName)] Report Mode '$reportMode' is invalid. Use live, live-with-design-fallback, or static."
+                    }
                 }
             } else {
                 Add-Pass "[$($file.Name)] Optional report web resources disabled (expected when not needed)."
@@ -348,12 +418,35 @@ if ($answersFiles.Count -eq 0) {
 Write-Host ""
 Write-Host "=== Dry Validation Report ===" -ForegroundColor Cyan
 
+if (Get-Command Test-WizardBuildContract -ErrorAction SilentlyContinue) {
+    $contractValidation = Test-WizardBuildContract -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $payloadsFolder -EnableBuildContractValidation:$EnableBuildContractValidation -StrictMode:$StrictMode -EnableAppModuleWiring:$EnableAppModuleWiring
+    foreach ($message in @($contractValidation.Passes)) { Add-Pass $message }
+    foreach ($message in @($contractValidation.Warnings)) { Add-Warn $message }
+    foreach ($message in @($contractValidation.Errors)) { Add-Error $message }
+
+    if ($EnableArtifactManifest) {
+        Initialize-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $contractValidation.ScenarioSlug -SolutionName $contractValidation.SolutionName -PublisherPrefix $contractValidation.PublisherPrefix | Out-Null
+    }
+
+    $artifactPaths = Write-WizardBuildContractArtifacts -RepoRoot $RepoRoot -ValidationResult $contractValidation
+}
+
 foreach ($p in $passes) { Write-Host "PASS  $p" -ForegroundColor Green }
 foreach ($w in $warnings) { Write-Host "WARN  $w" -ForegroundColor Yellow }
 foreach ($e in $errors) { Write-Host "ERROR $e" -ForegroundColor Red }
 
 Write-Host ""
 Write-Host "Summary: PASS=$($passes.Count) WARN=$($warnings.Count) ERROR=$($errors.Count)"
+if ($null -ne $artifactPaths) {
+    Write-Host "Contract JSON: $($artifactPaths.ContractJsonPath)"
+    Write-Host "Contract MD:   $($artifactPaths.ContractMarkdownPath)"
+}
+if ($FastMode) {
+    Write-Host "FastMode: enabled" -ForegroundColor DarkGray
+}
+if ($PreviewOnly) {
+    Write-Host "PreviewOnly: enabled" -ForegroundColor DarkGray
+}
 
 if ($errors.Count -gt 0) {
     if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {

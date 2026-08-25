@@ -6,11 +6,33 @@ Use this document when setting up this repo for the first time in VS Code.
 
 Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
 
-This is the beginner-safe, step-by-step path for building Dynamics 365 and Power Platform demos/apps from VS Code.
+This is the beginner-safe, step-by-step path for building standalone model-driven Power Apps and Dynamics 365 extensions from VS Code.
 
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+
+---
+
+## Fastest Start: Let Copilot Guide Setup
+
+Use this path when Git, VS Code, and Copilot Chat are already available. After cloning and opening the repository in VS Code, open Copilot Chat and enter:
+
+```text
+/power-platform-wizard-init
+```
+
+Natural-language fallback:
+
+```text
+Start the Power Platform wizard in this repository.
+```
+
+The first response must explain the initial setup before asking any discovery question. It will confirm the repository, inspect it without modifying tracked project files, run `00-prereq-check.ps1`, explain the results, ask whether this is a greenfield build or retrofit, and then ask you to choose chat or terminal.
+
+The prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`. Initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push.
+
+If Git, VS Code, or Copilot Chat is not available, follow the manual sequence below. The guided skill orchestrates the same prerequisite and planning order; do not run the same prerequisite step again unless setup changed or the earlier check failed.
 
 ---
 
@@ -151,17 +173,16 @@ Common mistake:
 
 ---
 
-## Step 4A: Start with the Shared Skill (Primary) or Direct Wizard Paths
+## Step 4A: Start a Direct Wizard Path
 
-You can start the repository wizard in either of these ways:
+If you already started `/power-platform-wizard-init`, continue in that conversation and do not start another wizard command. For the manual sequence, start one direct path:
 
-- VS Code shared skill (primary): run `/power-platform-wizard-init` in Copilot Chat for guided path selection (chat or terminal) and progress monitoring.
 - VS Code chat prompt (direct wizard path): run `/power-platform-demo-wizard` in Copilot Chat.
 - Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`.
+- Terminal retrofit wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Retrofit`.
 
 What each option does:
 
-- Shared skill: guides path selection, enforces planning gates, and can monitor progress from telemetry.
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
 - Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
@@ -265,12 +286,22 @@ Validation checkpoint:
 
 ## Step 7: Run Discovery Questions (Wizard Intake)
 
-Before building anything, answer the **11 required** questions in writing. This becomes your requirement source.
+Before building anything, select an application profile and confirm architecture intent. This happens before the **11 required** core questions and becomes part of your requirement source.
 
 Canonical contract sources:
 
 - `docs/wizard-contract-v1.md`
 - `wizard.profile.json`
+
+Supported application profiles:
+
+- `standalone-model-driven`
+- `dynamics-sales-extension`
+- `dynamics-customer-service-extension`
+- `dynamics-field-service-extension`
+- `generic-dataverse-solution`
+
+For the selected profile, confirm the OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, required review-app artifacts, and navigation group. New profile-based runs always create or update the review app. The app sitemap puts the entry table first and the requested view is attached to the app; this does not alter an environment-wide default view.
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -288,7 +319,7 @@ Then complete optional extension blocks based on profile and project needs:
 
 - `table-strategy` (standard/custom strategy)
 - `solution-identity` (new/existing solution and publisher prefix)
-- `reporting` (optional web resources)
+- `reporting` (explicit no-report decision, or critical-table report mappings with type, placement, fields, decision, owner, and validation)
 - `retrofit` (current state + remaining work)
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
@@ -307,11 +338,14 @@ Validation checkpoint:
 - Custom fields to add
 - Relationships to create
 - Do not generate payloads until this mapping block is complete and approved.
+- Confirm the entry-point logical name resolves to a reused standard table, planned custom table, or existing retrofit inventory table.
+- Confirm the landing-view action is recorded as create/update for a planned custom table or verify-existing for a reused/existing table. Before script 62, the named saved query must resolve in Dataverse.
 - For every planned relationship, record cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
 - Capture top user tasks with named owners and done definitions before designing forms, views, navigation, or automation.
 - If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.
 - If Task activities are enabled, approve parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not target every record unless `all` is explicitly approved.
 - Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, relationship distribution, idempotent rerun, source-tagging, and cleanup decisions.
+- Confirm `report-mappings.md` exists. If reports are enabled, every critical or high-frequency table must have an approved mapping; if reports are disabled, the artifact must record that explicit decision.
 - Demo-data intake is planning-only; no Dataverse rows are created by `05-start-wizard.ps1`.
 - Review `requirements/GithubInstructions_General.md` and record how source control will support the app or demo being created.
 - Confirm the target repository, remote, current/default branch, existing working-tree changes, recent history, existing tooling, and applicable validation commands.
@@ -404,7 +438,7 @@ Payload rules for Step 10:
 - `50-add-to-solution.ps1` derives the expected table set from payload references and fails before adding components if the target solution already contains foreign tables.
 - `50-add-to-solution.ps1` also produces a contamination scan artifact that classifies expected, wizard-managed foreign, and manual or legacy solution contents before more components are added.
 - Override that guard only when reuse is intentional: `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
-- To inspect or remove foreign tables from an unmanaged solution, run `pwsh ./scripts/bootstrap/55-prune-foreign-tables.ps1`.
+- To inspect or remove foreign tables from an unmanaged solution, run `pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1`.
 - `55-build-business-process-flows.ps1` reads `process-*.json` only when the scenario explicitly defines a BPF, validates stage fields and relationships against repo artifacts, upserts the wizard-managed process definition, and writes a BPF build report.
 - BPF completion is not satisfied by Active state alone or solution membership alone; use the BPF runbook completion criteria (validation PASS with thresholds, app linkage, and stage/condition/step evidence).
 - For BPF field updates, treat `clientdata`, `uidata`, and `xaml` as a consistency set; do not update a single surface in isolation.

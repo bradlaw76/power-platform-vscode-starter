@@ -82,9 +82,16 @@ try {
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'remote', 'add', 'origin', $remoteRoot)
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'push', '-u', 'origin', 'main')
 
-    @(
+    $scriptedAnswers = @(
         'Source Control Acceptance',
         $scenarioSlug,
+        'standalone-model-driven',
+        'hybrid',
+        'create-new-forms',
+        'incident',
+        'Active Cases',
+        'all run-created tables, forms, views, processes, and reports',
+        'Operations',
         'feature/source-control-acceptance',
         'specs/source-control-acceptance',
         'checkpoints',
@@ -97,7 +104,6 @@ try {
         'Track service requests',
         'Agents and supervisors',
         'Case, Review',
-        'both',
         'Main form, active cases view, review app',
         'A user can create and review a case',
         'Development',
@@ -112,11 +118,13 @@ try {
         'incident.title',
         'Review.sca_outcome',
         'Review -> Case',
-        'no',
+        'yes',
         'no',
         'Agent | create case | daily | Case/Active Cases | case is ready for review; Supervisor | review case | daily | Review/Pending Reviews | decision is recorded',
         'create case | App maker | agent can save a valid case; review case | App maker | supervisor can record a decision',
         'Review -> Case | N:1 | required | new | restrict delete | supervisor review form',
+        'incident, sca_review',
+        'incident | Case risk summary | form | Case Starter Main Form Summary tab | title,statuscode,prioritycode | case escalation | Supervisor | renders current record and priority; sca_review | Review workload | dashboard | Operations dashboard | sca_outcome,statuscode,createdon | review backlog | Operations manager | totals match active view',
         'selected',
         'Case, Review',
         'Case=create',
@@ -135,7 +143,8 @@ try {
         'source-control-acceptance',
         'synthetic data only; no personal or production data',
         'yes'
-    ) | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
+    )
+    $scriptedAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
 
     $beforeBranch = Invoke-Git -Arguments @('-C', $workspaceRoot, 'branch', '--show-current') -AllowOutput
     $beforeHead = Invoke-Git -Arguments @('-C', $workspaceRoot, 'rev-parse', 'HEAD') -AllowOutput
@@ -150,6 +159,14 @@ try {
 
     $scenarioFolder = Join-Path $workspaceRoot "specs/$scenarioSlug"
     Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
+        '## Application Profile',
+        '- Profile: standalone-model-driven',
+        '- Entry Point Table: incident',
+        '- Landing View: Active Cases',
+        '- Entry Point Validation: approved',
+        '- Landing View Plan: verify-existing-saved-query',
+        '## App Module',
+        '- App Name: Source Control Acceptance Review App',
         '## Source Control Plan',
         '- Scenario branch: feature/source-control-acceptance',
         '- Commit strategy: checkpoints',
@@ -162,6 +179,9 @@ try {
         '- Task scope and source-record limit: latest -- 10'
     )
     Assert-Contains -Path (Join-Path $scenarioFolder 'spec.md') -ExpectedValues @(
+        '## Application Architecture',
+        '- Profile: standalone-model-driven',
+        '- Entry point: incident',
         '## User Tasks',
         '## Demo Data Requirements',
         '- Scope and target tables: selected -- Case, Review',
@@ -170,6 +190,10 @@ try {
         '- Task activity generation: yes -- latest 10 records per table, ordered by createdon desc'
     )
     Assert-Contains -Path (Join-Path $scenarioFolder 'plan.md') -ExpectedValues @(
+        '## Model-Driven App Plan',
+        '- Default landing view: Active Cases',
+        '- Entry-point validation: approved',
+        '- Landing-view action: verify-existing-saved-query',
         '## Source Control Plan',
         '- Required validation/CI: docs consistency, script smoke',
         '- Keep remote operations human-approved and verify the remote commit after push.',
@@ -179,13 +203,26 @@ try {
         '- Source tag: source-control-acceptance'
     )
     Assert-Contains -Path (Join-Path $scenarioFolder 'tasks.md') -ExpectedValues @(
+        "Confirm application profile 'standalone-model-driven' and architecture intent",
+        "Confirm entry point 'incident' opens with 'Active Cases'",
+        "Execute landing-view action 'verify-existing-saved-query' for 'Active Cases' on 'incident' before app assembly",
+        "Verify the named landing view resolves to a saved query before running '62-build-app-module.ps1'",
         "Create or switch to scenario branch 'feature/source-control-acceptance' before implementation",
         'stage explicit files',
         'Push only after approval, verify the remote branch contains the local commit',
         'Validate relationship cardinality, requiredness, existing/new status, cascade behavior',
         'Approve demo data table scope and record counts: Case, Review -- Case=10; Review=20',
         'Approve hero records: Case | 2 | executive demo and escalation walkthrough',
-        'Approve bounded Task activity generation: yes -- parents Case, scope latest, limit 10, order createdon desc, tasks per record 1'
+        'Approve bounded Task activity generation: yes -- parents Case, scope latest, limit 10, order createdon desc, tasks per record 1',
+        'Review and approve report-mappings.md; every critical table must have an explicit report decision'
+    )
+    Assert-Contains -Path (Join-Path $scenarioFolder 'report-mappings.md') -ExpectedValues @(
+        '# Report Mappings',
+        '- Status: approved',
+        '- Critical or high-frequency tables: incident, sca_review',
+        '| incident | Case risk summary | form | Case Starter Main Form Summary tab | title,statuscode,prioritycode | case escalation | Supervisor | renders current record and priority |',
+        '| sca_review | Review workload | dashboard | Operations dashboard | sca_outcome,statuscode,createdon | review backlog | Operations manager | totals match active view |',
+        'Build scripts remain blocked until this mapping is reviewed'
     )
     $demoDataPlan = Get-Content -LiteralPath (Join-Path $scenarioFolder 'demo-data-plan.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     if (@($demoDataPlan.Tables).Count -ne 2 -or $demoDataPlan.Tables -notcontains 'Case' -or $demoDataPlan.Tables -notcontains 'Review') {
@@ -202,6 +239,115 @@ try {
         $demoDataPlan.TaskGeneration.TasksPerRecord -ne 1) {
         throw 'Expected demo-data-plan.json to preserve hero-record and bounded Task activity decisions.'
     }
+
+    $incompleteReportAnswers = @($scriptedAnswers)
+    $criticalTablesIndex = [Array]::IndexOf($incompleteReportAnswers, 'incident, sca_review')
+    if ($criticalTablesIndex -lt 0) {
+        throw 'Could not locate the critical report table answer in the acceptance fixture.'
+    }
+    $incompleteReportAnswers[$criticalTablesIndex] = 'incident, sca_review, account'
+    $incompleteReportAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
+
+    $previousErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    $blockedOutput = @(& pwsh -NoProfile -File $wizardPath -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $blockedExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($blockedExitCode -eq 0) {
+        throw 'Wizard did not block an unmapped critical report table.'
+    }
+    $blockedText = $blockedOutput | Out-String
+    if ($blockedText -notmatch 'Report scoping is incomplete' -or $blockedText -notmatch 'account') {
+        throw "Wizard failed for an unexpected reason:`n$($blockedOutput -join "`n")"
+    }
+
+    $invalidEntryAnswers = @($scriptedAnswers)
+    $entryPointIndex = [Array]::IndexOf($invalidEntryAnswers, 'incident')
+    if ($entryPointIndex -lt 0) {
+        throw 'Could not locate the entry-point table answer in the acceptance fixture.'
+    }
+    $invalidEntryAnswers[$entryPointIndex] = 'account'
+    $invalidEntryAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
+
+    $ErrorActionPreference = 'Continue'
+    $invalidEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $invalidEntryExitCode = $LASTEXITCODE
+    $ErrorActionPreference = $previousErrorActionPreference
+    if ($invalidEntryExitCode -eq 0) {
+        throw 'Wizard did not block an entry-point table outside the explicit table plan.'
+    }
+    $invalidEntryText = $invalidEntryOutput | Out-String
+    if ($invalidEntryText -notmatch 'is not present in the explicit table plan' -or $invalidEntryText -notmatch 'account') {
+        throw "Wizard failed for an unexpected entry-point reason:`n$($invalidEntryOutput -join "`n")"
+    }
+
+    $customEntryAnswers = @($scriptedAnswers)
+    $customEntryAnswers[$entryPointIndex] = 'sca_review'
+    $customEntryAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
+    $customEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Custom entry-point wizard run failed:`n$($customEntryOutput -join "`n")"
+    }
+    Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
+        '- Entry Point Table: sca_review',
+        '- Entry Point Validation: approved',
+        '- Landing View Plan: create-or-update-named-view'
+    )
+
+    $retrofitSlug = 'retrofit-entry-acceptance'
+    @(
+        'Retrofit Entry Acceptance',
+        $retrofitSlug,
+        'standalone-model-driven',
+        'custom-only',
+        'ret_request',
+        'Active Requests',
+        'all existing and remaining tables, forms, and views',
+        'Operations',
+        'feature/retrofit-entry-acceptance',
+        'specs/retrofit-entry-acceptance',
+        'final-only',
+        'docs consistency',
+        'no',
+        'squash',
+        'Model-driven request app',
+        'Power Apps',
+        'Operations coordinators',
+        'Track internal requests',
+        'Coordinators and managers',
+        'ret_request, ret_note',
+        'Request form and Active Requests view',
+        'Existing requests remain usable and remaining work is planned',
+        'Development',
+        'No',
+        'Unmanaged',
+        'ExistingRequestSolution',
+        'ret',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'none',
+        'no',
+        'no',
+        'Coordinator | review request | daily | Request/Active Requests | request is triaged',
+        'review request | App owner | coordinator can open and triage an existing request'
+    ) | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
+
+    $retrofitOutput = @(& pwsh -NoProfile -File $wizardPath -Retrofit -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    if ($LASTEXITCODE -ne 0) {
+        throw "Retrofit wizard acceptance run failed:`n$($retrofitOutput -join "`n")"
+    }
+    $retrofitFolder = Join-Path $workspaceRoot "specs/$retrofitSlug"
+    Assert-Contains -Path (Join-Path $retrofitFolder 'answers.md') -ExpectedValues @(
+        '- Entry Point Table: ret_request',
+        '- Entry Point Validation: approved',
+        '- Landing View Plan: verify-existing-saved-query',
+        '- retrofit: enabled'
+    )
 
     $afterBranch = Invoke-Git -Arguments @('-C', $workspaceRoot, 'branch', '--show-current') -AllowOutput
     $afterHead = Invoke-Git -Arguments @('-C', $workspaceRoot, 'rev-parse', 'HEAD') -AllowOutput

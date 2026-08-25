@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Add To Solution
+FILE:         scripts/bootstrap/50-add-to-solution.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Web API | Power Platform Solution Model
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Adds approved components to the target solution so created or reused metadata
+travels as a managed build unit.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          solution identity, payload-derived components, environment
+- Outputs:         solution component membership updates and build artifacts
+- Dependencies:    Dataverse Web API, solution helpers, planning artifacts
+- Side Effects:    mutates solution composition in the target environment
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Solution identity must already be validated.
+2. Required metadata components must already exist.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Required components are added to the intended solution.
+✔ Reruns avoid duplicating solution membership where possible.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Do not add components outside the approved scenario scope.
+- Keep solution composition rerunnable and reviewable.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Adds entities referenced by payload files to the target solution.
     Safe to rerun — adding an already-included component is a no-op.
@@ -19,7 +69,12 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder     = "",
-    [string]$ScenarioSlug       = ""
+    [string]$ScenarioSlug       = "",
+    [bool]$FailIfSolutionHasForeignTables = $true,
+    [bool]$EnableContaminationScan = $true,
+    [bool]$EnableArtifactManifest = $true,
+    [bool]$StrictMode = $true,
+    [bool]$AllowContaminatedSolution = $false
 )
 
 Set-StrictMode -Version Latest
@@ -30,6 +85,19 @@ $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
     Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "50-add-to-solution.ps1"
+}
+
+$solutionIsolationHelper = Join-Path $PSScriptRoot "helpers\solution-isolation.ps1"
+if (-not (Test-Path $solutionIsolationHelper)) {
+    Write-Host "Missing helper script: $solutionIsolationHelper" -ForegroundColor Red
+    exit 1
+}
+
+. $solutionIsolationHelper
+
+$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
+if (Test-Path $hardeningHelper) {
+    . $hardeningHelper
 }
 
 $envFile = Join-Path $repoRoot ".env.ps1"
@@ -65,66 +133,16 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
     }
 }
 
+if ($EnableArtifactManifest -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
+}
+
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
             "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
     $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
     if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
     return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
-}
-
-function Add-EntityName {
-    param(
-        [System.Collections.Generic.HashSet[string]]$Set,
-        [string]$Name
-    )
-
-    if (-not [string]::IsNullOrWhiteSpace($Name)) {
-        [void]$Set.Add($Name.ToLower())
-    }
-}
-
-function Get-PayloadEntityNames {
-    param([string]$Folder)
-
-    $names = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-
-    $tableFiles = @(Get-ChildItem -Path $Folder -Filter "table-*.json" -ErrorAction SilentlyContinue)
-    foreach ($file in $tableFiles) {
-        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-        $schemaName = $doc.EntityDefinition.SchemaName ?? $doc.SchemaName
-        Add-EntityName -Set $names -Name $schemaName
-    }
-
-    $columnFiles = @(Get-ChildItem -Path $Folder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
-    foreach ($file in $columnFiles) {
-        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-        Add-EntityName -Set $names -Name $doc.TableLogicalName
-    }
-
-    $relationshipFiles = @(Get-ChildItem -Path $Folder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)
-    foreach ($file in $relationshipFiles) {
-        $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-        $rels = @($doc.Relationships ?? $doc)
-        foreach ($rel in $rels) {
-            Add-EntityName -Set $names -Name ($rel.ReferencedEntity ?? $rel.RelationshipDefinition.ReferencedEntity)
-            Add-EntityName -Set $names -Name ($rel.ReferencingEntity ?? $rel.RelationshipDefinition.ReferencingEntity)
-            Add-EntityName -Set $names -Name ($rel.Entity1LogicalName ?? $rel.RelationshipDefinition.Entity1LogicalName)
-            Add-EntityName -Set $names -Name ($rel.Entity2LogicalName ?? $rel.RelationshipDefinition.Entity2LogicalName)
-        }
-    }
-
-    return @($names)
-}
-
-function Get-EntityDefinitionByLogicalName {
-    param([string]$LogicalName)
-
-    try {
-        return Invoke-Dv "Get" "EntityDefinitions(LogicalName='$LogicalName')?`$select=LogicalName,MetadataId"
-    } catch {
-        return $null
-    }
 }
 
 function Test-TruthyValue {
@@ -207,6 +225,114 @@ function Get-WebResourceComponentType {
     return 61
 }
 
+function Get-SolutionComponentTypeMap {
+    $map = @{}
+    $meta = Invoke-Dv "Get" "EntityDefinitions(LogicalName='solutioncomponent')/Attributes(LogicalName='componenttype')/Microsoft.Dynamics.CRM.PicklistAttributeMetadata?`$select=LogicalName&`$expand=OptionSet"
+    foreach ($opt in @($meta.OptionSet.Options)) {
+        $label = $opt.Label.UserLocalizedLabel.Label
+        if (-not [string]::IsNullOrWhiteSpace($label)) {
+            $map[$label] = [int]$opt.Value
+        }
+    }
+    return $map
+}
+
+function Get-ComponentTypeValue {
+    param(
+        [hashtable]$Map,
+        [string[]]$Labels,
+        [int]$Fallback = -1
+    )
+
+    foreach ($label in @($Labels)) {
+        if ($Map.ContainsKey($label)) {
+            return [int]$Map[$label]
+        }
+    }
+
+    return $Fallback
+}
+
+function Get-SolutionComponentInventory {
+    param(
+        [scriptblock]$InvokeGet,
+        [string]$SolutionId
+    )
+
+    $typeMap = Get-SolutionComponentTypeMap
+    $entityType = Get-ComponentTypeValue -Map $typeMap -Labels @('Entity') -Fallback 1
+    $webResourceType = Get-ComponentTypeValue -Map $typeMap -Labels @('Web Resource', 'WebResource') -Fallback 61
+    $systemFormType = Get-ComponentTypeValue -Map $typeMap -Labels @('System Form', 'SystemForm') -Fallback 60
+    $savedQueryType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query', 'SavedQuery') -Fallback 26
+    $processType = Get-ComponentTypeValue -Map $typeMap -Labels @('Process') -Fallback 29
+    $appModuleType = Get-ComponentTypeValue -Map $typeMap -Labels @('App Module', 'Model-driven App') -Fallback 80
+
+    $items = New-Object System.Collections.Generic.List[object]
+    $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype")
+    foreach ($component in $components) {
+        if (("$($component._solutionid_value)").Trim().ToLowerInvariant() -ne $SolutionId.Trim().ToLowerInvariant()) {
+            continue
+        }
+
+        $componentType = [int]$component.componenttype
+        $objectId = ("$($component.objectid)").Trim()
+
+        if ($componentType -eq $entityType) {
+            $entity = Get-EntityDefinitionByMetadataId -InvokeGet $InvokeGet -MetadataId $objectId
+            if ($null -ne $entity) {
+                $items.Add([pscustomobject]@{ Kind = 'table'; Name = $entity.LogicalName }) | Out-Null
+            }
+            continue
+        }
+
+        if ($componentType -eq $webResourceType) {
+            try {
+                $wr = Invoke-Dv "Get" "webresourceset($objectId)?`$select=name"
+                $items.Add([pscustomobject]@{ Kind = 'webresource'; Name = $wr.name }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $savedQueryType) {
+            try {
+                $view = Invoke-Dv "Get" "savedqueries($objectId)?`$select=name,returnedtypecode"
+                $normalizedName = if (("$($view.name)") -like 'Active*') { "$($view.returnedtypecode)|active" } else { "$($view.returnedtypecode)|$($view.name)" }
+                $items.Add([pscustomobject]@{ Kind = 'view'; Name = $normalizedName }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $systemFormType) {
+            try {
+                $form = Invoke-Dv "Get" "systemforms($objectId)?`$select=name,objecttypecode,type"
+                $kind = if ([int]$form.type -eq 2) { 'form' } else { 'dashboard' }
+                $normalizedName = if ($kind -eq 'form') { "$($form.objecttypecode)|main" } else { "$($form.name)" }
+                $items.Add([pscustomobject]@{ Kind = $kind; Name = $normalizedName }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $processType) {
+            try {
+                $workflow = Invoke-Dv "Get" "workflows($objectId)?`$select=name,uniquename,category"
+                if ([int]$workflow.category -eq 4) {
+                    $items.Add([pscustomobject]@{ Kind = 'bpf'; Name = ($workflow.uniquename ?? $workflow.name) }) | Out-Null
+                }
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $appModuleType) {
+            try {
+                $app = Invoke-Dv "Get" "appmodules($objectId)?`$select=name,uniquename"
+                $items.Add([pscustomobject]@{ Kind = 'appmodule'; Name = ($app.uniquename ?? $app.name) }) | Out-Null
+            } catch {}
+        }
+    }
+
+    return @($items.ToArray())
+}
+
 Write-Host ""
 Write-Host "=== Add to Solution ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
@@ -223,8 +349,61 @@ if ($null -eq $sol) {
 }
 Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 
+$invokeDvGet = { param($path) Invoke-Dv "Get" $path }
 $entityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
 $reportWebResourceNames = @(Get-ReportWebResourceNames -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PublisherPrefix $PublisherPrefix)
+$tableIsolationReport = Get-SolutionTableIsolationReport -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)" -ExpectedEntityNames $entityNames
+
+if ($EnableContaminationScan -and (Get-Command New-WizardExpectedArtifacts -ErrorAction SilentlyContinue)) {
+    $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+    $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
+    $scanResult = New-WizardContaminationVerdict -CurrentComponents $inventory -ExpectedArtifacts $expectedArtifacts -PublisherPrefix $PublisherPrefix
+    $scanArtifact = [pscustomobject]@{
+        generatedAtUtc = [DateTime]::UtcNow.ToString('o')
+        scenarioSlug = $ScenarioSlug
+        solutionName = $SolutionUniqueName
+        verdict = $scanResult.Verdict
+        expected = @($scanResult.Expected)
+        wizardOtherScenario = @($scanResult.WizardOtherScenario)
+        manualOrLegacy = @($scanResult.ManualOrLegacy)
+        unsupported = @('flows')
+    }
+    $artifactPaths = Write-WizardContaminationArtifacts -RepoRoot $repoRoot -ScanResult $scanArtifact
+
+    Write-Host "  Contamination verdict: $($scanArtifact.verdict)" -ForegroundColor $(if ($scanArtifact.verdict -eq 'clean') { 'Green' } elseif ($scanArtifact.verdict -eq 'warning') { 'Yellow' } else { 'Red' })
+    Write-Host "  Contamination JSON: $($artifactPaths.ContaminationJsonPath)" -ForegroundColor DarkGray
+
+    if ($StrictMode -and -not $AllowContaminatedSolution -and ($scanArtifact.verdict -eq 'contaminated')) {
+        Write-Host "Strict contamination mode blocked add-to-solution. Remediate the target solution or rerun with -AllowContaminatedSolution:`$true when reuse is intentional." -ForegroundColor Red
+        if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+            Register-WizardStepFailure -Message 'Contamination scan found manual or legacy foreign artifacts in the target solution.'
+        }
+        exit 1
+    }
+}
+
+if ($tableIsolationReport.ForeignTables.Count -gt 0) {
+    Write-Host ""
+    Write-Host "Foreign table components detected in solution '$SolutionUniqueName':" -ForegroundColor Yellow
+    foreach ($table in $tableIsolationReport.ForeignTables) {
+        Write-Host "  - $($table.LogicalName)" -ForegroundColor Yellow
+    }
+    Write-Host ""
+
+    if ($FailIfSolutionHasForeignTables) {
+        Write-Host "Strict table isolation is enabled. Stop and remediate this solution before adding components." -ForegroundColor Red
+        Write-Host "Run a dry cleanup review with: pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1 -SolutionUniqueName \"$SolutionUniqueName\"" -ForegroundColor Yellow
+        Write-Host "If reuse is intentional for this one run, override with: pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:`$false" -ForegroundColor Yellow
+        if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
+            Register-WizardStepFailure -Message "Foreign table components detected in target solution."
+        }
+        exit 1
+    }
+
+    Write-Host "Continuing because -FailIfSolutionHasForeignTables:`$false was supplied." -ForegroundColor Yellow
+} else {
+    Write-Host "  Solution table isolation: OK" -ForegroundColor Green
+}
 
 if ($entityNames.Count -eq 0 -and $reportWebResourceNames.Count -eq 0) {
     Write-Host "No payload entity references or report web resources were discovered." -ForegroundColor Yellow
@@ -244,9 +423,12 @@ $added = 0; $skipped = 0; $failed = 0
 foreach ($logicalName in $entityNames | Sort-Object) {
     Write-Host "  $logicalName " -NoNewline
 
-    $entity = Get-EntityDefinitionByLogicalName -LogicalName $logicalName
+    $entity = Get-EntityDefinitionByLogicalName -InvokeGet $invokeDvGet -LogicalName $logicalName
     if ($null -eq $entity -or [string]::IsNullOrWhiteSpace($entity.MetadataId)) {
         Write-Host "(not found — skipped)" -ForegroundColor Yellow
+        if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'skipped' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table'; reason = 'entity not found' } | Out-Null
+        }
         $skipped++
         continue
     }
@@ -255,12 +437,23 @@ foreach ($logicalName in $entityNames | Sort-Object) {
         $body = @{ ComponentId = $entity.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $true } | ConvertTo-Json -Compress
         Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
         Write-Host "(added)" -ForegroundColor Green
+        if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'created' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table' } | Out-Null
+        }
         $added++
     } catch {
         if ($_.Exception.Message -like "*already*" -or $_.Exception.Message -like "*duplicate*") {
-            Write-Host "(already in solution)" -ForegroundColor DarkGray; $skipped++
+            Write-Host "(already in solution)" -ForegroundColor DarkGray
+            if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'skipped' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table'; reason = 'already in solution' } | Out-Null
+            }
+            $skipped++
         } else {
-            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red; $failed++
+            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+            if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'failed' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table'; error = $_.Exception.Message } | Out-Null
+            }
+            $failed++
         }
     }
 }
@@ -275,6 +468,9 @@ if ($reportWebResourceNames.Count -gt 0) {
         $wr = @(Get-WebResourceByName -Name $name)
         if ($wr.Count -eq 0 -or [string]::IsNullOrWhiteSpace($wr[0].webresourceid)) {
             Write-Host "(not found — run 65-build-web-resources first)" -ForegroundColor Yellow
+            if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $name -Status 'skipped' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'webresource'; reason = 'web resource not found' } | Out-Null
+            }
             $skipped++
             continue
         }
@@ -283,13 +479,22 @@ if ($reportWebResourceNames.Count -gt 0) {
             $body = @{ ComponentId = $wr[0].webresourceid; ComponentType = $webResourceComponentType; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $true } | ConvertTo-Json -Compress
             Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
             Write-Host "(added)" -ForegroundColor Green
+            if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $name -Status 'created' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'webresource' } | Out-Null
+            }
             $added++
         } catch {
             if ($_.Exception.Message -like "*already*" -or $_.Exception.Message -like "*duplicate*") {
                 Write-Host "(already in solution)" -ForegroundColor DarkGray
+                if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $name -Status 'skipped' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'webresource'; reason = 'already in solution' } | Out-Null
+                }
                 $skipped++
             } else {
                 Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+                if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $name -Status 'failed' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'webresource'; error = $_.Exception.Message } | Out-Null
+                }
                 $failed++
             }
         }

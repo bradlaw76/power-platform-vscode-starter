@@ -1,6 +1,6 @@
 {
   "EntityDefinition": {
-    "SchemaName": "earnint_priority",
+    "SchemaName": "cct_priority",
     "DisplayName": {
       "LocalizedLabels": [
         {

@@ -1,6 +1,6 @@
 {
   "EntityDefinition": {
-    "SchemaName": "earnint_agent",
+    "SchemaName": "cct_agent",
     "DisplayName": {
       "LocalizedLabels": [
         {

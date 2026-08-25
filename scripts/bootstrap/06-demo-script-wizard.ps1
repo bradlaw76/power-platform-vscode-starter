@@ -1,4 +1,55 @@
 <#
+=============================================================================
+COMPONENT:    Demo Script Wizard
+FILE:         scripts/bootstrap/06-demo-script-wizard.ps1
+VERSION:      0.1.1
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | VS Code | Demo Walkthrough Generation
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Builds demo-script artifacts from approved planning files so a scenario can be
+presented consistently after discovery and before or alongside implementation.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          scenario answers and planning artifacts
+- Outputs:         demo script, talk track, walkthrough, and dry-run assets
+- Dependencies:    scenario planning files and repo documentation conventions
+- Side Effects:    writes presentation artifacts under specs/<scenario-slug>
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Scenario planning files must already exist.
+2. Run within the repo workflow for a selected scenario slug.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Existing scenario planning files generate demo artifacts successfully.
+✔ Output references the correct scenario folder and artifact names.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.1  2026-08-18  Made demo duration an explicit positive-minute intake question.
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep generated demo artifacts derived from approved planning inputs.
+- Do not invent scenario content outside the available planning context.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Generates a scenario-aware demo script from the outputs of 05-start-wizard.ps1.
 
@@ -558,10 +609,10 @@ $heroRecord = Read-RequiredValue "1. What is the hero record for the demo?" $sug
 $workflow = Read-RequiredValue "2. Which business workflow should the demo follow?" $flowSuggestions[0]
 $audiencePersona = Read-RequiredValue "3. Who is watching this demo?" $targetAudience
 $demoScope = Read-RequiredValue "4. What should the demo include?" (($artifacts -join ', '))
-$durationChoice = Read-RequiredValue "5. Target duration in minutes? (3/5/10/15)" "5"
+$durationChoice = Read-RequiredValue "5. How long should the demo be, in minutes?" "5"
 [int]$durationMinutes = 5
-if (-not [int]::TryParse($durationChoice, [ref]$durationMinutes)) {
-    throw "Duration must be a whole number of minutes."
+if (-not [int]::TryParse($durationChoice, [ref]$durationMinutes) -or $durationMinutes -lt 1) {
+    throw "Duration must be a positive whole number of minutes."
 }
 
 $dataModeDefault = if ($demoDataRequirement -match '^(yes|y)$') { "Use prepared sample data where helpful, but show at least one live change." } else { "Start with the current app state and explain what data would exist in production." }

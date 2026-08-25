@@ -1,14 +1,14 @@
 {
   "Relationships": [
     {
-      "SchemaName": "earnint_incident_earnint_agent",
+      "SchemaName": "cct_incident_cct_agent",
       "RelationshipDefinition": {
         "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
-        "SchemaName": "earnint_incident_earnint_agent",
-        "ReferencedEntity": "earnint_agent",
-        "ReferencedAttribute": "earnint_agentid",
+        "SchemaName": "cct_incident_cct_agent",
+        "ReferencedEntity": "cct_agent",
+        "ReferencedAttribute": "cct_agentid",
         "ReferencingEntity": "incident",
-        "ReferencingAttribute": "earnint_agentid",
+        "ReferencingAttribute": "cct_agentid",
         "CascadeConfiguration": {
           "Assign": "NoCascade",
           "Delete": "RemoveLink",

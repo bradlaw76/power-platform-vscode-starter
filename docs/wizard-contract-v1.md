@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.1.0
+Version: 1.4.0
 
 ## Purpose
 
@@ -28,15 +28,25 @@ All wizard entry points must follow this contract:
 
 ## Architecture Intent Contract (Always First)
 
+First select one supported application profile:
+
+- `standalone-model-driven`
+- `dynamics-sales-extension`
+- `dynamics-customer-service-extension`
+- `dynamics-field-service-extension`
+- `generic-dataverse-solution`
+
 Before any build recommendation, confirm all five architecture intent questions:
 
 1. Is the implementation **OOB extension only**, **custom tables only**, or **hybrid**?
 2. If OOB extension: should forms be **updated in place** or **cloned as new business forms**?
 3. What is the **required primary entry-point table** (first screen)?
 4. What is the **default landing view** for that entry-point table?
-5. Should the run **auto-create or auto-update a model-driven review app** that surfaces all built artifacts?
+5. Which artifacts must the required auto-created or updated **model-driven review app** surface?
 
 Do not proceed to discovery or build until all five are confirmed.
+
+After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. The landing view must have an explicit action: create or update the named view for a planned custom table, or verify the existing saved query for reused/existing tables. App assembly remains blocked until the named saved query resolves in Dataverse.
 
 ## Discovery Contract
 
@@ -69,7 +79,7 @@ Architecture intake questions (12–18):
 - `business-process-flow`: staged lifecycle intake, process root, stage definitions, and BPF execution preferences
 - `table-strategy`: standard vs custom table strategy and explicit mapping
 - `solution-identity`: new/existing solution and publisher prefix
-- `reporting`: web resource report generation scope
+- `reporting`: explicit report decision, critical/high-frequency table scope, report type and placement, required fields, supported business decision, owner, and validation checklist
 - `retrofit`: current-state and remaining-work intake for in-progress projects
 - `source-control`: target-repository preflight, scenario branch, work-item traceability, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy
 - `user-tasks`: persona, task, frequency, entry table/view, expected outcome, owner, and done definition
@@ -100,15 +110,18 @@ Required artifacts:
 - `plan.md`
 - `tasks.md`
 - `answers.md`
+- `report-mappings.md`
 - `demo-data-plan.json` when demo data is enabled
 
 Required gate before execution:
 - All 18 discovery questions answered
 - Architecture intent confirmed
+- Entry-point table resolved against the explicit table plan, with an approved landing-view create-or-verify action
 - Selected extension blocks completed
 - Source-control plan completed when the profile enables it
 - User tasks include owners and done definitions when the profile enables them
 - Relationship decisions are complete for every planned relationship
+- Report scoping is approved. When reports are enabled, every critical or high-frequency table has a mapping with type, placement, required fields, supported decision, owner, and validation checklist. When reports are disabled, that no-report decision is explicit.
 - When demo data is enabled, table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, rerun behavior, source tag, privacy constraints, and cleanup decision are approved
 - Spec Kit artifacts approved
 - No conflict between generated guidance and these docs (resolve toward internal docs or report conflict):
@@ -178,6 +191,8 @@ Every run must create or update a model-driven review app that:
 3. Aligns app navigation sitemap to selected workflow
 4. Is published after creation/update
 5. Is validated: user can open app, reach expected entities/forms/views, entry-point opens as intended
+
+For profile-based runs, app assembly must create or update an app-aware sitemap with the entry table first, resolve and attach the requested named landing view, attach the sitemap to the app, and publish. Landing-view validation is app-scoped; the wizard must not change a reused table's environment-wide default view.
 
 ## Form Strategy Contract
 

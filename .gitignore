@@ -10,3 +10,6 @@
 
 # Build output
 *.log
+
+# Local JavaScript dependencies
+node_modules/

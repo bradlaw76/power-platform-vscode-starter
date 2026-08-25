@@ -1,0 +1,54 @@
+{
+  "entities": [
+    {
+      "logicalName": "incident",
+      "displayName": "Case",
+      "primaryIdAttribute": "incidentid",
+      "primaryNameAttribute": "title",
+      "fields": [
+        "incidentid",
+        "title",
+        "statuscode",
+        "ownerid",
+        "createdon",
+        "modifiedon",
+        "cct_priority",
+        "cct_agent"
+      ],
+      "rowCount": 0
+    },
+    {
+      "logicalName": "cct_customer",
+      "displayName": "Customer",
+      "primaryIdAttribute": "cct_customerid",
+      "primaryNameAttribute": "cct_name",
+      "fields": [
+        "cct_customerid",
+        "cct_name"
+      ],
+      "rowCount": 0
+    },
+    {
+      "logicalName": "cct_agent",
+      "displayName": "Agent",
+      "primaryIdAttribute": "cct_agentid",
+      "primaryNameAttribute": "cct_name",
+      "fields": [
+        "cct_agentid",
+        "cct_name"
+      ],
+      "rowCount": 0
+    },
+    {
+      "logicalName": "cct_priority",
+      "displayName": "Priority",
+      "primaryIdAttribute": "cct_priorityid",
+      "primaryNameAttribute": "cct_name",
+      "fields": [
+        "cct_priorityid",
+        "cct_name"
+      ],
+      "rowCount": 0
+    }
+  ]
+}

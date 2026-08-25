@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Build Columns
+FILE:         scripts/bootstrap/30-build-columns.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | Dataverse Web API
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Creates approved Dataverse columns on standard or custom tables according to
+the scenario mapping and payload definitions.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          column payloads and approved entity mapping
+- Outputs:         created columns and build artifacts
+- Dependencies:    Dataverse Web API, planning files, repo helpers
+- Side Effects:    creates Dataverse metadata and local telemetry/artifacts
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Table mapping and payload readiness rules must already be satisfied.
+2. Required tables must exist or be reusable in the target environment.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Approved custom fields are created on the intended tables.
+✔ Reused standard fields are not recreated as custom metadata.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Respect the standard-vs-custom mapping from planning.
+- Avoid duplicate custom field creation on rerun where supported.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Adds columns to existing Dataverse tables from columns-*.json payload files.
     Safe to rerun — skips columns that already exist on the table.
@@ -27,9 +77,22 @@ if (Test-Path $telemetryHelper) {
     Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "30-build-columns.ps1"
 }
 
+$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
+if (Test-Path $hardeningHelper) {
+    . $hardeningHelper
+}
+
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
+}
+$scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
+    Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
+} else { $null }
+$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
+$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
+if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
 if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpace($AccessToken)) {
     Write-Host "Run 10-auth-connect.ps1 first." -ForegroundColor Red; exit 1
@@ -78,6 +141,9 @@ foreach ($file in $payloads) {
     $tableName = $doc.TableLogicalName
     if ([string]::IsNullOrWhiteSpace($tableName)) {
         Write-Host "  SKIP $($file.Name) — missing TableLogicalName property" -ForegroundColor Yellow
+        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name $file.Name -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'missing table logical name'; payload = $file.Name } | Out-Null
+        }
         $skipped++; continue
     }
     $tableName = $tableName.Trim()
@@ -92,6 +158,9 @@ foreach ($file in $payloads) {
 
         if ([string]::IsNullOrWhiteSpace($logical)) {
             Write-Host "    SKIP (missing SchemaName/LogicalName)" -ForegroundColor Yellow
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.[unknown]" -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'missing logical name'; payload = $file.Name } | Out-Null
+            }
             $skipped++
             continue
         }
@@ -101,6 +170,9 @@ foreach ($file in $payloads) {
 
         if (Test-ColumnExists $tableName $logical) {
             Write-Host "(exists — skipped)" -ForegroundColor DarkGray
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'already exists'; payload = $file.Name } | Out-Null
+            }
             $skipped++; continue
         }
 
@@ -111,9 +183,15 @@ foreach ($file in $payloads) {
             $body = $col | ConvertTo-Json -Depth 20 -Compress
             Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'created' -Step '30-build-columns.ps1' -Details @{ payload = $file.Name } | Out-Null
+            }
             $created++
         } catch {
             Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'failed' -Step '30-build-columns.ps1' -Details @{ payload = $file.Name; error = $_.Exception.Message } | Out-Null
+            }
             $failed++
         }
     }

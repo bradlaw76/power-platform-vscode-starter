@@ -1,4 +1,54 @@
 <#
+=============================================================================
+COMPONENT:    Demo Dry Run
+FILE:         scripts/bootstrap/07-demo-dry-run.ps1
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-07-19
+ENVIRONMENT:  PowerShell 7 | VS Code | Demo Artifact Review
+
+-----------------------------------------------------------------------------
+OVERVIEW
+-----------------------------------------------------------------------------
+Performs a dry-run review of generated demo artifacts so users can catch gaps
+before moving deeper into build or presentation work.
+
+-----------------------------------------------------------------------------
+ARCHITECTURE
+-----------------------------------------------------------------------------
+- Role:            bootstrap step
+- Inputs:          generated demo artifacts for a scenario
+- Outputs:         console review output and validation feedback
+- Dependencies:    scenario demo files and repo validation conventions
+- Side Effects:    no external changes beyond optional telemetry
+
+-----------------------------------------------------------------------------
+PREREQUISITES
+-----------------------------------------------------------------------------
+1. Demo artifacts must already exist for the scenario.
+2. Run against the intended scenario slug.
+
+-----------------------------------------------------------------------------
+TEST CASES
+-----------------------------------------------------------------------------
+✔ Complete demo artifacts pass the dry-run review.
+✔ Missing or inconsistent files are surfaced clearly.
+
+-----------------------------------------------------------------------------
+CHANGELOG
+-----------------------------------------------------------------------------
+v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
+
+-----------------------------------------------------------------------------
+NON-NEGOTIABLES
+-----------------------------------------------------------------------------
+- Keep the dry run read-only and review-focused.
+- Preserve actionable validation output when artifacts drift.
+- Update this header when the step contract materially changes.
+=============================================================================
+#>
+
+<#
 .SYNOPSIS
     Runs a lightweight dry run for a generated demo script.
 

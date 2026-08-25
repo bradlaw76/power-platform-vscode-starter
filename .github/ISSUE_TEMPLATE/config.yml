@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Power Platform Wizard Documentation
+    url: https://github.com/bradlaw76/power-platform-vscode-starter/tree/main/docs
+    about: View the complete wizard documentation and onboarding guide
+  - name: Build Log & Troubleshooting
+    url: https://github.com/bradlaw76/power-platform-vscode-starter/blob/main/docs/build-log.md
+    about: Check the build log template and known issues
