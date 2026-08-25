@@ -281,7 +281,7 @@ function Set-AppSiteMap {
         showrecents = $true
     } | ConvertTo-Json -Compress
 
-    if ($existingSiteMaps.Count -gt 0) {
+    if ((Get-WizardUpsertAction -ExistingItems $existingSiteMaps) -eq 'update') {
         Invoke-Dv -Method 'Patch' -Path "sitemaps($($existingSiteMaps[0].sitemapid))" -Body $body | Out-Null
         return [pscustomobject]@{ Id = $existingSiteMaps[0].sitemapid; Action = 'updated' }
     }
@@ -337,10 +337,10 @@ foreach ($value in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName, $appCon
 }
 
 $existing = @(Get-AppModule -UniqueName $appConfig.UniqueName)
-$action = 'created'
+$upsertAction = Get-WizardUpsertAction -ExistingItems $existing
+$action = if ($upsertAction -eq 'update') { 'updated' } else { 'created' }
 $appModuleId = ''
-if ($existing.Count -gt 0) {
-    $action = 'updated'
+if ($upsertAction -eq 'update') {
     $appModuleId = $existing[0].appmoduleid
     if (-not $PreviewOnly) {
         $patchBody = @{ name = $appConfig.AppName; description = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'." } | ConvertTo-Json -Compress

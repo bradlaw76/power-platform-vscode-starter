@@ -407,6 +407,8 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if enabled by profile + planning selection
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+# Final read-only inventory and export gate
+pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 # End-of-build analysis
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 # Generate a progress matrix from disclosed step events
@@ -423,10 +425,11 @@ Solution isolation behavior:
 - `50-add-to-solution.ps1` also writes a contamination scan artifact covering expected components, wizard-managed foreign artifacts, and manual or legacy artifacts in the solution.
 - Strict mode is on by default. Override only for intentional reuse with `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
 - To review or remove foreign tables from an existing unmanaged solution, use `pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1`.
-- `55-build-business-process-flows.ps1` only creates a Business Process Flow when the scenario has an explicit `process-*.json` definition and the referenced entities, fields, and relationships are already justified by the repo artifacts.
+- `55-build-business-process-flows.ps1` validates explicit `process-*.json` input and generates a Power Apps designer handoff. Apply mode requires the matching category-4 process to exist through that supported designer/solution path; the script then validates, activates, adds, and links it without fabricating workflow definition metadata.
 - If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
 - `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
 - `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
+- The final inventory-only pass records all mandatory and optional categories with Dataverse IDs and blocks export when required membership fails. Strict mode also blocks unauthorized components.
 - See [docs/solution-isolation-runbook.md](docs/solution-isolation-runbook.md) for the clean-build, detection, and cleanup flows.
 
 **After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
@@ -665,8 +668,8 @@ Release and rollback references for this update bundle:
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
 | `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
-| `50-add-to-solution.ps1` | Add payload-referenced entities to the target solution, scan for contamination, and emit solution scan artifacts | Yes | Yes |
-| `55-build-business-process-flows.ps1` | Validate optional `process-*.json` definitions, upsert wizard-managed Business Process Flows, add them to the target solution, and emit a BPF build report | Yes | Yes |
+| `50-add-to-solution.ps1` | Add payload entities; in `-InventoryOnly` mode, read all-category membership, preserve IDs, and enforce the export gate without Dataverse mutation | Yes, except inventory-only mode | Yes |
+| `55-build-business-process-flows.ps1` | Validate optional `process-*.json`, generate the supported designer handoff, and validate/activate/add/link an existing designer-authored BPF | Yes in apply mode; preview is local only | Yes |
 | `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
 | `62-build-app-module.ps1` | Create or update the scenario-aware model-driven app shell, attach intended components, and validate the resulting app | Yes | Yes |
 | `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |

@@ -129,6 +129,20 @@ try {
     throw 'Expected create-or-update review app mode.'
   }
 
+  $existingApp = [pscustomobject]@{ appmoduleid = 'app-id'; uniquename = 'tst_review' }
+  $existingSiteMap = [pscustomobject]@{ sitemapid = 'sitemap-id'; sitemapnameunique = 'tst_review_sitemap' }
+  foreach ($rerun in 1..2) {
+    if ((Get-WizardUpsertAction -ExistingItems @($existingApp)) -ne 'update') {
+      throw "App rerun $rerun should update the deterministic existing app, not create a duplicate."
+    }
+    if ((Get-WizardUpsertAction -ExistingItems @($existingSiteMap)) -ne 'update') {
+      throw "Sitemap rerun $rerun should update the deterministic existing sitemap, not create a duplicate."
+    }
+  }
+  if ((Get-WizardUpsertAction -ExistingItems @()) -ne 'create') {
+    throw 'A missing deterministic artifact should select create on the first run.'
+  }
+
   Add-WizardArtifactManifestItem -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst' -Kind 'table' -Name 'tst_agent' -Status 'created' -Step '20-build-tables.ps1' | Out-Null
   $manifest = Get-Content -Path (Join-Path $testRepo '.wizard-metrics/artifacts/manifest/generated-artifact-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
   if (@($manifest.items).Count -ne 1) {

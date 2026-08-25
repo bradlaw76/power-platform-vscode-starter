@@ -1,0 +1,23 @@
+{
+  "Relationships": [
+    {
+      "SchemaName": "cct_incident_cct_agent",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "cct_incident_cct_agent",
+        "ReferencedEntity": "cct_agent",
+        "ReferencedAttribute": "cct_agentid",
+        "ReferencingEntity": "incident",
+        "ReferencingAttribute": "cct_agentid",
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    }
+  ]
+}

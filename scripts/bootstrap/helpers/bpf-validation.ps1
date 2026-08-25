@@ -325,14 +325,10 @@ function Get-BpfDesiredAction {
     )
 
     if ($null -eq $ExistingProcess) {
-        return 'create'
+        return 'designer-handoff-required'
     }
 
-    if ($PreferUpdateExistingBpf) {
-        return 'update'
-    }
-
-    return 'skip'
+    return 'validate-existing'
 }
 
 function Test-BpfDefinition {
@@ -389,7 +385,8 @@ function Test-BpfDefinition {
         $requiredFields = @(Split-BpfList -Value $stage.RequiredFields)
         $entryCriteria = ($stage.EntryCriteria ?? '').Trim()
         $exitCriteria = ($stage.ExitCriteria ?? '').Trim()
-        $relationshipLogicalName = ($stage.RelationshipLogicalName ?? '').Trim().ToLowerInvariant()
+        $relationshipProperty = $stage.PSObject.Properties['RelationshipLogicalName']
+        $relationshipLogicalName = if ($null -eq $relationshipProperty) { '' } else { ("$($relationshipProperty.Value)").Trim().ToLowerInvariant() }
         $stageOrderKey = "$(($stage.Order ?? '').ToString())"
 
         if ([string]::IsNullOrWhiteSpace($stageName)) {

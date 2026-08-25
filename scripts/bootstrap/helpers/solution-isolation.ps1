@@ -280,3 +280,180 @@ function Invoke-SolutionTableCleanup {
 
     return $results.ToArray()
 }
+
+function ConvertTo-SolutionInventoryCategory {
+    param([string]$Kind)
+
+    $aliases = @{
+        table = 'tables'
+        column = 'columns'
+        relationship = 'relationships'
+        form = 'forms'
+        view = 'views'
+        appmodule = 'model-driven-apps'
+        'model-driven-app' = 'model-driven-apps'
+        sitemap = 'sitemap-updates'
+        webresource = 'web-resources'
+        dashboard = 'dashboards'
+        chart = 'charts'
+        flow = 'flows'
+        bpf = 'flows'
+    }
+
+    $normalized = ("$Kind").Trim().ToLowerInvariant()
+    if ($aliases.ContainsKey($normalized)) {
+        return $aliases[$normalized]
+    }
+    return $normalized
+}
+
+function New-SolutionMembershipReport {
+    param(
+        [hashtable]$ExpectedByCategory,
+        [object[]]$CurrentInventory = @(),
+        [object[]]$FailedArtifacts = @(),
+        [string[]]$MandatoryCategories = @('tables', 'columns', 'relationships', 'forms', 'views', 'model-driven-apps', 'sitemap-updates', 'web-resources'),
+        [string[]]$OptionalCategories = @('dashboards', 'charts', 'flows'),
+        [switch]$Strict
+    )
+
+    $categories = @($MandatoryCategories + $OptionalCategories | Select-Object -Unique)
+    $items = [System.Collections.Generic.List[object]]::new()
+    $matchedCurrentKeys = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
+
+    foreach ($category in $categories) {
+        $expectedNames = if ($ExpectedByCategory.ContainsKey($category)) { @($ExpectedByCategory[$category]) } else { @() }
+        foreach ($expectedName in @($expectedNames | Where-Object { -not [string]::IsNullOrWhiteSpace("$_") } | Sort-Object -Unique)) {
+            $matches = @($CurrentInventory | Where-Object {
+                (ConvertTo-SolutionInventoryCategory -Kind $_.Category) -eq $category -and
+                ("$($_.Name)").Trim().Equals(("$expectedName").Trim(), [System.StringComparison]::OrdinalIgnoreCase)
+            })
+            $failures = @($FailedArtifacts | Where-Object {
+                (ConvertTo-SolutionInventoryCategory -Kind $_.Kind) -eq $category -and
+                ("$($_.Name)").Trim().Equals(("$expectedName").Trim(), [System.StringComparison]::OrdinalIgnoreCase)
+            })
+            $match = $matches | Select-Object -First 1
+            $matchState = Get-OptionalPropertyValue -InputObject $match -PropertyName 'State'
+            $state = if ($failures.Count -gt 0) { 'Failed' } elseif ($null -eq $match) { 'Missing' } elseif ($matchState -eq 'Added') { 'Added' } else { 'Already in solution' }
+            $failureReason = if ($failures.Count -eq 0) {
+                ''
+            } else {
+                (Get-OptionalPropertyValue -InputObject $failures[0] -PropertyName 'Reason') ??
+                    (Get-OptionalPropertyValue -InputObject $failures[0] -PropertyName 'Error') ??
+                    'artifact build failed'
+            }
+            if ($null -ne $match) {
+                [void]$matchedCurrentKeys.Add("$category|$($match.SolutionComponentId)")
+            }
+            [void]$items.Add([pscustomobject]@{
+                Category = $category
+                Name = "$expectedName"
+                ObjectId = if ($null -eq $match) { '' } else { "$($match.ObjectId)" }
+                SolutionComponentId = if ($null -eq $match) { '' } else { "$($match.SolutionComponentId)" }
+                ComponentType = if ($null -eq $match) { $null } else { $match.ComponentType }
+                State = $state
+                Required = $category -in $MandatoryCategories
+                Reason = "$failureReason"
+            })
+        }
+    }
+
+    $unauthorized = @($CurrentInventory | Where-Object {
+        $category = ConvertTo-SolutionInventoryCategory -Kind $_.Category
+        $category -in $categories -and -not $matchedCurrentKeys.Contains("$category|$($_.SolutionComponentId)")
+    } | ForEach-Object {
+        [pscustomobject]@{
+            Category = ConvertTo-SolutionInventoryCategory -Kind $_.Category
+            Name = "$($_.Name)"
+            ObjectId = "$($_.ObjectId)"
+            SolutionComponentId = "$($_.SolutionComponentId)"
+            ComponentType = $_.ComponentType
+            State = 'Unauthorized'
+            Required = $false
+            Reason = 'Present in the solution but absent from the approved expected-artifact set.'
+        }
+    })
+    foreach ($entry in $unauthorized) { [void]$items.Add($entry) }
+
+    $blocking = @($items | Where-Object {
+        ($_.Required -and $_.State -in @('Missing', 'Failed')) -or ($Strict -and $_.State -eq 'Unauthorized')
+    })
+    $counts = [ordered]@{}
+    foreach ($state in @('Added', 'Already in solution', 'Failed', 'Missing', 'Unauthorized')) {
+        $counts[$state] = @($items | Where-Object State -eq $state).Count
+    }
+
+    return [pscustomobject]@{
+        GeneratedAtUtc = [DateTime]::UtcNow.ToString('o')
+        Strict = [bool]$Strict
+        Categories = $categories
+        Items = @($items.ToArray())
+        Counts = [pscustomobject]$counts
+        ExportAllowed = $blocking.Count -eq 0
+        BlockingItems = $blocking
+    }
+}
+
+function ConvertTo-SolutionExpectedCategoryMap {
+    param([object]$ExpectedArtifacts)
+
+    return @{
+        tables = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Tables'))
+        columns = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Columns'))
+        relationships = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Relationships'))
+        forms = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Forms'))
+        views = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Views'))
+        'model-driven-apps' = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'AppModules'))
+        'sitemap-updates' = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'SiteMaps'))
+        'web-resources' = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'WebResources'))
+        dashboards = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Dashboards'))
+        charts = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Charts'))
+        flows = @(
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Bpfs')) +
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Flows'))
+        )
+    }
+}
+
+function Write-SolutionMembershipReport {
+    param(
+        [object]$Report,
+        [string]$JsonPath,
+        [string]$MarkdownPath
+    )
+
+    foreach ($path in @($JsonPath, $MarkdownPath)) {
+        $folder = Split-Path $path -Parent
+        if (-not [string]::IsNullOrWhiteSpace($folder)) {
+            New-Item -ItemType Directory -Path $folder -Force | Out-Null
+        }
+    }
+    $Report | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $JsonPath -Encoding UTF8
+
+    $lines = [System.Collections.Generic.List[string]]::new()
+    $lines.Add('# Solution Membership Report') | Out-Null
+    $lines.Add('') | Out-Null
+    $lines.Add("- Generated UTC: $($Report.GeneratedAtUtc)") | Out-Null
+    $lines.Add("- Strict isolation: $($Report.Strict)") | Out-Null
+    $lines.Add("- Export allowed: $($Report.ExportAllowed)") | Out-Null
+    foreach ($state in @('Added', 'Already in solution', 'Failed', 'Missing', 'Unauthorized')) {
+        $lines.Add("- ${state}: $($Report.Counts.$state)") | Out-Null
+    }
+    foreach ($category in @($Report.Categories)) {
+        $lines.Add('') | Out-Null
+        $lines.Add("## $category") | Out-Null
+        $categoryItems = @($Report.Items | Where-Object Category -eq $category | Sort-Object Name, State)
+        if ($categoryItems.Count -eq 0) {
+            $lines.Add('- none') | Out-Null
+            continue
+        }
+        foreach ($item in $categoryItems) {
+            $idText = if ([string]::IsNullOrWhiteSpace("$($item.ObjectId)")) { '' } else { "; objectId=$($item.ObjectId); solutionComponentId=$($item.SolutionComponentId)" }
+            $reasonText = if ([string]::IsNullOrWhiteSpace("$($item.Reason)")) { '' } else { "; reason=$($item.Reason)" }
+            $lines.Add("- [$($item.State)] $($item.Name)$idText$reasonText") | Out-Null
+        }
+    }
+    Set-Content -LiteralPath $MarkdownPath -Value $lines -Encoding UTF8
+
+    return [pscustomobject]@{ JsonPath = $JsonPath; MarkdownPath = $MarkdownPath }
+}

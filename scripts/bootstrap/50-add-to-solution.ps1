@@ -74,7 +74,9 @@ param(
     [bool]$EnableContaminationScan = $true,
     [bool]$EnableArtifactManifest = $true,
     [bool]$StrictMode = $true,
-    [bool]$AllowContaminatedSolution = $false
+    [bool]$AllowContaminatedSolution = $false,
+    [switch]$InventoryOnly,
+    [switch]$EnforceExportGate
 )
 
 Set-StrictMode -Version Latest
@@ -261,11 +263,18 @@ function Get-SolutionComponentInventory {
 
     $typeMap = Get-SolutionComponentTypeMap
     $entityType = Get-ComponentTypeValue -Map $typeMap -Labels @('Entity') -Fallback 1
+    $attributeType = Get-ComponentTypeValue -Map $typeMap -Labels @('Attribute') -Fallback 2
+    $relationshipTypes = @(
+        Get-ComponentTypeValue -Map $typeMap -Labels @('Entity Relationship', 'Relationship') -Fallback 10
+        Get-ComponentTypeValue -Map $typeMap -Labels @('Entity Relationship Role', 'Relationship Role') -Fallback 11
+    ) | Select-Object -Unique
     $webResourceType = Get-ComponentTypeValue -Map $typeMap -Labels @('Web Resource', 'WebResource') -Fallback 61
     $systemFormType = Get-ComponentTypeValue -Map $typeMap -Labels @('System Form', 'SystemForm') -Fallback 60
     $savedQueryType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query', 'SavedQuery') -Fallback 26
     $processType = Get-ComponentTypeValue -Map $typeMap -Labels @('Process') -Fallback 29
     $appModuleType = Get-ComponentTypeValue -Map $typeMap -Labels @('App Module', 'Model-driven App') -Fallback 80
+    $siteMapType = Get-ComponentTypeValue -Map $typeMap -Labels @('Site Map', 'SiteMap') -Fallback 62
+    $chartType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query Visualization', 'SavedQueryVisualization') -Fallback 59
 
     $items = New-Object System.Collections.Generic.List[object]
     $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype")
@@ -280,15 +289,34 @@ function Get-SolutionComponentInventory {
         if ($componentType -eq $entityType) {
             $entity = Get-EntityDefinitionByMetadataId -InvokeGet $InvokeGet -MetadataId $objectId
             if ($null -ne $entity) {
-                $items.Add([pscustomobject]@{ Kind = 'table'; Name = $entity.LogicalName }) | Out-Null
+                $items.Add([pscustomobject]@{ Kind = 'table'; Category = 'tables'; Name = $entity.LogicalName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             }
+            continue
+        }
+
+        if ($componentType -eq $attributeType) {
+            try {
+                $entities = Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName&`$expand=Attributes(`$select=LogicalName,MetadataId;`$filter=MetadataId eq $objectId)"
+                $owner = @($entities.value | Where-Object { @($_.Attributes).Count -gt 0 } | Select-Object -First 1)
+                if ($owner.Count -gt 0) {
+                    $items.Add([pscustomobject]@{ Kind = 'column'; Category = 'columns'; Name = "$($owner[0].LogicalName).$($owner[0].Attributes[0].LogicalName)"; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+                }
+            } catch {}
+            continue
+        }
+
+        if ($componentType -in $relationshipTypes) {
+            try {
+                $relationship = Invoke-Dv "Get" "RelationshipDefinitions($objectId)?`$select=SchemaName,MetadataId"
+                $items.Add([pscustomobject]@{ Kind = 'relationship'; Category = 'relationships'; Name = $relationship.SchemaName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+            } catch {}
             continue
         }
 
         if ($componentType -eq $webResourceType) {
             try {
                 $wr = Invoke-Dv "Get" "webresourceset($objectId)?`$select=name"
-                $items.Add([pscustomobject]@{ Kind = 'webresource'; Name = $wr.name }) | Out-Null
+                $items.Add([pscustomobject]@{ Kind = 'webresource'; Category = 'web-resources'; Name = $wr.name; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
             continue
         }
@@ -297,7 +325,7 @@ function Get-SolutionComponentInventory {
             try {
                 $view = Invoke-Dv "Get" "savedqueries($objectId)?`$select=name,returnedtypecode"
                 $normalizedName = if (("$($view.name)") -like 'Active*') { "$($view.returnedtypecode)|active" } else { "$($view.returnedtypecode)|$($view.name)" }
-                $items.Add([pscustomobject]@{ Kind = 'view'; Name = $normalizedName }) | Out-Null
+                $items.Add([pscustomobject]@{ Kind = 'view'; Category = 'views'; Name = $normalizedName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
             continue
         }
@@ -307,7 +335,8 @@ function Get-SolutionComponentInventory {
                 $form = Invoke-Dv "Get" "systemforms($objectId)?`$select=name,objecttypecode,type"
                 $kind = if ([int]$form.type -eq 2) { 'form' } else { 'dashboard' }
                 $normalizedName = if ($kind -eq 'form') { "$($form.objecttypecode)|main" } else { "$($form.name)" }
-                $items.Add([pscustomobject]@{ Kind = $kind; Name = $normalizedName }) | Out-Null
+                $category = if ($kind -eq 'form') { 'forms' } else { 'dashboards' }
+                $items.Add([pscustomobject]@{ Kind = $kind; Category = $category; Name = $normalizedName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
             continue
         }
@@ -315,9 +344,8 @@ function Get-SolutionComponentInventory {
         if ($componentType -eq $processType) {
             try {
                 $workflow = Invoke-Dv "Get" "workflows($objectId)?`$select=name,uniquename,category"
-                if ([int]$workflow.category -eq 4) {
-                    $items.Add([pscustomobject]@{ Kind = 'bpf'; Name = ($workflow.uniquename ?? $workflow.name) }) | Out-Null
-                }
+                $kind = if ([int]$workflow.category -eq 4) { 'bpf' } else { 'flow' }
+                $items.Add([pscustomobject]@{ Kind = $kind; Category = 'flows'; Name = ($workflow.uniquename ?? $workflow.name); ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
             continue
         }
@@ -325,7 +353,23 @@ function Get-SolutionComponentInventory {
         if ($componentType -eq $appModuleType) {
             try {
                 $app = Invoke-Dv "Get" "appmodules($objectId)?`$select=name,uniquename"
-                $items.Add([pscustomobject]@{ Kind = 'appmodule'; Name = ($app.uniquename ?? $app.name) }) | Out-Null
+                $items.Add([pscustomobject]@{ Kind = 'appmodule'; Category = 'model-driven-apps'; Name = ($app.uniquename ?? $app.name); ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $siteMapType) {
+            try {
+                $siteMap = Invoke-Dv "Get" "sitemaps($objectId)?`$select=sitemapnameunique,sitemapname"
+                $items.Add([pscustomobject]@{ Kind = 'sitemap'; Category = 'sitemap-updates'; Name = ($siteMap.sitemapnameunique ?? $siteMap.sitemapname); ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $chartType) {
+            try {
+                $chart = Invoke-Dv "Get" "savedqueryvisualizations($objectId)?`$select=name"
+                $items.Add([pscustomobject]@{ Kind = 'chart'; Category = 'charts'; Name = $chart.name; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
         }
     }
@@ -353,6 +397,43 @@ $invokeDvGet = { param($path) Invoke-Dv "Get" $path }
 $entityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
 $reportWebResourceNames = @(Get-ReportWebResourceNames -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PublisherPrefix $PublisherPrefix)
 $tableIsolationReport = Get-SolutionTableIsolationReport -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)" -ExpectedEntityNames $entityNames
+
+if ($InventoryOnly) {
+    if (-not (Get-Command New-WizardExpectedArtifacts -ErrorAction SilentlyContinue)) {
+        throw 'Inventory-only mode requires scripts/bootstrap/helpers/wizard-hardening.ps1.'
+    }
+
+    $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+    $expectedByCategory = ConvertTo-SolutionExpectedCategoryMap -ExpectedArtifacts $expectedArtifacts
+    $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
+    $failedArtifacts = @()
+    $artifactPaths = Get-WizardArtifactPaths -RepoRoot $repoRoot
+    if (Test-Path -LiteralPath $artifactPaths.ManifestJsonPath) {
+        $manifest = Get-Content -LiteralPath $artifactPaths.ManifestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $failedArtifacts = @($manifest.items | Where-Object status -eq 'failed' | ForEach-Object {
+            [pscustomobject]@{
+                Kind = $_.kind
+                Name = $_.name
+                Reason = $_.details.error ?? $_.details.reason ?? 'artifact build failed'
+            }
+        })
+    }
+    $membershipReport = New-SolutionMembershipReport -ExpectedByCategory $expectedByCategory -CurrentInventory $inventory -FailedArtifacts $failedArtifacts -Strict:$StrictMode
+    $membershipJsonPath = Join-Path $artifactPaths.ContaminationFolder 'solution-membership-report.json'
+    $membershipMarkdownPath = Join-Path $artifactPaths.ContaminationFolder 'solution-membership-report.md'
+    $writtenReport = Write-SolutionMembershipReport -Report $membershipReport -JsonPath $membershipJsonPath -MarkdownPath $membershipMarkdownPath
+
+    Write-Host "  Membership JSON:     $($writtenReport.JsonPath)" -ForegroundColor DarkGray
+    Write-Host "  Membership Markdown: $($writtenReport.MarkdownPath)" -ForegroundColor DarkGray
+    Write-Host "  Export allowed:       $($membershipReport.ExportAllowed)" -ForegroundColor $(if ($membershipReport.ExportAllowed) { 'Green' } else { 'Red' })
+    if ($EnforceExportGate -and -not $membershipReport.ExportAllowed) {
+        foreach ($item in @($membershipReport.BlockingItems)) {
+            Write-Host "  BLOCKED [$($item.State)] [$($item.Category)] $($item.Name)" -ForegroundColor Red
+        }
+        throw 'Solution membership gate failed. Export is blocked until mandatory artifacts are present and strict isolation findings are resolved.'
+    }
+    exit 0
+}
 
 if ($EnableContaminationScan -and (Get-Command New-WizardExpectedArtifacts -ErrorAction SilentlyContinue)) {
     $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix

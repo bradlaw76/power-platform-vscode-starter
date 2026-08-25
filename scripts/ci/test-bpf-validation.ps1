@@ -212,16 +212,23 @@ try {
   Remove-TestScenario -Path $incomplete.Root
 }
 
-if ((Get-BpfDesiredAction -ExistingProcess $null -PreferUpdateExistingBpf:$true) -ne 'create') {
-  throw 'Expected a missing process to resolve to create.'
+if ((Get-BpfDesiredAction -ExistingProcess $null -PreferUpdateExistingBpf:$true) -ne 'designer-handoff-required') {
+  throw 'Expected a missing process to require a supported designer handoff.'
 }
 
-if ((Get-BpfDesiredAction -ExistingProcess ([pscustomobject]@{ workflowid = [guid]::NewGuid().Guid }) -PreferUpdateExistingBpf:$true) -ne 'update') {
-  throw 'Expected an existing process to resolve to update when PreferUpdateExistingBpf is true.'
+if ((Get-BpfDesiredAction -ExistingProcess ([pscustomobject]@{ workflowid = [guid]::NewGuid().Guid }) -PreferUpdateExistingBpf:$true) -ne 'validate-existing') {
+  throw 'Expected an existing process to be validated without metadata rewriting.'
 }
 
-if ((Get-BpfDesiredAction -ExistingProcess ([pscustomobject]@{ workflowid = [guid]::NewGuid().Guid }) -PreferUpdateExistingBpf:$false) -ne 'skip') {
-  throw 'Expected an existing process to resolve to skip when PreferUpdateExistingBpf is false.'
+$bpfScript = Get-Content -Path (Join-Path $repoRoot 'scripts/bootstrap/55-build-business-process-flows.ps1') -Raw
+if ($bpfScript -match "Invoke-DvWithRetry\s+-Method\s+'(?:Post|Patch)'\s+-Path\s+'workflows'") {
+  throw 'BPF stage must not directly create or patch workflow definition metadata.'
+}
+if ($bpfScript -match 'clientdata\s*=|uidata\s*=') {
+  throw 'BPF stage must not fabricate clientdata or uidata process definitions.'
+}
+if ($bpfScript -notmatch 'PreviewOnly' -or $bpfScript -notmatch 'designer-handoff-required') {
+  throw 'BPF stage must expose preview mode and the supported designer handoff.'
 }
 
 Write-Host 'BPF validation checks passed.' -ForegroundColor Green

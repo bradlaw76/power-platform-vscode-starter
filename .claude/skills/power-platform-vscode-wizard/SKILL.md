@@ -9,6 +9,12 @@ description: Use when building Power Platform model-driven apps, Dynamics 365 de
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
 
+## Runtime Compatibility Preflight
+
+Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
+
+Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use `docs/skill-distribution.md` for installation and provenance checks.
+
 ## Mandatory Rule
 
 > Do not build tables, forms, views, flows, or solution artifacts until Spec Kit is complete.
@@ -105,12 +111,17 @@ pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
+pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Run only if Q19 answer was yes
 pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 ```
 
 All scripts are idempotent — safe to rerun after fixing failures.
+
+Prefer `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>` for the complete ordered run. A planned BPF generates a designer handoff; author the initial definition through Power Apps. Script 55 validates, activates, adds, and links the existing category-4 process rather than fabricating workflow definition metadata. Do not export while the final solution membership gate fails.
 
 Script 65 generates 3 Dynamics-blue HTML reports (agent performance, supervisor oversight, executive KPI) from scenario design files and adds them to the solution as web resources. It skips silently when reports are disabled.
 
@@ -160,6 +171,7 @@ Post-wizard demo helpers:
 
 Note:
 - `01-install-skills.ps1` installs this skill to your local Claude skills folder.
+- It does not install a missing wizard runtime into another repository.
 - Skill availability depends on Claude session behavior and invocation context.
 
 ## Auth Flags

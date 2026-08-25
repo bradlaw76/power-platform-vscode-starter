@@ -72,13 +72,34 @@ Describe 'Copilot and Claude wizard skill parity' {
             foreach ($scriptName in @(
                 '00-prereq-check.ps1',
                 '05-start-wizard.ps1',
-                '10-auth-connect.ps1'
+                '10-auth-connect.ps1',
+                '55-build-business-process-flows.ps1',
+                '62-build-app-module.ps1',
+                '90-run-build.ps1'
             )) {
                 @{ Skill = $skill; ScriptName = $scriptName }
             }
         }
     ) {
         $skillContent[$Skill] | Should -Match ([regex]::Escape($ScriptName))
+    }
+
+    It '<Skill> distinguishes skill availability from runtime installation' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match '(?i)skill availability is not runtime installation'
+        $skillContent[$Skill] | Should -Match '(?i)copied `SKILL\.md` does not provide'
+        $skillContent[$Skill] | Should -Match '(?i)never overwrite existing instructions, skills, scripts, specs, or payloads'
+    }
+
+    It '<Skill> enforces supported BPF handoff and final membership gate' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match '(?i)designer handoff'
+        $skillContent[$Skill] | Should -Match 'InventoryOnly'
+        $skillContent[$Skill] | Should -Match 'EnforceExportGate'
     }
 
     It '<Skill> covers required stage <Stage>' -ForEach @(

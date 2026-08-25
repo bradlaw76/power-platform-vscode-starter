@@ -2,7 +2,7 @@
 
 Use the BPF feature only when the scenario has a real staged lifecycle such as intake -> review -> decision -> escalation or closure. If the scenario is only CRUD-oriented, leave BPF disabled and let script `55-build-business-process-flows.ps1` skip it.
 
-These reliability rules are mandatory quality gates for every wizard-generated or wizard-updated BPF.
+These reliability rules are mandatory quality gates for every designer-authored BPF validated by the wizard.
 
 ## When to enable BPF
 
@@ -35,17 +35,16 @@ These reliability rules are mandatory quality gates for every wizard-generated o
 - Do not declare success because workflow state is Active only.
 - Do not declare success because workflow is present in solution only.
 - Do not leave cloned template fields or labels in production BPF steps.
-- Do not update only one payload surface; keep `clientdata`, `uidata`, and `xaml` consistent.
-- Do not use unsafe text replacement that can corrupt similar field names.
+- Do not fabricate or patch `clientdata`, `uidata`, or `xaml` workflow definitions through the wizard.
 - Do not bind BPF steps to fields that are missing from primary-table metadata.
 - Do not rely on brittle UI automation as the only implementation path.
 
 ## Two-phase build model (required)
 
 1. Create and activate a base BPF in the designer.
-2. Run deterministic validation and scripted remediation.
+2. Run deterministic validation, activation, solution membership, and app-linkage checks.
 
-When designer runtime is unstable, switch to API or script remediation and revalidate.
+If designer authoring is unavailable or unstable, stop and preserve the handoff. Do not switch to unsupported workflow-definition payload construction.
 
 ## Deterministic validator requirements
 
@@ -61,11 +60,11 @@ Validate at minimum:
 - Step count sanity.
 - Field existence in Dataverse metadata before applying step bindings.
 
-Implementation requirements:
+Operator requirements:
 
 - Keep step-to-field mapping deterministic and replayable from plan artifacts.
-- Update field bindings and label text in separate passes.
-- Publish after updates.
+- Apply field bindings and label text in the Power Apps designer.
+- Publish the designer-authored process before rerunning script `55`.
 - Verify app linkage for workflow component type `29`.
 
 Threshold guidance:
@@ -98,10 +97,9 @@ Why script `55` sits here:
 - Missing stage field mappings: add the field to `columns-*.json` for custom fields or to the standard field mapping section in planning artifacts for standard fields.
 - Missing cross-table relationship: add or correct the `relationships-*.json` payload, then rerun scripts `40`, `50`, and `55`.
 - Ambiguous or CRUD-only scenario: disable BPF in discovery or delete the `process-*.json` draft so script `55` skips cleanly.
-- Existing wizard-managed BPF already present: leave `PreferUpdateExistingBpf` enabled to update in place; disable it only if you intentionally want the step to skip instead of updating.
+- Expected BPF is missing: open the generated designer handoff, create the category-4 process in Power Apps with the exact expected unique name, add it to the target solution, publish, and rerun script `55`.
+- Existing process has the wrong category or unique name: correct or replace it through the supported designer/solution path; the script will not rewrite its definition.
 - Dataverse customization lock or contention: retry with exponential backoff instead of hard-failing the run.
-- Invalid attribute error during patching: stop, identify the exact offending field name, and correct mapping before retry.
-- Field replacement collisions: use longest-first replacement ordering to avoid substring collisions.
 
 ## Completion criteria (must all pass)
 
@@ -124,6 +122,7 @@ Why script `55` sits here:
 ## Output artifacts
 
 - Build report: `specs/<scenario-slug>/reports/business-process-flow-report.json`
+- Designer handoff: `specs/<scenario-slug>/reports/business-process-flow-designer-handoff.md`
 - Process payload input: `payloads/scenarios/<scenario-slug>/process-*.json`
 - Build-log evidence: `docs/build-log.md`
 

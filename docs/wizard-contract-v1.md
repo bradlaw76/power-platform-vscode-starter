@@ -146,9 +146,10 @@ Required gate before execution:
 8. `55-build-business-process-flows.ps1`
 9. `60-build-forms-views.ps1`
 10. `62-build-app-module.ps1`
-11. Solution inventory collection and sync (inline, post-62)
-12. Publish (inline, after sync)
-13. `80-post-build-analysis.ps1`
+11. Optional profile-driven web resources
+12. Final `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
+13. Publish (owned by metadata/app update stages)
+14. `80-post-build-analysis.ps1`
 
 ### Optional Modules (profile-driven)
 

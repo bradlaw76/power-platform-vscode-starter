@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "cct_agent",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Agent",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Agents",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Synthetic sample support agent",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

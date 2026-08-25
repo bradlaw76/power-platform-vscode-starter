@@ -420,6 +420,8 @@ pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+# Final read-only inventory and export gate
+pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 # End-of-build summary analysis and optional README update/commit prompts
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 # Build a run matrix from disclosed step events
@@ -439,11 +441,10 @@ Payload rules for Step 10:
 - `50-add-to-solution.ps1` also produces a contamination scan artifact that classifies expected, wizard-managed foreign, and manual or legacy solution contents before more components are added.
 - Override that guard only when reuse is intentional: `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
 - To inspect or remove foreign tables from an unmanaged solution, run `pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1`.
-- `55-build-business-process-flows.ps1` reads `process-*.json` only when the scenario explicitly defines a BPF, validates stage fields and relationships against repo artifacts, upserts the wizard-managed process definition, and writes a BPF build report.
+- `55-build-business-process-flows.ps1` reads `process-*.json` only when explicitly planned, validates stage fields and relationships, and writes a designer handoff and BPF report. Create the initial process definition in Power Apps with the expected unique name; apply mode validates, activates, adds, and links that existing supported definition.
 - BPF completion is not satisfied by Active state alone or solution membership alone; use the BPF runbook completion criteria (validation PASS with thresholds, app linkage, and stage/condition/step evidence).
-- For BPF field updates, treat `clientdata`, `uidata`, and `xaml` as a consistency set; do not update a single surface in isolation.
-- If BPF branch logic is ambiguous at any point, stop and clarify before changing Dataverse metadata.
-- If BPF patching reports invalid attributes, identify exact offending names before retrying. Use longest-first replacement ordering for field-name replacements.
+- The wizard does not POST or PATCH fabricated `clientdata`, `uidata`, or `xaml` workflow definitions.
+- If BPF branch logic is ambiguous, resolve it in planning and the designer handoff before authoring the process.
 - `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
 - `60-build-forms-views.ps1` applies form and view quality gates and writes population artifacts for both surfaces.
 - `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
@@ -451,6 +452,7 @@ Payload rules for Step 10:
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
 - If optional reports are enabled, `70-build-web-resources.ps1` runs the reporting module and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
+- The final inventory-only pass writes `.wizard-metrics/artifacts/solution/solution-membership-report.{json,md}`. Do not export unless `ExportAllowed` is true.
 - `80-post-build-analysis.ps1` provides an end-of-build preview summary and asks for explicit confirmation before updating README markers or running any git commit/push action.
 - For preview only, run: `pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly`
 - Optional overrides for generalized workflows: `-SpecPath`, `-PlanPath`, `-TasksPath`, `-PayloadFolder`, and `-ReadmePath`.

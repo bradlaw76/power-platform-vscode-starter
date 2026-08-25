@@ -12,6 +12,12 @@ This skill starts the repository wizard safely through either chat or terminal, 
 
 This skill does not modify core wizard scripts.
 
+## Runtime Compatibility Preflight
+
+Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
+
+Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for installation and provenance checks.
+
 ## What This Produces
 
 - A selected start path (chat or terminal)
@@ -102,6 +108,10 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   - `tasks.md`
   - `report-mappings.md`
 - Do not recommend scripts `20+` before the planning gate passes.
+- Prefer the orchestrated preview and apply entry point: `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>`.
+- A planned BPF uses `55-build-business-process-flows.ps1` to validate payloads and generate a designer handoff. Initial definition authoring occurs through Power Apps; apply mode validates, activates, adds, and links the existing category-4 process.
+- The required review app is assembled and validated by `62-build-app-module.ps1`.
+- After app/report assembly, require `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`. Do not recommend export while required membership fails.
 
 8. Monitor progress using existing telemetry (no script changes)
 - Primary signal: `.wizard-metrics/events.jsonl`

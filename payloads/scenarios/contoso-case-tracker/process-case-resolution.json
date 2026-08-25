@@ -1,0 +1,34 @@
+{
+  "Enabled": true,
+  "BusinessProcessFlowName": "Contoso Case Resolution",
+  "PrimaryProcessEntity": "incident",
+  "FailIfBpfDefinitionIncomplete": true,
+  "PreferUpdateExistingBpf": true,
+  "CrossTableProgression": false,
+  "FormIntegration": {
+    "TargetFormName": "Contoso Case Main",
+    "RequireMainForm": true
+  },
+  "StageDefinitions": [
+    {
+      "Order": 1,
+      "StageName": "Triage",
+      "EntityLogicalName": "incident",
+      "RequiredFields": [
+        "title"
+      ],
+      "EntryCriteria": "A new case has been created.",
+      "ExitCriteria": "The case title and initial triage are confirmed."
+    },
+    {
+      "Order": 2,
+      "StageName": "Resolve",
+      "EntityLogicalName": "incident",
+      "RequiredFields": [
+        "statuscode"
+      ],
+      "EntryCriteria": "Triage is complete and an owner can work the case.",
+      "ExitCriteria": "The case status records the resolution outcome."
+    }
+  ]
+}

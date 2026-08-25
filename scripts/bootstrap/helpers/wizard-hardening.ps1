@@ -233,6 +233,7 @@ function Get-WizardPayloadSummary {
         TableFiles = @()
         ColumnTables = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         Columns = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        ColumnReferences = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         RelationshipEntities = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         Relationships = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         ProcessNames = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
@@ -268,6 +269,9 @@ function Get-WizardPayloadSummary {
                     (Get-WizardOptionalPropertyValue -InputObject $column -PropertyName 'SchemaName')
                 if (-not [string]::IsNullOrWhiteSpace($logicalName)) {
                     [void]$summary.Columns.Add($logicalName.Trim().ToLowerInvariant())
+                    if (-not [string]::IsNullOrWhiteSpace($table)) {
+                        [void]$summary.ColumnReferences.Add("$($table.Trim().ToLowerInvariant()).$($logicalName.Trim().ToLowerInvariant())")
+                    }
                 }
             }
         } catch {
@@ -317,6 +321,7 @@ function Get-WizardPayloadSummary {
         TableFiles           = @($summary.TableFiles)
         ColumnTables         = @($summary.ColumnTables | Sort-Object)
         Columns              = @($summary.Columns | Sort-Object)
+        ColumnReferences     = @($summary.ColumnReferences | Sort-Object)
         RelationshipEntities = @($summary.RelationshipEntities | Sort-Object)
         Relationships        = @($summary.Relationships | Sort-Object)
         ProcessNames         = @($summary.ProcessNames | Sort-Object)
@@ -649,14 +654,17 @@ function New-WizardExpectedArtifacts {
 
     return [pscustomobject]@{
         Tables = @($payloadSummary.Tables)
-        Columns = @($payloadSummary.Columns)
+        Columns = @($payloadSummary.ColumnReferences)
         Relationships = @($payloadSummary.Relationships)
         Bpfs = @($payloadSummary.ProcessNames)
         WebResources = @($reportWebResources | Sort-Object)
         Forms = @($payloadSummary.Tables | ForEach-Object { "$($_)|main" })
         Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })
         Dashboards = @()
+        Charts = @()
+        Flows = @()
         AppModules = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @($featureConfig.AppUniqueName) } else { @() }
+        SiteMaps = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @("$([regex]::Replace($featureConfig.AppUniqueName.ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_'))_sitemap") } else { @() }
         FeatureConfig = $featureConfig
     }
 }
@@ -670,20 +678,30 @@ function New-WizardContaminationVerdict {
 
     $expected = @{
         table = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        column = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        relationship = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         webresource = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         form = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         view = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         dashboard = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         appmodule = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        sitemap = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        chart = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        flow = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         bpf = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     }
 
     foreach ($name in @($ExpectedArtifacts.Tables)) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.Columns)) { [void]$expected.column.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.Relationships)) { [void]$expected.relationship.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.WebResources)) { [void]$expected.webresource.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Forms)) { [void]$expected.form.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Views)) { [void]$expected.view.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Dashboards)) { [void]$expected.dashboard.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.AppModules)) { [void]$expected.appmodule.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.SiteMaps)) { [void]$expected.sitemap.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.Charts)) { [void]$expected.chart.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.Flows)) { [void]$expected.flow.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Bpfs)) { [void]$expected.bpf.Add(($name ?? '').Trim().ToLowerInvariant()) }
 
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
@@ -1000,4 +1018,13 @@ function Get-WizardAppModuleConfig {
         ValidationErrors = @($validationErrors.ToArray())
         ValidationPassed = $validationErrors.Count -eq 0
     }
+}
+
+function Get-WizardUpsertAction {
+    param([object[]]$ExistingItems = @())
+
+    if (@($ExistingItems).Count -gt 0) {
+        return 'update'
+    }
+    return 'create'
 }

@@ -1,0 +1,22 @@
+{
+  "TableLogicalName": "incident",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "cct_triagebucket",
+      "LogicalName": "cct_triagebucket",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Triage Bucket",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    }
+  ]
+}
