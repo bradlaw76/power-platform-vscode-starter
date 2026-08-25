@@ -77,10 +77,16 @@ function Test-Tool {
     param(
         [string]$Name,
         [string]$Command,
-        [string]$Args = "--version"
+        [string[]]$Arguments = @('--version')
     )
     try {
-        $output = & $Command $Args 2>&1 | Select-Object -First 1
+        $global:LASTEXITCODE = 0
+        $outputLines = @(& $Command @Arguments 2>&1)
+        $exitCode = $LASTEXITCODE
+        $output = $outputLines | Select-Object -First 1
+        if ($exitCode -ne 0) {
+            throw "Command exited with code $exitCode. $output"
+        }
         $results.Add([PSCustomObject]@{ Tool = $Name; Status = "PASS"; Version = "$output" })
     }
     catch {
@@ -94,7 +100,7 @@ Write-Host "=== Prerequisite Check ===" -ForegroundColor Cyan
 Test-Tool -Name "VS Code"           -Command "code"
 Test-Tool -Name "PowerShell 7+"     -Command "pwsh"
 Test-Tool -Name "Azure CLI"         -Command "az"
-Test-Tool -Name "Power Platform CLI"-Command "pac"
+Test-Tool -Name "Power Platform CLI"-Command "pac" -Arguments @('help')
 Test-Tool -Name "Git"               -Command "git"
 
 Write-Host ""

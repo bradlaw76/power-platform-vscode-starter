@@ -78,6 +78,18 @@ foreach ($optionalModule in @($wizardProfile.execution.optionalModules.PSObject.
     }
 }
 
+$prerequisiteScriptPath = Join-Path $bootstrapFolder '00-prereq-check.ps1'
+$prerequisiteScriptText = Get-Content -LiteralPath $prerequisiteScriptPath -Raw
+if ($prerequisiteScriptText -notmatch '\[string\[\]\]\$Arguments' -or $prerequisiteScriptText -notmatch '&\s+\$Command\s+@Arguments') {
+    Add-ContractFailure '00-prereq-check.ps1 must pass version arguments through a non-automatic argument-array parameter.'
+}
+if ($prerequisiteScriptText -notmatch '\$exitCode\s*=\s*\$LASTEXITCODE' -or $prerequisiteScriptText -notmatch '\$exitCode\s+-ne\s+0') {
+    Add-ContractFailure '00-prereq-check.ps1 must reject installed tools whose version command exits unsuccessfully.'
+}
+if ($prerequisiteScriptText -notmatch 'Power Platform CLI[^\r\n]+-Arguments\s+@\(''help''\)') {
+    Add-ContractFailure "00-prereq-check.ps1 must probe PAC CLI with 'pac help', which returns a reliable process exit code."
+}
+
 $postBuildImplementations = @{
     'solution-inventory-collect' = '50-add-to-solution.ps1'
     'solution-inventory-sync' = '50-add-to-solution.ps1'
