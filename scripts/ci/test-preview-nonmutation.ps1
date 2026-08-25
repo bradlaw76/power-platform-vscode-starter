@@ -42,7 +42,7 @@ function Get-GitPreviewSnapshot {
     Push-Location $RepositoryRoot
     try {
         $head = (& git rev-parse HEAD).Trim()
-        $branch = (& git branch --show-current).Trim()
+        $branch = ((& git branch --show-current) | Out-String).Trim()
         $indexHash = ((& git diff --cached) | Out-String | ForEach-Object { $_ } | & git hash-object --stdin).Trim()
         $stagedFiles = @(& git diff --cached --name-only)
         if ($LASTEXITCODE -ne 0) {
