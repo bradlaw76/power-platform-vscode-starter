@@ -46,9 +46,11 @@ Use this sequence from first clone to final handoff:
 Validation checkpoint:
 - Pause at each step until validation passes. Do not continue on failed checks.
 
-### 0B. Required discovery questionnaire
+### 0B. Discovery modes
 
-Ask and capture these answers before Step 1:
+Use `demo-builder` by default. Ask six business questions and present one inferred technical recommendation for confirmation. Use `advanced-builder` explicitly to ask and capture the following detailed answers before Step 1. Use `framework-acceptance` explicitly to add environment authorization, isolated naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
+
+Advanced Builder questionnaire:
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -71,7 +73,7 @@ Optional extension blocks (profile-driven):
 - source-control (read-only target-repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
 
 Exit criteria:
-- All 11 required questions answered.
+- The selected mode's intake is complete. Demo Builder stays within seven prompts; Advanced Builder completes the 11 core questions and selected extensions.
 - Selected extension blocks completed.
 - Stakeholder confirms the answers are complete enough to draft `spec.md`.
 - For table-strategy, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.
@@ -202,8 +204,8 @@ Ask the user:
 8. Which records are hero records, how many are needed per table, and what demo scenario or purpose does each support?
 9. What parent/child distribution is required across relationships?
 10. Should related Dataverse Task activities be created? If yes, which parent tables qualify, should tasks target the latest, all, or selected parent records, what is the source-record limit (default 10 for latest), which field determines recency, and how many tasks are created per selected record?
-11. Should creation be scripted, manual, or imported, and should reruns upsert, replace, or fail when rows exist?
-12. What source tag identifies wizard-owned rows, what synthetic-data/privacy constraints apply, and should cleanup/reset instructions be generated?
+11. Should creation be scripted, manual, or imported?
+12. What synthetic-data/privacy constraints apply? In Framework Acceptance only, also capture rerun behavior, source tags, retention, and separately approved cleanup.
 
 Build decisions:
 - Task-to-artifact traceability for forms, views, navigation, BPF, automation, and validation.
@@ -211,17 +213,17 @@ Build decisions:
 - Explicit record-count plan per table; do not implicitly seed standard reused tables.
 - Named hero records tied to specific demo scenarios or walkthrough purposes.
 - Bounded Task activity generation; default to the latest 10 eligible parent records and require explicit approval for `all`.
-- Idempotent rerun and cleanup strategy using a scenario source tag.
+- In Framework Acceptance, an idempotent rerun and separately approved cleanup strategy using an acceptance source tag.
 - Synthetic data only unless an approved policy explicitly allows another source.
 
 Exit criteria:
 - User tasks have owners and done definitions.
 - Relationship decisions are complete and approved.
-- When demo data is enabled, `demo-data-plan.json` includes table scope, counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup decision.
+- When demo data is enabled, `demo-data-plan.json` includes table scope, counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints. Framework Acceptance also includes rerun, source-tag, retention, and cleanup decisions.
 - This planning stage creates no Dataverse rows.
 
 Copilot prompt:
-"Create a task and demo-data plan from the approved Dataverse schema, including relationship-aware insertion order, per-table counts, named hero records, bounded Dataverse Task activity generation, synthetic-data constraints, idempotent rerun behavior, source tagging, cleanup, owners, and done definitions."
+"Create a task and demo-data plan from the approved Dataverse schema, including relationship-aware insertion order, per-table counts, named hero records, bounded Dataverse Task activity generation, synthetic-data constraints, owners, and done definitions. In Framework Acceptance, also add idempotent rerun evidence, acceptance source tagging, retention, and separately approved cleanup."
 
 ## 4. App Experience Wizard (Model-Driven Layer)
 

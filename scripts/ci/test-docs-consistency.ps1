@@ -18,20 +18,50 @@ if ($requiredQuestions -ne 11) {
   throw "Expected requiredQuestions=11 in wizard.profile.json, found $requiredQuestions"
 }
 
-if ($contract -notmatch 'Required Question Set \(11(?:\s+core)?') {
-  throw 'Contract missing required question set declaration.'
+if ($contract -notmatch 'Advanced Question Set \(11 core') {
+  throw 'Contract missing the Advanced Builder 11-core-question declaration.'
 }
 
-if ($readme -notmatch '11(?: core)? discovery questions') {
-  throw 'README does not state the canonical 11 required discovery questions.'
+if ($readme -notmatch '11 core discovery questions') {
+  throw 'README does not describe the Advanced Builder 11-core-question set.'
 }
 
-if ($onboarding -notmatch '11 required questions') {
-  throw 'Onboarding does not state the canonical 11 required discovery questions.'
+if ($onboarding -notmatch '11 core questions') {
+  throw 'Onboarding does not describe the Advanced Builder 11-core-question set.'
 }
 
-if ($prompt -notmatch 'Required Question Set \(11\)' -and $prompt -notmatch '11 required') {
-  throw 'Prompt does not reference the 11-question required set.'
+if ($prompt -notmatch 'Advanced Builder Question Set \(11 core\)') {
+  throw 'Prompt does not reference the Advanced Builder question set.'
+}
+
+if ($wizardContract.discovery.defaultMode -ne 'demo-builder') {
+  throw 'Profile must default to demo-builder.'
+}
+
+$wizardModes = @($wizardContract.discovery.modes.PSObject.Properties.Name)
+foreach ($requiredMode in @('demo-builder', 'advanced-builder', 'framework-acceptance')) {
+  if ($wizardModes -notcontains $requiredMode) {
+    throw "Profile is missing wizard mode: $requiredMode"
+  }
+}
+
+$demoMode = $wizardContract.discovery.modes.'demo-builder'
+if ([int]$demoMode.questionBudget -lt 6 -or [int]$demoMode.questionBudget -gt 8) {
+  throw 'Demo Builder question budget must remain between 6 and 8.'
+}
+if (-not [bool]$demoMode.consolidatedRecommendationConfirmation) {
+  throw 'Demo Builder must consolidate technical recommendations for confirmation.'
+}
+if (-not [bool]$wizardContract.discovery.modes.'framework-acceptance'.explicitSelectionRequired) {
+  throw 'Framework Acceptance must require explicit selection.'
+}
+
+foreach ($contentCheck in @($readme, $onboarding, $prompt, $contract, $initSkill)) {
+  foreach ($requiredMode in @('demo-builder', 'advanced-builder', 'framework-acceptance')) {
+    if ($contentCheck -notmatch [regex]::Escape($requiredMode)) {
+      throw "Wizard contract surface is missing mode guidance: $requiredMode"
+    }
+  }
 }
 
 if (-not [bool]$wizardContract.discovery.optionalQuestionModules.'source-control') {
@@ -88,7 +118,7 @@ foreach ($requiredStartupText in @('First Response Contract', 'Initial setup', '
   }
 }
 
-foreach ($requiredInitBehavior in @('do not ask for confirmation again', 'Select scenario type before the start path', 'continue the intake in the current conversation', '05-start-wizard.ps1 -Retrofit', '.wizard-metrics/', 'non-destructive')) {
+foreach ($requiredInitBehavior in @('do not ask for confirmation again', 'Select scenario type and wizard mode before the start path', 'continue the intake in the current conversation', '05-start-wizard.ps1 -Mode advanced-builder -Retrofit', '.wizard-metrics/', 'non-destructive')) {
   if ($initSkill -notmatch [regex]::Escape($requiredInitBehavior)) {
     throw "Init skill is missing orchestration behavior: $requiredInitBehavior"
   }

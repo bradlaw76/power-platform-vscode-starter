@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.5.0
+VERSION:      0.6.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-08-09
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
@@ -43,6 +43,7 @@ v0.2.0  2026-08-09  Added profile-driven source-control preflight and planning.
 v0.3.0  2026-08-10  Added standalone model-driven app architecture intake.
 v0.4.0  2026-08-18  Added report scoping, mapping artifact, and critical-table gate.
 v0.5.0  2026-08-18  Added entry-table resolution and landing-view action planning.
+v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -82,6 +83,12 @@ NON-NEGOTIABLES
     discovery, and generates spec.md reflecting what exists plus plan.md for
     remaining work.
 
+.PARAMETER Mode
+    Selects discovery depth. Demo Builder is the seven-prompt default. Advanced
+    Builder exposes technical controls. Framework Acceptance adds explicit
+    environment safety, isolation, rerun, retention, cleanup, and evidence
+    controls.
+
 .PARAMETER AnswersFile
     Optional JSON file containing an ordered array of answers for unattended
     acceptance testing.
@@ -97,12 +104,14 @@ NON-NEGOTIABLES
     pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Force
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Retrofit
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit
 #>
 
 param(
     [switch]$Force,
     [switch]$Retrofit,
+    [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
+    [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
     [string]$WorkspaceRoot
 )
@@ -644,6 +653,7 @@ foreach ($requiredPath in @($contractPath, $onboardingPath, $payloadPath)) {
 
 Write-Host "" 
 Write-Host "=== Power Platform Demo Wizard ===" -ForegroundColor Cyan
+Write-Host "Mode: $Mode" -ForegroundColor Cyan
 
 if ($Retrofit) {
     Write-Host "RETROFIT MODE: Reverse-engineering spec from an existing/in-progress project." -ForegroundColor Yellow
@@ -655,11 +665,112 @@ if ($Retrofit) {
 
 Write-Host ""
 
+if ($Mode -eq 'demo-builder') {
+    $answers = [ordered]@{}
+    $answers["WizardMode"] = $Mode
+
+    Write-Host "Demo Builder asks seven questions, then generates the same planning artifacts used by the shared build pipeline." -ForegroundColor Cyan
+    $scenarioName = Read-RequiredValue "1. Describe the app idea and business outcome"
+    $scenarioSlug = ConvertTo-Slug $scenarioName
+    $primaryUserTask = Read-RequiredValue "2. Who is the primary user, and what is their top task?"
+    $dataToTrack = Read-RequiredValue "3. What business records or data should the app track? (comma-separated)"
+    $experienceAndLifecycle = Read-RequiredValue "4. What should users see or do, including any lifecycle stages?"
+    $successAndData = Read-RequiredValue "5. What makes the demo successful, and should it include synthetic sample data?"
+    $environmentAndOutput = Read-RequiredValue "6. What target environment and solution output do you expect?" "Development environment; unmanaged solution"
+
+    $publisherPrefix = ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Substring(0, [Math]::Min(5, ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Length))
+    $customTables = @(Split-ListValues -Value $dataToTrack)
+    $entryPointDisplayName = if ($customTables.Count -gt 0) { $customTables[0] } else { $scenarioName }
+    $entryPointTable = Convert-ToCustomLogicalName -Name $entryPointDisplayName -Prefix $publisherPrefix
+    $solutionName = [regex]::Replace((Get-Culture).TextInfo.ToTitleCase($scenarioSlug.Replace('-', ' ')), '[^A-Za-z0-9]', '')
+    $needsDemoData = if ($successAndData -match '(?i)\b(no|without)\s+(sample|synthetic|demo)\s+data\b') { 'No' } else { 'Yes' }
+    $solutionType = if ($environmentAndOutput -match '(?i)\bunmanaged\b') { 'Unmanaged' } elseif ($environmentAndOutput -match '(?i)\bmanaged\b') { 'Managed' } else { 'Unmanaged' }
+
+    Write-Host ""
+    Write-Host "Recommended technical design:" -ForegroundColor Cyan
+    Write-Host "  Standalone model-driven app; custom tables; new forms"
+    Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointDisplayName"
+    Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
+    Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
+    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
+    if ($recommendationConfirmation -ne 'yes') {
+        throw "Demo Builder recommendations were not approved. Rerun with -Mode advanced-builder to control the technical design."
+    }
+
+    $answers["ScenarioName"] = $scenarioName
+    $answers["ScenarioSlug"] = $scenarioSlug
+    $answers["ApplicationProfile"] = 'standalone-model-driven'
+    $answers["TableChoice"] = 'custom-only'
+    $answers["FormStrategy"] = 'create-new-forms'
+    $answers["EntryPointTable"] = $entryPointTable
+    $answers["EntryPointLandingView"] = "Active $entryPointDisplayName"
+    $answers["ReviewAppMode"] = 'create-or-update'
+    $answers["ReviewAppArtifacts"] = 'all run-created tables, forms, views, processes, and approved reports'
+    $answers["NavigationGroup"] = 'Operations'
+    $answers["SourceControlBranch"] = $sourceControlBranchPattern.Replace('<scenario-slug>', $scenarioSlug)
+    $answers["SourceControlWorkItem"] = "specs/$scenarioSlug"
+    $answers["SourceControlCheckpoints"] = 'checkpoints'
+    $answers["SourceControlCiChecks"] = 'applicable repo CI tests'
+    $answers["SourceControlPullRequest"] = 'yes'
+    $answers["SourceControlMergeStrategy"] = 'team-default'
+    $answers["AppType"] = $scenarioName
+    $answers["PlatformArea"] = 'Power Apps model-driven app on Dataverse'
+    $answers["TargetAudience"] = $primaryUserTask
+    $answers["BusinessProblem"] = $scenarioName
+    $answers["Users"] = $primaryUserTask
+    $answers["DataEntities"] = $dataToTrack
+    $answers["ArtifactsNeeded"] = $experienceAndLifecycle
+    $answers["SuccessLooksLike"] = $successAndData
+    $answers["BuildEnvironment"] = $environmentAndOutput
+    $answers["NeedsDemoData"] = $needsDemoData
+    $answers["SolutionType"] = $solutionType
+    $answers["SolutionChoice"] = 'new'
+    $answers["SolutionName"] = $solutionName
+    $answers["PrefixChoice"] = 'new'
+    $answers["PublisherPrefix"] = $publisherPrefix
+    $answers["ReviewAppEnabled"] = 'yes'
+    $answers["AppName"] = "$scenarioName Review App"
+    $answers["AppUniqueName"] = "$publisherPrefix`_$($scenarioSlug.Replace('-', '_'))_app".ToLowerInvariant()
+    $answers["StandardTablesReused"] = 'none'
+    $answers["CustomTablesToCreate"] = $dataToTrack
+    $answers["StandardFieldsReused"] = 'none'
+    $answers["CustomFieldsToAdd"] = 'to be refined during planning'
+    $answers["RelationshipsToCreate"] = if ($customTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
+    $answers["IncludeHtmlReports"] = 'no'
+    $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointDisplayName | $successAndData"
+    $answers["UserTaskOwnership"] = "$experienceAndLifecycle | app owner | $successAndData"
+    $answers["RelationshipRequirements"] = if ($customTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
+    $answers["CriticalReportTables"] = 'none'
+    $answers["ReportMappings"] = 'none (reports explicitly disabled during intake)'
+    $answers["ReportScopingStatus"] = 'approved-no-reports'
+    $reportMappingRows = @()
+    $answers["DemoDataScope"] = if ($needsDemoData -eq 'Yes') { 'all-created' } else { 'none' }
+    $answers["DemoDataTables"] = if ($needsDemoData -eq 'Yes') { $dataToTrack } else { 'none' }
+    $answers["DemoDataStandardTableStrategy"] = 'none'
+    $answers["DemoDataRecordCounts"] = if ($needsDemoData -eq 'Yes') { 'small synthetic set; counts to be confirmed during planning' } else { 'none' }
+    $answers["DemoDataScenarios"] = if ($needsDemoData -eq 'Yes') { $successAndData } else { 'none' }
+    $answers["DemoDataHeroRecords"] = 'none'
+    $answers["DemoDataRelationshipDistribution"] = 'none'
+    $answers["DemoDataCreateTasks"] = 'no'
+    $answers["DemoDataTaskParentTables"] = 'none'
+    $answers["DemoDataTaskScope"] = 'none'
+    $answers["DemoDataTaskSourceRecordLimit"] = '0'
+    $answers["DemoDataTaskOrderBy"] = 'none'
+    $answers["DemoDataTasksPerRecord"] = '0'
+    $answers["DemoDataMethod"] = if ($needsDemoData -eq 'Yes') { 'scripted' } else { 'none' }
+    $answers["DemoDataRerunBehavior"] = if ($needsDemoData -eq 'Yes') { 'upsert' } else { 'none' }
+    $answers["DemoDataSourceTag"] = if ($needsDemoData -eq 'Yes') { $scenarioSlug } else { 'none' }
+    $answers["DemoDataPrivacyConstraints"] = if ($needsDemoData -eq 'Yes') { 'synthetic data only; no personal or production data' } else { 'none' }
+    $answers["DemoDataCleanup"] = 'no'
+    $bpf = [ordered]@{ Enabled = $false; BusinessProcessFlowName = ''; PrimaryProcessEntity = ''; FailIfBpfDefinitionIncomplete = $true; PreferUpdateExistingBpf = $true; CrossTableProgression = $false; TargetFormName = ''; StageDefinitions = @() }
+    Test-AndSetEntryPointPlan -Answers $answers -RetrofitMode $false
+} else {
 $scenarioName = Read-RequiredValue "Scenario or app name"
 $scenarioSlugDefault = ConvertTo-Slug $scenarioName
 $scenarioSlug = Read-RequiredValue "Scenario folder slug" $scenarioSlugDefault
 
 $answers = [ordered]@{}
+$answers["WizardMode"] = $Mode
 $answers["ScenarioName"] = $scenarioName
 $answers["ScenarioSlug"] = $scenarioSlug
 
@@ -877,10 +988,17 @@ if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$') {
         $answers["DemoDataTasksPerRecord"] = "0"
     }
     $answers["DemoDataMethod"] = Read-RequiredValue "E-demo-data. Creation method (scripted/manual/import)" "scripted"
-    $answers["DemoDataRerunBehavior"] = Read-RequiredValue "E-demo-data. Rerun behavior (upsert/replace/fail-if-present)" "upsert"
-    $answers["DemoDataSourceTag"] = Read-RequiredValue "E-demo-data. Source tag used to identify wizard-owned records" $scenarioSlug
-    $answers["DemoDataPrivacyConstraints"] = Read-RequiredValue "E-demo-data. Synthetic-data/privacy constraints" "synthetic data only; no personal or production data"
-    $answers["DemoDataCleanup"] = Read-RequiredValue "E-demo-data. Generate cleanup/reset instructions? (yes/no)" "yes"
+    if ($Mode -eq 'framework-acceptance') {
+        $answers["DemoDataRerunBehavior"] = Read-RequiredValue "A-acceptance. Deterministic rerun behavior (upsert/replace/fail-if-present)" "upsert"
+        $answers["DemoDataSourceTag"] = Read-RequiredValue "A-acceptance. Run-specific source tag used to identify acceptance-owned records" $scenarioSlug
+        $answers["DemoDataPrivacyConstraints"] = Read-RequiredValue "A-acceptance. Synthetic-data/privacy constraints" "synthetic data only; no personal or production data"
+        $answers["DemoDataCleanup"] = Read-RequiredValue "A-acceptance. Generate cleanup/reset instructions? (yes/no)" "no"
+    } else {
+        $answers["DemoDataRerunBehavior"] = 'upsert'
+        $answers["DemoDataSourceTag"] = $scenarioSlug
+        $answers["DemoDataPrivacyConstraints"] = 'synthetic data only; no personal or production data'
+        $answers["DemoDataCleanup"] = 'no'
+    }
 } else {
     $answers["DemoDataScope"] = "none"
     $answers["DemoDataTables"] = "none"
@@ -900,6 +1018,32 @@ if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$') {
     $answers["DemoDataSourceTag"] = "none"
     $answers["DemoDataPrivacyConstraints"] = "none"
     $answers["DemoDataCleanup"] = "no"
+}
+}
+
+if ($Mode -eq 'framework-acceptance') {
+    Write-Host ""
+    Write-Host "Framework Acceptance controls (explicit mode only):" -ForegroundColor Cyan
+    $answers["AcceptanceEnvironmentAuthorization"] = Read-ChoiceValue -Prompt "A-acceptance. Is this environment explicitly authorized for framework acceptance?" -AllowedValues @('yes', 'no') -Default 'no'
+    if ($answers["AcceptanceEnvironmentAuthorization"] -ne 'yes') {
+        throw 'Framework Acceptance requires an explicitly authorized environment.'
+    }
+    $answers["AcceptanceIsolationName"] = Read-RequiredValue "A-acceptance. Timestamped acceptance-only solution name" $answers["SolutionName"]
+    $answers["AcceptancePublisherPrefix"] = Read-RequiredValue "A-acceptance. Acceptance publisher prefix" $answers["PublisherPrefix"]
+    $answers["AcceptanceHeroRecordLabels"] = Read-RequiredValue "A-acceptance. Hero record labels and purposes" $answers["DemoDataHeroRecords"]
+    $answers["AcceptanceRerunProof"] = Read-RequiredValue "A-acceptance. Evidence that a second run is deterministic and idempotent"
+    $answers["AcceptanceRetentionPolicy"] = Read-ChoiceValue -Prompt "A-acceptance. Retain acceptance artifacts after verification?" -AllowedValues @('retain', 'remove-after-approval') -Default 'retain'
+    $answers["AcceptanceCleanupApproval"] = Read-ChoiceValue -Prompt "A-acceptance. Is destructive cleanup separately approved for this run?" -AllowedValues @('yes', 'no') -Default 'no'
+    $answers["AcceptanceEvidencePlan"] = Read-RequiredValue "A-acceptance. Evidence to capture for lifecycle, availability, relationships, app navigation, and rerun checks"
+} else {
+    $answers["AcceptanceEnvironmentAuthorization"] = 'not applicable'
+    $answers["AcceptanceIsolationName"] = 'not applicable'
+    $answers["AcceptancePublisherPrefix"] = 'not applicable'
+    $answers["AcceptanceHeroRecordLabels"] = 'not applicable'
+    $answers["AcceptanceRerunProof"] = 'not applicable'
+    $answers["AcceptanceRetentionPolicy"] = 'not applicable'
+    $answers["AcceptanceCleanupApproval"] = 'not applicable'
+    $answers["AcceptanceEvidencePlan"] = 'not applicable'
 }
 
 $answers["EnableBusinessProcessFlow"] = if ($bpf.Enabled) { "yes" } else { "no" }
@@ -1068,6 +1212,7 @@ $answersContent = @"
 ## Contract
 - Contract: docs/wizard-contract-v1.md
 - Profile: wizard.profile.json
+- Wizard mode: $($answers["WizardMode"])
 
 ## Scenario
 - Name: $($answers["ScenarioName"])
@@ -1083,6 +1228,16 @@ $answersContent = @"
 - Landing View Plan: $($answers["EntryPointLandingViewPlan"])
 - Review App Mode: $($answers["ReviewAppMode"])
 - Required App Artifacts: $($answers["ReviewAppArtifacts"])
+
+## Framework Acceptance Controls
+- Environment authorized: $($answers["AcceptanceEnvironmentAuthorization"])
+- Isolated solution name: $($answers["AcceptanceIsolationName"])
+- Publisher prefix: $($answers["AcceptancePublisherPrefix"])
+- Hero record labels: $($answers["AcceptanceHeroRecordLabels"])
+- Rerun evidence: $($answers["AcceptanceRerunProof"])
+- Retention policy: $($answers["AcceptanceRetentionPolicy"])
+- Destructive cleanup separately approved: $($answers["AcceptanceCleanupApproval"])
+- Evidence plan: $($answers["AcceptanceEvidencePlan"])
 
 ## App Module
 - Enabled: $($answers["ReviewAppEnabled"])
@@ -1187,6 +1342,7 @@ $specContent = @"
 $($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["PlatformArea"]).
 
 ## Application Architecture
+- Wizard mode: $($answers["WizardMode"])
 - Profile: $($answers["ApplicationProfile"])
 - Table strategy: $($answers["TableChoice"])
 - Form strategy: $($answers["FormStrategy"])
@@ -1310,6 +1466,7 @@ $planContent = @"
 # plan.md$retrofitPlanLabel
 
 ## Build Approach
+- Wizard mode: $($answers["WizardMode"])
 - Application profile: $($answers["ApplicationProfile"])
 - Platform area: $($answers["PlatformArea"])
 - Environment: $($answers["BuildEnvironment"])
@@ -1447,6 +1604,7 @@ $tasksContent = @"
 ## Ordered Tasks
 
 - [ ] Review 'answers.md' with stakeholder
+- [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
 - [ ] Confirm application profile '$($answers["ApplicationProfile"])' and architecture intent
 - [ ] Confirm entry point '$($answers["EntryPointTable"])' opens with '$($answers["EntryPointLandingView"])'
 - [ ] Execute landing-view action '$($answers["EntryPointLandingViewPlan"])' for '$($answers["EntryPointLandingView"])' on '$($answers["EntryPointTable"])' before app assembly

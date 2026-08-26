@@ -4,6 +4,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $sourceScript = Join-Path $repoRoot 'scripts/bootstrap/60-build-forms-views.ps1'
 $sourceTelemetryHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-telemetry.ps1'
+$sourceHardeningHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-hardening.ps1'
 
 function New-TestRepo {
   $path = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-form-tests-" + [guid]::NewGuid().ToString('N'))
@@ -11,6 +12,7 @@ function New-TestRepo {
   New-Item -ItemType Directory -Path (Join-Path $path 'payloads') -Force | Out-Null
   Copy-Item -Path $sourceScript -Destination (Join-Path $path 'scripts/bootstrap/60-build-forms-views.ps1') -Force
   Copy-Item -Path $sourceTelemetryHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-telemetry.ps1') -Force
+  Copy-Item -Path $sourceHardeningHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Force
   return $path
 }
 
@@ -55,12 +57,13 @@ function Write-TestScenario {
     [string]$RepoPath,
     [string]$ScenarioSlug,
     [string]$SpecContent,
+    [string]$AnswersContent = 'placeholder answers',
     [string]$PlanContent = ''
   )
 
   $scenarioRoot = Join-Path $RepoPath "specs/$ScenarioSlug"
   New-Item -ItemType Directory -Path $scenarioRoot -Force | Out-Null
-  'placeholder answers' | Set-Content -Path (Join-Path $scenarioRoot 'answers.md') -Encoding UTF8
+  $AnswersContent | Set-Content -Path (Join-Path $scenarioRoot 'answers.md') -Encoding UTF8
   $SpecContent | Set-Content -Path (Join-Path $scenarioRoot 'spec.md') -Encoding UTF8
   $PlanContent | Set-Content -Path (Join-Path $scenarioRoot 'plan.md') -Encoding UTF8
 }
@@ -262,7 +265,27 @@ try {
     [pscustomobject]@{ LogicalName = 'tst_category'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Category' }) } },
     [pscustomobject]@{ LogicalName = 'ownerid'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Owner' }) } }
   )
-  Write-TestScenario -RepoPath $richRepo -ScenarioSlug 'case-scenario' -SpecContent @"
+  Write-TestScenario -RepoPath $richRepo -ScenarioSlug 'case-scenario' -AnswersContent @"
+# Discovery Answers
+
+## Scenario
+- Name: Case Scenario
+
+## Application Profile
+- Profile: standalone-model-driven
+- Table Strategy: custom-only
+- Form Strategy: create-new-forms
+- Entry Point Table: tst_case
+- Landing View: Active Cases
+- Review App Mode: create-or-update
+- Required App Artifacts: all run-created tables, forms, and views
+
+## App Module
+- Enabled: yes
+- App Name: Case Scenario Review App
+- Unique Name: tst_case_scenario_app
+- Navigation Group: Operations
+"@ -SpecContent @"
 # spec.md
 
 ## Required Experience and Artifacts
@@ -284,10 +307,11 @@ try {
 
   . (Join-Path $richRepo 'scripts/bootstrap/60-build-forms-views.ps1')
 
-  $firstRunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $richRepo 'payloads') -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $true -IncludeOwnerInViews $true -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
+  $firstRunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $richRepo 'payloads') -ScenarioSlug 'case-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $true -IncludeOwnerInViews $true -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($firstRunExitCode -eq 0) -Message 'Expected populated form scenario to succeed.'
   Assert-Condition -Condition ($script:MockContext.Forms.Count -eq 1) -Message 'Expected one Main form to be created.'
   Assert-Condition -Condition ($script:MockContext.Views.Count -eq 1) -Message 'Expected one working view to be created.'
+  Assert-Condition -Condition ($script:MockContext.Views[0].name -eq 'Active Cases') -Message 'Expected the entry table to use its configured landing-view name.'
 
   $createdFields = @(Get-FormFieldNames -FormXml $script:MockContext.Forms[0].formxml)
   foreach ($expectedField in @('tst_name', 'tst_description', 'tst_priority', 'tst_category', 'tst_region', 'ownerid')) {
@@ -306,7 +330,7 @@ try {
   $viewPostCountAfterFirstRun = @($script:MockContext.Requests | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'savedqueries' }).Count
   $viewPatchCountAfterFirstRun = @($script:MockContext.Requests | Where-Object { $_.Method -eq 'Patch' -and $_.Path -like 'savedqueries(*' }).Count
 
-  $secondRunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $richRepo 'payloads') -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $true -IncludeOwnerInViews $true -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
+  $secondRunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $richRepo 'payloads') -ScenarioSlug 'case-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $true -IncludeOwnerInViews $true -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($secondRunExitCode -eq 0) -Message 'Expected rerun to remain successful.'
 
   $formPostCountAfterSecondRun = @($script:MockContext.Requests | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'systemforms' }).Count

@@ -1530,16 +1530,17 @@ function Invoke-WizardFormsViewsBuild {
   }
 
   $scenarioContext = Get-ScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
+  $appConfig = $null
+  if ($null -ne $scenarioContext -and (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue)) {
+    try {
+      $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+    } catch {}
+  }
   $resolvedFormStrategy = $FormStrategy
   if ($resolvedFormStrategy -eq 'auto') {
     $resolvedFormStrategy = 'legacy'
-    if ($null -ne $scenarioContext -and (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue)) {
-      try {
-        $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
-        if (@('create-new-forms', 'update-in-place') -contains $appConfig.FormStrategy) {
-          $resolvedFormStrategy = $appConfig.FormStrategy
-        }
-      } catch {}
+    if ($null -ne $appConfig -and @('create-new-forms', 'update-in-place') -contains $appConfig.FormStrategy) {
+      $resolvedFormStrategy = $appConfig.FormStrategy
     }
   }
   if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
@@ -1715,7 +1716,11 @@ function Invoke-WizardFormsViewsBuild {
       $desiredViewFields = @($viewSelection.Fields)
       $viewSkippedFields = @($viewSelection.SkippedFields)
       $missingExpectedViewFields = @($viewSelection.MissingExpectedFields)
-      $viewName = 'Active Records'
+      $viewName = if (
+        $null -ne $appConfig -and
+        $logical -eq $appConfig.EntryPointTable -and
+        -not [string]::IsNullOrWhiteSpace($appConfig.LandingView)
+      ) { $appConfig.LandingView } else { 'Active Records' }
 
       $existingViews = @((Invoke-Dv -Method 'Get' -Path "savedqueries?`$select=savedqueryid,name,layoutxml,fetchxml,description&`$filter=returnedtypecode eq '$logical' and querytype eq 0").value)
       $targetView = $existingViews | Where-Object { $_.name -eq $viewName } | Select-Object -First 1

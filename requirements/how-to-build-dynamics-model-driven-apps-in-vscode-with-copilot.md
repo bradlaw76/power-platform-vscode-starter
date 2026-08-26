@@ -48,9 +48,11 @@ Validation checkpoints:
 - Stop if any step fails; fix before continuing.
 - Do not skip planning artifacts.
 
-### 0B. Wizard discovery questions (11 required + extension blocks)
+### 0B. Wizard discovery modes
 
-Answer these before writing or changing metadata:
+Use `demo-builder` by default: ask six business questions plus one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
+
+Advanced Builder questions:
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -72,7 +74,7 @@ Optional extension blocks (profile-driven):
 - retrofit (current-state and remaining-work intake)
 - source-control (target-repository preflight, scenario branch, traceability, checkpoint commits, discovered validation/CI, PR handoff, and merge strategy)
 - user-tasks (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
-- demo-data (conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision)
+- demo-data (conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; rerun/source-tag/retention/cleanup controls are Framework Acceptance only)
 
 The source-control block applies throughout whatever app or demo the end user is creating. Use `requirements/GithubInstructions_General.md` as the engineering standard. Inspect the target repository before implementation, record the plan in scenario artifacts, commit only coherent validated checkpoints, and reserve approved push/PR verification for handoff.
 

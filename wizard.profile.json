@@ -1,6 +1,6 @@
 {
-  "profileVersion": "1.1",
-  "contractVersion": "1.4.0",
+  "profileVersion": "1.2",
+  "contractVersion": "1.5.0",
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -9,10 +9,108 @@
     "generic-dataverse-solution"
   ],
   "discovery": {
-    "requiredQuestions": 18,
+    "defaultMode": "demo-builder",
+    "requiredQuestions": 6,
     "coreQuestions": 11,
     "architectureIntakeQuestions": 7,
-    "architectureIntakeRequired": true,
+    "architectureIntakeRequired": false,
+    "modes": {
+      "demo-builder": {
+        "default": true,
+        "explicitSelectionRequired": false,
+        "questionBudget": 6,
+        "questions": [
+          "idea-and-business-outcome",
+          "primary-user-and-top-task",
+          "data-to-track",
+          "experience-and-lifecycle",
+          "demo-success-and-sample-data",
+          "target-environment-and-solution-output"
+        ],
+        "inferTechnicalDesign": true,
+        "consolidatedRecommendationConfirmation": true,
+        "controls": [
+          "application-profile-recommendation",
+          "table-and-form-strategy-recommendation",
+          "entry-point-and-landing-view-recommendation",
+          "review-app-and-navigation-recommendation",
+          "relationship-and-report-recommendation",
+          "solution-identity-recommendation"
+        ],
+        "forbiddenPrompts": [
+          "disposable-environment-confirmation",
+          "destructive-cleanup-approval",
+          "retention-policy",
+          "rerun-proof-engineering",
+          "acceptance-run-source-tag"
+        ]
+      },
+      "advanced-builder": {
+        "default": false,
+        "explicitSelectionRequired": true,
+        "questionBudget": 40,
+        "questions": [
+          "core-discovery",
+          "architecture-intent",
+          "entity-mapping",
+          "user-tasks",
+          "relationship-design",
+          "report-scoping",
+          "demo-data-design",
+          "source-control"
+        ],
+        "inferTechnicalDesign": false,
+        "consolidatedRecommendationConfirmation": false,
+        "controls": [
+          "application-profile",
+          "table-strategy",
+          "form-strategy",
+          "entry-point-table",
+          "named-landing-view",
+          "review-app-artifacts",
+          "navigation-group",
+          "solution-and-publisher-identity",
+          "relationship-cardinality-requiredness-and-cascade",
+          "report-mappings",
+          "demo-data-scope"
+        ],
+        "forbiddenPrompts": [
+          "disposable-environment-confirmation",
+          "destructive-cleanup-approval",
+          "retention-policy",
+          "rerun-proof-engineering"
+        ]
+      },
+      "framework-acceptance": {
+        "default": false,
+        "explicitSelectionRequired": true,
+        "questionBudget": 48,
+        "questions": [
+          "advanced-builder-intake",
+          "authorized-environment",
+          "isolation-and-naming",
+          "acceptance-data-and-hero-records",
+          "idempotent-rerun-proof",
+          "retention-and-cleanup",
+          "acceptance-evidence"
+        ],
+        "inferTechnicalDesign": false,
+        "consolidatedRecommendationConfirmation": false,
+        "controls": [
+          "all-advanced-builder-controls",
+          "disposable-environment-confirmation",
+          "timestamped-solution-name",
+          "acceptance-publisher-prefix",
+          "acceptance-run-source-tag",
+          "hero-record-labels",
+          "rerun-proof-engineering",
+          "retention-policy",
+          "destructive-cleanup-approval",
+          "acceptance-evidence-plan"
+        ],
+        "forbiddenPrompts": []
+      }
+    },
     "optionalQuestionModules": {
       "business-process-flow": true,
       "table-strategy": true,

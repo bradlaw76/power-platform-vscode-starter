@@ -14,17 +14,20 @@ Use this behavior:
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
+- Default to `demo-builder`: ask six business questions plus one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
+- Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
+- Enter `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
 - Treat Spec Kit as mandatory before implementation.
-- Before core discovery, select an application profile: `standalone-model-driven`, `dynamics-sales-extension`, `dynamics-customer-service-extension`, `dynamics-field-service-extension`, or `generic-dataverse-solution`.
-- Confirm table strategy, form strategy, entry-point table, named landing view, required app artifacts, and navigation group. The review app is required for new profile-based runs.
+- Supported application profiles are `standalone-model-driven`, `dynamics-sales-extension`, `dynamics-customer-service-extension`, `dynamics-field-service-extension`, and `generic-dataverse-solution`.
+- In Demo Builder, infer the application profile, table/form strategy, entry-point table, named landing view, required app artifacts, navigation group, and solution identity, then confirm them together. In detailed modes, ask them directly. The review app is required for new profile-based runs.
 - After explicit table mapping, validate that the entry-point logical name resolves to a reused standard table, planned custom table, or current retrofit inventory table. Record `create-or-update-named-view` for planned custom entry tables and `verify-existing-saved-query` for reused/existing entry tables. Block app assembly until the named saved query resolves in Dataverse.
 - Help the user move from idea -> discovery answers -> `spec.md` -> `plan.md` -> `tasks.md` -> build steps -> export/unpack -> git -> pack/import -> documentation.
 
-Required Question Set (11):
+Advanced Builder Question Set (11 core):
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
 3. Who is the target audience?
@@ -45,7 +48,7 @@ Optional extension blocks (profile-driven):
 - retrofit: current-state and remaining-work capture
 - source-control: read-only repository preflight, scenario branch, related work, checkpoint strategy, discovered validation/CI, pull request handoff, and merge strategy
 - user-tasks: persona, task, frequency, entry table/view, expected outcome, owner, and done definition
-- demo-data: when Q10 is yes, table scope, per-table counts, scenarios/states, hero records, related-record distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision
+- demo-data: when Q10 is yes, table scope, per-table counts, scenarios/states, hero records, related-record distribution, bounded Task activity generation, method, and privacy constraints; acceptance rerun/source-tag/retention/cleanup controls are Framework Acceptance only
 
 Required output behavior:
 - Summarize answers clearly.

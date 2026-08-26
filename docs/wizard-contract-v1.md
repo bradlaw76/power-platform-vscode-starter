@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.4.0
+Version: 1.5.0
 
 ## Purpose
 
@@ -14,8 +14,8 @@ All wizard entry points must follow this contract:
 
 ## Canonical Flow
 
-1. Architecture intent (required, before any other step)
-2. Discovery (required questions)
+1. Wizard mode selection (`demo-builder` by default)
+2. Mode-specific discovery and technical-design confirmation
 3. Optional extension blocks (selected by profile)
 4. Source-control plan for the app or demo being created
 5. Spec Kit planning gate (`spec.md`, `plan.md`, `tasks.md`)
@@ -26,7 +26,33 @@ All wizard entry points must follow this contract:
 10. Optional execution modules
 11. Validation, push verification, pull request preparation, and handoff
 
-## Architecture Intent Contract (Always First)
+## Wizard Mode Contract
+
+Every entry point supports exactly three modes. Mode selection changes discovery depth, not planning artifacts or execution modules.
+
+### Demo Builder (default)
+
+- Uses six business questions plus one consolidated recommendation confirmation.
+- Asks about the idea/outcome, primary user/task, data, experience/lifecycle, demo success/sample data, and target environment/output.
+- Infers the application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, solution name, and publisher prefix.
+- Shows those technical recommendations together for approval before writing planning artifacts.
+- Must not ask about disposable environments, destructive cleanup, retention policy, rerun-proof engineering, or acceptance-run source tags.
+
+### Advanced Builder (explicit)
+
+- Exposes the complete core discovery, architecture intent, entity mapping, user-task, relationship, report, demo-data, solution identity, and source-control controls.
+- Must not ask about disposable environments, destructive cleanup, retention policy, or framework rerun-proof evidence.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder`.
+
+### Framework Acceptance (explicit only)
+
+- Includes Advanced Builder controls plus authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved destructive cleanup, and an evidence plan.
+- Never select this mode implicitly from an app idea or environment name.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`.
+
+All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
+
+## Architecture Intent Contract
 
 First select one supported application profile:
 
@@ -36,7 +62,7 @@ First select one supported application profile:
 - `dynamics-field-service-extension`
 - `generic-dataverse-solution`
 
-Before any build recommendation, confirm all five architecture intent questions:
+Before any build recommendation, either confirm all five architecture intent questions directly in Advanced Builder or Framework Acceptance, or approve the consolidated inferred recommendation in Demo Builder:
 
 1. Is the implementation **OOB extension only**, **custom tables only**, or **hybrid**?
 2. If OOB extension: should forms be **updated in place** or **cloned as new business forms**?
@@ -44,13 +70,13 @@ Before any build recommendation, confirm all five architecture intent questions:
 4. What is the **default landing view** for that entry-point table?
 5. Which artifacts must the required auto-created or updated **model-driven review app** surface?
 
-Do not proceed to discovery or build until all five are confirmed.
+Do not proceed to build until architecture intent is captured in the planning artifacts and approved.
 
 After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. The landing view must have an explicit action: create or update the named view for a planned custom table, or verify the existing saved query for reused/existing tables. App assembly remains blocked until the named saved query resolves in Dataverse.
 
 ## Discovery Contract
 
-### Required Question Set (11 core + 7 architecture intake)
+### Advanced Question Set (11 core + architecture intake)
 
 Core questions (1–11):
 1. What type of demo or app are you building?
@@ -83,7 +109,7 @@ Architecture intake questions (12–18):
 - `retrofit`: current-state and remaining-work intake for in-progress projects
 - `source-control`: target-repository preflight, scenario branch, work-item traceability, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy
 - `user-tasks`: persona, task, frequency, entry table/view, expected outcome, owner, and done definition
-- `demo-data`: conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup decision
+- `demo-data`: conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; Framework Acceptance adds rerun evidence, source tags, retention, and cleanup approval
 
 Relationship planning must identify the referencing and referenced tables, cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface supported by each relationship.
 
@@ -114,15 +140,15 @@ Required artifacts:
 - `demo-data-plan.json` when demo data is enabled
 
 Required gate before execution:
-- All 18 discovery questions answered
-- Architecture intent confirmed
+- The selected mode's discovery and confirmation contract is complete
+- Architecture intent is directly confirmed or its consolidated Demo Builder recommendation is approved
 - Entry-point table resolved against the explicit table plan, with an approved landing-view create-or-verify action
 - Selected extension blocks completed
 - Source-control plan completed when the profile enables it
 - User tasks include owners and done definitions when the profile enables them
 - Relationship decisions are complete for every planned relationship
 - Report scoping is approved. When reports are enabled, every critical or high-frequency table has a mapping with type, placement, required fields, supported decision, owner, and validation checklist. When reports are disabled, that no-report decision is explicit.
-- When demo data is enabled, table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, rerun behavior, source tag, privacy constraints, and cleanup decision are approved
+- When demo data is enabled, table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, and privacy constraints are approved. Acceptance-only rerun, retention, source-tag, and cleanup engineering is required only in Framework Acceptance mode.
 - Spec Kit artifacts approved
 - No conflict between generated guidance and these docs (resolve toward internal docs or report conflict):
   - `README.md`

@@ -63,6 +63,28 @@ function Test-RequiredPath {
     }
 }
 
+if ($wizardProfile.discovery.defaultMode -ne 'demo-builder') {
+    Add-ContractFailure 'wizard.profile.json must default to demo-builder.'
+}
+
+$wizardModeNames = @($wizardProfile.discovery.modes.PSObject.Properties.Name)
+foreach ($requiredMode in @('demo-builder', 'advanced-builder', 'framework-acceptance')) {
+    if ($wizardModeNames -notcontains $requiredMode) {
+        Add-ContractFailure "wizard.profile.json is missing mode '$requiredMode'."
+    }
+}
+
+if (-not [bool]$wizardProfile.discovery.modes.'framework-acceptance'.explicitSelectionRequired) {
+    Add-ContractFailure 'Framework Acceptance must require explicit selection.'
+}
+
+$wizardScriptPath = Join-Path $bootstrapFolder '05-start-wizard.ps1'
+$wizardScriptText = Get-Content -LiteralPath $wizardScriptPath -Raw
+if ($wizardScriptText -notmatch "\[string\]\`$Mode\s*=\s*'demo-builder'" -or
+    $wizardScriptText -notmatch "ValidateSet\('demo-builder',\s*'advanced-builder',\s*'framework-acceptance'\)") {
+    Add-ContractFailure '05-start-wizard.ps1 must expose the three modes and default to demo-builder.'
+}
+
 foreach ($folderProperty in @('payloadFolder', 'scenarioFolder', 'bootstrapFolder')) {
     $relativeFolder = "$($wizardProfile.conventions.$folderProperty)"
     Test-RequiredPath -RelativePath $relativeFolder -Description "Configured $folderProperty folder"

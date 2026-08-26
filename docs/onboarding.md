@@ -286,7 +286,7 @@ Validation checkpoint:
 
 ## Step 7: Run Discovery Questions (Wizard Intake)
 
-Before building anything, select an application profile and confirm architecture intent. This happens before the **11 required** core questions and becomes part of your requirement source.
+Before building anything, choose the discovery depth. The default is intentionally concise; all modes still capture or confirm architecture intent and create the same planning files.
 
 Canonical contract sources:
 
@@ -301,7 +301,15 @@ Supported application profiles:
 - `dynamics-field-service-extension`
 - `generic-dataverse-solution`
 
-For the selected profile, confirm the OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, required review-app artifacts, and navigation group. New profile-based runs always create or update the review app. The app sitemap puts the entry table first and the requested view is attached to the app; this does not alter an environment-wide default view.
+### Demo Builder (default)
+
+The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
+
+Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
+
+### Advanced Builder (explicit)
+
+Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder` when you need direct technical control. The following 11 core questions and architecture/mapping extensions apply in this mode:
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -315,6 +323,12 @@ For the selected profile, confirm the OOB/custom/hybrid table strategy, form str
 10. Does it need demo data?
 11. Should the output be a managed or unmanaged solution?
 
+### Framework Acceptance (explicit only)
+
+Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance` only for framework engineering. It adds authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an evidence plan. Never infer this mode from an app idea or environment name.
+
+All modes write compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline. New profile-based runs always create or update the review app. The app sitemap puts the entry table first and attaches the requested view without changing an environment-wide default view.
+
 Then complete optional extension blocks based on profile and project needs:
 
 - `table-strategy` (standard/custom strategy)
@@ -324,11 +338,11 @@ Then complete optional extension blocks based on profile and project needs:
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
 - `user-tasks` (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
-- `demo-data` (when enabled: all-created or selected table scope, resolved tables, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision)
+- `demo-data` (when enabled: all-created or selected table scope, resolved tables, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; rerun/source-tag/retention/cleanup engineering is Framework Acceptance only)
 
 Validation checkpoint:
 
-- All 11 required questions are answered and reviewed by the demo/app owner.
+- The selected mode's intake is complete and reviewed by the demo/app owner; Demo Builder stays within seven prompts, while Advanced Builder uses the 11 core questions and technical extensions.
 - Selected extension blocks are complete.
 - For table-strategy, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
 - Add an explicit entity mapping block before payload work:
@@ -344,7 +358,7 @@ Validation checkpoint:
 - Capture top user tasks with named owners and done definitions before designing forms, views, navigation, or automation.
 - If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.
 - If Task activities are enabled, approve parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not target every record unless `all` is explicitly approved.
-- Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, relationship distribution, idempotent rerun, source-tagging, and cleanup decisions.
+- Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, and relationship distribution. In Framework Acceptance, also confirm idempotent rerun, source-tagging, retention, and cleanup decisions.
 - Confirm `report-mappings.md` exists. If reports are enabled, every critical or high-frequency table must have an approved mapping; if reports are disabled, the artifact must record that explicit decision.
 - Demo-data intake is planning-only; no Dataverse rows are created by `05-start-wizard.ps1`.
 - Review `requirements/GithubInstructions_General.md` and record how source control will support the app or demo being created.

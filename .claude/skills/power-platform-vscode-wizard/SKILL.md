@@ -44,9 +44,17 @@ Reverse-engineer the discovery answers:
 
 This keeps Spec Kit relevant for brownfield projects, not just greenfield builds.
 
-## Discovery Questions (Run First)
+## Wizard Modes (Select First)
 
-Ask and capture all base discovery questions, then complete explicit entity mapping before any build work:
+- `demo-builder` is the default. Ask six business questions plus one consolidated recommendation confirmation. Infer technical design and do not ask disposable-environment, destructive-cleanup, retention, acceptance-source-tag, or rerun-proof questions.
+- `advanced-builder` requires explicit selection. Expose application profile, table strategy, form strategy, entry point, landing view, entity mapping, user tasks, relationships, reporting, demo data, solution identity, and source-control controls. Do not ask framework-acceptance or cleanup questions.
+- `framework-acceptance` requires explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an acceptance evidence plan.
+
+All modes generate compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline.
+
+## Advanced Discovery Questions
+
+In Advanced Builder and Framework Acceptance, ask and capture all base discovery questions, then complete explicit entity mapping before any build work:
 
 1. What type of demo or app are you building?
 2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
@@ -71,11 +79,11 @@ Ask and capture all base discovery questions, then complete explicit entity mapp
 
 If question 19 is yes, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. If question 19 is no, preserve that explicit no-report decision in `report-mappings.md`.
 
-After entity mapping, also capture:
+After entity mapping in the detailed modes, also capture:
 - Validate the primary entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Record a landing-view action (`create-or-update-named-view` or `verify-existing-saved-query`) and require authenticated saved-query resolution before app assembly.
 - Top user tasks: persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
 - Relationship decisions: cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
-- When demo data is enabled: all-created vs selected table scope, resolved tables, per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, rerun behavior, source tag, synthetic-data/privacy constraints, and cleanup/reset decision.
+- When demo data is enabled: all-created vs selected table scope, resolved tables, per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, and synthetic-data/privacy constraints. Capture rerun evidence, acceptance source tags, retention, and cleanup only in Framework Acceptance.
 - If Dataverse Task activities are requested: eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never target every record unless the user explicitly selects all.
 
 Generate `demo-data-plan.json` for approved demo-data planning. This does not authorize or execute Dataverse row creation.
@@ -91,7 +99,7 @@ Follow this exact sequence — do not skip validation checkpoints:
 | Step | Action | Validation |
 |------|--------|------------|
 | 0 | Clone repo, open in VS Code, install extensions | Extensions installed via `@recommended` |
-| 1 | Start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose chat or terminal intake; direct terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Discovery answers and source-control plan captured |
+| 1 | Start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose mode and chat or terminal intake; default terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Mode-specific discovery and source-control plan captured |
 | 2 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
 | 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | `demo-script.md` exists and matches the scenario story |
 | 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` | `demo-dry-run.md` captures rehearsal notes |

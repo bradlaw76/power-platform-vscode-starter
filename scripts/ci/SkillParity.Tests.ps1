@@ -102,6 +102,22 @@ Describe 'Copilot and Claude wizard skill parity' {
         $skillContent[$Skill] | Should -Match 'EnforceExportGate'
     }
 
+    It '<Skill> implements the three-mode discovery contract' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match 'demo-builder'
+        $skillContent[$Skill] | Should -Match 'advanced-builder'
+        $skillContent[$Skill] | Should -Match 'framework-acceptance'
+        $skillContent[$Skill] | Should -Match '(?i)six business questions plus one consolidated'
+        $skillContent[$Skill] | Should -Match '(?i)table.{0,24}strategy'
+        $skillContent[$Skill] | Should -Match '(?i)form.{0,24}strategy'
+        $skillContent[$Skill] | Should -Match '(?i)environment.{0,30}authoriz|authoriz.{0,30}environment'
+        $skillContent[$Skill] | Should -Match '(?i)retention'
+        $skillContent[$Skill] | Should -Match '(?i)separately approved cleanup'
+        $skillContent[$Skill] | Should -Match '(?i)same.{0,20}pipeline|shared.{0,20}(execution|pipeline)'
+    }
+
     It '<Skill> covers required stage <Stage>' -ForEach @(
         $stagePatterns = [ordered]@{
             'discovery'               = '(?i)discovery'

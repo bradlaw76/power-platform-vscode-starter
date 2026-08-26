@@ -1,7 +1,7 @@
 ---
 name: power-platform-wizard-init
 description: 'Use when: starting the Power Platform VS Code wizard, kicking off discovery/planning, choosing chat or terminal start path, or monitoring wizard run progress from telemetry. Supports greenfield and retrofit flows without changing core bootstrap scripts.'
-argument-hint: 'Optional: path=chat|terminal type=greenfield|retrofit scenario=<slug>'
+argument-hint: 'Optional: mode=demo-builder|advanced-builder|framework-acceptance path=chat|terminal type=greenfield|retrofit scenario=<slug>'
 ---
 
 # Power Platform Wizard Init
@@ -21,7 +21,7 @@ Before intake, inspect the target repository without modifying it. Report presen
 ## What This Produces
 
 - A selected start path (chat or terminal)
-- Completed discovery intake (including architecture intent)
+- A selected wizard mode and its completed discovery/confirmation contract
 - Planning gate status for `spec.md`, `plan.md`, and `tasks.md`
 - A progress snapshot (current step, last completed step, failure if present)
 - The exact next safe action
@@ -65,19 +65,24 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Run a read-only preflight for repository root, remote, current/default branch, working-tree state, recent history, existing tooling, and applicable validation commands.
 - Do not create a branch, stage files, commit, or push during intake.
 
-2. Select scenario type before the start path
+2. Select scenario type and wizard mode before the start path
 - Greenfield: define scope, mappings, and target solution identity.
 - Retrofit: inventory what already exists first, then define only remaining work.
+- Default to `demo-builder`. Use `advanced-builder` or `framework-acceptance` only after explicit selection.
 
 3. Select the start path
 - Chat path: continue the intake in the current conversation. Do not invoke `/power-platform-demo-wizard` and restart setup.
-- Greenfield terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1`
-- Retrofit terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Retrofit`
+- Demo Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1`
+- Advanced Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder`
+- Framework Acceptance terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`
+- Retrofit terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit`
 
-4. Run intake in sequence (do not skip)
-- Select the application profile first: standalone model-driven, Dynamics Sales extension, Dynamics Customer Service extension, Dynamics Field Service extension, or generic Dataverse solution.
-- Required discovery questions (11) from the repo onboarding contract.
-- Architecture intent questions (5):
+4. Run the selected mode's intake (do not mix modes)
+- Demo Builder asks six business questions plus one consolidated technical recommendation confirmation. Infer application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, and solution identity. Do not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
+- Advanced Builder asks the 11 core questions and exposes architecture controls directly. Do not ask framework-acceptance or cleanup questions.
+- Framework Acceptance includes Advanced Builder plus explicit environment authorization, isolated timestamped names, acceptance source tags/hero labels, deterministic rerun evidence, retention, separately approved cleanup, and evidence capture.
+- All three modes emit compatible planning artifacts for the same shared build pipeline.
+- Architecture intent captured directly or confirmed from Demo Builder recommendations includes:
   - OOB extension only, custom tables only, or hybrid?
   - If OOB extension: update forms in place or clone new business forms?
   - Required primary entry-point table?
@@ -85,11 +90,11 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   - Which artifacts must the required auto-created or updated model-driven review app surface?
 - After explicit table mapping, resolve the entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Record whether the named landing view must be created/updated or verified as an existing saved query. Do not proceed to app assembly until Dataverse resolves that view.
 
-5. Capture task, relationship, report, and demo-data planning
+5. Capture task, relationship, report, and demo-data planning at the selected mode's depth
 - Record top user tasks as persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
 - For each relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
 - Generate `report-mappings.md` for every run. If reports are enabled, capture critical/high-frequency tables and one mapping per report with table logical name, surface, form/dashboard/view type, placement, required fields, supported decision, owner, and validation checklist. Block progression when a critical table has no mapping. If reports are disabled, record that explicit decision.
-- If demo data is enabled, choose all scenario-created custom tables or selected tables, confirm the resolved tables, and capture per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, rerun behavior, source tag, privacy constraints, and cleanup/reset decision.
+- If demo data is enabled, choose all scenario-created custom tables or selected tables, confirm the resolved tables, and capture per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, and privacy constraints. Rerun-proof evidence, acceptance source tagging, retention, and cleanup approval belong only to Framework Acceptance.
 - If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not plan tasks for every record unless the user explicitly selects all.
 - Generate `demo-data-plan.json` when enabled. This stage plans data only and must not create Dataverse rows.
 

@@ -22,27 +22,16 @@ Always require planning before build implementation:
 - Create or update `spec.md`, `plan.md`, and `tasks.md` before recommending build scripts.
 - Only move to bootstrap scripts after requirements and tasks are clear.
 
-## Architecture Intent (Always First)
-Before recommending any build action, ask and confirm architecture intent:
-1. Is the implementation **OOB extension only**, **custom tables only**, or **hybrid**?
-2. If OOB extension: should forms be **updated in place** or **cloned as new business forms** on OOB tables?
-3. What is the **required primary entry-point table** (first screen)?
-4. What is the **default landing view** for that entry-point table?
-5. Should the run **auto-create or auto-update a model-driven review app** that surfaces all built artifacts?
+## Wizard Modes
+Use `demo-builder` by default. Ask six business questions (idea/outcome, primary user/task, data, experience/lifecycle, success/sample data, environment/output), infer the technical design, then present one consolidated recommendation for confirmation. Do not ask acceptance, disposable-environment, retention, rerun-proof, source-tag, or cleanup questions in this mode.
 
-Do not proceed to build scripts until all five architecture questions are confirmed.
+Use `advanced-builder` only when the user explicitly requests technical control or retrofit detail. Ask the core discovery and architecture questions directly, including table/form strategy, entry point, landing view, review app, mapping, relationships, reports, demo data, solution identity, and source control. Do not ask acceptance, disposable-environment, retention, rerun-proof, or cleanup questions.
 
-## Discovery Questions (Required Intake)
-In addition to the core 11 discovery questions, always ask:
-1. Should this build extend OOB tables, use custom tables, or both?
-2. If OOB tables are used, should existing forms be updated or new forms be created?
-3. What is the required primary entry-point table?
-4. What is the default landing view for that entry point?
-5. Should the wizard always create/update a model-driven review app with all run artifacts?
-6. Which artifacts must be visible in the review app at the end of the run?
-7. Which solution unique name selected during wizard setup is the target for all components?
+Use `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention, separately approved destructive cleanup, and acceptance evidence planning.
 
-When demo data is requested, also ask which tables receive records (all scenario-created custom tables or selected tables), the record count per table, required scenarios/lifecycle states, hero records and their demo purpose, parent-child distribution, creation method, rerun behavior, source tag, synthetic-data/privacy constraints, and cleanup/reset preference. Never seed standard reused tables implicitly. If Dataverse Task activities are requested, ask which parent tables qualify, whether tasks apply to the latest, all, or selected parent records, the maximum source-record count (default 10 for latest), the ordering field, and tasks per selected record; do not create tasks for every record unless the user explicitly selects all.
+All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
+
+When demo data is requested, never seed standard reused tables implicitly. If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, a bounded source-record count, ordering field, and tasks per selected record; do not create tasks for every record unless the user explicitly selects all.
 
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.
 
