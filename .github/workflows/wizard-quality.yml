@@ -73,7 +73,7 @@ jobs:
             Sort-Object Name)
           foreach ($script in $scripts) {
             Write-Host "Running $($script.Name)"
-            & $script.FullName
+            & pwsh -NoProfile -NonInteractive -File $script.FullName
             if ($LASTEXITCODE -ne 0) { throw "$($script.Name) exited with code $LASTEXITCODE." }
           }
 
