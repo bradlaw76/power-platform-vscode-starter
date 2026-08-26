@@ -155,6 +155,40 @@ function Test-TableExists([string]$LogicalName) {
     } catch { return $false }
 }
 
+function ConvertTo-DataverseEntityMetadata {
+    param([Parameter(Mandatory)] [object]$Payload)
+
+    $entityDefinition = $Payload.EntityDefinition ?? $Payload
+    $schemaName = [string]$entityDefinition.SchemaName
+    $prefix = if ($schemaName.Contains('_')) { $schemaName.Split('_', 2)[0] } else { $schemaName }
+    $metadata = [ordered]@{
+        '@odata.type' = 'Microsoft.Dynamics.CRM.EntityMetadata'
+        SchemaName = $schemaName
+        DisplayName = $entityDefinition.DisplayName
+        DisplayCollectionName = $entityDefinition.DisplayCollectionName
+        Description = $entityDefinition.Description
+        OwnershipType = $entityDefinition.OwnershipType
+        IsActivity = [bool]$entityDefinition.IsActivity
+        HasActivities = $false
+        HasNotes = $false
+        Attributes = @(
+            [ordered]@{
+                '@odata.type' = 'Microsoft.Dynamics.CRM.StringAttributeMetadata'
+                SchemaName = "${prefix}_name"
+                DisplayName = @{ LocalizedLabels = @(@{ Label = 'Name'; LanguageCode = 1033 }) }
+                Description = @{ LocalizedLabels = @(@{ Label = "Primary name for $schemaName"; LanguageCode = 1033 }) }
+                AttributeType = 'String'
+                AttributeTypeName = @{ Value = 'StringType' }
+                FormatName = @{ Value = 'Text' }
+                IsPrimaryName = $true
+                MaxLength = 100
+                RequiredLevel = @{ Value = 'ApplicationRequired'; CanBeChanged = $true; ManagedPropertyLogicalName = 'canmodifyrequirementlevelsettings' }
+            }
+        )
+    }
+    return $metadata
+}
+
 # ── Main ───────────────────────────────────────────────────────────────────
 Write-Host ""
 Write-Host "=== Build Tables ===" -ForegroundColor Cyan
@@ -207,7 +241,8 @@ foreach ($file in $payloads) {
     }
 
     try {
-        Invoke-Dv "Post" "EntityDefinitions" (Get-Content $file.FullName -Raw) | Out-Null
+        $metadata = ConvertTo-DataverseEntityMetadata -Payload $payload
+        Invoke-Dv "Post" "EntityDefinitions" ($metadata | ConvertTo-Json -Depth 12 -Compress) | Out-Null
         Write-Host "(created)" -ForegroundColor Green
         if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
             Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'table' -Name $logical -Status 'created' -Step '20-build-tables.ps1' -Details @{ payload = $file.Name } | Out-Null

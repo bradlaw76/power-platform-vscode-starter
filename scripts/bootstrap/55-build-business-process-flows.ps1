@@ -83,6 +83,7 @@ param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
+    [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder = '',
     [string]$ScenarioSlug = '',
     [bool]$EnableBusinessProcessFlow = $true,
@@ -120,6 +121,17 @@ if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     $AccessToken = $global:DV_TOKEN
     if ([string]::IsNullOrWhiteSpace($SolutionUniqueName) -and -not [string]::IsNullOrWhiteSpace($global:DV_SOLUTION_NAME)) {
         $SolutionUniqueName = $global:DV_SOLUTION_NAME
+    }
+    if ([string]::IsNullOrWhiteSpace($PublisherPrefix) -and -not [string]::IsNullOrWhiteSpace($global:DV_PUBLISHER_PREFIX)) {
+        $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
+    }
+}
+if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
+    if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) {
+        $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
+    } elseif (Test-Path $envFile) {
+        . $envFile
+        $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
     }
 }
 
@@ -255,7 +267,7 @@ function Write-BpfDesignerHandoff {
     )
 
     New-Item -ItemType Directory -Path $reportFolder -Force | Out-Null
-    $uniqueName = ConvertTo-WorkflowUniqueName -Value $Definition.BusinessProcessFlowName
+    $uniqueName = ConvertTo-WorkflowUniqueName -Value $Definition.BusinessProcessFlowName -PublisherPrefix $PublisherPrefix
     $lines = New-Object System.Collections.Generic.List[string]
     $lines.Add('# Business Process Flow Designer Handoff') | Out-Null
     $lines.Add('') | Out-Null
@@ -336,16 +348,24 @@ function Invoke-DvWithRetry {
 }
 
 function ConvertTo-WorkflowUniqueName {
-    param([string]$Value)
+    param(
+        [string]$Value,
+        [string]$PublisherPrefix
+    )
 
     $slug = ($Value ?? '').Trim().ToLowerInvariant()
     $slug = [regex]::Replace($slug, '[^a-z0-9]+', '_')
     $slug = $slug.Trim('_')
+    $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
+    $prefix = [regex]::Replace($prefix, '[^a-z0-9]+', '')
+    if ([string]::IsNullOrWhiteSpace($prefix)) {
+        $prefix = 'wizard'
+    }
     if ([string]::IsNullOrWhiteSpace($slug)) {
-        return 'wizard_bpf'
+        return "${prefix}_bpf"
     }
 
-    return "wizard_$slug"
+    return "${prefix}_$slug"
 }
 
 function Get-ExistingWorkflow {
@@ -403,7 +423,7 @@ function Upsert-BpfWorkflow {
     )
 
     $processName = ($Definition.BusinessProcessFlowName ?? '').Trim()
-    $uniqueName = ConvertTo-WorkflowUniqueName -Value $processName
+    $uniqueName = ConvertTo-WorkflowUniqueName -Value $processName -PublisherPrefix $PublisherPrefix
     $existing = @(Get-ExistingWorkflow -UniqueName $uniqueName)
     if ($existing.Count -eq 0) {
         throw "Supported BPF prerequisite is missing. Create '$processName' in the Power Apps designer with unique name '$uniqueName', add it to solution '$SolutionName', publish it, and rerun. Handoff: $handoffPath"
@@ -539,7 +559,7 @@ if ($PreviewOnly) {
         Provisioning = 'designer-handoff-required'
         MetadataMutation = 'none'
         HandoffPath = $handoffPath
-        ExpectedUniqueName = ConvertTo-WorkflowUniqueName -Value $definition.BusinessProcessFlowName
+        ExpectedUniqueName = ConvertTo-WorkflowUniqueName -Value $definition.BusinessProcessFlowName -PublisherPrefix $PublisherPrefix
         Thresholds = $thresholdValidation.Thresholds
         Metrics = $thresholdValidation.Metrics
     }

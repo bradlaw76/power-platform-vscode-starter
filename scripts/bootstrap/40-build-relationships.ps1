@@ -146,6 +146,33 @@ function Normalize-RelationshipEntityNames($RelationshipObject) {
     }
 }
 
+function ConvertTo-DataverseRelationshipMetadata {
+    param([Parameter(Mandatory)] [object]$Relationship)
+
+    $definition = $Relationship.RelationshipDefinition ?? $Relationship
+    $metadata = [ordered]@{}
+    foreach ($property in $definition.PSObject.Properties) {
+        if ($property.Name -ne 'ReferencingAttribute') {
+            $metadata[$property.Name] = $property.Value
+        }
+    }
+
+    $lookupProperty = $definition.PSObject.Properties['Lookup']
+    if ($null -eq $lookupProperty -and -not [string]::IsNullOrWhiteSpace($definition.ReferencingAttribute)) {
+        $referencedName = ([string]$definition.ReferencedEntity).Split('_')[-1]
+        $displayName = (Get-Culture).TextInfo.ToTitleCase($referencedName)
+        $metadata.Lookup = [ordered]@{
+            '@odata.type' = 'Microsoft.Dynamics.CRM.LookupAttributeMetadata'
+            SchemaName = [string]$definition.ReferencingAttribute
+            DisplayName = @{ LocalizedLabels = @(@{ Label = $displayName; LanguageCode = 1033 }) }
+            Description = @{ LocalizedLabels = @(@{ Label = "Related $displayName"; LanguageCode = 1033 }) }
+            RequiredLevel = @{ Value = 'None'; CanBeChanged = $true; ManagedPropertyLogicalName = 'canmodifyrequirementlevelsettings' }
+        }
+    }
+
+    return $metadata
+}
+
 Write-Host ""
 Write-Host "=== Build Relationships ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
@@ -188,7 +215,8 @@ foreach ($file in $payloads) {
         }
 
         try {
-            $body = ($rel | ConvertTo-Json -Depth 20 -Compress)
+            $relationshipDefinition = ConvertTo-DataverseRelationshipMetadata -Relationship $rel
+            $body = ($relationshipDefinition | ConvertTo-Json -Depth 20 -Compress)
             Invoke-Dv "Post" "RelationshipDefinitions" $body | Out-Null
             Write-Host "(created)" -ForegroundColor Green
             if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {

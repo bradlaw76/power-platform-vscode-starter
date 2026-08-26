@@ -90,6 +90,20 @@ if ($prerequisiteScriptText -notmatch 'Power Platform CLI[^\r\n]+-Arguments\s+@\
     Add-ContractFailure "00-prereq-check.ps1 must probe PAC CLI with 'pac help', which returns a reliable process exit code."
 }
 
+$tableScriptText = Get-Content -LiteralPath (Join-Path $bootstrapFolder '20-build-tables.ps1') -Raw
+if ($tableScriptText -notmatch '\$Payload\.EntityDefinition\s*\?\?\s*\$Payload' -or
+    $tableScriptText -notmatch 'Microsoft\.Dynamics\.CRM\.EntityMetadata' -or
+    $tableScriptText -notmatch 'IsPrimaryName\s*=\s*\$true') {
+    Add-ContractFailure '20-build-tables.ps1 must translate wrapped table payloads into EntityMetadata with a primary-name attribute.'
+}
+
+$relationshipScriptText = Get-Content -LiteralPath (Join-Path $bootstrapFolder '40-build-relationships.ps1') -Raw
+if ($relationshipScriptText -notmatch '\$Relationship\.RelationshipDefinition\s*\?\?\s*\$Relationship' -or
+    $relationshipScriptText -notmatch 'Microsoft\.Dynamics\.CRM\.LookupAttributeMetadata' -or
+    $relationshipScriptText -notmatch '\$property\.Name\s+-ne\s+''ReferencingAttribute''') {
+    Add-ContractFailure '40-build-relationships.ps1 must translate wrapped relationship payloads and create the referencing lookup metadata.'
+}
+
 $postBuildImplementations = @{
     'solution-inventory-collect' = '50-add-to-solution.ps1'
     'solution-inventory-sync' = '50-add-to-solution.ps1'

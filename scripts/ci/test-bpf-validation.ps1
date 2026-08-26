@@ -230,5 +230,9 @@ if ($bpfScript -match 'clientdata\s*=|uidata\s*=') {
 if ($bpfScript -notmatch 'PreviewOnly' -or $bpfScript -notmatch 'designer-handoff-required') {
   throw 'BPF stage must expose preview mode and the supported designer handoff.'
 }
+if ($bpfScript -notmatch 'ConvertTo-WorkflowUniqueName\s+-Value\s+[^\r\n]+\s+-PublisherPrefix\s+\$PublisherPrefix' -or
+    $bpfScript -notmatch 'return\s+"\$\{prefix\}_\$slug"') {
+  throw 'BPF designer handoff and lookup must derive workflow unique names from the configured publisher prefix.'
+}
 
 Write-Host 'BPF validation checks passed.' -ForegroundColor Green
