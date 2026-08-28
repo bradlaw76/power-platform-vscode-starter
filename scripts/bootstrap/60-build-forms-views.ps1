@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Build Forms Views
 FILE:         scripts/bootstrap/60-build-forms-views.ps1
-VERSION:      0.2.0
+VERSION:      0.3.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API | Model-Driven App Metadata
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.3.0  2026-08-28  Added blocked planning-disposition enforcement.
 v0.2.0  2026-08-28  Added explicit custom-view creation and safe generated Active-view adoption.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
@@ -1738,8 +1739,9 @@ function Invoke-WizardFormsViewsBuild {
       $viewSelection = Get-DesiredViewFields -TableLogical $logical -PrimaryField $primary -PrimaryLabel $primaryLabel -PrimaryIdField $primaryId -PayloadFields $payloadFields -Attributes $attributes -MinimumBusinessFields $MinBusinessColumnsPerView -IncludeOwner $IncludeOwnerInViews -IncludeStatus $IncludeStatusInViews -ScenarioContext $scenarioContext
       $desiredViewFields = @($viewSelection.Fields)
       $viewDefinition = Get-TableSurfaceDefinition -Definitions $surfaceContract.Views -TableLogical $logical
-      if ($null -ne $viewDefinition) {
-        $desiredViewFields = @((Get-PropertyValue -Object $viewDefinition -Name 'Columns' -Default @()) | ForEach-Object {
+      $contractColumns = @(if ($null -ne $viewDefinition) { Get-PropertyValue -Object $viewDefinition -Name 'Columns' -Default @() })
+      if ($contractColumns.Count -gt 0) {
+        $desiredViewFields = @($contractColumns | ForEach-Object {
             $field = "$_".ToLowerInvariant()
             if (-not $attributeMap.ContainsKey($field)) { throw "View '$($viewDefinition.Name)' references missing field '$field'." }
             [pscustomobject]@{ LogicalName = $field; Label = $attributeMap[$field].Label; Source = 'view-contract'; IsBusiness = $true }
@@ -1942,6 +1944,10 @@ function Get-ScenarioSurfaceContract {
 
   foreach ($view in @($result.Views)) {
     $disposition = "$(Get-PropertyValue -Object $view -Name 'Disposition')".Trim().ToLowerInvariant()
+    if ($disposition -eq 'explicit-decision-required') {
+      $reason = "$(Get-PropertyValue -Object $view -Name 'DecisionReason')".Trim()
+      throw "View '$($(Get-PropertyValue -Object $view -Name 'Name'))' is blocked pending an explicit disposition decision$(if ($reason) { ": $reason" })."
+    }
     if (@('create-custom', 'adopt-generated-active') -notcontains $disposition) {
       throw "Unsupported view disposition '$disposition'."
     }

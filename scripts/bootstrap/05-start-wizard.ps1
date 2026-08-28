@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.6.0
+VERSION:      0.7.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-09
+LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -44,6 +44,7 @@ v0.3.0  2026-08-10  Added standalone model-driven app architecture intake.
 v0.4.0  2026-08-18  Added report scoping, mapping artifact, and critical-table gate.
 v0.5.0  2026-08-18  Added entry-table resolution and landing-view action planning.
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
+v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -353,6 +354,74 @@ function Get-PlannedTableLogicalNames {
     return @($logicalNames | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object)
 }
 
+function Get-PredictablePluralDisplayName {
+    param([string]$DisplayName)
+
+    $name = ($DisplayName ?? '').Trim()
+    if ([string]::IsNullOrWhiteSpace($name)) { return $null }
+
+    $words = @($name -split '\s+')
+    $noun = $words[-1]
+    if ($noun -notmatch '^[A-Za-z]+$') { return $null }
+
+    $pluralNoun = if ($noun -match '(?i)[^aeiou]y$') {
+        $noun.Substring(0, $noun.Length - 1) + 'ies'
+    } elseif ($noun -match '(?i)(s|x|z|ch|sh)$') {
+        $noun + 'es'
+    } else {
+        $noun + 's'
+    }
+    $words[-1] = $pluralNoun
+    return ($words -join ' ')
+}
+
+function Get-PlannedCustomTableDisplayName {
+    param(
+        [string]$TableLogicalName,
+        [string]$CustomTables,
+        [string]$PublisherPrefix
+    )
+
+    $matches = @(Split-ListValues -Value $CustomTables | Where-Object {
+        (Convert-ToCustomLogicalName -Name $_ -Prefix $PublisherPrefix) -ieq $TableLogicalName
+    })
+    if ($matches.Count -ne 1) { return $null }
+    return $matches[0]
+}
+
+function Resolve-PlannedViewDisposition {
+    param(
+        [string]$TableLogicalName,
+        [string]$ViewName,
+        [string]$CustomTables,
+        [string]$StandardTables,
+        [string]$PublisherPrefix,
+        [bool]$RetrofitMode
+    )
+
+    if ($RetrofitMode) {
+        return [pscustomobject]@{ Disposition = 'explicit-decision-required'; Reason = 'retrofit table ownership requires an explicit decision' }
+    }
+
+    $customDisplayName = Get-PlannedCustomTableDisplayName -TableLogicalName $TableLogicalName -CustomTables $CustomTables -PublisherPrefix $PublisherPrefix
+    $standardLogicalNames = @(Get-PlannedTableLogicalNames -StandardTables $StandardTables -CustomTables 'none' -PublisherPrefix $PublisherPrefix)
+    if ($standardLogicalNames -contains $TableLogicalName -or [string]::IsNullOrWhiteSpace($customDisplayName)) {
+        return [pscustomobject]@{ Disposition = 'explicit-decision-required'; Reason = 'table is standard, shared, preexisting, hybrid-standard, or not uniquely planned as new custom' }
+    }
+
+    $pluralDisplayName = Get-PredictablePluralDisplayName -DisplayName $customDisplayName
+    if ([string]::IsNullOrWhiteSpace($pluralDisplayName)) {
+        return [pscustomobject]@{ Disposition = 'explicit-decision-required'; Reason = 'generated plural table display name cannot be predicted safely' }
+    }
+
+    $generatedActiveViewName = "Active $pluralDisplayName"
+    if ($ViewName -ceq $generatedActiveViewName) {
+        return [pscustomobject]@{ Disposition = 'adopt-generated-active'; Reason = 'exact predictable generated Active-view name on a newly planned custom table' }
+    }
+
+    return [pscustomobject]@{ Disposition = 'create-custom'; Reason = "business view name is distinct from '$generatedActiveViewName'" }
+}
+
 function Test-AndSetEntryPointPlan {
     param(
         [System.Collections.IDictionary]$Answers,
@@ -367,13 +436,10 @@ function Test-AndSetEntryPointPlan {
         throw "Entry-point table '$entryPoint' is not present in the explicit table plan. Planned logical names: $plannedText"
     }
 
-    $plannedCustomTables = @(Get-PlannedTableLogicalNames -StandardTables "none" -CustomTables $Answers["CustomTablesToCreate"] -PublisherPrefix $Answers["PublisherPrefix"])
     $Answers["EntryPointTable"] = $entryPoint
-    $Answers["EntryPointLandingViewPlan"] = if ($plannedCustomTables -contains $entryPoint) {
-        "create-custom"
-    } else {
-        "verify-existing-saved-query"
-    }
+    $viewPlan = Resolve-PlannedViewDisposition -TableLogicalName $entryPoint -ViewName $Answers["EntryPointLandingView"] -CustomTables $Answers["CustomTablesToCreate"] -StandardTables $Answers["StandardTablesReused"] -PublisherPrefix $Answers["PublisherPrefix"] -RetrofitMode $RetrofitMode
+    $Answers["EntryPointLandingViewPlan"] = $viewPlan.Disposition
+    $Answers["EntryPointLandingViewPlanReason"] = $viewPlan.Reason
     $Answers["EntryPointValidationStatus"] = "approved"
 }
 
@@ -681,6 +747,10 @@ if ($Mode -eq 'demo-builder') {
     $publisherPrefix = ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Substring(0, [Math]::Min(5, ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Length))
     $customTables = @(Split-ListValues -Value $dataToTrack)
     $entryPointDisplayName = if ($customTables.Count -gt 0) { $customTables[0] } else { $scenarioName }
+    $entryPointPluralDisplayName = Get-PredictablePluralDisplayName -DisplayName $entryPointDisplayName
+    if ([string]::IsNullOrWhiteSpace($entryPointPluralDisplayName)) {
+        throw "Demo Builder cannot predict the Dataverse plural display name for '$entryPointDisplayName'. Rerun with -Mode advanced-builder and make an explicit view disposition decision."
+    }
     $entryPointTable = Convert-ToCustomLogicalName -Name $entryPointDisplayName -Prefix $publisherPrefix
     $solutionName = [regex]::Replace((Get-Culture).TextInfo.ToTitleCase($scenarioSlug.Replace('-', ' ')), '[^A-Za-z0-9]', '')
     $needsDemoData = if ($successAndData -match '(?i)\b(no|without)\s+(sample|synthetic|demo)\s+data\b') { 'No' } else { 'Yes' }
@@ -689,7 +759,7 @@ if ($Mode -eq 'demo-builder') {
     Write-Host ""
     Write-Host "Recommended technical design:" -ForegroundColor Cyan
     Write-Host "  Standalone model-driven app; custom tables; new forms"
-    Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointDisplayName"
+    Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
     $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
@@ -703,7 +773,7 @@ if ($Mode -eq 'demo-builder') {
     $answers["TableChoice"] = 'custom-only'
     $answers["FormStrategy"] = 'create-new-forms'
     $answers["EntryPointTable"] = $entryPointTable
-    $answers["EntryPointLandingView"] = "Active $entryPointDisplayName"
+    $answers["EntryPointLandingView"] = "Active $entryPointPluralDisplayName"
     $answers["ReviewAppMode"] = 'create-or-update'
     $answers["ReviewAppArtifacts"] = 'all run-created tables, forms, views, processes, and approved reports'
     $answers["NavigationGroup"] = 'Operations'
@@ -737,7 +807,7 @@ if ($Mode -eq 'demo-builder') {
     $answers["CustomFieldsToAdd"] = 'to be refined during planning'
     $answers["RelationshipsToCreate"] = if ($customTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
     $answers["IncludeHtmlReports"] = 'no'
-    $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointDisplayName | $successAndData"
+    $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointPluralDisplayName | $successAndData"
     $answers["UserTaskOwnership"] = "$experienceAndLifecycle | app owner | $successAndData"
     $answers["RelationshipRequirements"] = if ($customTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
     $answers["CriticalReportTables"] = 'none'
@@ -1082,8 +1152,24 @@ $planPath = Join-Path $scenarioFolder "plan.md"
 $tasksPath = Join-Path $scenarioFolder "tasks.md"
 $demoDataPlanPath = Join-Path $scenarioFolder "demo-data-plan.json"
 $reportMappingsPath = Join-Path $scenarioFolder "report-mappings.md"
+$viewsPath = Join-Path $scenarioFolder "views.json"
 $scenarioPayloadFolder = Join-Path (Join-Path $repoRoot "payloads\scenarios") $scenarioSlug
 $bpfPayloadPath = Join-Path $scenarioPayloadFolder "process-$scenarioSlug.json"
+
+$viewsContract = [ordered]@{
+    Views = @(
+        [ordered]@{
+            TableLogicalName = $answers["EntryPointTable"]
+            Name             = $answers["EntryPointLandingView"]
+            Disposition      = $answers["EntryPointLandingViewPlan"]
+            DecisionReason   = $answers["EntryPointLandingViewPlanReason"]
+            Columns          = @()
+            Filter           = [ordered]@{ Attribute = 'statecode'; Operator = 'eq'; Value = '0' }
+            Sort             = [ordered]@{ Attribute = ''; Descending = $false }
+        }
+    )
+}
+$viewsJson = $viewsContract | ConvertTo-Json -Depth 8
 
 $standardFieldsList = Format-BulletList -Input $answers["StandardFieldsReused"]
 $customFieldsList = Format-BulletList -Input $answers["CustomFieldsToAdd"]
@@ -1661,6 +1747,7 @@ Set-Content -Path $specPath -Value $specContent -Encoding UTF8
 Set-Content -Path $planPath -Value $planContent -Encoding UTF8
 Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
 Set-Content -Path $reportMappingsPath -Value $reportMappingsContent -Encoding UTF8
+Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
 if ($null -ne $demoDataPlanObject) {
     Set-Content -Path $demoDataPlanPath -Value $demoDataPlanJson -Encoding UTF8
 }
@@ -1676,6 +1763,7 @@ Write-Host "  $specPath"
 Write-Host "  $planPath"
 Write-Host "  $tasksPath"
 Write-Host "  $reportMappingsPath"
+Write-Host "  $viewsPath"
 if ($null -ne $demoDataPlanObject) {
     Write-Host "  $demoDataPlanPath"
 }

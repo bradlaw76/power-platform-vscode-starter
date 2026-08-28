@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.6.0
+Version: 1.7.0
 
 ## Purpose
 
@@ -72,7 +72,7 @@ Before any build recommendation, either confirm all five architecture intent que
 
 Do not proceed to build until architecture intent is captured in the planning artifacts and approved.
 
-After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. Every planned view must declare a disposition in `views.json`: `create-custom` creates a separate wizard-owned view, while `adopt-generated-active` may enhance only the Dataverse-generated Active/default view of a table created by the current wizard scenario. App assembly remains blocked until each named saved query resolves in Dataverse.
+After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. Every planned view must declare a disposition in `views.json`. For a uniquely identified new custom table, the generator emits `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and emits `create-custom` for a distinct business view name. Standard, hybrid-standard, shared, preexisting, retrofit, or ambiguously classified tables emit `explicit-decision-required` rather than a guessed disposition. App assembly remains blocked until every explicit decision is resolved and each named saved query resolves in Dataverse.
 
 ### View Disposition Contract
 
@@ -82,6 +82,8 @@ After explicit table mapping, the entry-point logical name must resolve to a reu
 - The target is the table's unmanaged, active, public, default Dataverse-generated Active view.
 - Its table identity, query type, generated baseline columns, active-record filter, and sort match the generated dependency expected for that table.
 - It has not already been marked as owned by another wizard scenario, and no unrelated or preexisting business view is selected by name.
+
+The generated disposition is planning intent only. It does not establish live provenance or authorize mutation; step 60 must still prove every condition above at apply time.
 
 The adoption operation may update only FetchXML, LayoutXML, and the wizard ownership description. It must preserve the saved-query ID, name, active state, public query type, and default status. Reruns may update that same ID only when its ownership marker matches the current scenario. A same-name non-generated view, metadata mismatch, missing creation provenance, standard/shared/preexisting table, or ownership mismatch is a hard stop.
 

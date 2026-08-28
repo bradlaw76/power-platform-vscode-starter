@@ -161,7 +161,7 @@ try {
         '- Entry Point Table: incident',
         '- Landing View: Active Cases',
         '- Entry Point Validation: approved',
-        '- Landing View Plan: verify-existing-saved-query',
+        '- Landing View Plan: explicit-decision-required',
         '## App Module',
         '- App Name: Source Control Acceptance Review App',
         '## Source Control Plan',
@@ -190,7 +190,7 @@ try {
         '## Model-Driven App Plan',
         '- Default landing view: Active Cases',
         '- Entry-point validation: approved',
-        '- Landing-view action: verify-existing-saved-query',
+        '- Landing-view action: explicit-decision-required',
         '## Source Control Plan',
         '- Required validation/CI: docs consistency, script smoke',
         '- Keep remote operations human-approved and verify the remote commit after push.',
@@ -202,7 +202,7 @@ try {
     Assert-Contains -Path (Join-Path $scenarioFolder 'tasks.md') -ExpectedValues @(
         "Confirm application profile 'standalone-model-driven' and architecture intent",
         "Confirm entry point 'incident' opens with 'Active Cases'",
-        "Execute landing-view action 'verify-existing-saved-query' for 'Active Cases' on 'incident' before app assembly",
+        "Execute landing-view action 'explicit-decision-required' for 'Active Cases' on 'incident' before app assembly",
         "Verify the named landing view resolves to a saved query before running '62-build-app-module.ps1'",
         "Create or switch to scenario branch 'feature/source-control-acceptance' before implementation",
         'stage explicit files',
@@ -221,6 +221,10 @@ try {
         '| sca_review | Review workload | dashboard | Operations dashboard | sca_outcome,statuscode,createdon | review backlog | Operations manager | totals match active view |',
         'Build scripts remain blocked until this mapping is reviewed'
     )
+    $standardViews = Get-Content -LiteralPath (Join-Path $scenarioFolder 'views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($standardViews.Views[0].Disposition -ne 'explicit-decision-required') {
+        throw 'A standard or hybrid-standard entry table must never receive automatic generated-view adoption.'
+    }
     $demoDataPlan = Get-Content -LiteralPath (Join-Path $scenarioFolder 'demo-data-plan.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     if (@($demoDataPlan.Tables).Count -ne 2 -or $demoDataPlan.Tables -notcontains 'Case' -or $demoDataPlan.Tables -notcontains 'Review') {
         throw 'Expected demo-data-plan.json to contain the selected Case and Review tables.'
@@ -280,6 +284,11 @@ try {
 
     $customEntryAnswers = @($scriptedAnswers)
     $customEntryAnswers[$entryPointIndex] = 'sca_review'
+    $landingViewIndex = [Array]::IndexOf($customEntryAnswers, 'Active Cases')
+    if ($landingViewIndex -lt 0) {
+        throw 'Could not locate the landing-view answer in the acceptance fixture.'
+    }
+    $customEntryAnswers[$landingViewIndex] = 'Active Reviews'
     $customEntryAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
     $customEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
     if ($LASTEXITCODE -ne 0) {
@@ -288,8 +297,13 @@ try {
     Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
         '- Entry Point Table: sca_review',
         '- Entry Point Validation: approved',
-        '- Landing View Plan: create-custom'
+        '- Landing View: Active Reviews',
+        '- Landing View Plan: adopt-generated-active'
     )
+    $customViews = Get-Content -LiteralPath (Join-Path $scenarioFolder 'views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($customViews.Views[0].Disposition -ne 'adopt-generated-active') {
+        throw 'Advanced Builder must plan adoption for an exact generated Active-view collision on a newly planned custom table.'
+    }
 
     $retrofitSlug = 'retrofit-entry-acceptance'
     @(
@@ -342,9 +356,13 @@ try {
     Assert-Contains -Path (Join-Path $retrofitFolder 'answers.md') -ExpectedValues @(
         '- Entry Point Table: ret_request',
         '- Entry Point Validation: approved',
-        '- Landing View Plan: verify-existing-saved-query',
+        '- Landing View Plan: explicit-decision-required',
         '- retrofit: enabled'
     )
+    $retrofitViews = Get-Content -LiteralPath (Join-Path $retrofitFolder 'views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($retrofitViews.Views[0].Disposition -ne 'explicit-decision-required') {
+        throw 'A retrofit or preexisting table must never receive automatic generated-view adoption.'
+    }
 
     $afterBranch = Invoke-Git -Arguments @('-C', $workspaceRoot, 'branch', '--show-current') -AllowOutput
     $afterHead = Invoke-Git -Arguments @('-C', $workspaceRoot, 'rev-parse', 'HEAD') -AllowOutput

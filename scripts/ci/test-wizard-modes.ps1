@@ -30,9 +30,10 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $wizardPath = Join-Path $repoRoot 'scripts/bootstrap/05-start-wizard.ps1'
+$formsViewsPath = Join-Path $repoRoot 'scripts/bootstrap/60-build-forms-views.ps1'
 $profile = Get-Content -LiteralPath (Join-Path $repoRoot 'wizard.profile.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-modes-test-" + [guid]::NewGuid().ToString('N'))
-$coreArtifacts = @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md')
+$coreArtifacts = @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md', 'views.json')
 
 function Assert-True {
     param(
@@ -97,7 +98,23 @@ function Assert-ArtifactContract {
     }
 }
 
+function Assert-Step60ConsumesViewsContract {
+    param(
+        [string]$Workspace,
+        [string]$ScenarioSlug,
+        [string]$ExpectedDisposition
+    )
+
+    $scenarioContext = [pscustomobject]@{ ScenarioFolder = (Join-Path $Workspace "specs/$ScenarioSlug") }
+    $contract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext
+    Assert-True -Condition ($contract.Views.Count -eq 1) -Message "Step 60 did not consume the generated views.json for '$ScenarioSlug'."
+    Assert-True -Condition ($contract.Views[0].Disposition -eq $ExpectedDisposition) -Message "Step 60 read an unexpected disposition for '$ScenarioSlug'."
+}
+
 try {
+    $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
+    [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
+    . $formsViewsPath
     Assert-True -Condition ($profile.discovery.defaultMode -eq 'demo-builder') -Message 'Demo Builder must be the default mode.'
     $modeNames = @($profile.discovery.modes.PSObject.Properties.Name)
     Assert-True -Condition ($modeNames.Count -eq 3) -Message 'Exactly three wizard modes are required.'
@@ -133,7 +150,7 @@ try {
     $demoOutput = Invoke-WizardFixture -Workspace $demoWorkspace -Mode '' -Answers @(
         'Equipment checkout for faster, accountable lab lending',
         'Lab coordinator | review and issue checkout requests',
-        'Lab Asset, Checkout Request',
+        'Checkout Request, Lab Asset',
         'Review active requests, approve them, issue equipment, and record returns',
         'The coordinator completes the lifecycle with synthetic sample data',
         'Development environment; unmanaged solution',
@@ -142,7 +159,13 @@ try {
     Assert-True -Condition ($demoOutput -match 'Mode: demo-builder') -Message 'The omitted mode did not select Demo Builder.'
     Assert-True -Condition ($demoOutput -match 'Recommended technical design') -Message 'Demo Builder did not present consolidated recommendations.'
     Assert-True -Condition ($demoOutput -notmatch '(?i)A-acceptance|disposable|cleanup|retention') -Message 'Default Demo Builder output exposed acceptance or cleanup prompts.'
-    Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug 'equipment-checkout-for-faster-accountable-lab-lending' -Mode 'demo-builder'
+    $demoSlug = 'equipment-checkout-for-faster-accountable-lab-lending'
+    Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
+    Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
+    Assert-True -Condition ($demoViews.Views[0].Disposition -eq 'adopt-generated-active') -Message 'Demo Builder must plan adoption for an exact generated Active-view collision on a new custom table.'
+    Assert-Step60ConsumesViewsContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -ExpectedDisposition 'adopt-generated-active'
 
     $acceptanceWorkspace = New-WizardTestWorkspace -Name 'acceptance'
     $acceptanceOutput = Invoke-WizardFixture -Workspace $acceptanceWorkspace -Mode 'framework-acceptance' -Answers @(
@@ -196,11 +219,34 @@ try {
     Assert-True -Condition ($acceptanceOutput -match 'Framework Acceptance controls') -Message 'Explicit Framework Acceptance did not expose its controls.'
     Assert-ArtifactContract -Workspace $acceptanceWorkspace -ScenarioSlug 'framework-mode-acceptance' -Mode 'framework-acceptance'
 
+    $acceptanceViewsPath = Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/views.json'
+    $acceptanceViews = Get-Content -LiteralPath $acceptanceViewsPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True -Condition ($acceptanceViews.Views[0].Disposition -eq 'adopt-generated-active') -Message 'Advanced-style intake must plan adoption for Active Requests on a newly planned Request table.'
+
+    $distinctWorkspace = New-WizardTestWorkspace -Name 'distinct-business-view'
+    $distinctAnswers = @(
+        'Distinct Business View', 'distinct-business-view', 'standalone-model-driven', 'custom-only', 'dbv_labasset', 'Available Lab Assets',
+        'all run-created tables, forms, views, processes, and reports', 'Operations', 'feature/distinct-business-view', 'specs/distinct-business-view',
+        'checkpoints', 'applicable repo CI tests', 'no', 'squash', 'Model-driven asset app', 'Power Apps', 'Lab coordinators',
+        'Track lab assets', 'Lab coordinators', 'Lab Asset', 'Asset form and availability view', 'Available assets are visible', 'Development',
+        'No', 'Unmanaged', 'new', 'DistinctBusinessView', 'new', 'dbv', 'none', 'Lab Asset', 'none', 'LabAsset.dbv_name', 'none',
+        'no', 'no', 'Coordinator | find asset | daily | dbv_labasset/Available Lab Assets | available assets are visible',
+        'find asset | App owner | an available asset is visible', 'no', 'no'
+    )
+    $distinctOutput = Invoke-WizardFixture -Workspace $distinctWorkspace -Mode 'advanced-builder' -Answers $distinctAnswers
+    Assert-True -Condition ($distinctOutput -match 'Mode: advanced-builder') -Message 'Distinct-view fixture did not run Advanced Builder.'
+    Assert-ArtifactContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -Mode 'advanced-builder'
+    $distinctViews = Get-Content -LiteralPath (Join-Path $distinctWorkspace 'specs/distinct-business-view/views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
+    Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
+    Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
+
     $acceptanceAnswers = Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/answers.md') -Raw -Encoding UTF8
     Assert-True -Condition ($acceptanceAnswers -match 'Environment authorized: yes') -Message 'Framework Acceptance did not persist environment authorization.'
     Assert-True -Condition ($acceptanceAnswers -match 'Destructive cleanup separately approved: no') -Message 'Framework Acceptance did not preserve separate cleanup approval.'
 }
 finally {
+    [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', $originalSkipMain)
     if (Test-Path -LiteralPath $testRoot) {
         Remove-Item -LiteralPath $testRoot -Recurse -Force
     }
