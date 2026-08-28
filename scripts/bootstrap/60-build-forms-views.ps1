@@ -1562,7 +1562,7 @@ function Invoke-WizardFormsViewsBuild {
       $resolvedFormStrategy = $appConfig.FormStrategy
     }
   }
-  if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
+  if (-not $PreviewOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $PublisherPrefix | Out-Null
   }
 
@@ -1723,13 +1723,13 @@ function Invoke-WizardFormsViewsBuild {
         underpopulated = $underpopulated
       }) | Out-Null
 
-      if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+      if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         $manifestStatus = if ($underpopulated -and $FailIfUnderpopulatedForms) { 'failed' } else { $formAction }
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $PublisherPrefix -Kind 'form' -Name "$logical|main" -Status $manifestStatus -Step '60-build-forms-views.ps1' -Details @{ formName = $targetFormName; businessFieldsPlaced = $businessFieldsPlaced; underpopulated = $underpopulated } | Out-Null
       }
     } catch {
       Write-Host "    Form (FAILED: $($_.Exception.Message))" -ForegroundColor Red
-      if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+      if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $PublisherPrefix -Kind 'form' -Name "$logical|main" -Status 'failed' -Step '60-build-forms-views.ps1' -Details @{ error = $_.Exception.Message } | Out-Null
       }
       $failed++
@@ -1867,13 +1867,13 @@ function Invoke-WizardFormsViewsBuild {
         underpopulated = $underpopulatedView
       }) | Out-Null
 
-      if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+      if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         $viewManifestStatus = if ($underpopulatedView -and $FailIfUnderpopulatedViews) { 'failed' } elseif ($viewAction -eq 'manual-preserved' -or $viewAction -eq 'validated') { 'skipped' } else { $viewAction }
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $PublisherPrefix -Kind 'view' -Name "$logical|active" -Status $viewManifestStatus -Step '60-build-forms-views.ps1' -Details @{ viewName = $viewName; businessColumnCount = $businessViewColumns.Count; underpopulated = $underpopulatedView } | Out-Null
       }
     } catch {
       Write-Host "    View  (FAILED: $($_.Exception.Message))" -ForegroundColor Red
-      if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+      if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $PublisherPrefix -Kind 'view' -Name "$logical|active" -Status 'failed' -Step '60-build-forms-views.ps1' -Details @{ error = $_.Exception.Message } | Out-Null
       }
       $failed++
@@ -1975,11 +1975,9 @@ function Test-CurrentScenarioCreatedTable {
     [string]$TableLogical
   )
 
-  if (-not (Get-Command Get-WizardArtifactPaths -ErrorAction SilentlyContinue)) { return $false }
-  $manifestPath = (Get-WizardArtifactPaths -RepoRoot $RepoRoot).ManifestJsonPath
-  if (-not (Test-Path $manifestPath)) { return $false }
-  $manifest = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
-  if ("$(Get-PropertyValue -Object $manifest -Name 'scenarioSlug')" -cne $ScenarioSlug) { return $false }
+  if (-not (Get-Command Get-WizardArtifactManifest -ErrorAction SilentlyContinue)) { return $false }
+  $manifest = Get-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -SolutionName $env:DV_SOLUTION_NAME -PublisherPrefix $env:DV_PUBLISHER_PREFIX -AllowMissing
+  if ($null -eq $manifest) { return $false }
   $matches = @($manifest.items | Where-Object {
       $_.kind -eq 'table' -and $_.name -ieq $TableLogical -and $_.status -eq 'created' -and $_.step -eq '20-build-tables.ps1'
     })

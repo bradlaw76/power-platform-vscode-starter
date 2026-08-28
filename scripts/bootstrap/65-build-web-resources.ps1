@@ -1556,7 +1556,7 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
     }
 }
 
-if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
+if (-not $PreviewReportQueriesOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
 }
 
@@ -1816,7 +1816,7 @@ foreach ($report in $reportDefinitions) {
 
     if ($hasValidationFailure) {
         $failed++
-        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+        if (-not $PreviewReportQueriesOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
             Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'webresource' -Name "$($PublisherPrefix.ToLowerInvariant())_reports/$fileName" -Status 'failed' -Step '65-build-web-resources.ps1' -Details @{ reportKey = $report.Key; reason = 'validation failed' } | Out-Null
         }
         Write-Host "  $($report.Key) (validation failed)" -ForegroundColor Red
@@ -1824,9 +1824,6 @@ foreach ($report in $reportDefinitions) {
     }
 
     if ($PreviewReportQueriesOnly) {
-        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'webresource' -Name "$($PublisherPrefix.ToLowerInvariant())_reports/$fileName" -Status 'skipped' -Step '65-build-web-resources.ps1' -Details @{ reportKey = $report.Key; reason = 'preview only' } | Out-Null
-        }
         Write-Host "  $($report.Key) (preview generated)" -ForegroundColor Green
         continue
     }

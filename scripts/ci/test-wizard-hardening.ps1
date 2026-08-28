@@ -144,10 +144,59 @@ try {
   }
 
   Add-WizardArtifactManifestItem -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst' -Kind 'table' -Name 'tst_agent' -Status 'created' -Step '20-build-tables.ps1' | Out-Null
-  $manifest = Get-Content -Path (Join-Path $testRepo '.wizard-metrics/artifacts/manifest/generated-artifact-manifest.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+  $testManifestPath = (Get-WizardArtifactPaths -RepoRoot $testRepo -ScenarioSlug 'test-scenario').ManifestJsonPath
+  $manifest = Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst'
   if (@($manifest.items).Count -ne 1) {
     throw 'Expected one manifest item.'
   }
+
+  Add-WizardArtifactManifestItem -RepoRoot $testRepo -ScenarioSlug 'Second Scenario' -SolutionName 'SecondSolution' -PublisherPrefix 'snd' -Kind 'table' -Name 'snd_case' -Status 'created' -Step '20-build-tables.ps1' | Out-Null
+  $secondManifestPath = (Get-WizardArtifactPaths -RepoRoot $testRepo -ScenarioSlug 'second-scenario').ManifestJsonPath
+  if ($testManifestPath -eq $secondManifestPath -or -not (Test-Path $testManifestPath) -or -not (Test-Path $secondManifestPath)) {
+    throw 'Two scenarios must use separate normalized manifest paths.'
+  }
+  $firstManifestAfterSecond = Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst'
+  if (@($firstManifestAfterSecond.items).Count -ne 1 -or $firstManifestAfterSecond.items[0].name -ne 'tst_agent') {
+    throw 'A second scenario overwrote the first scenario manifest.'
+  }
+
+  foreach ($mismatch in @(
+      @{ Scenario = 'test-scenario'; Solution = 'GccSolution'; Prefix = 'tst'; Expected = 'solution identity' },
+      @{ Scenario = 'test-scenario'; Solution = 'TestSolution'; Prefix = 'gcc'; Expected = 'publisher identity' }
+    )) {
+    try {
+      Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug $mismatch.Scenario -SolutionName $mismatch.Solution -PublisherPrefix $mismatch.Prefix | Out-Null
+      throw "Expected $($mismatch.Expected) mismatch to stop manifest access."
+    } catch {
+      if ($_.Exception.Message -notmatch [regex]::Escape($mismatch.Expected)) { throw }
+    }
+  }
+  if ($null -ne (Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'gcc-framework-acceptance' -SolutionName 'GccSolution' -PublisherPrefix 'gcc' -AllowMissing)) {
+    throw 'A Contoso manifest must not authorize GCC scenario components.'
+  }
+
+  Add-WizardArtifactManifestItem -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst' -Kind 'column' -Name 'tst_agent.tst_region' -Status 'created' -Step '30-build-columns.ps1' | Out-Null
+  $rerunManifest = Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst'
+  if (@($rerunManifest.items).Count -ne 2 -or @($rerunManifest.items | Where-Object name -eq 'tst_agent').Count -ne 1) {
+    throw 'Scenario reruns must preserve existing history while adding later-stage items.'
+  }
+
+  $legacyPaths = Get-WizardArtifactPaths -RepoRoot $testRepo -ScenarioSlug 'legacy-scenario'
+  [ordered]@{ scenarioSlug = 'legacy-scenario'; solutionName = 'LegacySolution'; publisherPrefix = 'leg'; runId = 'legacy'; items = @() } |
+    ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $legacyPaths.LegacyManifestJsonPath -Encoding UTF8
+  if (Test-Path -LiteralPath $legacyPaths.ManifestJsonPath) { throw 'Legacy global manifest was silently migrated.' }
+  if ($null -ne (Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'legacy-scenario' -SolutionName 'LegacySolution' -PublisherPrefix 'leg' -AllowMissing)) {
+    throw 'Legacy global manifest was silently used as scenario provenance.'
+  }
+  try {
+    Move-WizardLegacyArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'legacy-scenario' -SolutionName 'WrongSolution' -PublisherPrefix 'leg' | Out-Null
+    throw 'Legacy migration must reject a mismatched solution identity.'
+  } catch {
+    if ($_.Exception.Message -notmatch 'solution identity') { throw }
+  }
+  Move-WizardLegacyArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'legacy-scenario' -SolutionName 'LegacySolution' -PublisherPrefix 'leg' | Out-Null
+  $migrated = Get-WizardArtifactManifest -RepoRoot $testRepo -ScenarioSlug 'legacy-scenario' -SolutionName 'LegacySolution' -PublisherPrefix 'leg'
+  if ($migrated.scenarioSlug -ne 'legacy-scenario') { throw 'Explicit validated legacy migration failed.' }
 
   Remove-Item -Path (Join-Path $testRepo 'specs/test-scenario/tasks.md') -Force
   $failedValidation = Test-WizardBuildContract -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -StrictMode $true

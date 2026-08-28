@@ -18,9 +18,22 @@
 
 ## Manifest Usage
 
-- Every run updates `.wizard-metrics/artifacts/manifest/generated-artifact-manifest.json`.
+- Each apply run updates only `.wizard-metrics/artifacts/manifest/<normalized-scenario-slug>/generated-artifact-manifest.json`.
 - Use the manifest to see which tables, columns, relationships, forms, views, BPFs, app components, and app modules were `created`, `updated`, `skipped`, or `failed`.
-- The markdown companion file is `.wizard-metrics/artifacts/manifest/generated-artifact-manifest.md`.
+- The markdown companion file is in the same scenario-specific folder.
+- Every manifest open validates the normalized scenario slug, solution unique name, and publisher prefix against the active stage. Any mismatch is a hard stop.
+- Preview may write disposable reports and run summaries, but it must not create or alter manifest provenance.
+
+### Explicit Legacy Migration
+
+The former global manifest at `.wizard-metrics/artifacts/manifest/generated-artifact-manifest.json` is never read automatically. To migrate it, first inspect it without exposing credentials or identifiers, then explicitly invoke the validated migration helper:
+
+```powershell
+. ./scripts/bootstrap/helpers/wizard-hardening.ps1
+Move-WizardLegacyArtifactManifest -RepoRoot $PWD -ScenarioSlug '<scenario-slug>' -SolutionName '<solution-unique-name>' -PublisherPrefix '<prefix>'
+```
+
+Migration copies the legacy manifest only when all three identities match and no scenario-specific manifest exists. A mismatch or existing target stops migration.
 
 ## Form And View Quality Troubleshooting
 

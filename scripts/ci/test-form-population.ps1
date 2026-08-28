@@ -254,7 +254,11 @@ function Invoke-RestMethod {
 }
 
 $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
+$originalSolutionName = $env:DV_SOLUTION_NAME
+$originalPublisherPrefix = $env:DV_PUBLISHER_PREFIX
 [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
+$env:DV_SOLUTION_NAME = 'TestSolution'
+$env:DV_PUBLISHER_PREFIX = 'tst'
 
 try {
   $richRepo = New-TestRepo
@@ -492,11 +496,15 @@ try {
   $script:MockContext.Views[0].description = $null
   $script:MockContext.Views[0].fetchxml = '<fetch><entity name="tst_request"><attribute name="tst_requestid"/><attribute name="tst_name"/><attribute name="createdon"/><order attribute="tst_name" descending="false"/><filter><condition attribute="statecode" operator="eq" value="0"/></filter></entity></fetch>'
   $script:MockContext.Views[0].layoutxml = '<grid><row><cell name="tst_name"/><cell name="createdon"/></row></grid>'
+  $adoptionManifestPath = (Get-WizardArtifactPaths -RepoRoot $adoptionRepo -ScenarioSlug 'adoption-scenario').ManifestJsonPath
+  $manifestHashBeforePreview = (Get-FileHash -LiteralPath $adoptionManifestPath -Algorithm SHA256).Hash
   $requestCountBeforePreview = $script:MockContext.Requests.Count
   $previewExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'preview-token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $adoptionRepo 'payloads') -ScenarioSlug 'adoption-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true -PreviewOnly $true
   Assert-Condition -Condition ($previewExitCode -eq 0) -Message 'Adoption preview should succeed.'
   $previewMutations = @($script:MockContext.Requests | Select-Object -Skip $requestCountBeforePreview | Where-Object { $_.Method -in @('Post', 'Patch', 'Delete') })
   Assert-Condition -Condition ($previewMutations.Count -eq 0) -Message 'Preview must not mutate forms, views, or publishing.'
+  $manifestHashAfterPreview = (Get-FileHash -LiteralPath $adoptionManifestPath -Algorithm SHA256).Hash
+  Assert-Condition -Condition ($manifestHashAfterPreview -eq $manifestHashBeforePreview) -Message 'Preview must not alter manifest provenance.'
   $adoptionReport = Get-Content -Path (Join-Path $adoptionRepo '.wizard-metrics/artifacts/views/view-population-report.json') -Raw | ConvertFrom-Json
   Assert-Condition -Condition ($adoptionReport.tables[0].viewAction -eq 'adoption-planned') -Message 'Preview must report the planned generated-view adoption.'
 
@@ -504,6 +512,8 @@ try {
 }
 finally {
   [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', $originalSkipMain)
+  $env:DV_SOLUTION_NAME = $originalSolutionName
+  $env:DV_PUBLISHER_PREFIX = $originalPublisherPrefix
 }
 
 exit 0

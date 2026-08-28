@@ -307,13 +307,13 @@ function Get-AppReportPaths {
 $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
 $paths = Get-AppReportPaths
 
-if ($EnableArtifactManifest) {
+if ($EnableArtifactManifest -and -not $PreviewOnly) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
 }
 
 if (-not $EnableAppModuleWiring -or -not $appConfig.Enabled) {
     [ordered]@{ status = 'skipped'; reason = 'app module wiring disabled'; scenarioSlug = $appConfig.ScenarioSlug } | ConvertTo-Json -Depth 10 | Set-Content -Path $paths.SummaryPath -Encoding UTF8
-    if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+    if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name ($appConfig.UniqueName ?? 'app-module') -Status 'skipped' -Step '62-build-app-module.ps1' -Details @{ reason = 'disabled' } | Out-Null
     }
     Write-Host 'App module wiring disabled or not requested for this scenario. Skipping.' -ForegroundColor Yellow
@@ -322,7 +322,7 @@ if (-not $EnableAppModuleWiring -or -not $appConfig.Enabled) {
 
 if (-not $appConfig.ValidationPassed) {
     [ordered]@{ status = 'failed'; errors = @($appConfig.ValidationErrors); scenarioSlug = $appConfig.ScenarioSlug } | ConvertTo-Json -Depth 10 | Set-Content -Path $paths.ValidationPath -Encoding UTF8
-    if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+    if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name $appConfig.UniqueName -Status 'failed' -Step '62-build-app-module.ps1' -Details @{ validationErrors = @($appConfig.ValidationErrors) } | Out-Null
     }
     Write-Host 'App module wiring contract is incomplete.' -ForegroundColor Red
@@ -570,8 +570,8 @@ $validationResult = [pscustomobject]@{
     previewOnly = [bool]$PreviewOnly
 } | ConvertTo-Json -Depth 20 | Set-Content -Path $paths.ValidationPath -Encoding UTF8
 
-if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-    $manifestStatus = if ($PreviewOnly) { 'skipped' } elseif (-not $validationResult.ValidationSuccess -and $StrictMode) { 'failed' } else { $action }
+if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+    $manifestStatus = if (-not $validationResult.ValidationSuccess -and $StrictMode) { 'failed' } else { $action }
     Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name $appConfig.UniqueName -Status $manifestStatus -Step '62-build-app-module.ps1' -Details @{ validationSuccess = [bool]$validationResult.ValidationSuccess; issueCount = @($validationResult.ValidationIssueList).Count } | Out-Null
 }
 

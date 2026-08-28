@@ -436,7 +436,7 @@ if (Get-Command Test-WizardBuildContract -ErrorAction SilentlyContinue) {
     foreach ($message in @($contractValidation.Warnings)) { Add-Warn $message }
     foreach ($message in @($contractValidation.Errors)) { Add-Error $message }
 
-    if ($EnableArtifactManifest) {
+    if ($EnableArtifactManifest -and -not $PreviewOnly) {
         Initialize-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $contractValidation.ScenarioSlug -SolutionName $contractValidation.SolutionName -PublisherPrefix $contractValidation.PublisherPrefix | Out-Null
     }
 

@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.7.0
+Version: 1.8.0
 
 ## Purpose
 
@@ -86,6 +86,8 @@ After explicit table mapping, the entry-point logical name must resolve to a reu
 The generated disposition is planning intent only. It does not establish live provenance or authorize mutation; step 60 must still prove every condition above at apply time.
 
 The adoption operation may update only FetchXML, LayoutXML, and the wizard ownership description. It must preserve the saved-query ID, name, active state, public query type, and default status. Reruns may update that same ID only when its ownership marker matches the current scenario. A same-name non-generated view, metadata mismatch, missing creation provenance, standard/shared/preexisting table, or ownership mismatch is a hard stop.
+
+Artifact provenance is scenario-scoped at `.wizard-metrics/artifacts/manifest/<normalized-scenario-slug>/`. Every stage must validate the manifest's scenario slug, solution unique name, and publisher prefix before reading or writing it. A legacy global manifest is untrusted until an operator explicitly runs the validated migration helper; it is never selected automatically. Preview must not create or alter manifest provenance.
 
 `create-custom` always creates or idempotently updates a separate wizard-owned view from its declared columns, filter, and sort. Generated forms and views are never changed by this disposition. Main forms created by the wizard remain separate named forms; generated `Information` forms are never update targets.
 

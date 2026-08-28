@@ -21,3 +21,11 @@ The live-read activity must not be represented as part of credential-free previe
 - Treat `PowerPlatformVSCodeStarter` publisher creation and acceptance-solution creation as explicit future mutations.
 - Rerun preview locally with connection values cleared and live resolution disabled.
 - Require explicit mutation authorization before any environment change.
+
+## Execution Record Correction: 2026-08-28
+
+- Earlier Dataverse GET activity included identity and metadata verification attempts or completed reads. It must not be described as though no Dataverse GET occurred.
+- No Dataverse metadata or data mutation occurred, and no publishing occurred during the stopped forms-and-views gate.
+- `.env.ps1` was read with `Get-Content` during the broader execution history and may have emitted its access token into local terminal or session output. That output is treated as sensitive and must not be reproduced.
+- Future logs and reports must not print `.env.ps1`, access tokens, authorization headers, tenant or organization identifiers, user identifiers, or component identifiers.
+- The existing PAC profile was not switched, deleted, or modified. A future authorized stage may use the explicitly approved environment URL and an independently verified Azure token without changing PAC profile alignment.

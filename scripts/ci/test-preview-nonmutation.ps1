@@ -54,8 +54,19 @@ function Get-GitPreviewSnapshot {
     }
 }
 
+function Get-ManifestProvenanceSnapshot {
+    param([string]$RepositoryRoot)
+
+    $manifestRoot = Join-Path $RepositoryRoot '.wizard-metrics/artifacts/manifest'
+    if (-not (Test-Path -LiteralPath $manifestRoot -PathType Container)) { return @() }
+    return @(Get-ChildItem -LiteralPath $manifestRoot -Filter 'generated-artifact-manifest.json' -File -Recurse | Sort-Object FullName | ForEach-Object {
+        "$([IO.Path]::GetRelativePath($manifestRoot, $_.FullName).Replace('\', '/'))|$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)"
+    })
+}
+
 $tokenBefore = $env:DV_TOKEN
 $before = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
+$manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
 & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview
 if ($LASTEXITCODE -ne 0) {
     throw "Orchestrated preview failed with exit code $LASTEXITCODE."
@@ -88,6 +99,7 @@ try {
     $env:DV_PUBLISHER_PREFIX = $prefixBefore
 }
 $after = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
+$manifestAfter = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
 
 if ($before.Head -ne $after.Head -or $before.Branch -ne $after.Branch -or $before.IndexHash -ne $after.IndexHash) {
     throw 'Preview changed Git HEAD, branch, or index.'
@@ -97,6 +109,9 @@ if (@(Compare-Object $before.StagedFiles $after.StagedFiles).Count -ne 0) {
 }
 if ($env:DV_TOKEN -ne $tokenBefore) {
     throw 'Preview changed the Dataverse access-token environment value.'
+}
+if (@(Compare-Object $manifestBefore $manifestAfter).Count -ne 0) {
+    throw 'Preview created, deleted, or altered artifact manifest provenance.'
 }
 
 Write-Host 'Preview non-mutation checks passed.' -ForegroundColor Green

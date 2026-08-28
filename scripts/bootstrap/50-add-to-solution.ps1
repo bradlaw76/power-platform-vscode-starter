@@ -407,9 +407,9 @@ if ($InventoryOnly) {
     $expectedByCategory = ConvertTo-SolutionExpectedCategoryMap -ExpectedArtifacts $expectedArtifacts
     $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
     $failedArtifacts = @()
-    $artifactPaths = Get-WizardArtifactPaths -RepoRoot $repoRoot
+    $artifactPaths = Get-WizardArtifactPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
     if (Test-Path -LiteralPath $artifactPaths.ManifestJsonPath) {
-        $manifest = Get-Content -LiteralPath $artifactPaths.ManifestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        $manifest = Get-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix
         $failedArtifacts = @($manifest.items | Where-Object status -eq 'failed' | ForEach-Object {
             [pscustomobject]@{
                 Kind = $_.kind

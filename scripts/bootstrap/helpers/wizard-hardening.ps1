@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Wizard Hardening Helper
 FILE:         scripts/bootstrap/helpers/wizard-hardening.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | Build Contract Validation
 
 -----------------------------------------------------------------------------
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.0  2026-08-28  Added scenario-scoped manifests and identity validation.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
 -----------------------------------------------------------------------------
@@ -571,23 +572,101 @@ function Test-WizardBuildContract {
     }
 }
 
+function ConvertTo-WizardManifestScenarioSlug {
+    param([string]$ScenarioSlug)
+
+    $normalized = ($ScenarioSlug ?? '').Trim().ToLowerInvariant()
+    $normalized = [regex]::Replace($normalized, '[^a-z0-9]+', '-')
+    $normalized = $normalized.Trim('-')
+    if ([string]::IsNullOrWhiteSpace($normalized)) {
+        throw 'A scenario slug is required for artifact manifest access.'
+    }
+    return $normalized
+}
+
 function Get-WizardArtifactPaths {
-    param([string]$RepoRoot)
+    param(
+        [string]$RepoRoot,
+        [string]$ScenarioSlug = ''
+    )
 
     $artifactRoot = Join-Path $RepoRoot '.wizard-metrics\artifacts'
     $manifestFolder = Join-Path $artifactRoot 'manifest'
+    $scenarioManifestFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) { '' } else { Join-Path $manifestFolder (ConvertTo-WizardManifestScenarioSlug -ScenarioSlug $ScenarioSlug) }
     return [pscustomobject]@{
         ArtifactRoot = $artifactRoot
         ContractFolder = Join-Path $artifactRoot 'validation'
         ContaminationFolder = Join-Path $artifactRoot 'solution'
-        ManifestFolder = $manifestFolder
+        ManifestFolder = $scenarioManifestFolder
+        LegacyManifestFolder = $manifestFolder
         ContractJsonPath = Join-Path (Join-Path $artifactRoot 'validation') 'build-contract-validation.json'
         ContractMarkdownPath = Join-Path (Join-Path $artifactRoot 'validation') 'build-contract-validation.md'
         ContaminationJsonPath = Join-Path (Join-Path $artifactRoot 'solution') 'contamination-scan.json'
         ContaminationMarkdownPath = Join-Path (Join-Path $artifactRoot 'solution') 'contamination-scan.md'
-        ManifestJsonPath = Join-Path $manifestFolder 'generated-artifact-manifest.json'
-        ManifestMarkdownPath = Join-Path $manifestFolder 'generated-artifact-manifest.md'
+        ManifestJsonPath = if ($scenarioManifestFolder) { Join-Path $scenarioManifestFolder 'generated-artifact-manifest.json' } else { '' }
+        ManifestMarkdownPath = if ($scenarioManifestFolder) { Join-Path $scenarioManifestFolder 'generated-artifact-manifest.md' } else { '' }
+        LegacyManifestJsonPath = Join-Path $manifestFolder 'generated-artifact-manifest.json'
+        LegacyManifestMarkdownPath = Join-Path $manifestFolder 'generated-artifact-manifest.md'
     }
+}
+
+function Assert-WizardArtifactManifestIdentity {
+    param(
+        [object]$Manifest,
+        [string]$ScenarioSlug,
+        [string]$SolutionName,
+        [string]$PublisherPrefix
+    )
+
+    $expectedSlug = ConvertTo-WizardManifestScenarioSlug -ScenarioSlug $ScenarioSlug
+    $actualSlug = ConvertTo-WizardManifestScenarioSlug -ScenarioSlug "$($Manifest.scenarioSlug)"
+    if ($actualSlug -cne $expectedSlug) { throw "Artifact manifest scenario mismatch. Expected '$expectedSlug'; found '$actualSlug'." }
+    if (-not [string]::Equals("$($Manifest.solutionName)".Trim(), ($SolutionName ?? '').Trim(), [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Artifact manifest solution identity does not match the active scenario.'
+    }
+    if (-not [string]::Equals("$($Manifest.publisherPrefix)".Trim(), ($PublisherPrefix ?? '').Trim(), [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Artifact manifest publisher identity does not match the active scenario.'
+    }
+}
+
+function Get-WizardArtifactManifest {
+    param(
+        [string]$RepoRoot,
+        [string]$ScenarioSlug,
+        [string]$SolutionName,
+        [string]$PublisherPrefix,
+        [switch]$AllowMissing
+    )
+
+    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug
+    if (-not (Test-Path -LiteralPath $paths.ManifestJsonPath -PathType Leaf)) {
+        if ($AllowMissing) { return $null }
+        throw "Scenario artifact manifest not found for '$(ConvertTo-WizardManifestScenarioSlug -ScenarioSlug $ScenarioSlug)'. Legacy global manifests are not used automatically."
+    }
+    $manifest = Get-Content -LiteralPath $paths.ManifestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-WizardArtifactManifestIdentity -Manifest $manifest -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix
+    return $manifest
+}
+
+function Move-WizardLegacyArtifactManifest {
+    param(
+        [string]$RepoRoot,
+        [string]$ScenarioSlug,
+        [string]$SolutionName,
+        [string]$PublisherPrefix
+    )
+
+    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug
+    if (-not (Test-Path -LiteralPath $paths.LegacyManifestJsonPath -PathType Leaf)) { throw 'Legacy global artifact manifest not found.' }
+    if (Test-Path -LiteralPath $paths.ManifestJsonPath) { throw 'Scenario artifact manifest already exists; legacy migration is blocked.' }
+    $legacy = Get-Content -LiteralPath $paths.LegacyManifestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    Assert-WizardArtifactManifestIdentity -Manifest $legacy -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix
+    New-Item -ItemType Directory -Path $paths.ManifestFolder -Force | Out-Null
+    Copy-Item -LiteralPath $paths.LegacyManifestJsonPath -Destination $paths.ManifestJsonPath
+    if (Test-Path -LiteralPath $paths.LegacyManifestMarkdownPath) {
+        Copy-Item -LiteralPath $paths.LegacyManifestMarkdownPath -Destination $paths.ManifestMarkdownPath
+    }
+    return $paths.ManifestJsonPath
 }
 
 function Write-WizardBuildContractArtifacts {
@@ -820,12 +899,15 @@ function Initialize-WizardArtifactManifest {
         [string]$PublisherPrefix
     )
 
-    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot
+    $normalizedSlug = ConvertTo-WizardManifestScenarioSlug -ScenarioSlug $ScenarioSlug
+    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot -ScenarioSlug $normalizedSlug
     New-Item -ItemType Directory -Path $paths.ManifestFolder -Force | Out-Null
 
-    if (-not (Test-Path $paths.ManifestJsonPath)) {
+    if (Test-Path $paths.ManifestJsonPath) {
+        Get-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $normalizedSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix | Out-Null
+    } else {
         $manifest = [ordered]@{
-            scenarioSlug = $ScenarioSlug
+            scenarioSlug = $normalizedSlug
             solutionName = $SolutionName
             publisherPrefix = $PublisherPrefix
             runId = Get-WizardRunId -RepoRoot $RepoRoot
@@ -853,7 +935,7 @@ function Add-WizardArtifactManifestItem {
     )
 
     $manifestPath = Initialize-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix
-    $manifest = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $manifest = Get-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix
     $items = New-Object System.Collections.Generic.List[object]
     foreach ($item in @($manifest.items)) {
         $items.Add($item) | Out-Null
@@ -892,19 +974,24 @@ function Add-WizardArtifactManifestItem {
     $manifest.updatedAtUtc = [DateTime]::UtcNow.ToString('o')
     $manifest | ConvertTo-Json -Depth 20 | Set-Content -Path $manifestPath -Encoding UTF8
 
-    Write-WizardArtifactManifestSummary -RepoRoot $RepoRoot | Out-Null
+    Write-WizardArtifactManifestSummary -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix | Out-Null
     return $manifestPath
 }
 
 function Write-WizardArtifactManifestSummary {
-    param([string]$RepoRoot)
+    param(
+        [string]$RepoRoot,
+        [string]$ScenarioSlug,
+        [string]$SolutionName,
+        [string]$PublisherPrefix
+    )
 
-    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot
+    $paths = Get-WizardArtifactPaths -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug
     if (-not (Test-Path $paths.ManifestJsonPath)) {
         return ''
     }
 
-    $manifest = Get-Content -Path $paths.ManifestJsonPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $manifest = Get-WizardArtifactManifest -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionName -PublisherPrefix $PublisherPrefix
     $lines = New-Object System.Collections.Generic.List[string]
     $lines.Add('# Generated Artifact Manifest') | Out-Null
     $lines.Add('') | Out-Null
