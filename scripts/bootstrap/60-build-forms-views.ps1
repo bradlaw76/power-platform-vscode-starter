@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Build Forms Views
 FILE:         scripts/bootstrap/60-build-forms-views.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API | Model-Driven App Metadata
 
 -----------------------------------------------------------------------------
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.0  2026-08-28  Added explicit custom-view creation and safe generated Active-view adoption.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
 -----------------------------------------------------------------------------
@@ -80,6 +81,9 @@ NON-NEGOTIABLES
 .PARAMETER ScenarioSlug
   Scenario folder under specs/. If omitted and there is exactly one scenario,
   that scenario is used automatically for view field prioritization.
+.PARAMETER PreviewOnly
+  Verifies and reports planned form/view actions without POST, PATCH, DELETE,
+  or publish requests.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/60-build-forms-views.ps1
@@ -101,7 +105,8 @@ param(
   [ValidateSet('auto', 'create-new-forms', 'update-in-place')]
   [string]$FormStrategy = 'auto',
   [bool]$FailIfUnderpopulatedForms = $true,
-  [bool]$FailIfUnderpopulatedViews = $true
+  [bool]$FailIfUnderpopulatedViews = $true,
+  [switch]$PreviewOnly
 )
 
 Set-StrictMode -Version Latest
@@ -1224,7 +1229,9 @@ function New-StarterViewFetchXml {
     [string]$TableLogical,
     [string]$PrimaryField,
     [array]$Fields,
-    [bool]$FilterToActiveRecords
+    [bool]$FilterToActiveRecords,
+    $FilterDefinition = $null,
+    $SortDefinition = $null
   )
 
   $attributeLines = New-Object System.Collections.Generic.List[string]
@@ -1233,7 +1240,13 @@ function New-StarterViewFetchXml {
   }
 
   $filterBlock = ''
-  if ($FilterToActiveRecords) {
+  if ($null -ne $FilterDefinition) {
+    $filterBlock = @"
+    <filter type="and">
+      <condition attribute="$(Get-PropertyValue -Object $FilterDefinition -Name 'Attribute')" operator="$(Get-PropertyValue -Object $FilterDefinition -Name 'Operator')" value="$(Get-PropertyValue -Object $FilterDefinition -Name 'Value')" />
+    </filter>
+"@
+  } elseif ($FilterToActiveRecords) {
     $filterBlock = @"
     <filter type="and">
       <condition attribute="statecode" operator="eq" value="0" />
@@ -1241,11 +1254,14 @@ function New-StarterViewFetchXml {
 "@
   }
 
+  $sortAttribute = if ($null -eq $SortDefinition) { $PrimaryField } else { Get-PropertyValue -Object $SortDefinition -Name 'Attribute' -Default $PrimaryField }
+  $sortDescending = if ($null -eq $SortDefinition) { 'false' } else { "$(ConvertTo-Boolean -Value (Get-PropertyValue -Object $SortDefinition -Name 'Descending'))".ToLowerInvariant() }
+
   return @"
 <fetch version="1.0" output-format="xml-platform" mapping="logical" distinct="false">
   <entity name="$TableLogical">
 $($attributeLines.ToArray() -join [Environment]::NewLine)
-    <order attribute="$PrimaryField" descending="false" />
+    <order attribute="$sortAttribute" descending="$sortDescending" />
 $filterBlock
   </entity>
 </fetch>
@@ -1490,7 +1506,8 @@ function Invoke-WizardFormsViewsBuild {
     [string]$PreferFormName,
     [string]$FormStrategy = 'auto',
     [bool]$FailIfUnderpopulatedForms,
-    [bool]$FailIfUnderpopulatedViews
+    [bool]$FailIfUnderpopulatedViews,
+    [bool]$PreviewOnly = $false
   )
 
   if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
@@ -1530,6 +1547,7 @@ function Invoke-WizardFormsViewsBuild {
   }
 
   $scenarioContext = Get-ScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
+  $surfaceContract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext
   $appConfig = $null
   if ($null -ne $scenarioContext -and (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue)) {
     try {
@@ -1561,6 +1579,7 @@ function Invoke-WizardFormsViewsBuild {
   Write-Host "  Add owner:   $IncludeOwnerOnForms"
   Write-Host "  View owner:  $IncludeOwnerInViews"
   Write-Host "  View status: $IncludeStatusInViews"
+  Write-Host "  Preview only: $PreviewOnly"
   Write-Host ''
 
   $payloadEntities = @(Get-EntitiesFromPayloads -Folder $PayloadsFolder)
@@ -1625,30 +1644,34 @@ function Invoke-WizardFormsViewsBuild {
       $skippedFields = @($selection.SkippedFields)
       $missingExpectedFields = @($selection.MissingExpectedFields)
 
+      $formDefinition = Get-TableSurfaceDefinition -Definitions $surfaceContract.Forms -TableLogical $logical
+      $resolvedFormName = if ($null -eq $formDefinition) { $PreferFormName } else { "$(Get-PropertyValue -Object $formDefinition -Name 'Name')" }
       $existingForms = @((Invoke-Dv -Method 'Get' -Path "systemforms?`$select=formid,name,type,formxml&`$filter=objecttypecode eq '$logical' and type eq 2").value)
-      $targetForm = Get-TargetMainForm -ExistingForms $existingForms -PreferredFormName $PreferFormName -FormStrategy $resolvedFormStrategy
-      $targetFormName = if ($null -eq $targetForm) { $PreferFormName } else { $targetForm.name }
+      $targetForm = Get-TargetMainForm -ExistingForms $existingForms -PreferredFormName $resolvedFormName -FormStrategy $resolvedFormStrategy
+      $targetFormName = if ($null -eq $targetForm) { $resolvedFormName } else { $targetForm.name }
       $formAction = 'skipped'
 
       if ($null -eq $targetForm) {
-        $formAction = 'created'
+        $formAction = if ($PreviewOnly) { 'create-planned' } else { 'created' }
         $mergeResult = Merge-FieldsIntoFormXml -ExistingFormXml '' -DesiredFields $orderedFields
         $formBody = @{
-          name           = $PreferFormName
+          name           = $resolvedFormName
           objecttypecode = $logical
           type           = 2
           formxml        = $mergeResult.FormXml
         } | ConvertTo-Json -Compress
-        Invoke-Dv -Method 'Post' -Path 'systemforms' -Body $formBody | Out-Null
-        Write-Host "    Form ($PreferFormName created)" -ForegroundColor Green
-        $formsCreated++
+        if (-not $PreviewOnly) {
+          Invoke-Dv -Method 'Post' -Path 'systemforms' -Body $formBody | Out-Null
+          $formsCreated++
+        }
+        Write-Host "    Form ($resolvedFormName $(if ($PreviewOnly) { 'planned' } else { 'created' }))" -ForegroundColor Green
         $currentFormXml = $mergeResult.FormXml
       } else {
         $mergeResult = Merge-FieldsIntoFormXml -ExistingFormXml $targetForm.formxml -DesiredFields $orderedFields
         $currentFormXml = $mergeResult.FormXml
         if ($targetForm.formxml -ne $mergeResult.FormXml) {
           $patchBody = @{ formxml = $mergeResult.FormXml } | ConvertTo-Json -Compress
-          Invoke-Dv -Method 'Patch' -Path "systemforms($($targetForm.formid))" -Body $patchBody | Out-Null
+          if (-not $PreviewOnly) { Invoke-Dv -Method 'Patch' -Path "systemforms($($targetForm.formid))" -Body $patchBody | Out-Null }
           Write-Host "    Form (updated $targetFormName with missing controls)" -ForegroundColor Green
           $formsUpdated++
           $formAction = 'updated'
@@ -1714,17 +1737,33 @@ function Invoke-WizardFormsViewsBuild {
     try {
       $viewSelection = Get-DesiredViewFields -TableLogical $logical -PrimaryField $primary -PrimaryLabel $primaryLabel -PrimaryIdField $primaryId -PayloadFields $payloadFields -Attributes $attributes -MinimumBusinessFields $MinBusinessColumnsPerView -IncludeOwner $IncludeOwnerInViews -IncludeStatus $IncludeStatusInViews -ScenarioContext $scenarioContext
       $desiredViewFields = @($viewSelection.Fields)
+      $viewDefinition = Get-TableSurfaceDefinition -Definitions $surfaceContract.Views -TableLogical $logical
+      if ($null -ne $viewDefinition) {
+        $desiredViewFields = @((Get-PropertyValue -Object $viewDefinition -Name 'Columns' -Default @()) | ForEach-Object {
+            $field = "$_".ToLowerInvariant()
+            if (-not $attributeMap.ContainsKey($field)) { throw "View '$($viewDefinition.Name)' references missing field '$field'." }
+            [pscustomobject]@{ LogicalName = $field; Label = $attributeMap[$field].Label; Source = 'view-contract'; IsBusiness = $true }
+          })
+      }
       $viewSkippedFields = @($viewSelection.SkippedFields)
       $missingExpectedViewFields = @($viewSelection.MissingExpectedFields)
-      $viewName = if (
+      $viewName = if ($null -ne $viewDefinition) { "$(Get-PropertyValue -Object $viewDefinition -Name 'Name')" } elseif (
         $null -ne $appConfig -and
         $logical -eq $appConfig.EntryPointTable -and
         -not [string]::IsNullOrWhiteSpace($appConfig.LandingView)
       ) { $appConfig.LandingView } else { 'Active Records' }
 
-      $existingViews = @((Invoke-Dv -Method 'Get' -Path "savedqueries?`$select=savedqueryid,name,layoutxml,fetchxml,description&`$filter=returnedtypecode eq '$logical' and querytype eq 0").value)
+      $existingViews = @((Invoke-Dv -Method 'Get' -Path "savedqueries?`$select=savedqueryid,name,returnedtypecode,querytype,statecode,statuscode,ismanaged,isdefault,layoutxml,fetchxml,description&`$filter=returnedtypecode eq '$logical' and querytype eq 0").value)
+      $disposition = if ($null -eq $viewDefinition) { 'create-custom' } else { "$(Get-PropertyValue -Object $viewDefinition -Name 'Disposition')".ToLowerInvariant() }
       $targetView = $existingViews | Where-Object { $_.name -eq $viewName } | Select-Object -First 1
-      $desiredFetchXml = New-StarterViewFetchXml -TableLogical $logical -PrimaryField $primary -Fields $desiredViewFields -FilterToActiveRecords ($attributeMap.ContainsKey('statecode'))
+      if ($disposition -eq 'adopt-generated-active') {
+        $isCustomTable = ConvertTo-Boolean -Value (Get-PropertyValue -Object $table -Name 'IsCustomEntity')
+        $tableCreatedByScenario = $isCustomTable -and (Test-CurrentScenarioCreatedTable -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -TableLogical $logical)
+        $targetView = Resolve-AdoptedGeneratedView -ExistingViews $existingViews -ViewName $viewName -TableLogical $logical -PrimaryField $primary -PrimaryIdField $primaryId -ScenarioSlug $scenarioContext.ScenarioSlug -TableCreatedByScenario $tableCreatedByScenario
+      }
+      $filterDefinition = if ($null -eq $viewDefinition) { $null } else { Get-PropertyValue -Object $viewDefinition -Name 'Filter' }
+      $sortDefinition = if ($null -eq $viewDefinition) { $null } else { Get-PropertyValue -Object $viewDefinition -Name 'Sort' }
+      $desiredFetchXml = New-StarterViewFetchXml -TableLogical $logical -PrimaryField $primary -Fields $desiredViewFields -FilterToActiveRecords ($attributeMap.ContainsKey('statecode')) -FilterDefinition $filterDefinition -SortDefinition $sortDefinition
       $desiredLayoutXml = New-StarterViewLayoutXml -Fields $desiredViewFields -PrimaryField $primary -PrimaryIdField $primaryId
       $viewAction = 'created'
       $currentFetchXml = $desiredFetchXml
@@ -1733,32 +1772,31 @@ function Invoke-WizardFormsViewsBuild {
       if ($null -eq $targetView) {
         $viewBody = @{
           name             = $viewName
-          description      = $script:WizardManagedViewMarker
+          description      = (Get-WizardViewOwnershipMarker -ScenarioSlug $scenarioContext.ScenarioSlug -Disposition $disposition)
           returnedtypecode = $logical
           querytype        = 0
           fetchxml         = $desiredFetchXml
           layoutxml        = $desiredLayoutXml
           iscustomizable   = @{ Value = $true }
         } | ConvertTo-Json -Compress
-        Invoke-Dv -Method 'Post' -Path 'savedqueries' -Body $viewBody | Out-Null
+        if (-not $PreviewOnly) { Invoke-Dv -Method 'Post' -Path 'savedqueries' -Body $viewBody | Out-Null }
         Write-Host "    View  ($viewName created)" -ForegroundColor Green
         $viewsCreated++
       } else {
         $currentFetchXml = Get-PropertyValue -Object $targetView -Name 'fetchxml' -Default ''
         $currentLayoutXml = Get-PropertyValue -Object $targetView -Name 'layoutxml' -Default ''
-        if (Test-IsWizardManagedView -View $targetView -PrimaryField $primary) {
+        if ($disposition -eq 'adopt-generated-active' -or (Test-IsWizardManagedView -View $targetView -PrimaryField $primary)) {
           $viewAction = 'validated'
           if (($currentFetchXml -ne $desiredFetchXml) -or ($currentLayoutXml -ne $desiredLayoutXml) -or ((Get-PropertyValue -Object $targetView -Name 'description' -Default '') -notlike "*$script:WizardManagedViewMarker*")) {
             $patchBody = @{
-              name        = $viewName
-              description = $script:WizardManagedViewMarker
+              description = (Get-WizardViewOwnershipMarker -ScenarioSlug $scenarioContext.ScenarioSlug -Disposition $disposition)
               fetchxml    = $desiredFetchXml
               layoutxml   = $desiredLayoutXml
             } | ConvertTo-Json -Compress
-            Invoke-Dv -Method 'Patch' -Path "savedqueries($((Get-PropertyValue -Object $targetView -Name 'savedqueryid')))" -Body $patchBody | Out-Null
+            if (-not $PreviewOnly) { Invoke-Dv -Method 'Patch' -Path "savedqueries($((Get-PropertyValue -Object $targetView -Name 'savedqueryid')))" -Body $patchBody | Out-Null }
             Write-Host "    View  ($viewName updated)" -ForegroundColor Green
             $viewsUpdated++
-            $viewAction = 'updated'
+            $viewAction = if ($PreviewOnly) { "$(if ($disposition -eq 'adopt-generated-active') { 'adoption' } else { 'update' })-planned" } elseif ($disposition -eq 'adopt-generated-active') { 'adopted' } else { 'updated' }
             $currentFetchXml = $desiredFetchXml
             $currentLayoutXml = $desiredLayoutXml
           } else {
@@ -1814,6 +1852,7 @@ function Invoke-WizardFormsViewsBuild {
         table = $logical
         viewName = $viewName
         viewAction = $viewAction
+        disposition = $disposition
         wizardManaged = ($viewAction -ne 'manual-preserved')
         columnsPlaced = @($viewAnalysis.LayoutColumns)
         fetchColumns = @($viewAnalysis.FetchColumns)
@@ -1843,12 +1882,16 @@ function Invoke-WizardFormsViewsBuild {
   $viewReportPath = Write-ViewPopulationReport -RepoRoot $repoRoot -ScenarioSlug $(if ($null -eq $scenarioContext) { '' } else { $scenarioContext.ScenarioSlug }) -MinimumBusinessColumns $MinBusinessColumnsPerView -IncludeOwner $IncludeOwnerInViews -IncludeStatus $IncludeStatusInViews -FailOnUnderpopulated $FailIfUnderpopulatedViews -TableReports @($viewTableReports.ToArray())
 
   Write-Host ''
-  Write-Host '  Publishing all customizations...' -NoNewline
-  try {
-    Invoke-Dv -Method 'Post' -Path 'PublishAllXml' -Body '{}' | Out-Null
-    Write-Host ' done.' -ForegroundColor Green
-  } catch {
-    Write-Host " WARNING: publish failed. Publish manually in maker portal. $($_.Exception.Message)" -ForegroundColor Yellow
+  if ($PreviewOnly) {
+    Write-Host '  Preview complete; no forms, views, or publishing were mutated.' -ForegroundColor Cyan
+  } else {
+    Write-Host '  Publishing all customizations...' -NoNewline
+    try {
+      Invoke-Dv -Method 'Post' -Path 'PublishAllXml' -Body '{}' | Out-Null
+      Write-Host ' done.' -ForegroundColor Green
+    } catch {
+      Write-Host " WARNING: publish failed. Publish manually in maker portal. $($_.Exception.Message)" -ForegroundColor Yellow
+    }
   }
 
   Write-Host ''
@@ -1883,8 +1926,134 @@ function Invoke-WizardFormsViewsBuild {
   return 0
 }
 
+function Get-ScenarioSurfaceContract {
+  param($ScenarioContext)
+
+  $result = [pscustomobject]@{ Forms = @(); Views = @() }
+  if ($null -eq $ScenarioContext) { return $result }
+
+  foreach ($contractName in @('forms.json', 'views.json')) {
+    $contractPath = Join-Path $ScenarioContext.ScenarioFolder $contractName
+    if (-not (Test-Path $contractPath)) { continue }
+    $document = Get-Content -Path $contractPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    if ($contractName -eq 'forms.json') { $result.Forms = @(Get-PropertyValue -Object $document -Name 'Forms' -Default @()) }
+    if ($contractName -eq 'views.json') { $result.Views = @(Get-PropertyValue -Object $document -Name 'Views' -Default @()) }
+  }
+
+  foreach ($view in @($result.Views)) {
+    $disposition = "$(Get-PropertyValue -Object $view -Name 'Disposition')".Trim().ToLowerInvariant()
+    if (@('create-custom', 'adopt-generated-active') -notcontains $disposition) {
+      throw "Unsupported view disposition '$disposition'."
+    }
+  }
+
+  return $result
+}
+
+function Get-TableSurfaceDefinition {
+  param(
+    [array]$Definitions,
+    [string]$TableLogical
+  )
+
+  $matches = @($Definitions | Where-Object { "$(Get-PropertyValue -Object $_ -Name 'TableLogicalName')" -ieq $TableLogical })
+  if ($matches.Count -gt 1) { throw "Multiple surface definitions target table '$TableLogical'." }
+  if ($matches.Count -eq 0) { return $null }
+  return $matches[0]
+}
+
+function Test-CurrentScenarioCreatedTable {
+  param(
+    [string]$RepoRoot,
+    [string]$ScenarioSlug,
+    [string]$TableLogical
+  )
+
+  if (-not (Get-Command Get-WizardArtifactPaths -ErrorAction SilentlyContinue)) { return $false }
+  $manifestPath = (Get-WizardArtifactPaths -RepoRoot $RepoRoot).ManifestJsonPath
+  if (-not (Test-Path $manifestPath)) { return $false }
+  $manifest = Get-Content -Path $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+  if ("$(Get-PropertyValue -Object $manifest -Name 'scenarioSlug')" -cne $ScenarioSlug) { return $false }
+  $matches = @($manifest.items | Where-Object {
+      $_.kind -eq 'table' -and $_.name -ieq $TableLogical -and $_.status -eq 'created' -and $_.step -eq '20-build-tables.ps1'
+    })
+  return $matches.Count -eq 1
+}
+
+function Get-WizardViewOwnershipMarker {
+  param(
+    [string]$ScenarioSlug,
+    [string]$Disposition
+  )
+
+  return "$script:WizardManagedViewMarker; scenario=$ScenarioSlug; disposition=$Disposition"
+}
+
+function Test-GeneratedActiveViewCandidate {
+  param(
+    $View,
+    [string]$TableLogical,
+    [string]$PrimaryField,
+    [string]$PrimaryIdField
+  )
+
+  if ("$(Get-PropertyValue -Object $View -Name 'returnedtypecode')" -ine $TableLogical) { return $false }
+  if ((Get-PropertyValue -Object $View -Name 'querytype' -Default -1) -ne 0) { return $false }
+  if (ConvertTo-Boolean -Value (Get-PropertyValue -Object $View -Name 'ismanaged') -Default $true) { return $false }
+  if (-not (ConvertTo-Boolean -Value (Get-PropertyValue -Object $View -Name 'isdefault'))) { return $false }
+  if ((Get-PropertyValue -Object $View -Name 'statecode' -Default -1) -ne 0) { return $false }
+  if ((Get-PropertyValue -Object $View -Name 'statuscode' -Default -1) -ne 1) { return $false }
+  if (-not [string]::IsNullOrWhiteSpace("$(Get-PropertyValue -Object $View -Name 'description')")) { return $false }
+
+  $fetchColumns = @(Get-FieldNamesFromViewFetchXml -FetchXml (Get-PropertyValue -Object $View -Name 'fetchxml' -Default ''))
+  $layoutColumns = @(Get-FieldNamesFromViewLayoutXml -LayoutXml (Get-PropertyValue -Object $View -Name 'layoutxml' -Default ''))
+  if ((($fetchColumns | Sort-Object) -join ',') -ne ((@($PrimaryIdField, $PrimaryField, 'createdon') | Sort-Object) -join ',')) { return $false }
+  if ((($layoutColumns | Sort-Object) -join ',') -ne ((@($PrimaryField, 'createdon') | Sort-Object) -join ',')) { return $false }
+
+  try { [xml]$fetchDocument = Get-PropertyValue -Object $View -Name 'fetchxml' -Default '' } catch { return $false }
+  $conditions = @($fetchDocument.SelectNodes('//entity/filter/condition'))
+  $orders = @($fetchDocument.SelectNodes('//entity/order'))
+  return $conditions.Count -eq 1 -and $conditions[0].attribute -eq 'statecode' -and $conditions[0].operator -eq 'eq' -and $conditions[0].value -eq '0' -and
+    $orders.Count -eq 1 -and $orders[0].attribute -eq $PrimaryField -and $orders[0].descending -eq 'false'
+}
+
+function Resolve-AdoptedGeneratedView {
+  param(
+    [array]$ExistingViews,
+    [string]$ViewName,
+    [string]$TableLogical,
+    [string]$PrimaryField,
+    [string]$PrimaryIdField,
+    [string]$ScenarioSlug,
+    [bool]$TableCreatedByScenario
+  )
+
+  if (-not $TableCreatedByScenario) { throw "Cannot adopt '$ViewName': table '$TableLogical' was not created by the current wizard scenario." }
+  $matches = @($ExistingViews | Where-Object { $_.name -ceq $ViewName })
+  if ($matches.Count -ne 1) { throw "Cannot adopt '$ViewName': expected exactly one same-name view, found $($matches.Count)." }
+  $view = $matches[0]
+  $expectedMarker = Get-WizardViewOwnershipMarker -ScenarioSlug $ScenarioSlug -Disposition 'adopt-generated-active'
+  $description = "$(Get-PropertyValue -Object $view -Name 'description')"
+  if ($description -eq $expectedMarker) {
+    if ("$(Get-PropertyValue -Object $view -Name 'returnedtypecode')" -ine $TableLogical -or
+      (Get-PropertyValue -Object $view -Name 'querytype' -Default -1) -ne 0 -or
+      (ConvertTo-Boolean -Value (Get-PropertyValue -Object $view -Name 'ismanaged') -Default $true) -or
+      -not (ConvertTo-Boolean -Value (Get-PropertyValue -Object $view -Name 'isdefault')) -or
+      (Get-PropertyValue -Object $view -Name 'statecode' -Default -1) -ne 0 -or
+      (Get-PropertyValue -Object $view -Name 'statuscode' -Default -1) -ne 1) {
+      throw "Cannot update adopted view '$ViewName': immutable generated-view metadata no longer matches."
+    }
+    return $view
+  }
+  if ($description -like "$script:WizardManagedViewMarker*") { throw "Cannot adopt '$ViewName': it is owned by another wizard scenario or disposition." }
+  if (-not (Test-GeneratedActiveViewCandidate -View $view -TableLogical $TableLogical -PrimaryField $PrimaryField -PrimaryIdField $PrimaryIdField)) {
+    throw "Cannot adopt '$ViewName': same-name view does not match the Dataverse-generated Active/default baseline."
+  }
+  return $view
+}
+
 if (-not (Test-WizardFormsViewsSkipMain)) {
-  $exitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -PublisherPrefix $PublisherPrefix -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug -MinBusinessFieldsPerForm $MinBusinessFieldsPerForm -MinBusinessColumnsPerView $MinBusinessColumnsPerView -IncludeOwnerOnForms $IncludeOwnerOnForms -IncludeOwnerInViews $IncludeOwnerInViews -IncludeStatusInViews $IncludeStatusInViews -PreferFormName $PreferFormName -FormStrategy $FormStrategy -FailIfUnderpopulatedForms $FailIfUnderpopulatedForms -FailIfUnderpopulatedViews $FailIfUnderpopulatedViews
+  $exitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -PublisherPrefix $PublisherPrefix -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug -MinBusinessFieldsPerForm $MinBusinessFieldsPerForm -MinBusinessColumnsPerView $MinBusinessColumnsPerView -IncludeOwnerOnForms $IncludeOwnerOnForms -IncludeOwnerInViews $IncludeOwnerInViews -IncludeStatusInViews $IncludeStatusInViews -PreferFormName $PreferFormName -FormStrategy $FormStrategy -FailIfUnderpopulatedForms $FailIfUnderpopulatedForms -FailIfUnderpopulatedViews $FailIfUnderpopulatedViews -PreviewOnly:$PreviewOnly
   if ($MyInvocation.InvocationName -ne '.') {
     exit $exitCode
   }

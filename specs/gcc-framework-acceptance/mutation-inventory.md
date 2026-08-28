@@ -12,7 +12,7 @@ Every item below is planned and unauthorized. No mutation has run.
 | 6 | Columns | 10 on `ppvs_checkoutrequest` | Create primary name, eight payload columns, and relationship lookup | Retain after verification |
 | 7 | Relationship | `ppvs_labasset_ppvs_checkoutrequest` | Create required N:1 with Restrict delete | Retain after verification |
 | 8 | Forms | Lab Asset Main; Checkout Request Main | Create or update wizard-managed main forms | Retain after verification |
-| 9 | Views | Available Lab Assets; Active Checkout Requests | Create or update named views | Retain after verification |
+| 9 | Views | Available Lab Assets; Active Checkout Requests | Create Available Lab Assets; adopt only the verified generated Active/default Checkout Requests view | Retain after verification |
 | 10 | BPF | `ppvs_lab_equipment_checkout_lifecycle` | Author initial definition in Power Apps designer; later validate/link | Retain after verification |
 | 11 | Charts | Requests by Lifecycle Stage; Assets by Availability | Create through supported maker/solution tooling | Retain after verification |
 | 12 | Dashboard | Lab Equipment Lifecycle and Availability | Create through supported maker/solution tooling | Retain after verification |

@@ -88,7 +88,7 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   - Required primary entry-point table?
   - Default landing view for that table?
   - Which artifacts must the required auto-created or updated model-driven review app surface?
-- After explicit table mapping, resolve the entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Record whether the named landing view must be created/updated or verified as an existing saved query. Do not proceed to app assembly until Dataverse resolves that view.
+- After explicit table mapping, resolve the entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Record `create-custom` by default in `views.json`; use `adopt-generated-active` only with current-run table-creation evidence and exact generated Active/default-view metadata. Standard, shared, and preexisting tables are never adoption targets. Do not proceed to app assembly until Dataverse resolves that view.
 
 5. Capture task, relationship, report, and demo-data planning at the selected mode's depth
 - Record top user tasks as persona, task, frequency, entry table/view, expected outcome, owner, and done definition.

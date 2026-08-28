@@ -159,9 +159,17 @@ foreach ($stage in $stageDefinitions) {
     }
 
     if ($Mode -eq 'Preview' -and $stage.Name -notin @('validate', 'app-module', 'post-build')) {
-        $result = [pscustomobject]@{ name = $stage.Name; script = $stage.Script; status = 'planned'; reason = 'mutation suppressed in preview mode'; durationSeconds = 0 }
+        $details = @()
+        if ($stage.Name -eq 'forms-views') {
+            $viewContractPath = Join-Path (Join-Path (Join-Path $repoRoot 'specs') $ScenarioSlug) 'views.json'
+            if (Test-Path -LiteralPath $viewContractPath) {
+                $viewContract = Get-Content -LiteralPath $viewContractPath -Raw -Encoding UTF8 | ConvertFrom-Json
+                $details = @($viewContract.Views | ForEach-Object { "$($_.TableLogicalName)|$($_.Name)|$($_.Disposition)" })
+            }
+        }
+        $result = [pscustomobject]@{ name = $stage.Name; script = $stage.Script; status = 'planned'; reason = 'mutation suppressed in preview mode'; details = $details; durationSeconds = 0 }
         $results.Add($result) | Out-Null
-        Write-Host "PLAN: $($stage.Script)" -ForegroundColor Cyan
+        Write-Host "PLAN: $($stage.Script)$(if ($details.Count -gt 0) { " [$($details -join '; ')]" })" -ForegroundColor Cyan
         continue
     }
 

@@ -370,7 +370,7 @@ function Test-AndSetEntryPointPlan {
     $plannedCustomTables = @(Get-PlannedTableLogicalNames -StandardTables "none" -CustomTables $Answers["CustomTablesToCreate"] -PublisherPrefix $Answers["PublisherPrefix"])
     $Answers["EntryPointTable"] = $entryPoint
     $Answers["EntryPointLandingViewPlan"] = if ($plannedCustomTables -contains $entryPoint) {
-        "create-or-update-named-view"
+        "create-custom"
     } else {
         "verify-existing-saved-query"
     }

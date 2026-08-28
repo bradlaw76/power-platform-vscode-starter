@@ -41,7 +41,8 @@ All 28 inventory rows are required in `LabEquipmentCheckoutAcceptance20260826`. 
 - Lookup: `ppvs_checkoutrequest.ppvs_labassetid`
 - Relationship: `ppvs_labasset_ppvs_checkoutrequest`
 - Forms: Lab Asset Main (`ppvs_labasset|main`), Checkout Request Main (`ppvs_checkoutrequest|main`)
-- Views: Available Lab Assets (`ppvs_labasset|active`), Active Checkout Requests (`ppvs_checkoutrequest|active`)
+- Views: Available Lab Assets (`ppvs_labasset|active`, `create-custom`), Active Checkout Requests (`ppvs_checkoutrequest|active`, `adopt-generated-active`)
+- Preview reports the declared dispositions without mutation; live generated-view provenance must still be proven at the apply gate.
 - BPF handoff: `ppvs_lab_equipment_checkout_lifecycle`
 - Charts: Requests by Lifecycle Stage; Assets by Availability
 - Dashboard: Lab Equipment Lifecycle and Availability

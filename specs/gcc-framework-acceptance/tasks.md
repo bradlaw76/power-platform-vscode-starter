@@ -50,7 +50,9 @@
 - [ ] Build prefixed columns and required restrict-delete relationship.
 - [ ] Create the base BPF in the Power Apps designer from the handoff.
 - [ ] Validate, activate, add, publish, and link the existing BPF through script 55.
-- [ ] Create/update main forms and active views.
+- [ ] Create the separate Lab Asset Main and Checkout Request Main forms without modifying generated Information forms.
+- [ ] Create Available Lab Assets using its `create-custom` contract.
+- [ ] Adopt only the verified generated Active Checkout Requests view using its `adopt-generated-active` contract.
 - [ ] Create/update review app and sitemap with Checkout Request first.
 - [ ] Author lifecycle/availability dashboard and charts through the supported maker/solution path.
 - [ ] Collect complete artifact inventory and sync all required components to the solution.

@@ -34,8 +34,8 @@ The publisher is a permanent prerequisite, not a solution component and never a 
 | Relationship | Lab Asset to Checkout Request | `ppvs_labasset_ppvs_checkoutrequest` | Required |
 | Main form | Lab Asset Main | `ppvs_labasset\|main` | Required |
 | Main form | Checkout Request Main | `ppvs_checkoutrequest\|main` | Required |
-| View | Available Lab Assets | `ppvs_labasset\|active` | Required |
-| View | Active Checkout Requests | `ppvs_checkoutrequest\|active` | Required; app landing view |
+| View | Available Lab Assets | `ppvs_labasset\|active` | Required; `create-custom` |
+| View | Active Checkout Requests | `ppvs_checkoutrequest\|active` | Required; app landing view; `adopt-generated-active` |
 | BPF | Lab Equipment Checkout Lifecycle | `ppvs_lab_equipment_checkout_lifecycle` | Required after designer authoring |
 | Chart | Requests by Lifecycle Stage | proposed maker-authored chart | Required |
 | Chart | Assets by Availability | proposed maker-authored chart | Required |

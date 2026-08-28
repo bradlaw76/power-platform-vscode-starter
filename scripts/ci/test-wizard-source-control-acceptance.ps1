@@ -288,7 +288,7 @@ try {
     Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
         '- Entry Point Table: sca_review',
         '- Entry Point Validation: approved',
-        '- Landing View Plan: create-or-update-named-view'
+        '- Landing View Plan: create-custom'
     )
 
     $retrofitSlug = 'retrofit-entry-acceptance'

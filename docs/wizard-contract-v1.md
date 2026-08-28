@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.5.0
+Version: 1.6.0
 
 ## Purpose
 
@@ -72,7 +72,20 @@ Before any build recommendation, either confirm all five architecture intent que
 
 Do not proceed to build until architecture intent is captured in the planning artifacts and approved.
 
-After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. The landing view must have an explicit action: create or update the named view for a planned custom table, or verify the existing saved query for reused/existing tables. App assembly remains blocked until the named saved query resolves in Dataverse.
+After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. Every planned view must declare a disposition in `views.json`: `create-custom` creates a separate wizard-owned view, while `adopt-generated-active` may enhance only the Dataverse-generated Active/default view of a table created by the current wizard scenario. App assembly remains blocked until each named saved query resolves in Dataverse.
+
+### View Disposition Contract
+
+`adopt-generated-active` is allowed only when all of the following are proven before mutation:
+
+- The table has a custom-table payload and the current run manifest records it as created by `20-build-tables.ps1` for the same scenario.
+- The target is the table's unmanaged, active, public, default Dataverse-generated Active view.
+- Its table identity, query type, generated baseline columns, active-record filter, and sort match the generated dependency expected for that table.
+- It has not already been marked as owned by another wizard scenario, and no unrelated or preexisting business view is selected by name.
+
+The adoption operation may update only FetchXML, LayoutXML, and the wizard ownership description. It must preserve the saved-query ID, name, active state, public query type, and default status. Reruns may update that same ID only when its ownership marker matches the current scenario. A same-name non-generated view, metadata mismatch, missing creation provenance, standard/shared/preexisting table, or ownership mismatch is a hard stop.
+
+`create-custom` always creates or idempotently updates a separate wizard-owned view from its declared columns, filter, and sort. Generated forms and views are never changed by this disposition. Main forms created by the wizard remain separate named forms; generated `Information` forms are never update targets.
 
 ## Discovery Contract
 

@@ -79,7 +79,7 @@ Relationship decision: N:1, required, new, Restrict delete, supporting request h
 ## Report Plan
 
 - Surface: Lab Equipment Lifecycle and Availability dashboard.
-- Components: Active Checkout Requests view, Available Lab Assets view, Requests by Lifecycle Stage chart, Assets by Availability chart, and dashboard drill-through.
+- Components: adopted generated Active Checkout Requests view, separate custom Available Lab Assets view, Requests by Lifecycle Stage chart, Assets by Availability chart, and dashboard drill-through.
 - Critical tables: `ppvs_checkoutrequest`, `ppvs_labasset`.
 - HTML report web resources: disabled.
 - Dashboard/chart authoring must use the supported maker/solution path if no repository automation exists; it may not be represented as completed until inventory and membership checks pass.

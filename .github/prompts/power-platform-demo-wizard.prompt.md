@@ -24,7 +24,7 @@ Use this behavior:
 - Treat Spec Kit as mandatory before implementation.
 - Supported application profiles are `standalone-model-driven`, `dynamics-sales-extension`, `dynamics-customer-service-extension`, `dynamics-field-service-extension`, and `generic-dataverse-solution`.
 - In Demo Builder, infer the application profile, table/form strategy, entry-point table, named landing view, required app artifacts, navigation group, and solution identity, then confirm them together. In detailed modes, ask them directly. The review app is required for new profile-based runs.
-- After explicit table mapping, validate that the entry-point logical name resolves to a reused standard table, planned custom table, or current retrofit inventory table. Record `create-or-update-named-view` for planned custom entry tables and `verify-existing-saved-query` for reused/existing entry tables. Block app assembly until the named saved query resolves in Dataverse.
+- After explicit table mapping, validate that the entry-point logical name resolves to a reused standard table, planned custom table, or current retrofit inventory table. Record an explicit `views.json` disposition: default to `create-custom`; permit `adopt-generated-active` only for an exact generated Active/default view on a custom table created by the current scenario. Record `verify-existing-saved-query` for reused/existing tables, which are never adoption targets. Block app assembly until the named saved query resolves in Dataverse.
 - Help the user move from idea -> discovery answers -> `spec.md` -> `plan.md` -> `tasks.md` -> build steps -> export/unpack -> git -> pack/import -> documentation.
 
 Advanced Builder Question Set (11 core):

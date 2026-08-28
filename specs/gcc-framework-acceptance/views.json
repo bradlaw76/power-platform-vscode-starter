@@ -1,0 +1,43 @@
+{
+  "Views": [
+    {
+      "TableLogicalName": "ppvs_checkoutrequest",
+      "Name": "Active Checkout Requests",
+      "Disposition": "adopt-generated-active",
+      "Columns": [
+        "ppvs_requestnumber",
+        "ppvs_labassetid",
+        "ppvs_lifecyclestage",
+        "ppvs_expectedreturndate"
+      ],
+      "Filter": {
+        "Attribute": "statecode",
+        "Operator": "eq",
+        "Value": "0"
+      },
+      "Sort": {
+        "Attribute": "ppvs_name",
+        "Descending": false
+      }
+    },
+    {
+      "TableLogicalName": "ppvs_labasset",
+      "Name": "Available Lab Assets",
+      "Disposition": "create-custom",
+      "Columns": [
+        "ppvs_assettag",
+        "ppvs_category",
+        "ppvs_availabilitystatus"
+      ],
+      "Filter": {
+        "Attribute": "ppvs_availabilitystatus",
+        "Operator": "eq",
+        "Value": "Available"
+      },
+      "Sort": {
+        "Attribute": "ppvs_assettag",
+        "Descending": false
+      }
+    }
+  ]
+}

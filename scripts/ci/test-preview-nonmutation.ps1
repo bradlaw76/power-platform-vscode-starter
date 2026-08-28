@@ -73,6 +73,14 @@ try {
     if ($LASTEXITCODE -ne 0) {
         throw "Enabled-app orchestrated preview failed with exit code $LASTEXITCODE."
     }
+    $previewSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
+    $formsViewsPreview = @($previewSummary.stages | Where-Object { $_.name -eq 'forms-views' })[0]
+    if (@($formsViewsPreview.details) -notcontains 'ppvs_checkoutrequest|Active Checkout Requests|adopt-generated-active') {
+        throw 'Credential-free preview did not report generated Active-view adoption.'
+    }
+    if (@($formsViewsPreview.details) -notcontains 'ppvs_labasset|Available Lab Assets|create-custom') {
+        throw 'Credential-free preview did not report the custom availability view.'
+    }
 } finally {
     $env:DV_ENVIRONMENT_URL = $environmentBefore
     $env:DV_TOKEN = $tokenBefore

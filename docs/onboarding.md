@@ -353,7 +353,7 @@ Validation checkpoint:
 - Relationships to create
 - Do not generate payloads until this mapping block is complete and approved.
 - Confirm the entry-point logical name resolves to a reused standard table, planned custom table, or existing retrofit inventory table.
-- Confirm the landing-view action is recorded as create/update for a planned custom table or verify-existing for a reused/existing table. Before script 62, the named saved query must resolve in Dataverse.
+- Confirm every planned view has a `views.json` disposition. Use `create-custom` for a separate wizard-owned view. Use `adopt-generated-active` only for the verified unmanaged Active/default view generated with a custom table created by the current scenario; standard, shared, preexisting, or metadata-mismatched tables/views must hard stop. Before script 62, the named saved query must resolve in Dataverse.
 - For every planned relationship, record cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
 - Capture top user tasks with named owners and done definitions before designing forms, views, navigation, or automation.
 - If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.

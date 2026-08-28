@@ -17,9 +17,10 @@
 - Form Strategy: create-new-forms
 - Entry Point Table: ppvs_checkoutrequest
 - Landing View: Active Checkout Requests
-- Landing View Plan: create or update the wizard-managed saved query, then resolve it before app assembly
+- Landing View Plan: adopt-generated-active after proving current-scenario table ownership and generated Active/default-view identity
 - Review App Mode: create-or-update
 - Required App Artifacts: Lab Asset and Checkout Request tables, main forms, active views, Lab Equipment Checkout Lifecycle BPF, lifecycle and availability report surface
+- View Dispositions: Active Checkout Requests = adopt-generated-active; Available Lab Assets = create-custom
 
 ## App Module
 

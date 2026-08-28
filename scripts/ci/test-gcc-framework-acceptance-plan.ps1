@@ -51,6 +51,8 @@ $requiredScenarioFiles = @(
     'plan.md',
     'tasks.md',
     'report-mappings.md',
+    'forms.json',
+    'views.json',
     'demo-data-plan.json',
     'component-inventory.md',
     'framework-acceptance-execution-plan.md',
@@ -111,6 +113,13 @@ foreach ($document in @($answers, $plan, $inventory)) {
 Assert-Condition -Condition ($answers -match '(?m)^- Unique Name: ppvs_[a-z0-9_]+\r?$') -Message 'Review app unique name must use prefix ppvs.'
 Assert-Condition -Condition ($answers.Contains('Publisher unique name: `PowerPlatformVSCodeStarter`')) -Message 'Permanent publisher unique name is missing.'
 Assert-Condition -Condition ($answers.Contains('create once as a permanent framework publisher; never include it in cleanup')) -Message 'Permanent publisher creation or cleanup exclusion is missing.'
+
+$formsContract = Get-Content -LiteralPath (Join-Path $scenarioRoot 'forms.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$viewsContract = Get-Content -LiteralPath (Join-Path $scenarioRoot 'views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+Assert-Condition -Condition (@($formsContract.Forms | Where-Object Name -eq 'Lab Asset Main').Count -eq 1) -Message 'Lab Asset Main form contract is missing.'
+Assert-Condition -Condition (@($formsContract.Forms | Where-Object Name -eq 'Checkout Request Main').Count -eq 1) -Message 'Checkout Request Main form contract is missing.'
+Assert-Condition -Condition (@($viewsContract.Views | Where-Object { $_.Name -eq 'Active Checkout Requests' -and $_.Disposition -eq 'adopt-generated-active' }).Count -eq 1) -Message 'Active Checkout Requests must adopt the generated Active view.'
+Assert-Condition -Condition (@($viewsContract.Views | Where-Object { $_.Name -eq 'Available Lab Assets' -and $_.Disposition -eq 'create-custom' }).Count -eq 1) -Message 'Available Lab Assets must be a separate custom view.'
 
 $demoData = Get-Content -LiteralPath (Join-Path $scenarioRoot 'demo-data-plan.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 Assert-Condition -Condition ($demoData.SolutionUniqueName -eq $solutionName) -Message 'Demo-data plan solution identity is incorrect.'

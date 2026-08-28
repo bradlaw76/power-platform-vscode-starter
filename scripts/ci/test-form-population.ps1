@@ -239,10 +239,10 @@ function Invoke-RestMethod {
     $viewId = $Matches[1].Trim()
     $payload = $Body | ConvertFrom-Json
     $view = @($script:MockContext.Views | Where-Object { $_.savedqueryid -eq $viewId } | Select-Object -First 1)[0]
-    $view.name = $payload.name
-    $view.description = $payload.description
-    $view.fetchxml = $payload.fetchxml
-    $view.layoutxml = $payload.layoutxml
+    if ($null -ne $payload.PSObject.Properties['name']) { $view.name = $payload.name }
+    if ($null -ne $payload.PSObject.Properties['description']) { $view.description = $payload.description }
+    if ($null -ne $payload.PSObject.Properties['fetchxml']) { $view.fetchxml = $payload.fetchxml }
+    if ($null -ne $payload.PSObject.Properties['layoutxml']) { $view.layoutxml = $payload.layoutxml }
     return $view
   }
 
@@ -417,6 +417,88 @@ try {
   Assert-Condition -Condition ($script:MockContext.Forms.Count -eq 2) -Message 'Expected a new wizard form alongside the existing Information form.'
   Assert-Condition -Condition ($script:MockContext.Forms[0].formxml -eq $existingFormXml) -Message 'Expected the existing Information form to remain unchanged.'
   Assert-Condition -Condition (@($script:MockContext.Forms | Where-Object { $_.name -eq 'Starter Main Form' }).Count -eq 1) -Message 'Expected one Starter Main Form for the standard table.'
+
+  $adoptionRepo = New-TestRepo
+  Write-TestPayloads -RepoPath $adoptionRepo -TableLogical 'tst_request' -Columns @(
+    [pscustomobject]@{ LogicalName = 'tst_number'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Request Number' }) } },
+    [pscustomobject]@{ LogicalName = 'tst_assetid'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Asset' }) } },
+    [pscustomobject]@{ LogicalName = 'tst_stage'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Stage' }) } },
+    [pscustomobject]@{ LogicalName = 'tst_due'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Due' }) } }
+  )
+  Write-TestScenario -RepoPath $adoptionRepo -ScenarioSlug 'adoption-scenario' -SpecContent '# generated view adoption fixture'
+  @{
+    Views = @(@{
+      TableLogicalName = 'tst_request'; Name = 'Active Requests'; Disposition = 'adopt-generated-active'
+      Columns = @('tst_number', 'tst_assetid', 'tst_stage', 'tst_due')
+      Filter = @{ Attribute = 'statecode'; Operator = 'eq'; Value = '0' }
+      Sort = @{ Attribute = 'tst_number'; Descending = $false }
+    })
+  } | ConvertTo-Json -Depth 8 | Set-Content -Path (Join-Path $adoptionRepo 'specs/adoption-scenario/views.json') -Encoding UTF8
+
+  $script:MockContext = New-MockContext -TableLogical 'tst_request' -PrimaryField 'tst_name' -PrimaryIdField 'tst_requestid' -Attributes @(
+    (New-Attribute -LogicalName 'tst_requestid' -Label 'Request' -AttributeType 'Uniqueidentifier' -IsPrimaryId $true),
+    (New-Attribute -LogicalName 'tst_name' -Label 'Request Name' -IsPrimaryName $true),
+    (New-Attribute -LogicalName 'tst_number' -Label 'Request Number'),
+    (New-Attribute -LogicalName 'tst_assetid' -Label 'Asset' -AttributeType 'Lookup'),
+    (New-Attribute -LogicalName 'tst_stage' -Label 'Stage'),
+    (New-Attribute -LogicalName 'tst_due' -Label 'Due' -AttributeType 'DateTime'),
+    (New-Attribute -LogicalName 'statecode' -Label 'Status' -AttributeType 'State'),
+    (New-Attribute -LogicalName 'createdon' -Label 'Created On' -AttributeType 'DateTime')
+  )
+  $informationXml = '<form><tabs /></form>'
+  $script:MockContext.Forms.Add([pscustomobject]@{ formid = 'information-form'; name = 'Information'; type = 2; formxml = $informationXml }) | Out-Null
+  $generatedView = [pscustomobject]@{
+    savedqueryid = 'generated-active-id'; name = 'Active Requests'; returnedtypecode = 'tst_request'; querytype = 0
+    statecode = 0; statuscode = 1; ismanaged = $false; isdefault = $true; description = $null
+    fetchxml = '<fetch><entity name="tst_request"><attribute name="tst_requestid"/><attribute name="tst_name"/><attribute name="createdon"/><order attribute="tst_name" descending="false"/><filter><condition attribute="statecode" operator="eq" value="0"/></filter></entity></fetch>'
+    layoutxml = '<grid><row><cell name="tst_name"/><cell name="createdon"/></row></grid>'
+  }
+  $otherView = [pscustomobject]@{
+    savedqueryid = 'other-generated-id'; name = 'Inactive Requests'; returnedtypecode = 'tst_request'; querytype = 0
+    statecode = 0; statuscode = 1; ismanaged = $false; isdefault = $false; description = $null
+    fetchxml = '<fetch><entity name="tst_request"><attribute name="tst_name"/></entity></fetch>'
+    layoutxml = '<grid><row><cell name="tst_name"/></row></grid>'
+  }
+  $script:MockContext.Views.Add($generatedView) | Out-Null
+  $script:MockContext.Views.Add($otherView) | Out-Null
+
+  . (Join-Path $adoptionRepo 'scripts/bootstrap/60-build-forms-views.ps1')
+  Add-WizardArtifactManifestItem -RepoRoot $adoptionRepo -ScenarioSlug 'adoption-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst' -Kind 'table' -Name 'tst_request' -Status 'created' -Step '20-build-tables.ps1' | Out-Null
+  $adoptionExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $adoptionRepo 'payloads') -ScenarioSlug 'adoption-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
+  Assert-Condition -Condition ($adoptionExitCode -eq 0) -Message 'A current-scenario-created custom table should adopt its generated Active view.'
+  Assert-Condition -Condition ($script:MockContext.Views.Count -eq 2) -Message 'Adoption must not create a duplicate view.'
+  Assert-Condition -Condition ($script:MockContext.Views[0].savedqueryid -eq 'generated-active-id') -Message 'Adoption must preserve the generated view identity.'
+  Assert-Condition -Condition ($script:MockContext.Views[0].name -eq 'Active Requests' -and $script:MockContext.Views[0].isdefault -and $script:MockContext.Views[0].statecode -eq 0 -and $script:MockContext.Views[0].querytype -eq 0) -Message 'Adoption must preserve name, default, active, and public metadata.'
+  Assert-Condition -Condition ($script:MockContext.Views[1].fetchxml -eq $otherView.fetchxml) -Message 'Other generated views must remain unchanged.'
+  Assert-Condition -Condition ($script:MockContext.Forms[0].formxml -eq $informationXml) -Message 'Generated Information forms must remain unchanged.'
+  $firstAdoptionPatchCount = @($script:MockContext.Requests | Where-Object { $_.Method -eq 'Patch' -and $_.Path -eq 'savedqueries(generated-active-id)' }).Count
+  Assert-Condition -Condition ($firstAdoptionPatchCount -eq 1) -Message 'First adoption should patch exactly the generated Active view.'
+
+  $rerunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $adoptionRepo 'payloads') -ScenarioSlug 'adoption-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
+  Assert-Condition -Condition ($rerunExitCode -eq 0) -Message 'Adoption rerun should succeed.'
+  Assert-Condition -Condition ($script:MockContext.Views.Count -eq 2) -Message 'Adoption rerun must not create duplicates.'
+  Assert-Condition -Condition (@($script:MockContext.Requests | Where-Object { $_.Method -eq 'Patch' -and $_.Path -eq 'savedqueries(generated-active-id)' }).Count -eq $firstAdoptionPatchCount) -Message 'Matching adoption rerun should not patch again.'
+
+  $preexistingStopped = $false
+  try { Resolve-AdoptedGeneratedView -ExistingViews @($generatedView) -ViewName 'Active Requests' -TableLogical 'tst_request' -PrimaryField 'tst_name' -PrimaryIdField 'tst_requestid' -ScenarioSlug 'adoption-scenario' -TableCreatedByScenario $false | Out-Null } catch { $preexistingStopped = $true }
+  Assert-Condition -Condition $preexistingStopped -Message 'A preexisting table generated view must never be adopted.'
+  $mismatchedView = $generatedView.PSObject.Copy()
+  $mismatchedView.description = $null
+  $mismatchedView.isdefault = $false
+  $mismatchStopped = $false
+  try { Resolve-AdoptedGeneratedView -ExistingViews @($mismatchedView) -ViewName 'Active Requests' -TableLogical 'tst_request' -PrimaryField 'tst_name' -PrimaryIdField 'tst_requestid' -ScenarioSlug 'adoption-scenario' -TableCreatedByScenario $true | Out-Null } catch { $mismatchStopped = $true }
+  Assert-Condition -Condition $mismatchStopped -Message 'A same-name metadata-mismatched view must hard stop.'
+
+  $script:MockContext.Views[0].description = $null
+  $script:MockContext.Views[0].fetchxml = '<fetch><entity name="tst_request"><attribute name="tst_requestid"/><attribute name="tst_name"/><attribute name="createdon"/><order attribute="tst_name" descending="false"/><filter><condition attribute="statecode" operator="eq" value="0"/></filter></entity></fetch>'
+  $script:MockContext.Views[0].layoutxml = '<grid><row><cell name="tst_name"/><cell name="createdon"/></row></grid>'
+  $requestCountBeforePreview = $script:MockContext.Requests.Count
+  $previewExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'preview-token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $adoptionRepo 'payloads') -ScenarioSlug 'adoption-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true -PreviewOnly $true
+  Assert-Condition -Condition ($previewExitCode -eq 0) -Message 'Adoption preview should succeed.'
+  $previewMutations = @($script:MockContext.Requests | Select-Object -Skip $requestCountBeforePreview | Where-Object { $_.Method -in @('Post', 'Patch', 'Delete') })
+  Assert-Condition -Condition ($previewMutations.Count -eq 0) -Message 'Preview must not mutate forms, views, or publishing.'
+  $adoptionReport = Get-Content -Path (Join-Path $adoptionRepo '.wizard-metrics/artifacts/views/view-population-report.json') -Raw | ConvertFrom-Json
+  Assert-Condition -Condition ($adoptionReport.tables[0].viewAction -eq 'adoption-planned') -Message 'Preview must report the planned generated-view adoption.'
 
   Write-Host 'Form population tests passed.' -ForegroundColor Green
 }

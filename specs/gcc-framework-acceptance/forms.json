@@ -1,0 +1,12 @@
+{
+  "Forms": [
+    {
+      "TableLogicalName": "ppvs_labasset",
+      "Name": "Lab Asset Main"
+    },
+    {
+      "TableLogicalName": "ppvs_checkoutrequest",
+      "Name": "Checkout Request Main"
+    }
+  ]
+}
