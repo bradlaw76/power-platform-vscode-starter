@@ -1,0 +1,55 @@
+{
+  "Enabled": true,
+  "BusinessProcessFlowName": "Lab Equipment Checkout Lifecycle",
+  "PrimaryProcessEntity": "ppvs_checkoutrequest",
+  "FailIfBpfDefinitionIncomplete": true,
+  "PreferUpdateExistingBpf": true,
+  "CrossTableProgression": false,
+  "FormIntegration": {
+    "TargetFormName": "Checkout Request Main",
+    "RequireMainForm": true
+  },
+  "StageDefinitions": [
+    {
+      "Order": 1,
+      "StageName": "Review",
+      "EntityLogicalName": "ppvs_checkoutrequest",
+      "RequiredFields": [
+        "ppvs_requestnumber",
+        "ppvs_requestedon"
+      ],
+      "EntryCriteria": "A synthetic checkout request has been created and linked to a Lab Asset.",
+      "ExitCriteria": "Request details and expected return date have been reviewed."
+    },
+    {
+      "Order": 2,
+      "StageName": "Approve",
+      "EntityLogicalName": "ppvs_checkoutrequest",
+      "RequiredFields": [
+        "ppvs_approvaldecision"
+      ],
+      "EntryCriteria": "Review is complete.",
+      "ExitCriteria": "Approval Decision is Approved or Declined; only Approved requests proceed to Issue."
+    },
+    {
+      "Order": 3,
+      "StageName": "Issue",
+      "EntityLogicalName": "ppvs_checkoutrequest",
+      "RequiredFields": [
+        "ppvs_lifecyclestage"
+      ],
+      "EntryCriteria": "Approval Decision is Approved and the linked asset is available.",
+      "ExitCriteria": "Lifecycle Stage is Issue and the asset availability is Issued."
+    },
+    {
+      "Order": 4,
+      "StageName": "Return",
+      "EntityLogicalName": "ppvs_checkoutrequest",
+      "RequiredFields": [
+        "ppvs_actualreturndate"
+      ],
+      "EntryCriteria": "The asset has been issued.",
+      "ExitCriteria": "Actual Return Date is recorded, Lifecycle Stage is Return, and the asset is available."
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "Relationships": [
+    {
+      "SchemaName": "ppvs_labasset_ppvs_checkoutrequest",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "ppvs_labasset_ppvs_checkoutrequest",
+        "ReferencedEntity": "ppvs_labasset",
+        "ReferencedAttribute": "ppvs_labassetid",
+        "ReferencingEntity": "ppvs_checkoutrequest",
+        "ReferencingAttribute": "ppvs_labassetid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "ppvs_labassetid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Lab Asset",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Required lab asset for this checkout request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    }
+  ]
+}

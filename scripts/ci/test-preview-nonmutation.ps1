@@ -10,8 +10,8 @@ ENVIRONMENT:  PowerShell 7 | Git | Credential-Free CI
 -----------------------------------------------------------------------------
 OVERVIEW
 -----------------------------------------------------------------------------
-Runs the canonical synthetic scenario in orchestrated preview mode and verifies
-that Git references and the index do not change.
+Runs canonical and enabled-app scenarios in orchestrated preview mode and
+verifies that Git references and the index do not change.
 
 -----------------------------------------------------------------------------
 ARCHITECTURE
@@ -59,6 +59,25 @@ $before = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
 & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview
 if ($LASTEXITCODE -ne 0) {
     throw "Orchestrated preview failed with exit code $LASTEXITCODE."
+}
+
+$environmentBefore = $env:DV_ENVIRONMENT_URL
+$solutionBefore = $env:DV_SOLUTION_NAME
+$prefixBefore = $env:DV_PUBLISHER_PREFIX
+try {
+    $env:DV_ENVIRONMENT_URL = 'https://preview.invalid'
+    $env:DV_TOKEN = 'preview-no-token'
+    $env:DV_SOLUTION_NAME = 'LabEquipmentCheckoutAcceptance20260826'
+    $env:DV_PUBLISHER_PREFIX = 'ppvs'
+    & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation
+    if ($LASTEXITCODE -ne 0) {
+        throw "Enabled-app orchestrated preview failed with exit code $LASTEXITCODE."
+    }
+} finally {
+    $env:DV_ENVIRONMENT_URL = $environmentBefore
+    $env:DV_TOKEN = $tokenBefore
+    $env:DV_SOLUTION_NAME = $solutionBefore
+    $env:DV_PUBLISHER_PREFIX = $prefixBefore
 }
 $after = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
 

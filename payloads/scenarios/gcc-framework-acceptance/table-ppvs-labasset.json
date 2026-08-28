@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "ppvs_labasset",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Lab Asset",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Lab Assets",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Synthetic lab equipment tracked by the isolated framework acceptance scenario",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

@@ -329,6 +329,88 @@ if (-not $appConfig.ValidationPassed) {
     exit 1
 }
 
+$orderedTables = New-Object System.Collections.Generic.List[string]
+if (-not [string]::IsNullOrWhiteSpace($appConfig.EntryPointTable) -and $appConfig.Tables -contains $appConfig.EntryPointTable) {
+    $orderedTables.Add($appConfig.EntryPointTable) | Out-Null
+}
+foreach ($table in @($appConfig.Tables | Sort-Object)) {
+    if (-not $orderedTables.Contains($table)) {
+        $orderedTables.Add($table) | Out-Null
+    }
+}
+
+if ($PreviewOnly) {
+    $siteMapUniqueName = "$(ConvertTo-SiteMapIdPart -Value $appConfig.UniqueName)_sitemap"
+    $navigationItems = foreach ($table in @($orderedTables.ToArray())) {
+        $viewIdentity = @($appConfig.Views | Where-Object { $_ -like "$table|*" } | Select-Object -First 1)
+        [ordered]@{
+            group = $appConfig.NavigationGroup
+            type = 'table'
+            name = $table
+            isEntryPoint = ($table -eq $appConfig.EntryPointTable)
+            view = if ($table -eq $appConfig.EntryPointTable) { $appConfig.LandingView } elseif ($viewIdentity.Count -gt 0) { $viewIdentity[0] } else { '' }
+        }
+    }
+
+    [ordered]@{
+        generatedAtUtc = [DateTime]::UtcNow.ToString('o')
+        scenarioSlug = $appConfig.ScenarioSlug
+        appName = $appConfig.AppName
+        appUniqueName = $appConfig.UniqueName
+        action = 'preview'
+        applicationProfile = $appConfig.ApplicationProfile
+        entryPointTable = $appConfig.EntryPointTable
+        landingView = $appConfig.LandingView
+        siteMapUniqueName = $siteMapUniqueName
+        siteMapAction = 'preview'
+        tables = @($orderedTables.ToArray())
+        forms = @($appConfig.Forms)
+        views = @($appConfig.Views)
+        bpfs = @($appConfig.Bpfs)
+        liveResolution = 'not attempted'
+        solutionMembership = 'proposed, not live-verified'
+    } | ConvertTo-Json -Depth 20 | Set-Content -Path $paths.SummaryPath -Encoding UTF8
+
+    [ordered]@{
+        appUniqueName = $appConfig.UniqueName
+        siteMapUniqueName = $siteMapUniqueName
+        navigationGroup = $appConfig.NavigationGroup
+        entryPointTable = $appConfig.EntryPointTable
+        landingView = $appConfig.LandingView
+        siteMapAction = 'preview'
+        items = @($navigationItems)
+        structuralValidation = [ordered]@{
+            hasGroup = -not [string]::IsNullOrWhiteSpace($appConfig.NavigationGroup)
+            hasItems = @($navigationItems).Count -gt 0
+            hasEntryPoint = @($navigationItems | Where-Object { $_.isEntryPoint }).Count -eq 1
+            hasLandingView = -not [string]::IsNullOrWhiteSpace($appConfig.LandingView)
+            hasSiteMap = -not [string]::IsNullOrWhiteSpace($siteMapUniqueName)
+        }
+    } | ConvertTo-Json -Depth 20 | Set-Content -Path $paths.NavigationPath -Encoding UTF8
+
+    [ordered]@{
+        appUniqueName = $appConfig.UniqueName
+        validationSuccess = $true
+        validationIssues = @()
+        previewOnly = $true
+        liveResolution = 'not attempted'
+    } | ConvertTo-Json -Depth 20 | Set-Content -Path $paths.ValidationPath -Encoding UTF8
+
+    Write-Host ''
+    Write-Host '=== Build App Module ===' -ForegroundColor Cyan
+    Write-Host "  App:        $($appConfig.AppName) [$($appConfig.UniqueName)]"
+    Write-Host '  Action:     preview (local contract only)'
+    Write-Host '  Live reads: none'
+    Write-Host "  Summary:    $($paths.SummaryPath)"
+    Write-Host "  Navigation: $($paths.NavigationPath)"
+    Write-Host "  Validation: $($paths.ValidationPath)"
+
+    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
+        Complete-WizardStepTelemetry -Message 'App module local preview completed.'
+    }
+    exit 0
+}
+
 foreach ($value in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName, $appConfig.UniqueName, $appConfig.AppName)) {
     if ([string]::IsNullOrWhiteSpace($value)) {
         Write-Host 'Missing required values for app module wiring.' -ForegroundColor Red
@@ -358,16 +440,6 @@ if ($upsertAction -eq 'update') {
         if ($created.Count -gt 0) {
             $appModuleId = $created[0].appmoduleid
         }
-    }
-}
-
-$orderedTables = New-Object System.Collections.Generic.List[string]
-if (-not [string]::IsNullOrWhiteSpace($appConfig.EntryPointTable) -and $appConfig.Tables -contains $appConfig.EntryPointTable) {
-    $orderedTables.Add($appConfig.EntryPointTable) | Out-Null
-}
-foreach ($table in @($appConfig.Tables | Sort-Object)) {
-    if (-not $orderedTables.Contains($table)) {
-        $orderedTables.Add($table) | Out-Null
     }
 }
 

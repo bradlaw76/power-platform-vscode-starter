@@ -1,0 +1,73 @@
+{
+  "TableLogicalName": "ppvs_labasset",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_assettag",
+      "LogicalName": "ppvs_assettag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Asset Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_category",
+      "LogicalName": "ppvs_category",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Category",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_availabilitystatus",
+      "LogicalName": "ppvs_availabilitystatus",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Availability Status",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_acceptancesourcetag",
+      "LogicalName": "ppvs_acceptancesourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Acceptance Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

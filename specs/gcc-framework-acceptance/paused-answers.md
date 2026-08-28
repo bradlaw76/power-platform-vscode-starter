@@ -1,6 +1,6 @@
 # Paused Framework Acceptance Answers
 
-Status: Paused before authentication, preview, apply, export, or cleanup
+Status: Paused for explicit mutation authorization after revised credential-free preview
 
 This record preserves the completed discovery decisions for a future GCC acceptance run. It is planning evidence only. It does not authorize Dataverse access or mutation.
 
@@ -9,11 +9,21 @@ This record preserves the completed discovery decisions for a future GCC accepta
 - Mode: Framework Acceptance
 - Selection: Explicit acceptance-engineering run
 - Scenario: Lab Equipment Checkout
-- Environment: Unresolved; must be explicitly confirmed before authentication
-- Environment authorization: Unresolved; no disposable-environment assertion has been made
-- Solution unique name: Unresolved; use a timestamped acceptance-only name after approval
-- Publisher prefix: Unresolved
-- Source tag: Unresolved; use a run-specific synthetic-data tag after approval
+- Environment: Power Platform VS Code Starter - GCC
+- Environment URL: `[APPROVED_GCC_ENVIRONMENT_URL]`
+- Environment authorization: Authorized for this isolated Framework Acceptance run
+- Environment lifecycle: Permanent; must not be reset or deleted
+- Execution constraint: Follow preview-first and explicit-approval gates before applying changes or performing cleanup
+- Solution unique name: `LabEquipmentCheckoutAcceptance20260826`
+- Solution display name: Lab Equipment Checkout Acceptance — 2026-08-26
+- Solution isolation: Separate from the permanent framework-validation solution
+- Publisher prefix: `ppvs`
+- Publisher unique name: `PowerPlatformVSCodeStarter`
+- Publisher display name: Power Platform VS Code Starter
+- Publisher strategy: Create once as a permanent framework publisher, then create the acceptance solution under it
+- Publisher cleanup boundary: Never delete or include the permanent publisher in any cleanup scope
+- Source tag: `ppvs-acceptance-20260826`
+- Source tag purpose: Identify acceptance-owned synthetic records for inventory, validation, deterministic rerun testing, and any future separately approved targeted cleanup
 - Retention: Retain acceptance artifacts after verification
 - Cleanup: Never run automatically; requires separate explicit approval
 
@@ -49,10 +59,11 @@ This record preserves the completed discovery decisions for a future GCC accepta
 
 - Lab Asset records: 3
 - Checkout Request records: 5
-- Hero record: One request demonstrating the full Review-to-Return journey; exact label unresolved
+- Hero record: `LECA-20260826-001 — Full Review-to-Return Journey`
+- Hero record purpose: Demonstrate the complete Review-to-Return lifecycle
 - Coverage: Request lifecycle states, asset availability states, and related-record behavior
 - Privacy: Synthetic data only; no personal, customer, or production data
-- Rerun behavior: Deterministic and idempotent using the unresolved run-specific source tag
+- Rerun behavior: Deterministic and idempotent using source tag `ppvs-acceptance-20260826`
 - Existing standard tables: Do not seed implicitly
 
 ## Acceptance Checks
@@ -69,4 +80,4 @@ This record preserves the completed discovery decisions for a future GCC accepta
 
 ## Resume Gate
 
-Before resuming, explicitly select Framework Acceptance mode and resolve all unresolved values above. Then review generated `spec.md`, `plan.md`, `tasks.md`, payloads, and the acceptance execution plan. Authentication, Dataverse preview, apply, export, retention changes, and cleanup each remain outside this paused record and require the approvals defined by the framework.
+All Framework Acceptance intake values are resolved. Local preview is complete. Publisher creation, solution creation, apply, export, retention changes, and cleanup remain outside this record and require the approvals defined by the framework.

@@ -1,0 +1,141 @@
+{
+  "TableLogicalName": "ppvs_checkoutrequest",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_requestnumber",
+      "LogicalName": "ppvs_requestnumber",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Request Number",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_requestername",
+      "LogicalName": "ppvs_requestername",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Requester Name",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "ppvs_requestedon",
+      "LogicalName": "ppvs_requestedon",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Requested On",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "ppvs_expectedreturndate",
+      "LogicalName": "ppvs_expectedreturndate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Expected Return Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "ppvs_actualreturndate",
+      "LogicalName": "ppvs_actualreturndate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Actual Return Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_lifecyclestage",
+      "LogicalName": "ppvs_lifecyclestage",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Lifecycle Stage",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_approvaldecision",
+      "LogicalName": "ppvs_approvaldecision",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approval Decision",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "ppvs_acceptancesourcetag",
+      "LogicalName": "ppvs_acceptancesourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Acceptance Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

@@ -112,6 +112,18 @@ $payloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
 } else {
     $PayloadsFolder
 }
+$payloadRootFolder = $payloadsFolder
+$payloadValidationFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
+    $payloadsFolder
+} elseif (
+    (Split-Path $payloadsFolder -Leaf) -eq $ScenarioSlug -and
+    (Split-Path (Split-Path $payloadsFolder -Parent) -Leaf) -eq 'scenarios'
+) {
+    $payloadRootFolder = Split-Path (Split-Path $payloadsFolder -Parent) -Parent
+    $payloadsFolder
+} else {
+    Join-Path $payloadsFolder (Join-Path "scenarios" $ScenarioSlug)
+}
 $specsFolder = Join-Path $RepoRoot "specs"
 $envFile = Join-Path $RepoRoot ".env.ps1"
 
@@ -222,14 +234,14 @@ if ($specFiles.Count -eq 0) {
 }
 
 # Validate payload folder presence
-if (-not (Test-Path $payloadsFolder)) {
-    Add-Warn "payloads/ folder not found. Build payload dry checks skipped."
+if (-not (Test-Path $payloadValidationFolder)) {
+    Add-Warn "Scenario payload folder not found: $payloadValidationFolder. Build payload dry checks skipped."
 } else {
-    Add-Pass "Found payloads/ folder."
+    Add-Pass "Found payload folder: $payloadValidationFolder"
 
-    $tablePayloads = @(Get-ChildItem -Path $payloadsFolder -Filter "table-*.json" -ErrorAction SilentlyContinue)
-    $columnPayloads = @(Get-ChildItem -Path $payloadsFolder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
-    $relationshipPayloads = @(Get-ChildItem -Path $payloadsFolder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)
+    $tablePayloads = @(Get-ChildItem -Path $payloadValidationFolder -Filter "table-*.json" -ErrorAction SilentlyContinue)
+    $columnPayloads = @(Get-ChildItem -Path $payloadValidationFolder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
+    $relationshipPayloads = @(Get-ChildItem -Path $payloadValidationFolder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)
 
     if ($tablePayloads.Count -eq 0) { Add-Warn "No table-*.json files found." } else { Add-Pass "Found $($tablePayloads.Count) table payload file(s)." }
     if ($columnPayloads.Count -eq 0) { Add-Warn "No columns-*.json files found." } else { Add-Pass "Found $($columnPayloads.Count) column payload file(s)." }
@@ -419,7 +431,7 @@ Write-Host ""
 Write-Host "=== Dry Validation Report ===" -ForegroundColor Cyan
 
 if (Get-Command Test-WizardBuildContract -ErrorAction SilentlyContinue) {
-    $contractValidation = Test-WizardBuildContract -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $payloadsFolder -EnableBuildContractValidation:$EnableBuildContractValidation -StrictMode:$StrictMode -EnableAppModuleWiring:$EnableAppModuleWiring
+    $contractValidation = Test-WizardBuildContract -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $payloadRootFolder -EnableBuildContractValidation:$EnableBuildContractValidation -StrictMode:$StrictMode -EnableAppModuleWiring:$EnableAppModuleWiring
     foreach ($message in @($contractValidation.Passes)) { Add-Pass $message }
     foreach ($message in @($contractValidation.Warnings)) { Add-Warn $message }
     foreach ($message in @($contractValidation.Errors)) { Add-Error $message }

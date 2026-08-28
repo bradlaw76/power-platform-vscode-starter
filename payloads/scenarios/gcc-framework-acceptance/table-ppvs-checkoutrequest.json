@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "ppvs_checkoutrequest",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Checkout Request",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Checkout Requests",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Synthetic lab equipment checkout request used by the isolated framework acceptance scenario",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}
