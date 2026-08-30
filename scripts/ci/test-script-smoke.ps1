@@ -46,9 +46,13 @@ foreach ($required in @('EnableBusinessProcessFlow', 'BusinessProcessFlowName', 
   }
 }
 
-foreach ($scriptFile in @(Get-ChildItem -LiteralPath $repoRoot -Filter '*.ps1' -File -Recurse | Where-Object {
-    $_.FullName -notmatch '[\\/](?:\.git|node_modules|out|\.wizard-metrics)[\\/]'
-} | Sort-Object FullName)) {
+$trackedScripts = @(& git -C $repoRoot ls-files --cached -- '*.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate tracked PowerShell scripts with Git.' }
+$untrackedRepositoryScripts = @(& git -C $repoRoot ls-files --others --exclude-standard -- 'scripts/*.ps1' 'scripts/**/*.ps1')
+if ($LASTEXITCODE -ne 0) { throw 'Unable to enumerate untracked repository PowerShell scripts with Git.' }
+$repositoryScripts = @($trackedScripts + $untrackedRepositoryScripts | Sort-Object -Unique)
+foreach ($relativeScriptPath in $repositoryScripts) {
+  $scriptFile = Get-Item -LiteralPath (Join-Path $repoRoot $relativeScriptPath)
   $parseErrors = $null
   $parseTokens = $null
   [System.Management.Automation.Language.Parser]::ParseFile(
@@ -57,8 +61,7 @@ foreach ($scriptFile in @(Get-ChildItem -LiteralPath $repoRoot -Filter '*.ps1' -
     [ref]$parseErrors
   ) | Out-Null
   if ($parseErrors.Count -gt 0) {
-    $relativePath = [IO.Path]::GetRelativePath($repoRoot, $scriptFile.FullName)
-    throw "$relativePath has PowerShell parse errors: $(($parseErrors | ForEach-Object { $_.Message }) -join '; ')"
+    throw "$relativeScriptPath has PowerShell parse errors: $(($parseErrors | ForEach-Object { $_.Message }) -join '; ')"
   }
 }
 

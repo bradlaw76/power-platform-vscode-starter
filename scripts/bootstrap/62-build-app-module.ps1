@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Build App Module
 FILE:         scripts/bootstrap/62-build-app-module.ps1
-VERSION:      0.2.0
+VERSION:      0.3.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-07-19
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API | Model-Driven App Metadata
@@ -39,6 +39,7 @@ CHANGELOG
 -----------------------------------------------------------------------------
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 v0.2.0  2026-08-10  Added profile-aware sitemap and landing-view validation.
+v0.3.0  2026-08-30  Replaced broad publishing with app-module-scoped PublishXml.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -91,6 +92,13 @@ if (-not (Test-Path $hardeningHelper)) {
 
 . $hardeningHelper
 
+$dataverseRuntimeHelper = Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1'
+if (-not (Test-Path $dataverseRuntimeHelper)) {
+    Write-Host "Missing helper script: $dataverseRuntimeHelper" -ForegroundColor Red
+    exit 1
+}
+. $dataverseRuntimeHelper
+
 $envFile = Join-Path $repoRoot '.env.ps1'
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
@@ -124,10 +132,30 @@ function Invoke-Dv {
 }
 
 function Get-AppModule {
-    param([string]$UniqueName)
+    param(
+        [string]$UniqueName,
+        [string]$DisplayName
+    )
 
     $safe = $UniqueName.Replace("'", "''")
-    return @((Invoke-Dv -Method 'Get' -Path "appmodules?`$select=appmoduleid,name,uniquename&`$filter=uniquename eq '$safe'").value | Select-Object -First 1)
+    $safeDisplayName = $DisplayName.Replace("'", "''")
+    return @((Invoke-Dv -Method 'Get' -Path "appmodules?`$select=appmoduleid,name,uniquename,description&`$filter=uniquename eq '$safe' or name eq '$safeDisplayName'").value)
+}
+
+function Test-ComponentInTargetSolution {
+    param(
+        [string]$ObjectId,
+        [string]$ComponentTypeLabel
+    )
+
+    $safeSolutionName = $SolutionUniqueName.Replace("'", "''")
+    $solutions = @((Invoke-Dv -Method 'Get' -Path "solutions?`$select=solutionid&`$filter=uniquename eq '$safeSolutionName'").value)
+    if ($solutions.Count -ne 1) { throw "Expected exactly one target solution '$SolutionUniqueName'; found $($solutions.Count)." }
+    $componentType = Get-SolutionComponentTypeValue -Label $ComponentTypeLabel
+    if ($null -eq $componentType) { throw "Dataverse component type '$ComponentTypeLabel' could not be resolved." }
+    $solutionId = $solutions[0].solutionid
+    $members = @((Invoke-Dv -Method 'Get' -Path "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq $solutionId and objectid eq $ObjectId and componenttype eq $componentType").value)
+    return $members.Count -eq 1
 }
 
 function Get-SolutionComponentTypeValue {
@@ -257,10 +285,14 @@ $($subAreas -join [Environment]::NewLine)
 }
 
 function Get-AppSiteMap {
-    param([string]$UniqueName)
+    param(
+        [string]$UniqueName,
+        [string]$DisplayName
+    )
 
     $safe = $UniqueName.Replace("'", "''")
-    return @((Invoke-Dv -Method 'Get' -Path "sitemaps?`$select=sitemapid,sitemapname,sitemapnameunique,sitemapxml&`$filter=sitemapnameunique eq '$safe'").value | Select-Object -First 1)
+    $safeDisplayName = $DisplayName.Replace("'", "''")
+    return @((Invoke-Dv -Method 'Get' -Path "sitemaps?`$select=sitemapid,sitemapname,sitemapnameunique,sitemapxml&`$filter=sitemapnameunique eq '$safe' or sitemapname eq '$safeDisplayName'").value)
 }
 
 function Set-AppSiteMap {
@@ -270,7 +302,7 @@ function Set-AppSiteMap {
         [string]$SiteMapXml
     )
 
-    $existingSiteMaps = @(Get-AppSiteMap -UniqueName $UniqueName)
+    $existingSiteMaps = @(Get-AppSiteMap -UniqueName $UniqueName -DisplayName $DisplayName)
     $body = @{
         sitemapname = $DisplayName
         sitemapnameunique = $UniqueName
@@ -282,12 +314,18 @@ function Set-AppSiteMap {
     } | ConvertTo-Json -Compress
 
     if ((Get-WizardUpsertAction -ExistingItems $existingSiteMaps) -eq 'update') {
+        if ($existingSiteMaps[0].sitemapnameunique -cne $UniqueName -or $existingSiteMaps[0].sitemapname -cne $DisplayName) {
+            throw "Cannot update site map '$DisplayName': same-name or same-unique-name metadata does not match the scenario contract."
+        }
+        if (-not (Test-ComponentInTargetSolution -ObjectId $existingSiteMaps[0].sitemapid -ComponentTypeLabel 'Site Map')) {
+            throw "Cannot update site map '$DisplayName': it is not uniquely owned by target solution '$SolutionUniqueName'."
+        }
         Invoke-Dv -Method 'Patch' -Path "sitemaps($($existingSiteMaps[0].sitemapid))" -Body $body | Out-Null
         return [pscustomobject]@{ Id = $existingSiteMaps[0].sitemapid; Action = 'updated' }
     }
 
     Invoke-Dv -Method 'Post' -Path 'sitemaps' -Body $body | Out-Null
-    $created = @(Get-AppSiteMap -UniqueName $UniqueName)
+    $created = @(Get-AppSiteMap -UniqueName $UniqueName -DisplayName $DisplayName)
     if ($created.Count -eq 0) {
         throw "Site map '$UniqueName' was not found after create."
     }
@@ -418,12 +456,19 @@ foreach ($value in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName, $appCon
     }
 }
 
-$existing = @(Get-AppModule -UniqueName $appConfig.UniqueName)
+$existing = @(Get-AppModule -UniqueName $appConfig.UniqueName -DisplayName $appConfig.AppName)
 $upsertAction = Get-WizardUpsertAction -ExistingItems $existing
 $action = if ($upsertAction -eq 'update') { 'updated' } else { 'created' }
 $appModuleId = ''
 if ($upsertAction -eq 'update') {
     $appModuleId = $existing[0].appmoduleid
+    $expectedDescription = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'."
+    if ($existing[0].uniquename -cne $appConfig.UniqueName -or $existing[0].name -cne $appConfig.AppName -or $existing[0].description -cne $expectedDescription) {
+        throw "Cannot update app '$($appConfig.AppName)': same-name or same-unique-name metadata does not match the scenario contract."
+    }
+    if (-not (Test-ComponentInTargetSolution -ObjectId $appModuleId -ComponentTypeLabel 'App Module')) {
+        throw "Cannot update app '$($appConfig.AppName)': it is not uniquely owned by target solution '$SolutionUniqueName'."
+    }
     if (-not $PreviewOnly) {
         $patchBody = @{ name = $appConfig.AppName; description = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'." } | ConvertTo-Json -Compress
         Invoke-Dv -Method 'Patch' -Path "appmodules($appModuleId)" -Body $patchBody | Out-Null
@@ -436,7 +481,7 @@ if ($upsertAction -eq 'update') {
     }
 
     if ([string]::IsNullOrWhiteSpace($appModuleId)) {
-        $created = @(Get-AppModule -UniqueName $appConfig.UniqueName)
+        $created = @(Get-AppModule -UniqueName $appConfig.UniqueName -DisplayName $appConfig.AppName)
         if ($created.Count -gt 0) {
             $appModuleId = $created[0].appmoduleid
         }
@@ -511,7 +556,8 @@ $solutionAddStatus = 'skipped'
 if (-not $PreviewOnly -and -not [string]::IsNullOrWhiteSpace($appModuleId)) {
     Add-AppComponents -AppId $appModuleId -Components @($componentRefs.ToArray())
     $solutionAddStatus = Add-AppToSolution -AppModuleId $appModuleId
-    Invoke-Dv -Method 'Post' -Path 'PublishAllXml' -Body '{}' | Out-Null
+    $publishXml = New-WizardAppModulePublishXml -AppModuleId $appModuleId
+    Invoke-Dv -Method 'Post' -Path 'PublishXml' -Body (@{ ParameterXml = $publishXml } | ConvertTo-Json -Compress) | Out-Null
 }
 
 $platformValidationResult = if ($PreviewOnly -or [string]::IsNullOrWhiteSpace($appModuleId)) {

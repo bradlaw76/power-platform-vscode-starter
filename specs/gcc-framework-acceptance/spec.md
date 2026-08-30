@@ -84,8 +84,8 @@ The table builder also creates the required primary name column `ppvs_name` on e
 - Expected unique name: `ppvs_lab_equipment_checkout_lifecycle`
 - Primary table: `ppvs_checkoutrequest`
 - Stages: Review, Approve, Issue, Return
-- Initial definition authoring: Power Apps Business Process Flow designer only
-- Automation boundary: script 55 may validate the payload, generate a handoff, verify the existing category-4 process, activate it, add it to the solution, publish it, and link it to the app; it must not construct or patch workflow definition metadata
+- Acceptance deliverable: generate and validate the supported Power Apps Business Process Flow designer handoff
+- Automation boundary: do not construct, patch, activate, publish, add, or link workflow definition metadata during this acceptance run
 
 ## Synthetic Acceptance Data
 
@@ -103,8 +103,9 @@ The table builder also creates the required primary name column `ppvs_name` on e
 - Proposed membership is limited to `LabEquipmentCheckoutAcceptance20260826`.
 - The review app opens on Active Checkout Requests.
 - The relationship is required and restricts deletion of an asset with request history.
-- Review, Approve, Issue, and Return are represented in the designer-authored BPF.
+- The validated designer handoff specifies Review, Approve, Issue, and Return.
 - The dashboard supports lifecycle and availability drill-through.
 - A deterministic second run produces no uncontrolled duplicates.
+- The unmanaged solution exports, unpacks, and contains only the required acceptance components.
 - Existing isolated Contoso components remain unchanged.
 - No environment reset, deletion, or cleanup occurs.

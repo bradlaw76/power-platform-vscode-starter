@@ -1110,7 +1110,11 @@ function Get-WizardAppModuleConfig {
 function Get-WizardUpsertAction {
     param([object[]]$ExistingItems = @())
 
-    if (@($ExistingItems).Count -gt 0) {
+    $count = @($ExistingItems).Count
+    if ($count -gt 1) {
+        throw "Cannot select an upsert target: expected at most one matching component, found $count."
+    }
+    if ($count -eq 1) {
         return 'update'
     }
     return 'create'

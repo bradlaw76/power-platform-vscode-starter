@@ -19,7 +19,7 @@
 - Landing View: Active Checkout Requests
 - Landing View Plan: adopt-generated-active after proving current-scenario table ownership and generated Active/default-view identity
 - Review App Mode: create-or-update
-- Required App Artifacts: Lab Asset and Checkout Request tables, main forms, active views, Lab Equipment Checkout Lifecycle BPF, lifecycle and availability report surface
+- Required App Artifacts: Lab Asset and Checkout Request tables, main forms, active views, validated Lab Equipment Checkout Lifecycle designer handoff, lifecycle and availability report surface
 - View Dispositions: Active Checkout Requests = adopt-generated-active; Available Lab Assets = create-custom
 
 ## App Module

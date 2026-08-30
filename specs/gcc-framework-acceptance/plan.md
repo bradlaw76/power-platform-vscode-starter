@@ -57,20 +57,18 @@ Relationship decision: N:1, required, new, Restrict delete, supporting request h
 1. Review and approve planning artifacts and complete component inventory.
 2. Validate JSON payloads, prefix usage, solution identity, source tag, and hero label without credentials.
 3. Run the authorized credential-free preview and inspect its local plan without applying mutations.
-4. Stop and request explicit mutation authorization.
-5. After authorization, verify-or-create permanent publisher `PowerPlatformVSCodeStarter` with prefix `ppvs`.
-6. Verify-or-create unmanaged solution `LabEquipmentCheckoutAcceptance20260826` under that publisher.
-7. Build tables, columns, and relationship.
-8. Use the Power Apps designer handoff to create the base BPF; do not automate its definition metadata.
-9. Validate/activate/add/link the existing BPF through script 55 after designer publication.
-10. Create forms, views, review app, navigation, and the approved report surface.
-11. Inventory and synchronize all proposed components into the isolated solution, then verify membership.
-12. Seed only the approved synthetic records with the approved source tag.
-13. Run functional and deterministic-rerun validation; retain artifacts and stop without cleanup.
+4. Complete GET-only provenance reconstruction for the existing publisher, solution, and schema.
+5. Stop and request one consolidated completion authorization.
+6. Create forms, views, charts, dashboard, review app, and navigation.
+7. Generate and validate the supported BPF designer handoff; do not fabricate or require workflow metadata.
+8. Inventory and synchronize all required components into the isolated solution, then publish and verify membership.
+9. Seed only the approved synthetic records with the approved source tag.
+10. Run functional and deterministic-rerun validation.
+11. Export, unpack, and inspect the unmanaged solution; retain artifacts and stop without cleanup.
 
 ## Idempotency Plan
 
-- Tables, columns, relationships, forms, views, app, sitemap, and BPF are resolved by stable logical or unique names.
+- Tables, columns, relationships, forms, views, charts, dashboard, app, and sitemap are resolved by stable logical or unique names.
 - Synthetic records are upserted using scenario-defined natural keys scoped by `ppvs-acceptance-20260826`.
 - The second approved run must report created/updated/skipped counts and show no uncontrolled duplicate records or components.
 - Cleanup is not part of rerun behavior and remains prohibited without separate approval.
@@ -92,14 +90,14 @@ Relationship decision: N:1, required, new, Restrict delete, supporting request h
 - Identity audit confirms only `LabEquipmentCheckoutAcceptance20260826`.
 - Demo-data audit confirms every planned record has source tag `ppvs-acceptance-20260826`.
 - Hero audit confirms `LECA-20260826-001 — Full Review-to-Return Journey`.
-- Proposed component inventory and membership are reviewed before preview authorization is requested.
-- Publisher and solution creation remain planned mutations and are not represented as completed.
+- Scenario-scoped provenance confirms the existing publisher, unmanaged solution, 2 tables, 15 columns, and relationship.
+- Final component inventory and membership must pass before unmanaged export.
 
 ## Safety Gates
 
-- Do not authenticate, query, apply, export, seed, publish, or clean up at the current stop point.
+- Do not resume live access, apply, export, seed, publish, or clean up at the current stop point.
 - The environment is permanent and must not be reset or deleted.
-- Credential-free preview is authorized and complete.
-- Apply and all mutations, including publisher and solution creation, require separate explicit authorization.
+- Credential-free preview and GET-only provenance reconstruction are complete.
+- The remaining build, publishing, verification, rerun, and export require one consolidated explicit authorization.
 - Cleanup requires separate explicit approval and is currently prohibited.
 - Preserve existing isolated Contoso components.

@@ -5,6 +5,7 @@ $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $sourceScript = Join-Path $repoRoot 'scripts/bootstrap/60-build-forms-views.ps1'
 $sourceTelemetryHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-telemetry.ps1'
 $sourceHardeningHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-hardening.ps1'
+$sourceDataverseRuntimeHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/dataverse-runtime.ps1'
 
 function New-TestRepo {
   $path = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-form-tests-" + [guid]::NewGuid().ToString('N'))
@@ -13,6 +14,7 @@ function New-TestRepo {
   Copy-Item -Path $sourceScript -Destination (Join-Path $path 'scripts/bootstrap/60-build-forms-views.ps1') -Force
   Copy-Item -Path $sourceTelemetryHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-telemetry.ps1') -Force
   Copy-Item -Path $sourceHardeningHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Force
+  Copy-Item -Path $sourceDataverseRuntimeHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/dataverse-runtime.ps1') -Force
   return $path
 }
 
@@ -204,6 +206,7 @@ function Invoke-RestMethod {
       formid = [guid]::NewGuid().ToString()
       name = $payload.name
       type = $payload.type
+      description = $payload.description
       formxml = $payload.formxml
     }
     $script:MockContext.Forms.Add($form) | Out-Null
@@ -246,7 +249,7 @@ function Invoke-RestMethod {
     return $view
   }
 
-  if (($Method -eq 'Post') -and ($path -eq 'PublishAllXml')) {
+  if (($Method -eq 'Post') -and ($path -eq 'PublishXml')) {
     return [pscustomobject]@{}
   }
 
@@ -315,6 +318,13 @@ try {
   Assert-Condition -Condition ($firstRunExitCode -eq 0) -Message 'Expected populated form scenario to succeed.'
   Assert-Condition -Condition ($script:MockContext.Forms.Count -eq 1) -Message 'Expected one Main form to be created.'
   Assert-Condition -Condition ($script:MockContext.Views.Count -eq 1) -Message 'Expected one working view to be created.'
+  $publishRequests = @($script:MockContext.Requests | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'PublishXml' })
+  Assert-Condition -Condition ($publishRequests.Count -eq 1) -Message 'Expected one scoped PublishXml request.'
+  Assert-Condition -Condition (($publishRequests[0].Body | ConvertFrom-Json).ParameterXml -eq '<importexportxml><entities><entity>tst_case</entity></entities></importexportxml>') -Message 'Expected publication to target only tst_case.'
+  Assert-Condition -Condition (@($script:MockContext.Requests | Where-Object Path -eq 'PublishAllXml').Count -eq 0) -Message 'Normal form/view build must not call PublishAllXml.'
+  $duplicateFormStopped = $false
+  try { Get-TargetMainForm -ExistingForms @([pscustomobject]@{ name = 'Starter Main Form' }, [pscustomobject]@{ name = 'Starter Main Form' }) -PreferredFormName 'Starter Main Form' -FormStrategy 'create-new-forms' | Out-Null } catch { $duplicateFormStopped = $true }
+  Assert-Condition -Condition $duplicateFormStopped -Message 'Duplicate same-name Main forms must cause a hard stop.'
   Assert-Condition -Condition ($script:MockContext.Views[0].name -eq 'Active Cases') -Message 'Expected the entry table to use its configured landing-view name.'
 
   $createdFields = @(Get-FormFieldNames -FormXml $script:MockContext.Forms[0].formxml)

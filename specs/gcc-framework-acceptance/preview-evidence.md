@@ -33,7 +33,7 @@
 
 ## Proposed Inventory Confirmation
 
-All 28 inventory rows are required in `LabEquipmentCheckoutAcceptance20260826`. The exact planned mutations also include one permanent publisher, one unmanaged solution, and eight synthetic rows. Publish, activation, and membership calls are operations against those identities rather than additional components.
+The solution inventory has 27 required component rows plus one validated BPF designer-handoff artifact that is not a solution component. The exact plan also includes one permanent publisher, one unmanaged solution, and eight synthetic rows. Publisher, solution, and schema creation are now completed historical work with reconstructed provenance.
 
 - Tables: `ppvs_labasset`, `ppvs_checkoutrequest`
 - Lab Asset columns: `ppvs_name`, `ppvs_assettag`, `ppvs_category`, `ppvs_availabilitystatus`, `ppvs_acceptancesourcetag`
@@ -43,13 +43,13 @@ All 28 inventory rows are required in `LabEquipmentCheckoutAcceptance20260826`. 
 - Forms: Lab Asset Main (`ppvs_labasset|main`), Checkout Request Main (`ppvs_checkoutrequest|main`)
 - Views: Available Lab Assets (`ppvs_labasset|active`, `create-custom`), Active Checkout Requests (`ppvs_checkoutrequest|active`, `adopt-generated-active`)
 - Preview reports the declared dispositions without mutation; live generated-view provenance must still be proven at the apply gate.
-- BPF handoff: `ppvs_lab_equipment_checkout_lifecycle`
+- BPF handoff artifact: `ppvs_lab_equipment_checkout_lifecycle` (validated design only; not a required BPF component)
 - Charts: Requests by Lifecycle Stage; Assets by Availability
 - Dashboard: Lab Equipment Lifecycle and Availability
 - App: `ppvs_lab_equipment_checkout_acceptance_20260826`
 - Sitemap: `ppvs_lab_equipment_checkout_acceptance_20260826_sitemap`
 
-Local app/navigation validation confirmed one entry point, the named landing view, two ordered tables, two forms, two views, one BPF reference, one navigation group, and the deterministic sitemap identity. Chart and dashboard display names resolve uniquely in the planning contract; they remain supported maker-authored components without locally generated metadata IDs.
+Local app/navigation validation confirmed one entry point, the named landing view, two ordered tables, two forms, two views, one navigation group, and the deterministic sitemap identity. The BPF reference is a validated handoff only. Chart and dashboard display names resolve uniquely in the planning contract; they remain supported maker-authored components without locally generated metadata IDs.
 
 ## Identity And Data Evidence
 
@@ -80,10 +80,19 @@ After an earlier credential-free preview, authentication and GET-only Dataverse 
 
 - Publisher with prefix `ppvs`: absent
 - Solution `LabEquipmentCheckoutAcceptance20260826`: absent
-- All 28 planned component identities: absent
+- All component identities planned at that historical point: absent
 
 Those historical observations are not evidence produced by this fresh credential-free preview and were not rechecked. No current live query is authorized.
 
-## Stop Point
+## Credential-Free Preview Stop Point
 
-Publisher creation, solution creation, all component/data mutations, authentication, live query, export, commit, push, and cleanup remain blocked pending their applicable explicit authorization. The permanent publisher is excluded from cleanup categorically.
+At the end of the original preview, publisher creation, solution creation, all component/data mutations, authentication, live query, export, commit, push, and cleanup were blocked. This historical stop was superseded by the separately authorized schema gate and GET-only provenance reconstruction below. The permanent publisher remains excluded from cleanup categorically.
+
+## Read-Only Provenance Reconstruction: 2026-08-28
+
+- The scenario-scoped manifest correction passed local tests and GitHub Actions before reconstruction.
+- GET-only checks verified the approved URL binding, active-token tenant binding, exact unmanaged solution, permanent publisher, two custom table descriptions, table and column creation timestamps, all 15 planned columns, and exact relationship shape.
+- The live timestamps correlate to the recorded successful schema gate at 2026-08-28 02:01-02:10 UTC.
+- The GCC manifest was reconstructed with 2 table, 15 column, and 1 relationship `created` entries, each marked as reconstructed evidence. The legacy Contoso manifest remained separate.
+- Step 60 then passed in `PreviewOnly` mode with `MinBusinessColumnsPerView 3`: two forms were planned, `Active Checkout Requests` reported `adoption-planned`, and `Available Lab Assets` reported custom creation. No form, view, publish, or provenance mutation occurred.
+- GCC access stopped after this gate. The remaining completion build requires the single consolidated authorization in `revised-apply-plan.md`.

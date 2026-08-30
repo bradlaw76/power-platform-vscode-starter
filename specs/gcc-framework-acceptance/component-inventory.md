@@ -6,7 +6,7 @@
 - Solution display name: Lab Equipment Checkout Acceptance — 2026-08-26
 - Publisher unique name: `PowerPlatformVSCodeStarter`
 - Publisher prefix: `ppvs`
-- Membership state: absent/uncreated based on the stopped prior GET-only observation; not rechecked during revised preview
+- Membership state: publisher, unmanaged solution, and scenario schema verified by GET-only reconstruction on 2026-08-28; live solution-component count was 2 and full membership remains pending
 
 The publisher is a permanent prerequisite, not a solution component and never a cleanup target. The unmanaged solution is created under that publisher before component creation.
 
@@ -36,7 +36,7 @@ The publisher is a permanent prerequisite, not a solution component and never a 
 | Main form | Checkout Request Main | `ppvs_checkoutrequest\|main` | Required |
 | View | Available Lab Assets | `ppvs_labasset\|active` | Required; `create-custom` |
 | View | Active Checkout Requests | `ppvs_checkoutrequest\|active` | Required; app landing view; `adopt-generated-active` |
-| BPF | Lab Equipment Checkout Lifecycle | `ppvs_lab_equipment_checkout_lifecycle` | Required after designer authoring |
+| BPF designer handoff | Lab Equipment Checkout Lifecycle | `ppvs_lab_equipment_checkout_lifecycle` | Required as generated and validated handoff; no fabricated workflow component |
 | Chart | Requests by Lifecycle Stage | proposed maker-authored chart | Required |
 | Chart | Assets by Availability | proposed maker-authored chart | Required |
 | Dashboard | Lab Equipment Lifecycle and Availability | proposed maker-authored dashboard | Required |
@@ -45,9 +45,9 @@ The publisher is a permanent prerequisite, not a solution component and never a 
 
 ## Membership Gate
 
-- Every listed component must be added to `LabEquipmentCheckoutAcceptance20260826`.
+- Every row marked as a required solution component must be added to `LabEquipmentCheckoutAcceptance20260826`; the validated BPF designer handoff remains a local evidence artifact.
 - The inventory/sync step must report Added, Already in solution, Failed with reason, or Missing after sync for each component.
 - Export is prohibited until every required component is confirmed present.
 - Existing Contoso components are excluded and must remain unchanged.
-- No component currently has target-solution membership because the publisher and solution are uncreated.
-- The absence statement is historical; the revised preview made no Dataverse request.
+- The publisher and unmanaged solution exist with the planned identities. Two scenario components were present in the live solution-component inventory at reconstruction time; final categorized membership remains to be verified.
+- The remaining component set must be synchronized and pass the final membership gate before export.

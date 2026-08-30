@@ -104,9 +104,33 @@ Assert-Condition -Condition ($process.PrimaryProcessEntity -eq 'ppvs_checkoutreq
 $expectedProcessUniqueName = 'ppvs_' + ([regex]::Replace($process.BusinessProcessFlowName.ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_'))
 Assert-Condition -Condition ($expectedProcessUniqueName -eq 'ppvs_lab_equipment_checkout_lifecycle') -Message "Unexpected BPF unique name: $expectedProcessUniqueName"
 
+$handoffPath = Join-Path $scenarioRoot 'reports/business-process-flow-designer-handoff.md'
+Assert-Condition -Condition (Test-Path -LiteralPath $handoffPath -PathType Leaf) -Message 'BPF designer handoff is missing.'
+$handoff = Get-Content -LiteralPath $handoffPath -Raw -Encoding UTF8
+foreach ($requiredText in @(
+    'This validated handoff is the Framework Acceptance deliverable',
+    'Expected unique name: `ppvs_lab_equipment_checkout_lifecycle`',
+    'Primary table: `ppvs_checkoutrequest`',
+    'Target solution: `LabEquipmentCheckoutAcceptance20260826`',
+    '### 1. Review',
+    '### 2. Approve',
+    '### 3. Issue',
+    '### 4. Return',
+    'The acceptance run does not create or modify BPF definition metadata',
+    'Do not fabricate or patch `clientdata`, `uidata`, or `xaml`',
+    'without requiring an active process, solution membership, or app linkage'
+)) {
+    Assert-Condition -Condition $handoff.Contains($requiredText) -Message "BPF designer handoff is missing required contract text: $requiredText"
+}
+foreach ($field in @($process.StageDefinitions | ForEach-Object { @($_.RequiredFields) } | Sort-Object -Unique)) {
+    Assert-Condition -Condition $handoff.Contains("``$field``") -Message "BPF designer handoff is missing payload field '$field'."
+}
+
 $answers = Get-Content -LiteralPath (Join-Path $scenarioRoot 'answers.md') -Raw -Encoding UTF8
 $plan = Get-Content -LiteralPath (Join-Path $scenarioRoot 'plan.md') -Raw -Encoding UTF8
 $inventory = Get-Content -LiteralPath (Join-Path $scenarioRoot 'component-inventory.md') -Raw -Encoding UTF8
+$revisedPlan = Get-Content -LiteralPath (Join-Path $scenarioRoot 'revised-apply-plan.md') -Raw -Encoding UTF8
+$mutationInventory = Get-Content -LiteralPath (Join-Path $scenarioRoot 'mutation-inventory.md') -Raw -Encoding UTF8
 foreach ($document in @($answers, $plan, $inventory)) {
     Assert-Condition -Condition $document.Contains($solutionName) -Message "Planning artifact is missing solution identity $solutionName."
 }
@@ -120,6 +144,19 @@ Assert-Condition -Condition (@($formsContract.Forms | Where-Object Name -eq 'Lab
 Assert-Condition -Condition (@($formsContract.Forms | Where-Object Name -eq 'Checkout Request Main').Count -eq 1) -Message 'Checkout Request Main form contract is missing.'
 Assert-Condition -Condition (@($viewsContract.Views | Where-Object { $_.Name -eq 'Active Checkout Requests' -and $_.Disposition -eq 'adopt-generated-active' }).Count -eq 1) -Message 'Active Checkout Requests must adopt the generated Active view.'
 Assert-Condition -Condition (@($viewsContract.Views | Where-Object { $_.Name -eq 'Available Lab Assets' -and $_.Disposition -eq 'create-custom' }).Count -eq 1) -Message 'Available Lab Assets must be a separate custom view.'
+foreach ($identity in @(
+    'ppvs_labasset / Lab Asset Main / type=2',
+    'ppvs_checkoutrequest / Checkout Request Main / type=2',
+    'ppvs_labasset / Available Lab Assets / create-custom',
+    'ppvs_checkoutrequest / Active Checkout Requests / adopt-generated-active',
+    'ppvs_checkoutrequest / Requests by Lifecycle Stage',
+    'ppvs_labasset / Assets by Availability',
+    'Lab Equipment Lifecycle and Availability / systemform type=0',
+    'ppvs_lab_equipment_checkout_acceptance_20260826',
+    'ppvs_lab_equipment_checkout_acceptance_20260826_sitemap'
+)) {
+    Assert-Condition -Condition (($revisedPlan.Contains($identity)) -or ($mutationInventory.Contains($identity))) -Message "Exact mutation identity is missing: $identity"
+}
 
 $demoData = Get-Content -LiteralPath (Join-Path $scenarioRoot 'demo-data-plan.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 Assert-Condition -Condition ($demoData.SolutionUniqueName -eq $solutionName) -Message 'Demo-data plan solution identity is incorrect.'
@@ -132,6 +169,19 @@ foreach ($record in $records) {
 }
 $heroRecords = @($records | Where-Object { $_.ppvs_name -eq $heroLabel })
 Assert-Condition -Condition ($heroRecords.Count -eq 1) -Message "Expected exactly one hero record '$heroLabel'; found $($heroRecords.Count)."
+$naturalKeys = @($demoData.Tables | ForEach-Object {
+    $keyName = $_.NaturalKey
+    @($_.Records | ForEach-Object { $_.$keyName })
+})
+Assert-Condition -Condition (@($naturalKeys | Sort-Object -Unique).Count -eq 8) -Message 'All eight synthetic records must have unique planned natural keys.'
+foreach ($requiredContractText in @(
+    'A same-name mismatch or duplicate is a hard stop.',
+    'The second run must create zero components and zero records',
+    '`PublishAllXml` prohibited',
+    'local inspection only; no import'
+)) {
+    Assert-Condition -Condition (($mutationInventory + $revisedPlan + (Get-Content -LiteralPath (Join-Path $scenarioRoot 'framework-acceptance-execution-plan.md') -Raw -Encoding UTF8)).Contains($requiredContractText)) -Message "Final mutation contract is missing: $requiredContractText"
+}
 
 $safetyText = @(
     $answers

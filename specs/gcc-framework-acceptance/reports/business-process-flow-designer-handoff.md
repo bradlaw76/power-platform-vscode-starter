@@ -1,6 +1,6 @@
 # Business Process Flow Designer Handoff
 
-This repository does not create BPF definition metadata through direct Dataverse Web API workflow payloads. Create the base process with the Power Apps Business Process Flow designer, add it to the target solution, activate and publish it, then use script 55 only for supported validation, membership, activation, and app-linkage work after explicit apply authorization.
+This validated handoff is the Framework Acceptance deliverable for the planned BPF. The acceptance run does not create or modify BPF definition metadata. A future separately authorized maker may use this document to create the process with the Power Apps Business Process Flow designer.
 
 - Display name: Lab Equipment Checkout Lifecycle
 - Expected unique name: `ppvs_lab_equipment_checkout_lifecycle`
@@ -42,16 +42,16 @@ This repository does not create BPF definition metadata through direct Dataverse
 - Exit criteria: Actual Return Date is recorded, Lifecycle Stage is Return, and the asset is available.
 - Completion behavior: Finish means the request lifecycle is complete and the asset can be issued again.
 
-## Supported Verification
+## Handoff Validation
 
-1. Confirm every field exists before binding it in the designer.
-2. Activate and publish the process in Power Apps.
-3. Confirm the process is present in `LabEquipmentCheckoutAcceptance20260826`.
-4. After explicit apply authorization, rerun script 55 to validate the existing category-4 process.
-5. Confirm active state, stage and step thresholds, solution membership, and review-app linkage.
+1. Confirm the handoff identifies the exact target solution, primary table, form, unique name, and four ordered stages.
+2. Confirm every referenced field exists in the approved scenario payloads and live reconstructed schema.
+3. Confirm each stage has entry, exit, and human-checkpoint or completion guidance.
+4. Confirm the handoff requires the supported Power Apps designer and forbids direct workflow-definition payload construction.
+5. Record the handoff as validated without requiring an active process, solution membership, or app linkage.
 
 ## Unsupported Operations
 
 - Do not fabricate or patch `clientdata`, `uidata`, or `xaml`.
 - Do not use direct workflow-definition payload construction.
-- Do not treat an Active state or solution membership alone as proof of a valid BPF.
+- Do not represent the handoff as an active BPF component.

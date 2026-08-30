@@ -18,7 +18,7 @@ The live-read activity must not be represented as part of credential-free previe
 
 - Stop all Dataverse access.
 - Correct the unsupported publisher-reuse assumption.
-- Treat `PowerPlatformVSCodeStarter` publisher creation and acceptance-solution creation as explicit future mutations.
+- Historical correction at that stop: treat publisher and solution creation as explicit future mutations. Those operations were later authorized, completed, and verified before the 2026-08-28 provenance reconstruction.
 - Rerun preview locally with connection values cleared and live resolution disabled.
 - Require explicit mutation authorization before any environment change.
 

@@ -250,15 +250,34 @@ function Publish-WizardCustomizations {
     param(
         [Parameter(Mandatory)] [string]$EnvironmentUrl,
         [Parameter(Mandatory)] [string]$AccessToken,
-        [string]$ParameterXml = '',
+        [Parameter(Mandatory)] [string]$ParameterXml,
         [switch]$PreviewOnly,
         [scriptblock]$RequestInvoker
     )
 
-    if ([string]::IsNullOrWhiteSpace($ParameterXml)) {
-        return Invoke-WizardDataverseRequest -Method Post -Path 'PublishAllXml' -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body @{} -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker
-    }
+    if ([string]::IsNullOrWhiteSpace($ParameterXml)) { throw 'Scoped publication requires non-empty ParameterXml.' }
     return Invoke-WizardDataverseRequest -Method Post -Path 'PublishXml' -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body @{ ParameterXml = $ParameterXml } -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker
+}
+
+function New-WizardEntityPublishXml {
+    param([Parameter(Mandatory)] [string[]]$EntityLogicalNames)
+
+    $entities = @($EntityLogicalNames | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+    if ($entities.Count -eq 0) { throw 'Entity-scoped publication requires at least one logical name.' }
+    foreach ($entity in $entities) {
+        if ($entity -cnotmatch '^[a-z][a-z0-9_]*$') { throw "Invalid entity logical name for scoped publication: '$entity'." }
+    }
+    return '<importexportxml><entities>' + (($entities | ForEach-Object { "<entity>$_</entity>" }) -join '') + '</entities></importexportxml>'
+}
+
+function New-WizardAppModulePublishXml {
+    param([Parameter(Mandatory)] [string]$AppModuleId)
+
+    $parsedId = [guid]::Empty
+    if (-not [guid]::TryParse($AppModuleId, [ref]$parsedId) -or $parsedId -eq [guid]::Empty) {
+        throw "Invalid app module ID for scoped publication: '$AppModuleId'."
+    }
+    return "<importexportxml><appmodules><appmodule>$($parsedId.ToString())</appmodule></appmodules></importexportxml>"
 }
 
 function Resolve-WizardScenarioPaths {

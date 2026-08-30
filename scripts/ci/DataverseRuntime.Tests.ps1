@@ -130,3 +130,48 @@ Describe 'Wait-WizardDataverseOperation' {
         { Wait-WizardDataverseOperation -StatusProvider { @{ Completed = $false; Failed = $false } } -TimeoutSeconds 0 -PollIntervalSeconds 0 -SleepAction { param($seconds) } } | Should -Throw '*timed out*'
     }
 }
+
+Describe 'Scoped wizard publication' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../bootstrap/helpers/dataverse-runtime.ps1')
+    }
+
+    It 'builds deterministic entity-scoped publication XML' {
+        New-WizardEntityPublishXml -EntityLogicalNames @('ppvs_labasset', 'ppvs_checkoutrequest', 'ppvs_labasset') |
+            Should -Be '<importexportxml><entities><entity>ppvs_checkoutrequest</entity><entity>ppvs_labasset</entity></entities></importexportxml>'
+    }
+
+    It 'builds app-module-scoped publication XML' {
+        $appId = '00001111-aaaa-2222-bbbb-3333cccc4444'
+        New-WizardAppModulePublishXml -AppModuleId $appId |
+            Should -Be "<importexportxml><appmodules><appmodule>$appId</appmodule></appmodules></importexportxml>"
+    }
+
+    It 'rejects publication without an explicit scope' {
+        { Publish-WizardCustomizations -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -ParameterXml ' ' } |
+            Should -Throw '*requires non-empty ParameterXml*'
+    }
+
+    It 'posts only to PublishXml' {
+        $global:wizardPublishPath = ''
+        $xml = New-WizardEntityPublishXml -EntityLogicalNames @('ppvs_labasset')
+        Publish-WizardCustomizations -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -ParameterXml $xml -RequestInvoker {
+            param($request)
+            $global:wizardPublishPath = $request.Uri
+            return @{ ok = $true }
+        } | Out-Null
+        $global:wizardPublishPath | Should -Match '/PublishXml$'
+        $global:wizardPublishPath | Should -Not -Match 'PublishAllXml'
+    }
+}
+
+Describe 'Wizard upsert collision safety' {
+    BeforeAll {
+        . (Join-Path $PSScriptRoot '../bootstrap/helpers/wizard-hardening.ps1')
+    }
+
+    It 'rejects multiple matching components' {
+        { Get-WizardUpsertAction -ExistingItems @(@{ id = 1 }, @{ id = 2 }) } |
+            Should -Throw '*expected at most one matching component*'
+    }
+}

@@ -2,7 +2,7 @@
 
 ## Current Stop Point
 
-Dataverse access is stopped. A revised credential-free local preview is authorized; authentication, Dataverse queries, apply, export, seeding, publishing, retention changes, reset, deletion, and cleanup must not run.
+Dataverse access is stopped after the successful GET-only provenance reconstruction. The remaining live build requires one consolidated authorization covering forms/views, charts/dashboard, app/sitemap, tagged synthetic records, publishing, functional verification, second-run idempotency, and unmanaged export/package inspection.
 
 ## Operation Classification
 
@@ -14,25 +14,24 @@ Dataverse access is stopped. A revised credential-free local preview is authoriz
 | Run `15-dry-validate.ps1` against local payloads | Read-only local validation | Authorized | Use explicit prefix override `ppvs` |
 | Run `90-run-build.ps1 -Mode Preview` | Preview-only orchestration | Authorized | Use sentinel connection values; live resolution disabled |
 | Run `10-auth-connect.ps1` | Authentication and live validation | Not authorized | May query environment/solution/publisher; requires separate approval |
-| Query Dataverse metadata or solution membership | Live read-only | Not authorized | Requires separate approval after planning review |
-| Create publisher `PowerPlatformVSCodeStarter` with prefix `ppvs` | Mutating prerequisite | Not authorized | Permanent framework publisher; never a cleanup target |
-| Create unmanaged solution `LabEquipmentCheckoutAcceptance20260826` | Mutating prerequisite | Not authorized | Must use the permanent publisher |
-| Run scripts 20, 30, 40, 50, 55 apply path, 60, 62, or report authoring | Mutating | Not authorized | Creates/updates metadata, solution membership, forms/views/app/BPF linkage, or reports |
+| Query Dataverse metadata or solution membership | Live read-only | Completed for provenance; future reads included only in consolidated build | GET-only reconstruction passed |
+| Publisher `PowerPlatformVSCodeStarter` with prefix `ppvs` | Existing prerequisite | Verified | Permanent framework publisher; never a cleanup target |
+| Unmanaged solution `LabEquipmentCheckoutAcceptance20260826` | Existing prerequisite | Verified | Exact publisher identity confirmed |
+| Existing schema: scripts 20, 30, and 40 | Completed before reconstruction | Proven | 2 tables, 15 columns, and 1 relationship reconstructed into scoped provenance |
+| Run forms/views, charts/dashboard, app/sitemap, sync, and required publish operations | Mutating | Not authorized | Covered by one consolidated completion request |
 | Seed synthetic records | Mutating | Not authorized | Must use source tag `ppvs-acceptance-20260826` on every row |
-| Publish customizations | Mutating | Not authorized | Required only after approved metadata changes |
-| Export/unpack solution | Live read plus local write | Not authorized | Blocked until membership gate passes and export is approved |
+| Publish customizations | Mutating | Not authorized | Component-scoped `PublishXml` only for scenario tables and exact app module; `PublishAllXml` prohibited |
+| Export/unpack and inspect unmanaged solution | Live read plus local write | Not authorized | Unmanaged export only; local inspection only; no import; blocked until membership passes |
 | Reset or delete environment | Destructive | Prohibited | Environment is permanent |
 | Delete components or synthetic records | Destructive cleanup | Prohibited | Requires separate explicit future approval; no approval exists |
 
-## Preview-First Gates
+## Completion Flow
 
-1. Complete credential-free validation and review all generated contents.
-2. Run only the authorized orchestrated Preview mode and review its output.
-3. Stop before authentication, live query, or mutation.
-4. Obtain separate mutation authorization.
-5. Create the permanent publisher and unmanaged solution as separate bounded prerequisites.
-6. Apply one bounded phase at a time with validation checkpoints.
-7. Never infer cleanup approval from apply approval.
+1. Revalidate identity, scoped provenance, and inventory.
+2. Execute the remaining build as one authorized flow with validation checkpoints, stopping on any hard-gate failure.
+3. Generate and validate the BPF designer handoff; do not fabricate workflow internals.
+4. Publish only scoped components, verify function, rerun for zero duplicates, enforce membership, then export/unpack/inspect locally without import.
+5. Never infer cleanup, environment deletion, PAC profile changes, or source-control approval from build approval.
 
 ## Supported BPF Designer Handoff
 
@@ -41,8 +40,8 @@ Dataverse access is stopped. A revised credential-free local preview is authoriz
 - Use unique name `ppvs_lab_equipment_checkout_lifecycle` and primary table `ppvs_checkoutrequest`.
 - Add Review, Approve, Issue, and Return stages using the mappings in the process payload and designer handoff.
 - Add the process to `LabEquipmentCheckoutAcceptance20260826`, activate it, and publish through the supported maker path.
-- Only then may an approved script 55 apply run validate the existing category-4 process, verify fields and thresholds, add/confirm membership, activate if required, and link it to the review app.
-- If designer authoring is unavailable, stop and preserve the handoff; do not synthesize `clientdata`, `uidata`, or `xaml`.
+- Acceptance requires only generation and validation of this supported designer handoff.
+- Do not synthesize `clientdata`, `uidata`, or `xaml`, and do not require an active BPF component for this acceptance run.
 
 ## Permanent Environment Constraints
 
@@ -62,5 +61,7 @@ Dataverse access is stopped. A revised credential-free local preview is authoriz
 - Preview output reviewed before apply authorization.
 - Created/updated/skipped/failed counts by component category.
 - Final inventory and solution membership report.
-- BPF designer handoff, validation thresholds, active state, membership, and app-linkage evidence.
+- Generated and validated BPF designer handoff; active-state, membership, and app linkage are not required for this acceptance scenario.
 - Functional evidence for landing view, navigation, relationship requiredness, restrict delete, lifecycle, availability, dashboard drill-through, and deterministic rerun.
+- Unmanaged export, successful unpack, and package-content inspection evidence.
+- Collision checks prove exactly one matching form, view, chart, dashboard, app, sitemap, and natural-key record; mismatched ownership, solution membership, or metadata stops before mutation.

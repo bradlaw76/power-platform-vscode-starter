@@ -52,7 +52,7 @@ This record preserves the completed discovery decisions for a future GCC accepta
 - Entry view: Active Checkout Requests
 - Navigation: Checkout Request is the first workflow entry; Lab Asset remains reachable in the review app
 - Business process flow: Enabled with stages Review, Approve, Issue, Return
-- BPF creation: Use the supported Power Apps designer handoff for the initial definition; automation may validate, activate, add, publish, and link the existing process only
+- BPF acceptance boundary: Generate and validate the supported Power Apps designer handoff only; do not fabricate, activate, add, publish, or link workflow metadata
 - Reporting: Lifecycle and availability report with drill-through to active requests
 
 ## Synthetic Acceptance Data
@@ -80,4 +80,4 @@ This record preserves the completed discovery decisions for a future GCC accepta
 
 ## Resume Gate
 
-All Framework Acceptance intake values are resolved. Local preview is complete. Publisher creation, solution creation, apply, export, retention changes, and cleanup remain outside this record and require the approvals defined by the framework.
+All Framework Acceptance intake values are resolved. Local preview and GET-only schema provenance reconstruction are complete. The consolidated remaining build and export require explicit authorization; retention changes and cleanup remain outside this record.

@@ -41,23 +41,32 @@
 - [x] Stop all further Dataverse access.
 - [x] Rerun the complete credential-free local preview without authentication or Dataverse queries.
 
-## Future Mutating Work (Not Authorized)
+## Scenario Provenance Reconstruction
 
-- [ ] Obtain separate apply authorization.
-- [ ] Create permanent publisher `PowerPlatformVSCodeStarter` with prefix `ppvs`.
-- [ ] Create unmanaged solution `LabEquipmentCheckoutAcceptance20260826` under that publisher.
-- [ ] Build `ppvs_labasset` and `ppvs_checkoutrequest`.
-- [ ] Build prefixed columns and required restrict-delete relationship.
-- [ ] Create the base BPF in the Power Apps designer from the handoff.
-- [ ] Validate, activate, add, publish, and link the existing BPF through script 55.
+- [x] Deploy and validate scenario-scoped manifest architecture.
+- [x] Correlate the recorded successful schema gate with exact live table descriptions and creation timestamps.
+- [x] Verify all 15 planned columns and the exact relationship shape with GET-only metadata calls.
+- [x] Verify unmanaged solution and publisher identity without changing PAC profiles.
+- [x] Reconstruct 2 table, 15 column, and 1 relationship creation entries in the GCC scenario manifest.
+- [x] Prove the legacy Contoso manifest remains separate.
+- [x] Run step 60 in GET-only preview mode and prove generated Active-view adoption, both planned forms, the custom asset view, and preview provenance nonmutation.
+
+## Consolidated Remaining Build (Not Authorized)
+
+- [ ] Obtain one consolidated completion authorization.
+- [x] Verify permanent publisher `PowerPlatformVSCodeStarter`, unmanaged solution `LabEquipmentCheckoutAcceptance20260826`, and completed schema.
+- [x] Generate and validate the supported Power Apps designer handoff; do not fabricate BPF workflow metadata.
 - [ ] Create the separate Lab Asset Main and Checkout Request Main forms without modifying generated Information forms.
 - [ ] Create Available Lab Assets using its `create-custom` contract.
 - [ ] Adopt only the verified generated Active Checkout Requests view using its `adopt-generated-active` contract.
-- [ ] Create/update review app and sitemap with Checkout Request first.
 - [ ] Author lifecycle/availability dashboard and charts through the supported maker/solution path.
+- [ ] Create/update review app and sitemap with Checkout Request first.
 - [ ] Collect complete artifact inventory and sync all required components to the solution.
-- [ ] Verify solution membership before any export.
+- [ ] Publish only the two scenario tables and exact app module through scoped `PublishXml`; stop on `PublishAllXml`.
 - [ ] Seed exactly 3 assets and 5 requests using the approved source tag.
-- [ ] Validate the hero journey and deterministic second run.
+- [ ] Functionally verify navigation, forms, views, relationship behavior, charts, dashboard drill-through, and hero journey.
+- [ ] Execute a second run and prove zero new components or records and exactly one of every contracted identity.
+- [ ] Verify final solution membership.
+- [ ] Export, unpack, and inspect the unmanaged solution package locally without importing it anywhere.
 - [ ] Retain acceptance artifacts after verification.
-- [ ] Do not reset, delete, or clean up the environment.
+- [ ] Do not reset/delete the environment, clean up components, change unrelated PAC profiles, fabricate a BPF, or make Git changes during live execution.

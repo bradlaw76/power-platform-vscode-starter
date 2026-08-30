@@ -1,29 +1,52 @@
 # Revised Apply Plan
 
+## Completion Goal
+
+Prove that a coworker can use the default Demo Builder experience to produce a functioning, repeatable, exportable model-driven Lab Equipment Checkout demo safely.
+
 ## Current Gate
 
-No apply step is authorized. Stop for explicit mutation authorization.
+The scenario-scoped manifest correction and read-only GCC provenance reconstruction passed on 2026-08-28.
 
-## Ordered Plan
+- Exact environment URL binding, active-token tenant binding, unmanaged solution identity, publisher identity, table descriptions, creation timestamps, columns, and relationship shape were verified with Dataverse GET requests only.
+- The scenario manifest contains 2 table, 15 column, and 1 relationship creation records. The legacy Contoso manifest remains separate.
+- Step 60 completed in `PreviewOnly` mode with two forms planned, generated `Active Checkout Requests` adoption proven, custom `Available Lab Assets` creation planned, and no under-population failures at the scenario's three-column view threshold.
+- No Dataverse mutation or publishing occurred during reconstruction or preview.
 
-1. Capture a pre-apply inventory and confirm the permanent-environment safety boundary.
-2. Verify-or-create publisher unique name `PowerPlatformVSCodeStarter`, display name Power Platform VS Code Starter, prefix `ppvs`.
-3. Mark the publisher permanent and exclude it from all cleanup instructions and tooling inputs.
-4. Verify-or-create unmanaged solution `LabEquipmentCheckoutAcceptance20260826` under that exact publisher.
-5. Re-run strict local validation against the approved payloads.
-6. Run tables, columns, relationships, initial solution sync, forms/views, app module, and final membership checks in repository order.
-7. Pause for the Power Apps designer handoff to author the initial BPF definition; do not generate workflow definition internals.
-8. After the designer artifact exists and separate approval remains valid, validate, activate, add, publish, and link the BPF through supported paths.
-9. Create the two charts and dashboard through supported maker/solution tooling.
-10. Upsert exactly 3 Lab Asset and 5 Checkout Request records using `ppvs-acceptance-20260826`.
-11. Verify all 28 proposed component rows are members of the target solution.
-12. Validate app navigation, named landing view, forms, charts, dashboard drill-through, hero journey, and deterministic rerun.
-13. Retain all acceptance artifacts. Do not run cleanup, export, commit, or push without their separate approvals.
+The remaining live build is not authorized until the consolidated authorization below is approved.
 
-## Idempotency And Stops
+## Consolidated Remaining Build
 
-- Publisher and solution stages are verify-or-create by exact unique name and prefix; conflicts stop the run.
-- Each metadata phase stops on identity mismatch, foreign-component contamination, or failed membership.
-- Publisher creation and solution creation are separate mutations and require authorization before either begins.
-- Export remains blocked until the final membership report passes.
-- Cleanup remains unauthorized, and the permanent publisher is categorically excluded.
+1. Revalidate the exact environment, unmanaged solution, publisher, scoped manifest, and current target-solution inventory.
+2. Create or update only `ppvs_labasset / Lab Asset Main / type=2`, `ppvs_checkoutrequest / Checkout Request Main / type=2`, `ppvs_labasset / Available Lab Assets / create-custom`, and `ppvs_checkoutrequest / Active Checkout Requests / adopt-generated-active`. Run step 60 with `MinBusinessColumnsPerView 3`; preserve generated Information forms and all unrelated views.
+3. Generate and validate the supported Power Apps designer handoff for `Lab Equipment Checkout Lifecycle`. Do not create, patch, activate, or link unsupported BPF workflow-definition metadata.
+4. Create only `ppvs_checkoutrequest / Requests by Lifecycle Stage`, `ppvs_labasset / Assets by Availability`, and `Lab Equipment Lifecycle and Availability / systemform type=0` through supported Power Apps maker and solution tooling.
+5. Create or update only app `ppvs_lab_equipment_checkout_acceptance_20260826` and sitemap `ppvs_lab_equipment_checkout_acceptance_20260826_sitemap`, with Checkout Request first and `Active Checkout Requests` as the landing view.
+6. Sync all required scenario components into `LabEquipmentCheckoutAcceptance20260826` and publish only the two scenario tables and exact app module through scoped `PublishXml` requests.
+7. Upsert exactly the three asset keys `LECA-ASSET-001` through `LECA-ASSET-003` and five request keys `LECA-20260826-001` through `LECA-20260826-005`; every row must carry source tag `ppvs-acceptance-20260826`.
+8. Functionally verify navigation, forms, views, required lookup, restrict-delete behavior, lifecycle and availability data, charts, dashboard drill-through, and the hero journey.
+9. Run the authorized build a second time and prove exactly one of every listed component and record natural key, zero new components or rows, stable IDs, and deterministic created/updated/skipped outcomes.
+10. Enforce final solution membership, export only an unmanaged solution, unpack and inspect it locally for required components and exclusion of unrelated components, and do not import the package anywhere.
+
+## Separately Excluded
+
+- Environment reset or deletion
+- Component or synthetic-record cleanup
+- Changes to unrelated PAC profiles
+- Unsupported BPF fabrication
+- Git staging, commits, pushes, branch changes, or other source-control mutation during live execution
+- Import into another environment
+
+## Stops
+
+- Stop on environment, tenant, solution, publisher, or scenario-manifest mismatch.
+- Stop on foreign-component contamination or any same-name form, view, chart, dashboard, app, or sitemap whose identity, scenario ownership, target-solution membership, or metadata differs from this contract.
+- Stop if any stage requests `PublishAllXml`; only component-scoped `PublishXml` is authorized.
+- Stop before export unless every required component is confirmed in the unmanaged solution.
+- Stop if the supported BPF designer handoff cannot be generated and validated; do not synthesize workflow internals.
+
+## Estimate And Critical Path
+
+Estimated remaining execution time: 75-110 minutes, assuming normal Dataverse propagation and maker-tool availability.
+
+Critical path: identity/inventory recheck -> forms/views -> charts/dashboard -> app/sitemap -> solution sync and publish -> synthetic data -> functional verification -> second run -> membership gate -> unmanaged export/unpack/package inspection.
