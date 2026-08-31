@@ -50,7 +50,8 @@ param(
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder = '',
     [switch]$Resume,
-    [switch]$StrictSolutionIsolation
+    [switch]$StrictSolutionIsolation,
+    [scriptblock]$RequestInvoker
 )
 
 Set-StrictMode -Version Latest
@@ -58,6 +59,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
+. (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
 
 $paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
 foreach ($requiredPath in @($paths.ScenarioFolder, $paths.PayloadFolder)) {
@@ -104,16 +106,16 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'solution'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; FailIfSolutionHasForeignTables = [bool]$StrictSolutionIsolation } }
     [pscustomobject]@{ Name = 'business-process-flow'; Script = '55-build-business-process-flows.ps1'; Optional = $true; Enabled = $hasBpfPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'forms-views'; Script = '60-build-forms-views.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
-    [pscustomobject]@{ Name = 'native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
-    [pscustomobject]@{ Name = 'app-module'; Script = '62-build-app-module.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'app-module'; Script = '62-build-app-module.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'web-resources'; Script = '65-build-web-resources.ps1'; Optional = $true; Enabled = $reportsEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug } }
-    [pscustomobject]@{ Name = 'synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-first-pass'; Script = '50-add-to-solution.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-baseline'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'CaptureBaseline' } }
     [pscustomobject]@{ Name = 'rerun-forms-views'; Script = '60-build-forms-views.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
-    [pscustomobject]@{ Name = 'rerun-native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
-    [pscustomobject]@{ Name = 'rerun-app-module'; Script = '62-build-app-module.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
-    [pscustomobject]@{ Name = 'rerun-synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'rerun-native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'rerun-app-module'; Script = '62-build-app-module.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'rerun-synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
     [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
@@ -122,7 +124,7 @@ $stageDefinitions = @(
 
 $runState = $null
 if ($Resume -and (Test-Path -LiteralPath $statePath)) {
-    $runState = Get-Content -LiteralPath $statePath -Raw | ConvertFrom-Json
+    $runState = Read-WizardJsonFile -Path $statePath
     if ($runState.scopeHash -ne $scopeHash) {
         throw 'Resume state belongs to a different scenario, environment, solution, publisher, or payload folder.'
     }
@@ -210,7 +212,7 @@ foreach ($stage in $stageDefinitions) {
     }
     $results.Add($result) | Out-Null
     $runState.stages = @($results.ToArray())
-    $runState | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $statePath -Encoding UTF8
+    Write-WizardAtomicJson -Path $statePath -InputObject $runState -Depth 20
     if ($status -eq 'failed') { break }
 }
 
