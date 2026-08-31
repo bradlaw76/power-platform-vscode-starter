@@ -368,8 +368,8 @@ function Get-SolutionComponentInventory {
 
         if ($componentType -eq $chartType) {
             try {
-                $chart = Invoke-Dv "Get" "savedqueryvisualizations($objectId)?`$select=name"
-                $items.Add([pscustomobject]@{ Kind = 'chart'; Category = 'charts'; Name = $chart.name; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+                $chart = Invoke-Dv "Get" "savedqueryvisualizations($objectId)?`$select=name,primaryentitytypecode"
+                $items.Add([pscustomobject]@{ Kind = 'chart'; Category = 'charts'; Name = "$($chart.primaryentitytypecode)|$($chart.name)"; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
         }
     }

@@ -1,0 +1,56 @@
+{
+  "Enabled": true,
+  "SourceTag": "ppvs-acceptance-20260826",
+  "SourceTagField": "ppvs_acceptancesourcetag",
+  "Tables": [
+    {
+      "TableLogicalName": "ppvs_labasset",
+      "NaturalKey": "ppvs_assettag",
+      "Records": [
+        {
+          "Key": "LECA-ASSET-001",
+          "Values": { "ppvs_name": "LECA Asset 001 — Thermal Camera", "ppvs_category": "Imaging", "ppvs_availabilitystatus": "Available" }
+        },
+        {
+          "Key": "LECA-ASSET-002",
+          "Values": { "ppvs_name": "LECA Asset 002 — Portable Oscilloscope", "ppvs_category": "Electronics", "ppvs_availabilitystatus": "Issued" }
+        },
+        {
+          "Key": "LECA-ASSET-003",
+          "Values": { "ppvs_name": "LECA Asset 003 — Calibration Kit", "ppvs_category": "Calibration", "ppvs_availabilitystatus": "Available" }
+        }
+      ]
+    },
+    {
+      "TableLogicalName": "ppvs_checkoutrequest",
+      "NaturalKey": "ppvs_requestnumber",
+      "Records": [
+        {
+          "Key": "LECA-20260826-001",
+          "Values": { "ppvs_name": "LECA-20260826-001 — Full Review-to-Return Journey", "ppvs_requestername": "Synthetic Lab User 01", "ppvs_requestedon": "2026-08-20T09:00:00Z", "ppvs_expectedreturndate": "2026-08-22T17:00:00Z", "ppvs_actualreturndate": "2026-08-22T15:30:00Z", "ppvs_lifecyclestage": "Return", "ppvs_approvaldecision": "Approved" },
+          "Lookups": [{ "Field": "ppvs_labassetid", "TargetTable": "ppvs_labasset", "TargetKey": "ppvs_assettag", "TargetValue": "LECA-ASSET-001" }]
+        },
+        {
+          "Key": "LECA-20260826-002",
+          "Values": { "ppvs_name": "LECA-20260826-002 — Awaiting Review", "ppvs_requestername": "Synthetic Lab User 02", "ppvs_requestedon": "2026-08-25T10:00:00Z", "ppvs_expectedreturndate": "2026-08-28T17:00:00Z", "ppvs_actualreturndate": null, "ppvs_lifecyclestage": "Review", "ppvs_approvaldecision": "Pending" },
+          "Lookups": [{ "Field": "ppvs_labassetid", "TargetTable": "ppvs_labasset", "TargetKey": "ppvs_assettag", "TargetValue": "LECA-ASSET-003" }]
+        },
+        {
+          "Key": "LECA-20260826-003",
+          "Values": { "ppvs_name": "LECA-20260826-003 — Approved for Issue", "ppvs_requestername": "Synthetic Lab User 03", "ppvs_requestedon": "2026-08-24T13:00:00Z", "ppvs_expectedreturndate": "2026-08-29T17:00:00Z", "ppvs_actualreturndate": null, "ppvs_lifecyclestage": "Approve", "ppvs_approvaldecision": "Approved" },
+          "Lookups": [{ "Field": "ppvs_labassetid", "TargetTable": "ppvs_labasset", "TargetKey": "ppvs_assettag", "TargetValue": "LECA-ASSET-001" }]
+        },
+        {
+          "Key": "LECA-20260826-004",
+          "Values": { "ppvs_name": "LECA-20260826-004 — Asset Issued", "ppvs_requestername": "Synthetic Lab User 04", "ppvs_requestedon": "2026-08-23T08:30:00Z", "ppvs_expectedreturndate": "2026-08-27T17:00:00Z", "ppvs_actualreturndate": null, "ppvs_lifecyclestage": "Issue", "ppvs_approvaldecision": "Approved" },
+          "Lookups": [{ "Field": "ppvs_labassetid", "TargetTable": "ppvs_labasset", "TargetKey": "ppvs_assettag", "TargetValue": "LECA-ASSET-002" }]
+        },
+        {
+          "Key": "LECA-20260826-005",
+          "Values": { "ppvs_name": "LECA-20260826-005 — Request Declined", "ppvs_requestername": "Synthetic Lab User 05", "ppvs_requestedon": "2026-08-21T11:15:00Z", "ppvs_expectedreturndate": "2026-08-24T17:00:00Z", "ppvs_actualreturndate": null, "ppvs_lifecyclestage": "Approve", "ppvs_approvaldecision": "Declined" },
+          "Lookups": [{ "Field": "ppvs_labassetid", "TargetTable": "ppvs_labasset", "TargetKey": "ppvs_assettag", "TargetValue": "LECA-ASSET-003" }]
+        }
+      ]
+    }
+  ]
+}

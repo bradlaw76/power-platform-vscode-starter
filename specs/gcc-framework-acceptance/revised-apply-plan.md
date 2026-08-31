@@ -15,18 +15,20 @@ The scenario-scoped manifest correction and read-only GCC provenance reconstruct
 
 The remaining live build is not authorized until the consolidated authorization below is approved.
 
+The repository implementation is complete and credential-free tests cover native reporting, synthetic-data reruns, app/sitemap reruns, stable-ID verification, and unmanaged export/unpack inspection. This does not authorize GCC access.
+
 ## Consolidated Remaining Build
 
 1. Revalidate the exact environment, unmanaged solution, publisher, scoped manifest, and current target-solution inventory.
 2. Create or update only `ppvs_labasset / Lab Asset Main / type=2`, `ppvs_checkoutrequest / Checkout Request Main / type=2`, `ppvs_labasset / Available Lab Assets / create-custom`, and `ppvs_checkoutrequest / Active Checkout Requests / adopt-generated-active`. Run step 60 with `MinBusinessColumnsPerView 3`; preserve generated Information forms and all unrelated views.
 3. Generate and validate the supported Power Apps designer handoff for `Lab Equipment Checkout Lifecycle`. Do not create, patch, activate, or link unsupported BPF workflow-definition metadata.
-4. Create only `ppvs_checkoutrequest / Requests by Lifecycle Stage`, `ppvs_labasset / Assets by Availability`, and `Lab Equipment Lifecycle and Availability / systemform type=0` through supported Power Apps maker and solution tooling.
+4. Run `64-build-charts-dashboard.ps1` to create only `ppvs_checkoutrequest / Requests by Lifecycle Stage`, `ppvs_labasset / Assets by Availability`, and `Lab Equipment Lifecycle and Availability / systemform type=0` from the validated reporting payload.
 5. Create or update only app `ppvs_lab_equipment_checkout_acceptance_20260826` and sitemap `ppvs_lab_equipment_checkout_acceptance_20260826_sitemap`, with Checkout Request first and `Active Checkout Requests` as the landing view.
 6. Sync all required scenario components into `LabEquipmentCheckoutAcceptance20260826` and publish only the two scenario tables and exact app module through scoped `PublishXml` requests.
-7. Upsert exactly the three asset keys `LECA-ASSET-001` through `LECA-ASSET-003` and five request keys `LECA-20260826-001` through `LECA-20260826-005`; every row must carry source tag `ppvs-acceptance-20260826`.
+7. Run `66-seed-synthetic-data.ps1` to upsert exactly the three asset keys `LECA-ASSET-001` through `LECA-ASSET-003` and five request keys `LECA-20260826-001` through `LECA-20260826-005`; every row must carry source tag `ppvs-acceptance-20260826`.
 8. Functionally verify navigation, forms, views, required lookup, restrict-delete behavior, lifecycle and availability data, charts, dashboard drill-through, and the hero journey.
-9. Run the authorized build a second time and prove exactly one of every listed component and record natural key, zero new components or rows, stable IDs, and deterministic created/updated/skipped outcomes.
-10. Enforce final solution membership, export only an unmanaged solution, unpack and inspect it locally for required components and exclusion of unrelated components, and do not import the package anywhere.
+9. Let `90-run-build.ps1` capture the first-pass baseline, run its controlled second pass, and invoke `85-verify-idempotency.ps1` to prove exactly one of every listed component and record natural key, zero new components or rows, and stable IDs.
+10. Enforce final solution membership and run `95-export-unmanaged-solution.ps1` to export only an unmanaged solution, unpack and inspect it locally, and never import it.
 
 ## Separately Excluded
 

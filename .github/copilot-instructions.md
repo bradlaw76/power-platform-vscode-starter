@@ -137,10 +137,10 @@ Use this build sequence unless the user has a documented reason to change it:
 3. Run `00-prereq-check.ps1`
 4. Run `10-auth-connect.ps1`
 5. Complete Spec Kit planning (architecture intent confirmed)
-6. Run scripts `15`, `20`, `30`, `40`, `50`, `55`, `60`, `62` in order
-7. Run solution inventory and sync; produce membership report
-8. Publish; validate app usability
-9. Export, unpack, commit, pack, import, validate
+6. Run scripts `15`, `20`, `30`, `40`, `50`, `55`, `60`, `64`, `62`, `65`, and `66` when their scenario payloads enable them
+7. Run first solution membership, capture idempotency baseline, rerun experience/data stages, and run final membership plus script `85`
+8. Publish only scoped components and validate app usability
+9. Run script `95` for unmanaged export and local unpack/inspection; Framework Acceptance must never import that package
 
 ## Documentation References
 Use and reference these files when relevant:

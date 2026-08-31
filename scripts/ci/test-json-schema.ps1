@@ -26,7 +26,7 @@ ARCHITECTURE
 TEST CASES
 -----------------------------------------------------------------------------
 ✔ Every JSON file parses successfully.
-✔ table, columns, relationships, and process payloads match their schema.
+✔ All registered payload families match their schema.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -46,6 +46,8 @@ $schemaByFamily = [ordered]@{
     'columns'       = Join-Path $schemaRoot 'columns.schema.json'
     'relationships' = Join-Path $schemaRoot 'relationships.schema.json'
     'process'       = Join-Path $schemaRoot 'process.schema.json'
+    'reporting'     = Join-Path $schemaRoot 'reporting.schema.json'
+    'data'          = Join-Path $schemaRoot 'data.schema.json'
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
@@ -72,7 +74,7 @@ foreach ($file in $jsonFiles) {
         continue
     }
 
-    if ($file.Name -notmatch '^(?<family>table|columns|relationships|process)-.+\.json$') {
+    if ($file.Name -notmatch '^(?<family>table|columns|relationships|process|reporting|data)-.+\.json$') {
         continue
     }
 

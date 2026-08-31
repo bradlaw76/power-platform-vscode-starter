@@ -731,6 +731,20 @@ function New-WizardExpectedArtifacts {
         [void]$reportWebResources.Add("$prefix`_reports/shared.css")
     }
 
+    $reportingPayloads = @(Get-ChildItem -LiteralPath $context.PayloadsFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue)
+    if ($reportingPayloads.Count -gt 1) {
+        throw "Expected at most one reporting payload in '$($context.PayloadsFolder)'; found $($reportingPayloads.Count)."
+    }
+    $nativeCharts = @()
+    $nativeDashboards = @()
+    if ($reportingPayloads.Count -eq 1) {
+        $reporting = Get-Content -LiteralPath $reportingPayloads[0].FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($reporting.Enabled) {
+            $nativeCharts = @($reporting.Charts | ForEach-Object { "$($_.TableLogicalName)|$($_.Name)" })
+            $nativeDashboards = @($reporting.Dashboard.Name)
+        }
+    }
+
     return [pscustomobject]@{
         Tables = @($payloadSummary.Tables)
         Columns = @($payloadSummary.ColumnReferences)
@@ -739,8 +753,8 @@ function New-WizardExpectedArtifacts {
         WebResources = @($reportWebResources | Sort-Object)
         Forms = @($payloadSummary.Tables | ForEach-Object { "$($_)|main" })
         Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })
-        Dashboards = @()
-        Charts = @()
+        Dashboards = $nativeDashboards
+        Charts = $nativeCharts
         Flows = @()
         AppModules = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @($featureConfig.AppUniqueName) } else { @() }
         SiteMaps = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @("$([regex]::Replace($featureConfig.AppUniqueName.ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_'))_sitemap") } else { @() }

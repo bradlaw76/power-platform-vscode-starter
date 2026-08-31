@@ -1,0 +1,28 @@
+{
+  "Enabled": true,
+  "Charts": [
+    {
+      "Name": "Requests by Lifecycle Stage",
+      "TableLogicalName": "ppvs_checkoutrequest",
+      "CategoryField": "ppvs_lifecyclestage",
+      "AggregateField": "ppvs_requestnumber",
+      "Aggregate": "countcolumn",
+      "ChartType": "column"
+    },
+    {
+      "Name": "Assets by Availability",
+      "TableLogicalName": "ppvs_labasset",
+      "CategoryField": "ppvs_availabilitystatus",
+      "AggregateField": "ppvs_assettag",
+      "Aggregate": "countcolumn",
+      "ChartType": "pie"
+    }
+  ],
+  "Dashboard": {
+    "Name": "Lab Equipment Lifecycle and Availability",
+    "ChartNames": [
+      "Requests by Lifecycle Stage",
+      "Assets by Availability"
+    ]
+  }
+}

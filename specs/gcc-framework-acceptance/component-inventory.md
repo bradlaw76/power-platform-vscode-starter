@@ -37,9 +37,9 @@ The publisher is a permanent prerequisite, not a solution component and never a 
 | View | Available Lab Assets | `ppvs_labasset\|active` | Required; `create-custom` |
 | View | Active Checkout Requests | `ppvs_checkoutrequest\|active` | Required; app landing view; `adopt-generated-active` |
 | BPF designer handoff | Lab Equipment Checkout Lifecycle | `ppvs_lab_equipment_checkout_lifecycle` | Required as generated and validated handoff; no fabricated workflow component |
-| Chart | Requests by Lifecycle Stage | proposed maker-authored chart | Required |
-| Chart | Assets by Availability | proposed maker-authored chart | Required |
-| Dashboard | Lab Equipment Lifecycle and Availability | proposed maker-authored dashboard | Required |
+| Chart | Requests by Lifecycle Stage | `ppvs_checkoutrequest\|Requests by Lifecycle Stage` from `reporting-*.json` | Required; script 64 |
+| Chart | Assets by Availability | `ppvs_labasset\|Assets by Availability` from `reporting-*.json` | Required; script 64 |
+| Dashboard | Lab Equipment Lifecycle and Availability | `Lab Equipment Lifecycle and Availability` from `reporting-*.json` | Required; script 64 |
 | Model-driven app | Lab Equipment Checkout Acceptance — 2026-08-26 | `ppvs_lab_equipment_checkout_acceptance_20260826` | Required |
 | Sitemap | Review app sitemap | `ppvs_lab_equipment_checkout_acceptance_20260826_sitemap` | Required with app |
 
@@ -51,3 +51,4 @@ The publisher is a permanent prerequisite, not a solution component and never a 
 - Existing Contoso components are excluded and must remain unchanged.
 - The publisher and unmanaged solution exist with the planned identities. Two scenario components were present in the live solution-component inventory at reconstruction time; final categorized membership remains to be verified.
 - The remaining component set must be synchronized and pass the final membership gate before export.
+- Script 85 must prove stable IDs across the controlled second pass, and script 95 may export/unpack only after this gate. Import is prohibited for this acceptance package.

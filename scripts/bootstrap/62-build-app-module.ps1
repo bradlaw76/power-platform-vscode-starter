@@ -71,7 +71,8 @@ param(
     [bool]$EnableAppModuleWiring = $true,
     [bool]$EnableArtifactManifest = $true,
     [bool]$StrictMode = $true,
-    [bool]$PreviewOnly = $false
+    [bool]$PreviewOnly = $false,
+    [scriptblock]$RequestInvoker
 )
 
 Set-StrictMode -Version Latest
@@ -114,6 +115,14 @@ function Invoke-Dv {
         [string]$Path,
         [string]$Body = ''
     )
+
+    if ($null -ne $RequestInvoker) {
+        return & $RequestInvoker ([pscustomobject]@{
+            Method = $Method
+            Path = $Path
+            Body = $Body
+        })
+    }
 
     $headers = @{
         Authorization = "Bearer $AccessToken"
@@ -351,7 +360,7 @@ if ($EnableArtifactManifest -and -not $PreviewOnly) {
 
 if (-not $EnableAppModuleWiring -or -not $appConfig.Enabled) {
     [ordered]@{ status = 'skipped'; reason = 'app module wiring disabled'; scenarioSlug = $appConfig.ScenarioSlug } | ConvertTo-Json -Depth 10 | Set-Content -Path $paths.SummaryPath -Encoding UTF8
-    if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+    if ($EnableArtifactManifest -and -not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name ($appConfig.UniqueName ?? 'app-module') -Status 'skipped' -Step '62-build-app-module.ps1' -Details @{ reason = 'disabled' } | Out-Null
     }
     Write-Host 'App module wiring disabled or not requested for this scenario. Skipping.' -ForegroundColor Yellow
@@ -360,7 +369,7 @@ if (-not $EnableAppModuleWiring -or -not $appConfig.Enabled) {
 
 if (-not $appConfig.ValidationPassed) {
     [ordered]@{ status = 'failed'; errors = @($appConfig.ValidationErrors); scenarioSlug = $appConfig.ScenarioSlug } | ConvertTo-Json -Depth 10 | Set-Content -Path $paths.ValidationPath -Encoding UTF8
-    if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+    if ($EnableArtifactManifest -and -not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
         Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name $appConfig.UniqueName -Status 'failed' -Step '62-build-app-module.ps1' -Details @{ validationErrors = @($appConfig.ValidationErrors) } | Out-Null
     }
     Write-Host 'App module wiring contract is incomplete.' -ForegroundColor Red
@@ -538,6 +547,29 @@ foreach ($bpfName in @($appConfig.Bpfs)) {
     } catch {}
 }
 
+$reportingPayloads = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue)
+if ($reportingPayloads.Count -gt 1) {
+    $localValidationIssues.Add("Expected at most one reporting payload; found $($reportingPayloads.Count).") | Out-Null
+} elseif ($reportingPayloads.Count -eq 1) {
+    $reporting = Get-Content -LiteralPath $reportingPayloads[0].FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($chart in @($reporting.Charts)) {
+        $safeChartName = $chart.Name.Replace("'", "''")
+        $chartMatches = @((Invoke-Dv -Method 'Get' -Path "savedqueryvisualizations?`$select=savedqueryvisualizationid,name,primaryentitytypecode&`$filter=name eq '$safeChartName' and primaryentitytypecode eq '$($chart.TableLogicalName)'").value)
+        if ($chartMatches.Count -ne 1) {
+            $localValidationIssues.Add("Chart '$($chart.TableLogicalName)|$($chart.Name)' must resolve exactly once; found $($chartMatches.Count).") | Out-Null
+        } else {
+            $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.savedqueryvisualization' -IdProperty 'savedqueryvisualizationid' -IdValue $chartMatches[0].savedqueryvisualizationid)) | Out-Null
+        }
+    }
+    $safeDashboardName = $reporting.Dashboard.Name.Replace("'", "''")
+    $dashboardMatches = @((Invoke-Dv -Method 'Get' -Path "systemforms?`$select=formid,name,type&`$filter=name eq '$safeDashboardName' and type eq 0").value)
+    if ($dashboardMatches.Count -ne 1) {
+        $localValidationIssues.Add("Dashboard '$($reporting.Dashboard.Name)' must resolve exactly once; found $($dashboardMatches.Count).") | Out-Null
+    } else {
+        $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.systemform' -IdProperty 'formid' -IdValue $dashboardMatches[0].formid)) | Out-Null
+    }
+}
+
 $siteMapResult = [pscustomobject]@{ Id = ''; Action = if ($PreviewOnly) { 'preview' } else { 'skipped' } }
 if ($orderedTables.Count -gt 0) {
     $siteMapUniqueName = "$(ConvertTo-SiteMapIdPart -Value $appConfig.UniqueName)_sitemap"
@@ -616,9 +648,10 @@ $validationResult = [pscustomobject]@{
     previewOnly = [bool]$PreviewOnly
 } | ConvertTo-Json -Depth 20 | Set-Content -Path $paths.ValidationPath -Encoding UTF8
 
-if (-not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+if ($EnableArtifactManifest -and -not $PreviewOnly -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
     $manifestStatus = if (-not $validationResult.ValidationSuccess -and $StrictMode) { 'failed' } else { $action }
-    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name $appConfig.UniqueName -Status $manifestStatus -Step '62-build-app-module.ps1' -Details @{ validationSuccess = [bool]$validationResult.ValidationSuccess; issueCount = @($validationResult.ValidationIssueList).Count } | Out-Null
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appmodule' -Name $appConfig.UniqueName -Status $manifestStatus -Step '62-build-app-module.ps1' -Details @{ id = $appModuleId; siteMapId = $siteMapResult.Id; validationSuccess = [bool]$validationResult.ValidationSuccess; issueCount = @($validationResult.ValidationIssueList).Count } | Out-Null
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'sitemap' -Name $siteMapUniqueName -Status $siteMapResult.Action -Step '62-build-app-module.ps1' -Details @{ id = $siteMapResult.Id; appModuleId = $appModuleId } | Out-Null
 }
 
 Write-Host ''
@@ -641,4 +674,4 @@ if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message 'App module wiring completed.'
 }
 
-exit 0
+return

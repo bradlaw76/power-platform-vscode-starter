@@ -74,7 +74,11 @@ Describe 'Copilot and Claude wizard skill parity' {
                 '05-start-wizard.ps1',
                 '10-auth-connect.ps1',
                 '55-build-business-process-flows.ps1',
+                '64-build-charts-dashboard.ps1',
                 '62-build-app-module.ps1',
+                '66-seed-synthetic-data.ps1',
+                '85-verify-idempotency.ps1',
+                '95-export-unmanaged-solution.ps1',
                 '90-run-build.ps1'
             )) {
                 @{ Skill = $skill; ScriptName = $scriptName }

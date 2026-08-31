@@ -432,11 +432,17 @@ pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
 # Final read-only inventory and export gate
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
+# Rerun forms/views, native reporting, app/sitemap, and synthetic data, then rerun the membership gate
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 # End-of-build summary analysis and optional README update/commit prompts
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 # Build a run matrix from disclosed step events
@@ -463,6 +469,10 @@ Payload rules for Step 10:
 - `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
 - `60-build-forms-views.ps1` applies form and view quality gates and writes population artifacts for both surfaces.
 - `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
+- `64-build-charts-dashboard.ps1` reads `reporting-*.json`, safely upserts native charts and a dashboard, and adds them to the selected solution before app assembly.
+- `66-seed-synthetic-data.ps1` reads `data-*.json` and upserts only source-tagged records through stable natural keys and exact lookup resolution.
+- `85-verify-idempotency.ps1` compares first- and second-pass identity-to-ID evidence and fails on changed IDs, new identities, missing identities, or second-pass creates.
+- `95-export-unmanaged-solution.ps1` requires a passing final membership report, exports unmanaged, unpacks locally, and inspects solution identity. It never imports.
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.

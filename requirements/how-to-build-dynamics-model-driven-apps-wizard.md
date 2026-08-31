@@ -38,9 +38,11 @@ Use this sequence from first clone to final handoff:
 9. Create implementation plan.
 10. Create task list.
 11. Build or modify artifacts.
-12. Export and unpack solution.
+12. For Framework Acceptance, run the stable-ID/zero-duplicate second-pass verifier, then export and unpack the unmanaged solution through the checked-in stages.
 13. Commit to Git.
-14. Pack and import solution.
+14. Pack and import only for a separately approved normal ALM workflow. Never import the Framework Acceptance export.
+
+Executable scenario contracts use `reporting-*.json` with `64-build-charts-dashboard.ps1` and `data-*.json` with `66-seed-synthetic-data.ps1`. The orchestrator captures and verifies the second pass with `85-verify-idempotency.ps1`, then gates `95-export-unmanaged-solution.ps1` on final solution membership.
 15. Document finished demo.
 
 Validation checkpoint:

@@ -58,6 +58,12 @@ Starter Main Form patched on rerun (yes/no):
 Non-starter Main forms preserved (yes/no):
 Business labels visible on starter form (yes/no):
 Solution Exported (yes/no):
+Native Reporting Stage (created/updated/skipped/failed):
+Synthetic Data Stage (created/updated/skipped/failed):
+Second-Run Stable IDs (yes/no/not applicable):
+Second-Run Duplicate Count:
+Unmanaged Package Unpacked and Inspected (yes/no):
+Acceptance Package Imported (must be no):
 Solution Unpacked (yes/no):
 Solution Packed (yes/no):
 Solution Imported (yes/no):

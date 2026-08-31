@@ -1,6 +1,6 @@
 {
-  "profileVersion": "1.2",
-  "contractVersion": "1.8.0",
+  "profileVersion": "1.3",
+  "contractVersion": "1.9.0",
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -155,6 +155,7 @@
       "50-add-to-solution.ps1",
       "55-build-business-process-flows.ps1",
       "60-build-forms-views.ps1",
+      "64-build-charts-dashboard.ps1",
       "62-build-app-module.ps1"
     ],
     "mandatoryPostBuildSteps": [
@@ -162,6 +163,9 @@
       "solution-inventory-sync",
       "solution-membership-report",
       "publish",
+      "66-seed-synthetic-data.ps1",
+      "85-verify-idempotency.ps1",
+      "95-export-unmanaged-solution.ps1",
       "80-post-build-analysis.ps1"
     ],
     "optionalModules": {
@@ -199,7 +203,11 @@
         "50": 15,
         "55": 18,
         "60": 30,
+        "64": 20,
         "65": 20,
+        "66": 15,
+        "85": 10,
+        "95": 10,
         "80": 10
       }
     }
@@ -223,11 +231,11 @@
       "views",
       "model-driven-apps",
       "sitemap-updates",
-      "web-resources"
+      "web-resources",
+      "dashboards",
+      "charts"
     ],
     "optionalCategories": [
-      "dashboards",
-      "charts",
       "flows"
     ],
     "persistLogicalNamesAndIds": true,

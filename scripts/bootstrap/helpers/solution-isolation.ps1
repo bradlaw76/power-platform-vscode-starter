@@ -312,8 +312,8 @@ function New-SolutionMembershipReport {
         [hashtable]$ExpectedByCategory,
         [object[]]$CurrentInventory = @(),
         [object[]]$FailedArtifacts = @(),
-        [string[]]$MandatoryCategories = @('tables', 'columns', 'relationships', 'forms', 'views', 'model-driven-apps', 'sitemap-updates', 'web-resources'),
-        [string[]]$OptionalCategories = @('dashboards', 'charts', 'flows'),
+        [string[]]$MandatoryCategories = @('tables', 'columns', 'relationships', 'forms', 'views', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'dashboards', 'charts'),
+        [string[]]$OptionalCategories = @('flows'),
         [switch]$Strict
     )
 

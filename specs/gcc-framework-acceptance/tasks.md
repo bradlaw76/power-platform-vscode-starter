@@ -51,7 +51,9 @@
 - [x] Prove the legacy Contoso manifest remains separate.
 - [x] Run step 60 in GET-only preview mode and prove generated Active-view adoption, both planned forms, the custom asset view, and preview provenance nonmutation.
 
-## Consolidated Remaining Build (Not Authorized)
+## Consolidated Remaining Live Build (Not Authorized)
+
+The reusable checked-in stages and credential-free tests are implemented. The tasks below remain live GCC execution tasks and require separate authorization.
 
 - [ ] Obtain one consolidated completion authorization.
 - [x] Verify permanent publisher `PowerPlatformVSCodeStarter`, unmanaged solution `LabEquipmentCheckoutAcceptance20260826`, and completed schema.
@@ -59,14 +61,14 @@
 - [ ] Create the separate Lab Asset Main and Checkout Request Main forms without modifying generated Information forms.
 - [ ] Create Available Lab Assets using its `create-custom` contract.
 - [ ] Adopt only the verified generated Active Checkout Requests view using its `adopt-generated-active` contract.
-- [ ] Author lifecycle/availability dashboard and charts through the supported maker/solution path.
+- [ ] Run `64-build-charts-dashboard.ps1` for the two payload-defined charts and dashboard.
 - [ ] Create/update review app and sitemap with Checkout Request first.
 - [ ] Collect complete artifact inventory and sync all required components to the solution.
 - [ ] Publish only the two scenario tables and exact app module through scoped `PublishXml`; stop on `PublishAllXml`.
-- [ ] Seed exactly 3 assets and 5 requests using the approved source tag.
+- [ ] Run `66-seed-synthetic-data.ps1` for exactly 3 assets and 5 requests using the approved source tag.
 - [ ] Functionally verify navigation, forms, views, relationship behavior, charts, dashboard drill-through, and hero journey.
-- [ ] Execute a second run and prove zero new components or records and exactly one of every contracted identity.
+- [ ] Execute the orchestrated second pass and run `85-verify-idempotency.ps1 -Phase Verify` to prove stable IDs and zero duplicates.
 - [ ] Verify final solution membership.
-- [ ] Export, unpack, and inspect the unmanaged solution package locally without importing it anywhere.
+- [ ] Run `95-export-unmanaged-solution.ps1` to export, unpack, and inspect the unmanaged package locally without importing it anywhere.
 - [ ] Retain acceptance artifacts after verification.
 - [ ] Do not reset/delete the environment, clean up components, change unrelated PAC profiles, fabricate a BPF, or make Git changes during live execution.

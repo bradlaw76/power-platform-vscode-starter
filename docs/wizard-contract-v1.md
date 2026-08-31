@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.8.0
+Version: 1.9.0
 
 ## Purpose
 
@@ -188,20 +188,31 @@ Required gate before execution:
 7. `50-add-to-solution.ps1`
 8. `55-build-business-process-flows.ps1`
 9. `60-build-forms-views.ps1`
-10. `62-build-app-module.ps1`
-11. Optional profile-driven web resources
-12. Final `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
-13. Publish (owned by metadata/app update stages)
-14. `80-post-build-analysis.ps1`
+10. Optional `64-build-charts-dashboard.ps1` from `reporting-*.json`
+11. `62-build-app-module.ps1`, including declared chart/dashboard components
+12. Optional profile-driven web resources
+13. Optional `66-seed-synthetic-data.ps1` from `data-*.json`
+14. First `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
+15. `85-verify-idempotency.ps1 -Phase CaptureBaseline`
+16. Controlled second pass of forms/views, reporting, app/sitemap, and synthetic data
+17. Final membership gate and `85-verify-idempotency.ps1 -Phase Verify`
+18. `95-export-unmanaged-solution.ps1`
+19. `80-post-build-analysis.ps1`
 
 ### Optional Modules (profile-driven)
 
 - `65-build-web-resources.ps1`
+- `64-build-charts-dashboard.ps1`
+- `66-seed-synthetic-data.ps1`
 - `06-demo-script-wizard.ps1`
 - `07-demo-dry-run.ps1`
-- future execution modules: data seeding, AI summary, integration adapters
+- future execution modules: AI summary and integration adapters
 
-The current demo-data extension is planning-only. It must not create Dataverse rows. A future seeding module requires a separate approved contract and must be idempotent, relationship-aware, hero-record-aware, source-tagged, synthetic-data-safe, enforce approved Task activity bounds, and report created/skipped/failed counts.
+Synthetic data is created only from a validated `data-*.json` payload. The stage requires a source tag and stable natural keys, resolves entity-set names from metadata, fails on duplicate or foreign same-key records, resolves lookups exactly once, and updates the same IDs on rerun.
+
+Native charts and dashboards are distinct from HTML web resources. `64-build-charts-dashboard.ps1` creates or updates only wizard-owned `savedqueryvisualization` and dashboard `systemform` identities declared in `reporting-*.json`, adds those exact components to the selected solution, and publishes only their scenario tables.
+
+Framework Acceptance export is unmanaged export plus local unpack/inspection only. `95-export-unmanaged-solution.ps1` requires a passing final membership report and never packs or imports the exported solution.
 
 ## Reliability Rules
 

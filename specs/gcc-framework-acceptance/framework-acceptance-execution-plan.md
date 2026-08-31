@@ -4,6 +4,8 @@
 
 Dataverse access is stopped after the successful GET-only provenance reconstruction. The remaining live build requires one consolidated authorization covering forms/views, charts/dashboard, app/sitemap, tagged synthetic records, publishing, functional verification, second-run idempotency, and unmanaged export/package inspection.
 
+The reusable stages are now checked in and covered by credential-free tests: `64-build-charts-dashboard.ps1`, `66-seed-synthetic-data.ps1`, `85-verify-idempotency.ps1`, and `95-export-unmanaged-solution.ps1`. This implementation status does not authorize a live GCC run.
+
 ## Operation Classification
 
 | Operation | Classification | Current authorization | Notes |
@@ -30,8 +32,10 @@ Dataverse access is stopped after the successful GET-only provenance reconstruct
 1. Revalidate identity, scoped provenance, and inventory.
 2. Execute the remaining build as one authorized flow with validation checkpoints, stopping on any hard-gate failure.
 3. Generate and validate the BPF designer handoff; do not fabricate workflow internals.
-4. Publish only scoped components, verify function, rerun for zero duplicates, enforce membership, then export/unpack/inspect locally without import.
-5. Never infer cleanup, environment deletion, PAC profile changes, or source-control approval from build approval.
+4. Run forms/views, native reporting, app/sitemap, and source-tagged synthetic data through `90-run-build.ps1`.
+5. Publish only scoped components, capture the first-pass evidence, run the controlled second pass, verify stable IDs and zero duplicates, and enforce final membership.
+6. Run unmanaged export/unpack/inspection through script 95 without import.
+7. Never infer cleanup, environment deletion, PAC profile changes, or source-control approval from build approval.
 
 ## Supported BPF Designer Handoff
 

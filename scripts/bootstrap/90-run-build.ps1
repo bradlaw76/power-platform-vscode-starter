@@ -76,6 +76,9 @@ $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
 $reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b'
+$hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
+$hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
+$idempotencyEnabled = $hasReportingPayload -or $hasDataPayload
 
 $runRoot = Join-Path $repoRoot ".wizard-metrics/runs/$ScenarioSlug"
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
@@ -101,9 +104,19 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'solution'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; FailIfSolutionHasForeignTables = [bool]$StrictSolutionIsolation } }
     [pscustomobject]@{ Name = 'business-process-flow'; Script = '55-build-business-process-flows.ps1'; Optional = $true; Enabled = $hasBpfPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'forms-views'; Script = '60-build-forms-views.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
     [pscustomobject]@{ Name = 'app-module'; Script = '62-build-app-module.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'web-resources'; Script = '65-build-web-resources.ps1'; Optional = $true; Enabled = $reportsEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug } }
-    [pscustomobject]@{ Name = 'solution-membership'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
+    [pscustomobject]@{ Name = 'synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'solution-membership-first-pass'; Script = '50-add-to-solution.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
+    [pscustomobject]@{ Name = 'idempotency-baseline'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'CaptureBaseline' } }
+    [pscustomobject]@{ Name = 'rerun-forms-views'; Script = '60-build-forms-views.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'rerun-native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
+    [pscustomobject]@{ Name = 'rerun-app-module'; Script = '62-build-app-module.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'rerun-synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
+    [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
+    [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
     [pscustomobject]@{ Name = 'post-build'; Script = '80-post-build-analysis.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $paths.PayloadFolder; PreviewOnly = $true } }
 )
 
@@ -158,7 +171,8 @@ foreach ($stage in $stageDefinitions) {
         continue
     }
 
-    if ($Mode -eq 'Preview' -and $stage.Name -notin @('validate', 'app-module', 'post-build')) {
+    $previewExecutableStages = @('validate', 'app-module', 'native-reporting', 'synthetic-data', 'idempotency-baseline', 'idempotency-verification', 'unmanaged-export', 'post-build')
+    if ($Mode -eq 'Preview' -and $stage.Name -notin $previewExecutableStages) {
         $details = @()
         if ($stage.Name -eq 'forms-views') {
             $viewContractPath = Join-Path (Join-Path (Join-Path $repoRoot 'specs') $ScenarioSlug) 'views.json'
@@ -175,7 +189,7 @@ foreach ($stage in $stageDefinitions) {
 
     $scriptPath = Join-Path $PSScriptRoot $stage.Script
     $arguments = @{} + $stage.Arguments
-    if ($Mode -eq 'Preview' -and $stage.Name -eq 'app-module') { $arguments.PreviewOnly = $true }
+    if ($Mode -eq 'Preview' -and $stage.Name -in $previewExecutableStages) { $arguments.PreviewOnly = $true }
     $started = [DateTime]::UtcNow
     Write-Host "RUN:  $($stage.Script)" -ForegroundColor Yellow
     try {

@@ -413,11 +413,17 @@ pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if enabled by profile + planning selection
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
 # Final read-only inventory and export gate
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
+# Rerun idempotent experience/data stages and the final membership gate
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 # End-of-build analysis
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
 # Generate a progress matrix from disclosed step events
@@ -438,6 +444,10 @@ Solution isolation behavior:
 - If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
 - `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
 - `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
+- `64-build-charts-dashboard.ps1` creates native Dataverse charts and dashboards from scenario payloads; it is not the HTML web-resource stage.
+- `66-seed-synthetic-data.ps1` safely upserts source-tagged records by stable natural key and exact relationship references.
+- `85-verify-idempotency.ps1` proves stable component/record IDs and zero second-pass creates.
+- `95-export-unmanaged-solution.ps1` performs gated unmanaged export and local unpack/inspection only; it never imports the package.
 - The final inventory-only pass records all mandatory and optional categories with Dataverse IDs and blocks export when required membership fails. Strict mode also blocks unauthorized components.
 - See [docs/solution-isolation-runbook.md](docs/solution-isolation-runbook.md) for the clean-build, detection, and cleanup flows.
 

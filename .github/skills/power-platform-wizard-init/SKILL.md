@@ -117,7 +117,11 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Prefer the orchestrated preview and apply entry point: `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>`.
 - A planned BPF uses `55-build-business-process-flows.ps1` to validate payloads and generate a designer handoff. Initial definition authoring occurs through Power Apps; apply mode validates, activates, adds, and links the existing category-4 process.
 - The required review app is assembled and validated by `62-build-app-module.ps1`.
+- Native `reporting-*.json` charts/dashboard are built by `64-build-charts-dashboard.ps1` before app assembly.
+- Stable-key, source-tagged `data-*.json` records are built by `66-seed-synthetic-data.ps1`.
+- Framework Acceptance captures and verifies a controlled second pass with `85-verify-idempotency.ps1`.
 - After app/report assembly, require `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`. Do not recommend export while required membership fails.
+- `95-export-unmanaged-solution.ps1` performs unmanaged export and local unpack/inspection only. Never import that acceptance package.
 
 8. Monitor progress using existing telemetry (no script changes)
 - Primary signal: `.wizard-metrics/events.jsonl`

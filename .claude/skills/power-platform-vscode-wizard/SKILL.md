@@ -122,15 +122,24 @@ pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# Run when reporting-*.json exists
+pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Run only if Q19 answer was yes
 pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
+pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
+# Rerun idempotent experience/data stages and the final membership gate
+pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 ```
 
 All scripts are idempotent — safe to rerun after fixing failures.
 
 Prefer `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>` for the complete ordered run. A planned BPF generates a designer handoff; author the initial definition through Power Apps. Script 55 validates, activates, adds, and links the existing category-4 process rather than fabricating workflow definition metadata. Do not export while the final solution membership gate fails.
+
+Native charts/dashboard and HTML web resources are separate capabilities. Framework Acceptance uses scenario-owned reporting/data payloads, a controlled second pass proving stable IDs and zero duplicates, and unmanaged export plus local unpack/inspection. Never import the Framework Acceptance export.
 
 Script 65 generates 3 Dynamics-blue HTML reports (agent performance, supervisor oversight, executive KPI) from scenario design files and adds them to the solution as web resources. It skips silently when reports are disabled.
 
@@ -147,10 +156,10 @@ pac solution export --name "<SolutionName>" --path "./out/<SolutionName>_unmanag
 # Unpack to source files (Git-friendly)
 pac solution unpack --zipfile "./out/<SolutionName>_unmanaged.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
 
-# Pack back to zip
+# Pack back to zip for normal ALM workflows only, not Framework Acceptance
 pac solution pack --zipfile "./out/<SolutionName>_unmanaged_new.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
 
-# Import to target environment
+# Import to target environment for normal ALM workflows only, never Framework Acceptance
 pac solution import --path "./out/<SolutionName>_unmanaged_new.zip"
 ```
 
