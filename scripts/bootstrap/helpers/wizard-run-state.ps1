@@ -17,7 +17,8 @@ function Write-WizardAtomicJson {
         [Parameter(Mandatory)] [object]$InputObject,
         [ValidateRange(1, 100)] [int]$Depth = 20,
         [ValidateRange(1, 20)] [int]$RetryCount = 8,
-        [ValidateRange(1, 2000)] [int]$InitialRetryDelayMilliseconds = 25
+        [ValidateRange(1, 2000)] [int]$InitialRetryDelayMilliseconds = 25,
+        [scriptblock]$CommitInvoker
     )
 
     $directory = Split-Path -Parent $Path
@@ -43,7 +44,8 @@ function Write-WizardAtomicJson {
 
         for ($attempt = 1; $attempt -le $RetryCount; $attempt++) {
             try {
-                [IO.File]::Move($tempPath, $Path, $true)
+                if ($null -eq $CommitInvoker) { [IO.File]::Move($tempPath, $Path, $true) }
+                else { & $CommitInvoker $tempPath $Path }
                 return
             } catch {
                 $fileSystemException = $_.Exception.GetBaseException()

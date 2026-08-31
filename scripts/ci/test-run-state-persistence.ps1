@@ -79,17 +79,11 @@ $atomicPath = Join-Path $atomicRoot 'current-run.json'
 try {
     $original = [ordered]@{ runId='original'; scopeHash='scope'; mode='Preview'; startedAtUtc='2026-08-31T00:00:00Z'; stages=@() }
     Write-WizardAtomicJson -Path $atomicPath -InputObject $original
-    $lockedStream = [IO.FileStream]::new($atomicPath, [IO.FileMode]::Open, [IO.FileAccess]::Read, [IO.FileShare]::Read)
+    $failedCommit = { param($SourcePath, $DestinationPath) throw [IO.IOException]::new("Simulated interrupted commit from '$SourcePath' to '$DestinationPath'.") }
     try {
-        try {
-            Write-WizardAtomicJson -Path $atomicPath -InputObject ([ordered]@{ runId='replacement'; stages=@() }) -RetryCount 1
-            throw 'Expected the locked atomic replacement to fail.'
-        } catch {
-            $expectedFileSystemFailure = $_.Exception -is [IO.IOException] -or $_.Exception -is [UnauthorizedAccessException]
-            if (-not $expectedFileSystemFailure) { throw }
-        }
-    } finally {
-        $lockedStream.Dispose()
+        Write-WizardAtomicJson -Path $atomicPath -InputObject ([ordered]@{ runId='replacement'; stages=@() }) -RetryCount 1 -CommitInvoker $failedCommit
+        throw 'Expected the interrupted atomic replacement to fail.'
+    } catch [IO.IOException] {
     }
     $preserved = Read-WizardJsonFile -Path $atomicPath
     if ($preserved.runId -cne 'original') { throw 'A failed atomic write corrupted the previous run state.' }
