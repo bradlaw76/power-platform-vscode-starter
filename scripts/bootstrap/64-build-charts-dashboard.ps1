@@ -25,6 +25,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-hardening.ps1')
+. (Join-Path $PSScriptRoot 'helpers/reporting-wizard.ps1')
 
 function ConvertTo-WizardXmlValue { param([string]$Value) return [Security.SecurityElement]::Escape($Value) }
 
@@ -66,11 +67,9 @@ function Invoke-WizardReportingStage {
             $matches = @((& $invoke Get "savedqueryvisualizations?`$select=savedqueryvisualizationid,name,primaryentitytypecode,description&`$filter=name eq '$safeName'").value)
             if ($matches.Count -gt 1) { throw "Chart identity collision for '$($chart.Name)': found $($matches.Count)." }
             if ($matches.Count -eq 1 -and ($matches[0].primaryentitytypecode -cne $chart.TableLogicalName -or $matches[0].description -cne $marker)) { throw "Chart '$($chart.Name)' is not owned by scenario '$ScenarioSlug'." }
-            $aggregate = ConvertTo-WizardXmlValue $chart.Aggregate
             $category = ConvertTo-WizardXmlValue $chart.CategoryField
-            $aggregateField = ConvertTo-WizardXmlValue $chart.AggregateField
-            $table = ConvertTo-WizardXmlValue $chart.TableLogicalName
-            $dataXml = "<datadefinition><fetchcollection><fetch mapping='logical' aggregate='true'><entity name='$table'><attribute name='$aggregateField' aggregate='$aggregate' alias='aggregatevalue'/><attribute name='$category' groupby='true' alias='categoryvalue'/></entity></fetch></fetchcollection><categorycollection><category alias='categoryvalue'><measurecollection><measure alias='aggregatevalue'/></measurecollection></category></categorycollection></datadefinition>"
+            $fetchXml = New-WizardAggregateFetchXml -Chart $chart
+            $dataXml = "<datadefinition><fetchcollection>$fetchXml</fetchcollection><categorycollection><category alias='categoryvalue'><measurecollection><measure alias='aggregatevalue'/></measurecollection></category></categorycollection></datadefinition>"
             $requestedChartType = if ($chart.PSObject.Properties.Name -contains 'ChartType') { "$($chart.ChartType)" } else { 'column' }
             $chartType = switch ($requestedChartType) { 'pie' { 'Pie' } 'doughnut' { 'Doughnut' } 'bar' { 'Bar' } default { 'Column' } }
             $presentationXml = "<Chart Palette='BrightPastel'><Series><Series ChartType='$chartType' IsValueShownAsLabel='True' YValueMembers='aggregatevalue'/></Series><ChartAreas><ChartArea><AxisY/><AxisX Interval='1'/></ChartArea></ChartAreas><Legends><Legend/></Legends><Titles><Title Text='$(ConvertTo-WizardXmlValue $chart.Name)'/></Titles></Chart>"

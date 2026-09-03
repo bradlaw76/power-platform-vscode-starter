@@ -64,6 +64,8 @@ NON-NEGOTIABLES
     Skills installed:
     - power-platform-vscode-wizard: guided wizard for building Power Platform
       model-driven apps from VS Code using PAC CLI.
+    - dataverse-report-wizard: report-only workflow for discovering,
+      previewing, and deploying native Dataverse charts and dashboards.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/01-install-skills.ps1
@@ -124,11 +126,15 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 Write-Host "  Skills are now available in Claude Code on this machine."
 Write-Host "  Start a new Claude Code session and run the wizard skill:"
 Write-Host "  /power-platform-vscode-wizard"
+Write-Host "  Or run the Dataverse reporting skill:"
+Write-Host "  /dataverse-report-wizard"
 Write-Host ""
 Write-Host "VS Code Copilot Chat users:" -ForegroundColor Cyan
 Write-Host "  This repo also includes a shared skill at .github/skills/power-platform-wizard-init"
+Write-Host "  and a report-only skill at .github/skills/dataverse-report-wizard"
 Write-Host "  Invoke it in Copilot Chat with:"
 Write-Host "  /power-platform-wizard-init"
+Write-Host "  /dataverse-report-wizard"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Skills installed."
 }

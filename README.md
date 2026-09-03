@@ -1,792 +1,822 @@
-# Power Platform VS Code Starter
+# Dataverse Report Wizard for VS Code
 
-![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
+Create native Dataverse charts and dashboards for Dynamics 365 and Power Apps
+model-driven apps from Visual Studio Code.
 
-A repo-agnostic starter kit for building Power Platform model-driven apps from VS Code using the Power Platform CLI and Dataverse Web API. Clone it into any project to get a guided, scripted path from idea to working solution -- without manual portal clicks.
+The repository provides:
 
-> [!IMPORTANT]
-> **Spec Kit planning is a mandatory gate.** Do not run build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The wizard helps you create them.
+- a conversational skill for GitHub Copilot and Claude Code;
+- an interactive PowerShell wizard;
+- live Dataverse metadata discovery;
+- natural-language report recommendations;
+- FetchXML preview before deployment;
+- native Dataverse chart and dashboard generation;
+- solution registration and model-driven app attachment; and
+- credential-free simulation and automated tests.
 
----
+## Contents
 
-## Start here
+- [How it works](#how-it-works)
+- [Full app-builder compatibility](#full-app-builder-compatibility)
+- [Before you begin](#before-you-begin)
+- [Clone and open the repository](#clone-and-open-the-repository)
+- [Install prerequisites](#install-prerequisites)
+- [Start with GitHub Copilot](#start-with-github-copilot)
+- [Start with Claude Code](#start-with-claude-code)
+- [Run the wizard directly](#run-the-wizard-directly)
+- [Recommended first run: simulation](#recommended-first-run-simulation)
+- [Create a live report preview](#create-a-live-report-preview)
+- [Review generated artifacts](#review-generated-artifacts)
+- [Deploy an approved report](#deploy-an-approved-report)
+- [Wizard questions](#wizard-questions)
+- [Natural-language recommendations](#natural-language-recommendations)
+- [Supported report features](#supported-report-features)
+- [Noninteractive and CI usage](#noninteractive-and-ci-usage)
+- [Repository structure](#repository-structure)
+- [Security and safety](#security-and-safety)
+- [Troubleshooting](#troubleshooting)
+- [Validation](#validation)
+- [Current limitations](#current-limitations)
+- [Contributing](#contributing)
 
-If Git, VS Code, and Copilot Chat are already available, use this single guided start:
+## How it works
 
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter
-cd power-platform-vscode-starter
-code .
-```
-
-When the folder opens in VS Code, open Copilot Chat and enter:
+The skill and wizard have different responsibilities:
 
 ```text
-/power-platform-wizard-init
+GitHub Copilot or Claude skill
+    Guides intake, preview, approval, and safe execution
+                         |
+                         v
+PowerShell report wizard
+    Authenticates, discovers metadata, validates, and generates artifacts
+                         |
+                         v
+Reporting payload and FetchXML preview
+    Reviewable and source-control-friendly report definition
+                         |
+             explicit approval required
+                         |
+                         v
+Dataverse deployment runtime
+    Creates or updates charts and dashboard, adds them to the solution,
+    attaches them to the selected model-driven app, and publishes the app
 ```
 
-If the slash command is not shown, enter this instead:
+The skill does not contain the Dataverse implementation. The PowerShell runtime
+does not replace the conversational guidance and approval gates. They are
+designed to be used together, but the wizard can also run directly.
+
+## Full app-builder compatibility
+
+This repository also retains the broader Power Platform app-building wizard.
+Use `/power-platform-wizard-init`, or tell Copilot:
 
 ```text
 Start the Power Platform wizard in this repository.
 ```
 
-If `git` or `code` is not recognized, use the [first-time machine setup](#1-install-required-tools) below. You can also use GitHub's **Code > Download ZIP**, extract the folder, and open it with **File > Open Folder** in VS Code.
+That workflow performs initial setup, runs `00-prereq-check.ps1`, and then
+guides complete model-driven app planning and generation. Its supported modes
+are:
 
-You do not need to work out the setup order first. Before the discovery wizard asks about your app, Copilot will:
+- `demo-builder` for the streamlined default experience;
+- `advanced-builder`, which covers 11 core discovery questions; and
+- `framework-acceptance` for explicit framework validation.
 
-1. Confirm that it is working in the repository you intended.
-2. Inspect the repository and working tree without modifying tracked project files.
-3. Run the non-destructive prerequisite check for VS Code, PowerShell 7, Azure CLI, Power Platform CLI (PAC CLI), and Git.
-4. Explain any missing setup and help resolve it.
-5. Ask whether this is a new build or retrofit of existing work, then whether to continue in chat or the terminal.
+The full wizard supports the `standalone-model-driven` and
+`dynamics-customer-service-extension` application profiles. It also captures
+the entry-point table and landing view before app assembly. Follow
+`docs/onboarding.md` as the authoritative sequence for that workflow.
 
-This initial setup writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`. It does **not** sign in to Power Platform, create or change Dataverse resources, run build scripts, commit, or push. After setup passes, the wizard starts discovery and prepares the required Spec Kit planning files: `spec.md`, `plan.md`, and `tasks.md`.
-
----
-
-## Table of Contents
-
-- [Start here](#start-here)
-- [What this repo is for](#what-this-repo-is-for)
-- [Who this is for](#who-this-is-for)
-- [Key concepts](#key-concepts)
-- [How it works](#how-it-works)
-- [Visual walkthrough](docs/wizard-walkthrough.html)
-- [Getting started](#getting-started)
-- [Install Spec Kit tooling](#install-spec-kit-tooling)
-- [Build sequence](#build-sequence)
-- [End-of-Build Analysis](#end-of-build-analysis)
-- [Using VS Code chat and Claude Code](#using-vs-code-chat-and-claude-code)
-- [Solution lifecycle](#solution-lifecycle)
-- [Git workflow](#git-workflow)
-- [Script reference](#script-reference)
-- [Repo contents](#repo-contents)
-- [Troubleshooting](#troubleshooting)
-- [Related documents](#related-documents)
-
----
-
-## What this repo is for
-
-Use this starter when you want to:
-
-- Build standalone model-driven Power Apps or extend Dynamics 365 from VS Code
-- Replace manual portal clicks with repeatable, source-controlled scripts
-- Plan work with Spec Kit artifacts before writing any metadata
-- Package and promote results as a Power Platform solution across environments
-
-**Core outcome:** Move from requirements to working Dataverse artifacts, packaged as a solution that can be exported, versioned in Git, and imported into any environment.
-
----
-
-## Who this is for
-
-| You are... | This repo gives you... |
-| --- | --- |
-| A first-time model-driven app builder new to VS Code | A step-by-step wizard with no assumed knowledge |
-| A team that wants scripted, repeatable builds | Idempotent bootstrap scripts for every build phase |
-| A repo needing a consistent onboarding contract | A single `docs/onboarding.md` any new person can follow in under an hour |
-
-No prior experience needed with VS Code terminals, Git branches, PAC CLI, or Dataverse solution management. This documentation explains each term on first use.
-
----
-
-## Key concepts
-
-| Term | Meaning |
-| --- | --- |
-| **PAC CLI** | The Power Platform command-line tool (`pac`) for solution operations and environment auth |
-| **Dataverse** | The data platform behind model-driven apps: tables, columns, relationships, forms, views |
-| **Solution** | The deployable package containing your app components |
-| **Unpack / Pack** | Convert a solution zip to editable source files (unpack), then rebuild the zip (pack) |
-| **Spec Kit** | A planning method requiring `spec.md`, `plan.md`, and `tasks.md` before any implementation |
-| **Claude Code skill** | A reusable workflow guide made available to Claude Code for AI-assisted builds |
-
----
-
-## How it works
-
-Primary entry point is the VS Code shared skill. Direct wizard routes remain supported and lead to the same planning/build sequence:
-
-Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html).
-
-| Entry point | How to start | Best for |
-| --- | --- | --- |
-| **VS Code shared skill (primary)** | `/power-platform-wizard-init` in Copilot Chat | Guided chat-or-terminal kickoff plus progress monitoring |
-| **VS Code Copilot Chat (direct wizard path)** | `/power-platform-demo-wizard` in Copilot Chat | Direct chat-first planning and Spec Kit generation |
-| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Seven-prompt Demo Builder by default; scaffold planning files |
-| **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
-
-All three paths converge on the same sequence:
-
-```text
-Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
-```
-
-Disclosed local usage metrics are available for wizard runs. Bootstrap scripts log non-identifying step progress to `.wizard-metrics/events.jsonl`, print a telemetry notice when they do so, and support opt-out with `WIZARD_METRICS_OPTOUT=1`.
-
----
-
-## Getting started
-
-The recommended path is the guided start above: open the repository and enter `/power-platform-wizard-init`. The sections below are the detailed manual setup reference. You can use them directly, or let the init skill walk through them and explain each result.
-
-### 1. Install required tools
+Wizard telemetry is stored under `.wizard-metrics/`. The opt-out setting is
+`WIZARD_METRICS_OPTOUT=1`; in PowerShell, set it for the current shell with:
 
 ```powershell
+$env:WIZARD_METRICS_OPTOUT = '1'
+```
+
+The report wizard described in the rest of this guide is the focused path when
+the app and tables already exist and only native reporting artifacts are
+needed.
+
+## Before you begin
+
+For live preview or deployment, you need:
+
+- access to a Microsoft Power Platform environment with Dataverse;
+- permission to read Dataverse metadata;
+- an existing model-driven app;
+- an existing unmanaged solution for deployment;
+- permission to create and update solution components;
+- permission to update and publish the selected model-driven app; and
+- an authorized nonproduction environment for initial testing.
+
+Do not test deployment against production.
+
+Simulation does not require a Dataverse environment or credentials.
+
+## Clone and open the repository
+
+```powershell
+git clone <repository-url>
+Set-Location .\power-platform-vscode-reporting
+code .
+```
+
+If the folder name differs, use the folder created by `git clone`.
+
+## Install prerequisites
+
+### Required tools
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [PowerShell 7](https://learn.microsoft.com/powershell/)
+- [Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)
+- [Microsoft Power Platform CLI](https://learn.microsoft.com/power-platform/developer/cli/introduction)
+- [Git](https://git-scm.com/)
+
+For the conversational experience, also install and sign in to GitHub Copilot
+in VS Code. Claude Code users can use the included Claude skill instead.
+
+### Windows installation
+
+```powershell
+winget install Microsoft.VisualStudioCode
 winget install Microsoft.PowerShell
 winget install Microsoft.AzureCLI
 winget install Microsoft.PowerPlatformCLI
 winget install Git.Git
 ```
 
-Verify all tools are accessible:
+Restart VS Code after installation so its integrated terminal receives the
+updated `PATH`.
+
+### Verify the repository and tools
+
+From the repository root:
 
 ```powershell
-pwsh --version; az --version; pac --version; git --version; code --version
+pwsh .\scripts\bootstrap\00-prereq-check.ps1
 ```
 
-Each command must return a version number. Fix any failures before continuing.
+Resolve failed prerequisite checks before live discovery or deployment.
 
----
+## Start with GitHub Copilot
 
-### 2. Clone and open
-
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter
-cd power-platform-vscode-starter
-code .
-```
-
-When VS Code opens, accept the extension recommendations when prompted. If you missed the prompt, open Extensions (`Ctrl+Shift+X`), search `@recommended`, and install all.
-
-**Extensions installed by this repo:**
-
-| Extension | Purpose |
-| --- | --- |
-| GitHub Copilot | AI assistant |
-| GitHub Copilot Chat | In-editor chat for the prompt-based wizard |
-| Power Platform Tools | Maker portal and CLI integration |
-| PowerShell | Terminal language support |
-| JSON | Schema validation for payload files |
-| Markdown lint | Documentation quality checks |
-| YAML | Process definition file support |
-
----
-
-### 3. Install Claude Code skills (once per machine)
-
-```powershell
-pwsh ./scripts/bootstrap/01-install-skills.ps1
-```
-
-Expected output:
+The repository includes the shared skill:
 
 ```text
-=== Install Claude Code Skills ===
-Source: ..\.claude\skills
-Dest:   C:\Users\<you>\.claude\skills
-
-  INSTALLED power-platform-vscode-wizard
-
-Done. Installed: 1  Skipped: 0
+.github/skills/dataverse-report-wizard/SKILL.md
 ```
 
-This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
-
-For VS Code Copilot Chat users, this repo also includes a shared skill at `.github/skills/power-platform-wizard-init` that can be invoked as `/power-platform-wizard-init` without running the installer.
-
----
-
-## Install Spec Kit tooling
-
-If you are looking for "Speck Kit" installation: this repo uses **Spec Kit** as a planning gate and includes the setup path already. There is no separate external installer required for basic use.
-
-Official upstream project:
-
-- https://github.com/github/spec-kit/
-- Docs: https://github.github.io/spec-kit/
-
-Use this setup so Spec Kit artifacts can be created consistently:
-
-1. Install repo skills (once per machine):
-
-```powershell
-pwsh ./scripts/bootstrap/01-install-skills.ps1
-```
-
-2. Start the guided planning flow (creates `spec.md`, `plan.md`, `tasks.md`):
-
-```powershell
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
-```
-
-The default `demo-builder` asks six business questions and presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering.
-
-3. Optional chat-first path in VS Code Copilot Chat:
+1. Open the cloned repository in VS Code.
+2. Open GitHub Copilot Chat.
+3. Select **Agent** mode.
+4. Enter:
 
 ```text
-/power-platform-demo-wizard
+/dataverse-report-wizard
 ```
 
-Optional: install the upstream Specify CLI from the official Spec Kit repo
-(recommended if you also want full Spec Kit CLI workflows outside this starter):
-
-Prerequisites from upstream: Python 3.11+, `uv` (recommended) or `pipx`, and Git.
-
-```powershell
-uv tool install specify-cli --from git+https://github.com/github/spec-kit.git@vX.Y.Z
-```
-
-Then initialize Spec Kit in any project:
-
-```powershell
-specify init my-project --integration copilot
-```
-
-Replace `vX.Y.Z` with a released tag from:
-https://github.com/github/spec-kit/releases/latest
-
-Validation checkpoint:
-
-- `spec.md`, `plan.md`, and `tasks.md` exist in root or under `specs/<scenario-slug>/`.
-- The three files are reviewed and consistent before running scripts `20` to `60`.
-
----
-
-### 4. Check prerequisites
-
-```powershell
-pwsh ./scripts/bootstrap/00-prereq-check.ps1
-```
-
-All tools must show **PASS** before continuing. Install any that show **FAIL** using the install commands in step 1.
-
----
-
-### 5. Run the discovery kickoff (primary: shared skill)
-
-Primary path:
+You can also start with natural language:
 
 ```text
-/power-platform-wizard-init
+Start the Dataverse report wizard in this repository.
 ```
 
-Direct wizard alternatives (still supported):
+The skill defaults to simulation when a mode has not been selected. For live
+work, it guides environment intake, report design, preview review, and the
+separate deployment approval.
 
-```powershell
-# Demo Builder (default)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
+If the skill does not appear immediately after cloning, reload the VS Code
+window and reopen Copilot Chat from the repository workspace.
 
-# Advanced Builder (explicit technical controls)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder
+## Start with Claude Code
 
-# Framework Acceptance (explicit authorized acceptance only)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance
-```
+The repository includes:
 
 ```text
-/power-platform-demo-wizard
+.claude/skills/dataverse-report-wizard/SKILL.md
 ```
 
-All modes capture or confirm the same architecture contract, then scaffold compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files under `specs/<scenario-slug>/`. Demo Builder uses seven prompts; Advanced Builder exposes the 11 core discovery questions and technical extensions; Framework Acceptance adds environment safety and evidence controls.
-
-Canonical source for discovery/planning/execution contract:
-
-- `docs/wizard-contract-v1.md`
-- `wizard.profile.json`
-
-**Application profiles (selected before discovery):**
-
-- `standalone-model-driven`: a normal Power Apps model-driven app, usually built from custom tables, with neutral operational report labels.
-- `dynamics-sales-extension`, `dynamics-customer-service-extension`, or `dynamics-field-service-extension`: an extension that can reuse standard Dynamics tables and either create dedicated forms or update selected forms in place.
-- `generic-dataverse-solution`: Dataverse components packaged in a solution with the same explicit app contract.
-
-Every new profile-based run records its table/form strategy, primary entry-point table, named landing view, required app artifacts, and navigation group. The wizard creates or updates the model-driven review app on every run. App assembly places the entry-point table first in an app-aware sitemap and attaches the requested view; it does not change that table's environment-wide default view.
-
-**Discovery questions:**
-
-1. What type of demo or app are you building?
-2. Is it for Dynamics 365 Sales, Customer Service, Field Service, Contact Center, Power Apps, Power Pages, Copilot Studio, or Dataverse?
-3. Who is the target audience?
-4. What business problem does it solve?
-5. Who are the users?
-6. What data tables or entities are needed?
-7. What screens, forms, views, pages, flows, or copilots are needed?
-8. What does a successful demo look like?
-9. What environment should it be built in?
-10. Does it need demo data?
-11. Should the output be a managed or unmanaged solution?
-
-**Optional extension blocks (profile-driven):**
-
-- table strategy and explicit mapping
-- solution identity (new/existing solution + publisher prefix)
-- reporting module scope
-- retrofit mode (current state + remaining work)
-
-Exit criteria: all 11 answers captured and reviewed before moving to authentication.
-
----
-
-### 6. Authenticate
+Install all checked-in Claude skills:
 
 ```powershell
-pwsh ./scripts/bootstrap/10-auth-connect.ps1
+pwsh .\scripts\bootstrap\01-install-skills.ps1
 ```
 
-Prompts for environment URL, Azure tenant, publisher prefix, and solution names. Saves a local `.env.ps1` -- never committed (protected by `.gitignore`).
-
-Solution safety rules in this step:
-
-- The default path is `new` solution creation.
-- Reusing an existing solution requires explicitly choosing `existing`.
-- If you choose `new` and the solution unique name already exists, the script stops so you can enter a unique name instead of reusing the old solution by accident.
-
-Additional auth modes:
-
-```powershell
-pwsh ./scripts/bootstrap/10-auth-connect.ps1 -UseDeviceCode    # No browser / remote machine
-pwsh ./scripts/bootstrap/10-auth-connect.ps1 -ServicePrincipal # CI / service principal
-```
-
-Validation: `az account show` and `pac auth list` both return your profile and environment.
-
----
-
-## Build sequence
-
-> [!IMPORTANT]
-> Do not run build scripts until your planning files are complete and reviewed (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). This is a hard gate -- building before planning creates rework.
-
-Optional but recommended before authentication and build scripts:
-
-```powershell
-pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
-```
-
-This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates:
-
-- `demo-walkthrough.md` (engineer/operator runbook)
-- `demo-talk-track.md` (presenter narrative)
-- `demo-script.md` (compatibility copy of the talk track)
-
-Add payload files to `payloads/` before running scripts:
-
-| File pattern | Contents |
-| --- | --- |
-| `payloads/table-*.json` | Table definitions |
-| `payloads/columns-*.json` | Column definitions |
-| `payloads/relationships-*.json` | Lookup relationship definitions |
-
-Before payload generation, planning must include an explicit mapping section:
-
-- Standard reused tables (mapped to Dataverse logical names, e.g., Case -> incident)
-- Custom tables to create (generated with the selected publisher prefix)
-- Standard fields reused
-- Custom fields to add
-- Relationships to create
-
-Rules:
-
-- Never put standard entities (Contact, Account, Case/incident, Lead, Opportunity, Product, Task, Activity, etc.) in table-creation payloads.
-- Table payloads must contain only true custom entities.
-- Column and relationship payloads may target both standard and custom entities.
-
-Forms and labels rules:
-
-- `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for each custom table in `table-*.json`.
-- Primary name field is placed first, then payload-defined fields in payload order.
-- Visible labels use payload `DisplayName.LocalizedLabels` (language 1033 first, then first available).
-- Missing labels fall back to friendly title-case labels from logical names (prefix removed, underscores replaced with spaces).
-- If Starter Main Form exists, reruns patch its form XML to apply payload field/label changes.
-- If a non-starter Main form exists, starter form creation/update is skipped.
-
-Run build scripts in order:
-
-```powershell
-pwsh ./scripts/bootstrap/15-dry-validate.ps1
-pwsh ./scripts/bootstrap/20-build-tables.ps1
-pwsh ./scripts/bootstrap/30-build-columns.ps1
-pwsh ./scripts/bootstrap/40-build-relationships.ps1
-pwsh ./scripts/bootstrap/50-add-to-solution.ps1
-pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
-pwsh ./scripts/bootstrap/60-build-forms-views.ps1
-pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
-pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
-# Optional if enabled by profile + planning selection
-pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
-pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
-# Final read-only inventory and export gate
-pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
-pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
-# Rerun idempotent experience/data stages and the final membership gate
-pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
-pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
-# End-of-build analysis
-pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
-# Generate a progress matrix from disclosed step events
-pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
-# Generate an HTML analytics dashboard from telemetry
-pwsh ./scripts/bootstrap/82-build-progress-report.ps1
-```
-
-After each script: check that the failed count is zero before running the next. All scripts are idempotent -- safe to rerun after fixing any failure.
-
-Solution isolation behavior:
-
-- `50-add-to-solution.ps1` derives the expected table set from payload references and fails fast if the target solution already contains foreign table components.
-- `50-add-to-solution.ps1` also writes a contamination scan artifact covering expected components, wizard-managed foreign artifacts, and manual or legacy artifacts in the solution.
-- Strict mode is on by default. Override only for intentional reuse with `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
-- To review or remove foreign tables from an existing unmanaged solution, use `pwsh ./scripts/bootstrap/57-prune-foreign-tables.ps1`.
-- `55-build-business-process-flows.ps1` validates explicit `process-*.json` input and generates a Power Apps designer handoff. Apply mode requires the matching category-4 process to exist through that supported designer/solution path; the script then validates, activates, adds, and links it without fabricating workflow definition metadata.
-- If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
-- `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
-- `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
-- `64-build-charts-dashboard.ps1` creates native Dataverse charts and dashboards from scenario payloads; it is not the HTML web-resource stage.
-- `66-seed-synthetic-data.ps1` safely upserts source-tagged records by stable natural key and exact relationship references.
-- `85-verify-idempotency.ps1` proves stable component/record IDs and zero second-pass creates.
-- `95-export-unmanaged-solution.ps1` performs gated unmanaged export and local unpack/inspection only; it never imports the package.
-- The final inventory-only pass records all mandatory and optional categories with Dataverse IDs and blocks export when required membership fails. Strict mode also blocks unauthorized components.
-- See [docs/solution-isolation-runbook.md](docs/solution-isolation-runbook.md) for the clean-build, detection, and cleanup flows.
-
-**After script 60:** Open [Power Apps Maker](https://make.powerapps.com), select your environment, and confirm tables, forms, and views appear inside the target solution before exporting.
-
-Optional report web resources:
-
-- `05-start-wizard.ps1` captures a yes/no decision for optional reporting module scope (when enabled in `wizard.profile.json`).
-- `70-build-web-resources.ps1` is the canonical optional module entrypoint.
-- `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
-- The script upserts Dataverse HTML web resources and adds them to the selected solution.
-
-Wizard step metrics:
-
-- Bootstrap scripts disclose local step-progress telemetry and write events to `.wizard-metrics/events.jsonl`.
-- Events include run ID, step code, status, and timestamps only; they do not include user name, machine name, email, or access tokens.
-- Use `pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1` to generate a run matrix showing which steps each user/run completed or dropped off on.
-- Set `WIZARD_METRICS_OPTOUT=1` before running a script if you want to disable local telemetry for that session.
-
-## End-of-Build Analysis
-
-`80-post-build-analysis.ps1` produces a concise end-of-build summary and prints a preview before any write action.
-
-It also generates a build mind map artifact for wizard-driven builds, visualizing what was created and how entities relate.
-
-It reads:
-
-- `specs/<scenario>/spec.md`
-- `specs/<scenario>/plan.md`
-- `specs/<scenario>/tasks.md`
-- `scripts/payloads/table-*.json` and/or `payloads/table-*.json`
-- `scripts/payloads/columns-*.json` and/or `payloads/columns-*.json`
-- `scripts/payloads/relationships-*.json` and/or `payloads/relationships-*.json`
-- `scripts/payloads/webresource-*.json` and/or `payloads/webresource-*.json`
-- `README.md`
-
-Optional overrides for generalized workflows:
-
-- `-SpecPath`
-- `-PlanPath`
-- `-TasksPath`
-- `-PayloadFolder`
-- `-ReadmePath`
-- `-MindMapOutputPath`
-
-If one or more inputs are missing, summary sections render `Not available` instead of failing.
-
-Generated mind map artifacts:
-
-- `.wizard-metrics/artifacts/analysis/build-mind-map.md` (Mermaid graph)
-- `.wizard-metrics/artifacts/analysis/build-mind-map.json` (structured data)
-
-Interactive flow:
-
-- Prompt: `Update README generated summary section now? (y/N)`.
-- If yes: replace only the content between the generated summary markers.
-- Prompt: `Stage and commit README update now? (y/N)`.
-- If yes: show repository-target safety checks (`git rev-parse --show-toplevel`, `git remote -v`, `git branch --show-current`) and require explicit confirmation before commit/push.
-- Prompt: `Push to origin/<current-branch> now? (y/N)` before any push.
-
-Preview mode:
-
-```powershell
-pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
-```
-
-Progress matrix:
-
-```powershell
-pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
-```
-
-Default output is written to `.wizard-metrics/build-progress-matrix.md`.
-
-HTML progress dashboard:
-
-```powershell
-pwsh ./scripts/bootstrap/82-build-progress-report.ps1
-```
-
-Outputs:
-
-- `.wizard-metrics/build-progress-data.json` (analytics snapshot)
-- `.wizard-metrics/build-progress-report.html` (self-contained dashboard)
-- `.wizard-metrics/artifacts/analysis/build-mind-map.md` (build relationship mind map)
-- `.wizard-metrics/artifacts/analysis/build-mind-map.json` (mind map source data)
-
-Open the report:
-
-- Wizard Progress Report: `.wizard-metrics/build-progress-report.html`
-- Wizard Progress Data (JSON): `.wizard-metrics/build-progress-data.json`
-
-Note: these links are local workspace artifacts. Run `pwsh ./scripts/bootstrap/82-build-progress-report.ps1` first if the files do not exist yet.
-
-Update model:
-
-- New work appends events to `.wizard-metrics/events.jsonl`.
-- Re-run `82-build-progress-report.ps1` to refresh JSON + HTML from latest events.
-- If you only want to re-render HTML from existing JSON, use: `pwsh ./scripts/bootstrap/82-build-progress-report.ps1 -SkipRefresh`.
-
-BEGIN GENERATED BUILD SUMMARY
-### Scenario and solution metadata
-- Scenario slug: contoso-case-tracker
-- Scenario summary: Contoso Case Tracker is a Model-driven app for tracking customer support cases for Dynamics 365 Customer Service.
-- Environment: https://contoso-dev.crm.dynamics.com
-- Solution type: Unmanaged
-- Solution unique name: ContosoCaseTracker (new)
-- Publisher prefix: cct (new)
-
-### Tables built (standard table extensions and custom tables)
-- Standard table extensions:
-  - incident (columns: cct_escalationreason, cct_triagebucket)
-- Custom tables:
-  - Agent -> cct_agent
-  - Customer -> cct_customer
-  - Priority -> cct_priority
-
-### Relationship map
-- incident (referencing) -> cct_agent (referenced)
-- incident (referencing) -> cct_priority (referenced)
-- incident (referencing) -> contact (referenced)
-- incident.cct_agentid -> cct_agent (cct_incident_cct_agent)
-
-### Forms and views created or updated
-- Case form
-- active cases view
-
-### Web resources created or updated
-- (none detected)
-
-### Demo talk track
-- Demo Talk Track: Contoso Case Tracker - Run the end-to-end Contoso Case Tracker story from intake through closure, using Case, Customer, Agent, Priority and proving 'Agent opens a case, fills the f...
-
-### Recommended next enhancements
-- Identify tables requiring report surfaces (greenfield: from spec/tasks; retrofit: from existing solution inventory)
-- Decide demo data approach: Yes
-- Create Report Mapping Table in 'report-mappings.md' with one row per report (table logical name, report surface name, report type, target placement, required fields, Dataverse owner)
-- For each table marked critical: confirm explicit report type decision (form web resource, dashboard KPI, or queue/view summary)
-- For each report, document decision that report supports (e.g., case escalation, agent performance, SLA risk)
-- Define report-level placement (form iframe, dashboard tile, view footer, or ribbon notification)
-END GENERATED BUILD SUMMARY
-Validation scenarios to run for every workflow change:
-
-- Standard-only model: `table-*.json` includes no standard entities, and no custom duplicates (for example, `<prefix>_case`, `<prefix>_contact`) are created.
-- Custom-only model: all required entities are created with the chosen prefix in lowercase logical form.
-- Mixed model: standard entities are reused, only true custom entities are created, custom fields can be added to standard entities, and mixed relationships plus payload-referenced solution assembly succeed.
-- Uppercase prefix input: users can enter mixed/uppercase prefix input, entity logical names and script filtering behave in lowercase consistently, and the dry check command is `pwsh ./scripts/bootstrap/15-dry-validate.ps1 -PayloadsFolder "./payloads/scenarios/mixed" -PublisherPrefixOverride "CcT"`.
-- Form-label and rerun behavior: new custom table forms show business labels such as `Priority Code` rather than raw logical names, rerunning after payload label updates patches Starter Main Form labels, non-starter Main forms remain untouched, and repeated runs do not create duplicate starter forms.
-
----
-
-## Using VS Code chat and Claude Code
-
-### Copilot Chat prompts
+Start a new Claude Code session and enter:
 
 ```text
-/power-platform-wizard-init path=terminal mode=full
-/power-platform-demo-wizard Create a Dynamics 365 Customer Service demo for case triage
-Walk me through this repo like a beginner wizard
-Ask me the discovery questions one at a time and help me write spec.md, plan.md, and tasks.md
+/dataverse-report-wizard
 ```
 
-### Claude Code skill
+The installer copies complete skill folders to `~/.claude/skills`. Installing
+a skill does not copy this repository's PowerShell runtime into another
+project. Run the skill from a compatible clone of this repository.
 
-After running `01-install-skills.ps1`, the `power-platform-vscode-wizard` skill is installed on this machine and available in Claude Code sessions. The skill provides the full wizard workflow, validation checkpoints, script reference, solution lifecycle commands, and troubleshooting.
+## Run the wizard directly
 
-### VS Code shared skill
-
-This repo includes `.github/skills/power-platform-wizard-init`. In Copilot Chat, invoke `/power-platform-wizard-init` to choose chat or terminal kickoff, enforce planning gates, and monitor progress from existing telemetry.
-
-### How the entry points connect
-
-```text
-VS Code shared skill (primary) -> path selection + progress monitoring -> same planning artifacts -> build scripts
-Direct wizard routes            -> same planning artifacts              -> build scripts
-Terminal wizard               -> spec.md, plan.md, tasks.md -> demo-walkthrough.md + demo-talk-track.md -> build scripts
-Copilot Chat                  -> same planning artifacts     -> demo-walkthrough.md + demo-talk-track.md -> build scripts
-Claude Code skill (available) -> guides the entire flow      -> inline help at each step
-```
-
----
-
-## Solution lifecycle
-
-After validating in the Maker portal, use PAC CLI to source-control the solution:
+You can bypass the AI skill and run the PowerShell wizard:
 
 ```powershell
-# Export unmanaged solution from source environment
-pac solution export --name "<SolutionName>" --path "./out/<SolutionName>_unmanaged.zip" --managed false
-
-# Unpack to editable source files (diff-friendly in Git)
-pac solution unpack --zipfile "./out/<SolutionName>_unmanaged.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
-
-# Pack source files back into a zip
-pac solution pack --zipfile "./out/<SolutionName>_unmanaged_new.zip" --folder "./solutions/<SolutionName>" --packagetype Unmanaged
-
-# Import into target environment
-pac solution import --path "./out/<SolutionName>_unmanaged_new.zip"
+pwsh .\scripts\bootstrap\08-report-wizard.ps1
 ```
 
-Unpacked solution files can be diffed, reviewed in pull requests, and rolled back via Git history. The pack/import pattern gives a repeatable, reversible promotion path across environments.
+The interactive wizard asks for:
 
----
+1. a scenario slug;
+2. the Dataverse environment URL;
+3. authentication when required;
+4. what the user wants to see;
+5. confirmation or correction of the recommended report design;
+6. optional additional charts and filters; and
+7. the dashboard name.
 
-## Git workflow
+Running without `-Deploy` generates local review artifacts only.
+
+## Recommended first run: simulation
+
+Run the credential-free simulation before connecting to Dataverse:
 
 ```powershell
-git checkout -b feature/<short-description>
-git status
-git add .
-git commit -m "Add <feature> Dataverse artifacts and docs"
-git push -u origin feature/<short-description>
+pwsh .\scripts\ci\test-report-wizard.ps1
 ```
 
-`git status` must show a clean working tree after commit. Never commit `.env.ps1` -- it contains tokens and is protected by `.gitignore`. Verify with `git status` before every commit.
+The simulation:
 
-Release and rollback references for this update bundle:
+- loads sanitized model-driven app, table, and column metadata;
+- interprets a natural-language reporting request;
+- generates a reporting payload and filtered aggregate FetchXML;
+- validates overwrite protection;
+- rejects incompatible aggregations;
+- simulates chart and dashboard creation;
+- simulates solution registration;
+- simulates attaching the chart and dashboard to an app;
+- simulates app publication; and
+- removes temporary scenario artifacts.
 
-- Release tag: `payload-wizard-bundle-20260713`
-- Rollback tag: `rollback-before-all-20260713`
-- To consume this bundle from another repo, fetch tags from `origin` and cherry-pick or base your branch on the release tag.
-- To revert locally, use the rollback tag or `git revert` against the release commit if you want a non-destructive undo.
+The simulation does not contact or modify Dataverse.
 
----
+## Create a live report preview
 
-## Script reference
+### Using the skill
 
-| Script | Purpose | Changes environment? | Safe to rerun? |
-| --- | --- | --- | --- |
-| `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
-| `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
-| `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
-| `06-demo-script-wizard.ps1` | Generate scenario-aware `demo-walkthrough.md` and `demo-talk-track.md` (plus compatibility `demo-script.md`) | No | Yes (prompts before overwrite) |
-| `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
-| `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
-| `15-dry-validate.ps1` | Validate planning artifacts, payload prerequisites, optional report/BPF/app inputs, and emit contract artifacts before mutation | No | Yes |
-| `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
-| `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
-| `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
-| `50-add-to-solution.ps1` | Add payload entities; in `-InventoryOnly` mode, read all-category membership, preserve IDs, and enforce the export gate without Dataverse mutation | Yes, except inventory-only mode | Yes |
-| `55-build-business-process-flows.ps1` | Validate optional `process-*.json`, generate the supported designer handoff, and validate/activate/add/link an existing designer-authored BPF | Yes in apply mode; preview is local only | Yes |
-| `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
-| `62-build-app-module.ps1` | Create or update the scenario-aware model-driven app shell, attach intended components, and validate the resulting app | Yes | Yes |
-| `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
-| `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
-| `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
-| `81-build-progress-matrix.ps1` | Summarize disclosed wizard telemetry into a per-run step matrix | No | Yes |
-| `82-build-progress-report.ps1` | Generate a local HTML dashboard from wizard telemetry analytics | No | Yes |
-
----
-
-## Repo contents
+In Copilot Chat or Claude Code:
 
 ```text
-power-platform-vscode-starter/
-  .claude/
-    skills/
-      power-platform-vscode-wizard/
-        SKILL.md              -- Claude Code skill: wizard workflow, scripts, troubleshooting
-  .github/
-    copilot-instructions.md   -- Repo-wide Copilot Chat behavior and workflow guidance
-    skills/
-      power-platform-wizard-init/
-        SKILL.md              -- Shared Copilot skill: dual-path wizard kickoff + progress monitoring
-        references/progress-monitoring.md -- Telemetry-based status guidance
-    prompts/
-      power-platform-demo-wizard.prompt.md -- Slash prompt for guided chat-based wizard
-  .vscode/
-    extensions.json           -- Recommended extensions (installs on first open)
-  .gitignore                  -- Protects .env.ps1 and .wizard-metrics/ from accidental commits
-  docs/
-    onboarding.md             -- Step-by-step setup guide for new builders
-    build-log.md              -- Log template for recording each build run
-    wizard-contract-v1.md     -- Canonical workflow contract (discovery/planning/execution)
-  payloads/                   -- Add table-*.json, columns-*.json, relationships-*.json here
-  requirements/
-    how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
-    how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
-  scripts/
-    ci/
-      test-docs-consistency.ps1  -- Guardrail: docs/prompt question-contract consistency
-      test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
-      test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
-  scripts/
-    bootstrap/
-      00-prereq-check.ps1          -- Verify tools are installed (no changes made)
-      01-install-skills.ps1        -- Copy Claude Code skills to ~/.claude/skills/
-      05-start-wizard.ps1          -- Discovery questions -> Spec Kit starter files
-      10-auth-connect.ps1          -- Sign in, configure PAC auth, save session
-      15-dry-validate.ps1         -- Validate planning artifacts and payload prerequisites before mutation
-      20-build-tables.ps1          -- Create tables from payloads/table-*.json
-      30-build-columns.ps1         -- Add columns from payloads/columns-*.json
-      40-build-relationships.ps1   -- Create lookups from payloads/relationships-*.json
-      50-add-to-solution.ps1       -- Add payload-referenced entities to target solution
-      55-build-business-process-flows.ps1 -- Validate and build optional Business Process Flows
-      60-build-forms-views.ps1     -- Build payload-driven Starter Main Forms and Active views, then publish
-      62-build-app-module.ps1      -- Create or update the scenario-aware model-driven app shell
-      65-build-web-resources.ps1   -- Generate optional scenario-driven HTML report web resources and add to solution
-      70-build-web-resources.ps1   -- Canonical optional reporting module entrypoint (wrapper)
-      80-post-build-analysis.ps1   -- Post-build summary generation and optional README update/commit prompts
-      81-build-progress-matrix.ps1 -- Build a run matrix from disclosed wizard telemetry events
-      82-build-progress-report.ps1 -- Build an HTML dashboard from wizard telemetry analytics
-      helpers/wizard-telemetry.ps1 -- Shared local telemetry helper for bootstrap steps
-      wizard.profile.json          -- Project profile (required questions, modules, sequencing, conventions, gates)
-      MIGRATION.md                 -- Upgrade guidance and compatibility expectations
+/dataverse-report-wizard
 ```
 
----
+Choose live preview when prompted.
+
+### Using the terminal
+
+```powershell
+pwsh .\scripts\bootstrap\08-report-wizard.ps1
+```
+
+The wizard asks for an HTTPS Dataverse environment URL such as:
+
+```text
+https://your-org.crm.dynamics.com
+```
+
+It then:
+
+1. verifies Azure CLI and Power Platform CLI availability;
+2. reuses the current Azure session or starts interactive sign-in;
+3. acquires a token scoped to the specified Dataverse environment;
+4. creates or selects a PAC CLI authentication profile;
+5. reads model-driven apps from `appmodules`;
+6. reads reportable tables from `EntityDefinitions`;
+7. reads table attributes and their types;
+8. asks what the user wants to see;
+9. recommends a report design; and
+10. creates local preview artifacts.
+
+Live preview reads environment metadata but does not create charts or
+dashboards.
+
+## Review generated artifacts
+
+For a scenario named `case-operations`, the wizard creates:
+
+```text
+payloads/scenarios/case-operations/reporting-case-operations.json
+specs/case-operations/report-artifacts/query-preview.json
+specs/case-operations/report-mappings.md
+```
+
+### Reporting payload
+
+The reporting payload is the machine-readable source of truth. It contains:
+
+- the original reporting request;
+- target model-driven app unique name;
+- output targets;
+- chart definitions;
+- Dataverse table and column logical names;
+- aggregation types;
+- chart types;
+- filters; and
+- dashboard composition.
+
+It is validated against:
+
+```text
+schemas/payloads/reporting.schema.json
+```
+
+### FetchXML query preview
+
+`query-preview.json` contains the exact aggregate FetchXML generated for every
+chart. Review:
+
+- table logical names;
+- category and measure columns;
+- aggregation type;
+- filter operators and values; and
+- whether the query represents the requested business question.
+
+### Report mappings
+
+`report-mappings.md` provides a human-readable summary of the request, app,
+dashboard, charts, fields, aggregations, output targets, and filters.
+
+Do not deploy until the payload, FetchXML, and mapping are approved.
+
+## Deploy an approved report
+
+Deployment requires explicit approval after preview.
+
+Before deploying, confirm:
+
+- environment URL;
+- existing solution unique name;
+- existing publisher prefix;
+- target model-driven app;
+- dashboard name;
+- chart names;
+- selected tables and fields;
+- calculations; and
+- filters.
+
+Run:
+
+```powershell
+pwsh .\scripts\bootstrap\08-report-wizard.ps1 `
+  -ScenarioSlug case-operations `
+  -Force `
+  -Deploy
+```
+
+The deployment runtime:
+
+1. validates the reporting payload;
+2. resolves the selected unmanaged solution;
+3. creates or updates scenario-owned system charts;
+4. creates or updates the scenario-owned dashboard;
+5. adds charts and the dashboard to the solution;
+6. publishes affected table customizations;
+7. resolves the selected model-driven app;
+8. attaches the generated components with `AddAppComponents`; and
+9. publishes the selected app.
+
+`-Force` permits replacement of an existing local scenario payload. It should
+only be used after reviewing the existing file.
+
+The runtime refuses to update same-name charts or dashboards that are not
+marked as owned by the current scenario.
+
+## Wizard questions
+
+The live wizard follows this order.
+
+### 1. Scenario
+
+A stable lowercase identifier used for artifact folders and ownership markers:
+
+```text
+case-operations
+```
+
+Allowed characters are lowercase letters, numbers, and single hyphens.
+
+### 2. Environment
+
+The exact Dataverse environment URL:
+
+```text
+https://your-org.crm.dynamics.com
+```
+
+The wizard authenticates immediately so later questions can use live metadata.
+
+### 3. Reporting request
+
+The user describes the desired outcome in natural language:
+
+```text
+Show service managers open cases grouped by priority.
+```
+
+A useful request includes:
+
+- intended audience;
+- decision the report supports;
+- records or business process involved;
+- grouping or comparison;
+- measure or KPI;
+- time period; and
+- filters such as open, active, closed, region, owner, or category.
+
+### 4. Recommended design
+
+The wizard proposes:
+
+- model-driven app;
+- Dataverse table;
+- category column;
+- measure column;
+- aggregation;
+- chart type; and
+- recognized active/open or inactive/closed filters.
+
+The user can accept the proposal or choose metadata values manually.
+
+### 5. Additional charts
+
+A dashboard supports one to three generated charts in the current version.
+
+### 6. Dashboard
+
+The user provides the display name for the generated dashboard.
+
+### 7. Deployment details
+
+Only when deployment is requested, the wizard asks for missing solution and
+publisher details.
+
+## Natural-language recommendations
+
+The recommendation engine uses live Dataverse display names, logical names,
+attribute types, and common reporting terms.
+
+Examples:
+
+| Request | Likely recommendation |
+|---|---|
+| Show open cases by priority | Count Case rows, grouped by Priority, filtered to active state |
+| Show total estimated value by owner | Sum a numeric or money field, grouped by Owner |
+| Show average amount by category as a pie chart | Average a numeric field, grouped by Category, pie visualization |
+| Show inactive assets by status | Count assets, grouped by Status, filtered to inactive state |
+
+Recommendations are drafts. They must be confirmed against live metadata and
+the generated FetchXML.
+
+## Supported report features
+
+### Native artifacts
+
+- Dataverse system charts (`savedqueryvisualization`)
+- Dataverse dashboards (`systemform`)
+- Model-driven app component attachment
+- Solution component registration
+- Scoped publication
+
+### Aggregations
+
+- `count`
+- `countcolumn`
+- `sum`
+- `avg`
+- `min`
+- `max`
+
+`sum`, `avg`, `min`, and `max` require a numeric Dataverse attribute such as
+whole number, decimal, floating point, money, or big integer.
+
+### Chart types
+
+- column
+- bar
+- pie
+- doughnut
+
+### Filter operators
+
+- equals: `eq`
+- not equal: `ne`
+- greater than: `gt`
+- greater than or equal: `ge`
+- less than: `lt`
+- less than or equal: `le`
+- null
+- not null
+
+All filters in a generated chart currently use logical `and`.
+
+## Noninteractive and CI usage
+
+Use `-ConfigurationPath` to bypass interactive report-design questions.
+Configuration files should not contain credentials.
+
+Example:
+
+```json
+{
+  "ReportRequest": "Show open cases grouped by priority for service managers.",
+  "TargetAppUniqueName": "contoso_customer_service",
+  "OutputTargets": [
+    "fetchxml-preview",
+    "native-chart-dashboard"
+  ],
+  "DashboardName": "Case Operations",
+  "Charts": [
+    {
+      "Name": "Open Cases by Priority",
+      "TableLogicalName": "incident",
+      "CategoryField": "prioritycode",
+      "AggregateField": "incidentid",
+      "Aggregate": "count",
+      "ChartType": "column",
+      "Filters": [
+        {
+          "Field": "statecode",
+          "Operator": "eq",
+          "Value": "0"
+        }
+      ]
+    }
+  ]
+}
+```
+
+Run a preview using sanitized metadata:
+
+```powershell
+pwsh .\scripts\bootstrap\08-report-wizard.ps1 `
+  -ScenarioSlug case-operations `
+  -MetadataSnapshotPath .\scripts\ci\fixtures\report-wizard-metadata.json `
+  -ConfigurationPath C:\Temp\case-report.json
+```
+
+Use `-MetadataSnapshotPath` only with sanitized metadata. Do not commit customer
+metadata exports without review.
+
+For live noninteractive execution, omit `-MetadataSnapshotPath` and supply an
+authorized environment and authentication context.
+
+## Repository structure
+
+```text
+.github/
+  skills/
+    dataverse-report-wizard/
+      SKILL.md                    GitHub Copilot skill
+
+.claude/
+  skills/
+    dataverse-report-wizard/
+      SKILL.md                    Claude Code skill
+
+schemas/
+  payloads/
+    reporting.schema.json         Reporting payload contract
+
+scripts/
+  bootstrap/
+    00-prereq-check.ps1           Tool prerequisite validation
+    01-install-skills.ps1         Claude skill installer
+    08-report-wizard.ps1          Interactive report wizard
+    10-auth-connect.ps1           Full app-builder authentication workflow
+    64-build-charts-dashboard.ps1 Native report deployment stage
+    helpers/
+      dataverse-runtime.ps1       Web API retry and token runtime
+      reporting-wizard.ps1        Discovery, recommendation, generation, app wiring
+  ci/
+    test-report-wizard.ps1        End-to-end credential-free simulation
+    SkillParity.Tests.ps1         Copilot and Claude contract parity
+    fixtures/
+      report-wizard-metadata.json Sanitized metadata fixture
+
+payloads/
+  scenarios/
+    <scenario>/                   Generated machine-readable report payloads
+
+specs/
+  <scenario>/
+    report-artifacts/             Generated FetchXML previews
+    report-mappings.md            Human-readable report plan
+```
+
+## Security and safety
+
+### Credentials
+
+- Access tokens must never be printed or committed.
+- `.env.ps1` is local and git-ignored.
+- Generated report configuration must not contain credentials.
+- Use interactive user authentication for normal development.
+- Use a dedicated service principal only through an approved CI design.
+
+### Environment safety
+
+- Start with simulation.
+- Use a dedicated development or test environment.
+- Confirm the exact environment before authentication.
+- Preview before deployment.
+- Treat deployment approval as specific to the displayed environment,
+  solution, app, dashboard, charts, and filters.
+- Do not reuse approval after changing the report definition.
+
+### Dataverse ownership
+
+Generated native artifacts include a scenario ownership marker. Reruns update
+matching scenario-owned artifacts and refuse ambiguous or foreign same-name
+components.
+
+### Source control
+
+Before committing:
+
+```powershell
+git status --short
+git diff --check
+git diff
+```
+
+Review generated artifacts for environment-specific identifiers, customer
+information, and accidental credentials.
 
 ## Troubleshooting
 
-| Symptom | Likely cause | Fix |
-| --- | --- | --- |
-| `pac` not found | CLI not installed or PATH not updated | `winget install Microsoft.PowerPlatformCLI`, close and reopen terminal |
-| 401 on every API call | Token resource URL mismatch | Rerun `10-auth-connect.ps1` -- no trailing slash on environment URL |
-| Token works then stops mid-run | Token expired (60-90 min timeout) | Rerun `10-auth-connect.ps1` to refresh |
-| PAC errors after `az login` | PAC and Azure CLI are separate auth mechanisms | Run both `az login` and `pac auth create` |
-| Login opens wrong tenant | Multiple tenants on account | Pass `-tenantId` flag or rerun auth with explicit tenant |
-| Solution not found in script 50 | Solution does not exist in environment yet | Create solution in Maker portal, then rerun `50-add-to-solution.ps1` |
-| BPF build skipped | No `process-*.json` exists or the scenario has no clear staged progression | Leave BPF disabled or add a complete process definition with stages, fields, and criteria |
-| BPF validation failed | Stage fields, primary entity, or cross-table relationships are missing or ambiguous | Fix `process-*.json`, explicit field mappings in planning artifacts, or the missing relationship payloads, then rerun `55-build-business-process-flows.ps1` |
-| Build script fails midway | Any error during execution | Scripts are idempotent -- fix issue and rerun the same script |
-| `code` command not found | VS Code shell command not in PATH | Command palette -> "Shell Command: Install 'code' command in PATH", restart terminal |
-| `git push` rejected | Branch behind remote | `git pull --ff-only`, then push with `-u origin <branch>` |
-| `.env.ps1` accidentally staged | `.gitignore` changed or bypassed | `git rm --cached .env.ps1`, verify `.gitignore` includes `.env.ps1` |
-| Unpack fails | Wrong zip path or invalid export | Re-run export, verify zip exists in `out/`, then re-run unpack |
-| Import fails: missing dependencies | Target environment missing base components | Import into correct base environment or include required dependencies |
+### The skill does not appear in Copilot Chat
 
----
+1. Confirm the repository contains:
 
-## Related documents
+   ```text
+   .github/skills/dataverse-report-wizard/SKILL.md
+   ```
 
-| Document | Purpose |
-| --- | --- |
-| [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
-| [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html) | Full visual walkthrough with direct links to skill entry points, scripts, and runbooks |
-| [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |
-| [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md) | Canonical workflow contract for discovery, planning, and execution |
-| [docs/standard-dataverse-tables.md](docs/standard-dataverse-tables.md) | Reference for standard (out-of-box) vs. custom Dataverse tables -- helps you decide which to reuse and which to create |
-| [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md) | Full implementation playbook |
-| [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](requirements/how-to-build-dynamics-model-driven-apps-wizard.md) | Guided discovery wizard, Spec Kit steps, and architecture decision framework |
-| [MIGRATION.md](MIGRATION.md) | Migration guidance for existing consumers moving to the contract/profile model |
+2. Open the repository folder, not an individual file.
+3. Reload the VS Code window.
+4. Reopen Copilot Chat in Agent mode.
+5. Try the natural-language fallback:
+
+   ```text
+   Start the Dataverse report wizard in this repository.
+   ```
+
+### `pwsh` is not recognized
+
+Install PowerShell 7:
+
+```powershell
+winget install Microsoft.PowerShell
+```
+
+Restart VS Code.
+
+### `az` or `pac` is not recognized
+
+```powershell
+winget install Microsoft.AzureCLI
+winget install Microsoft.PowerPlatformCLI
+```
+
+Restart VS Code and rerun:
+
+```powershell
+pwsh .\scripts\bootstrap\00-prereq-check.ps1
+```
+
+### Azure authentication fails
+
+Verify that the environment URL is correct and that your account is a member of
+the environment's tenant. Then run:
+
+```powershell
+az login --allow-no-subscriptions
+```
+
+Restart the report wizard.
+
+### The app or table is missing
+
+- Confirm the correct environment URL.
+- Confirm the application is a model-driven app.
+- Confirm your account can read app and table metadata.
+- Confirm the required Dynamics 365 application is installed.
+- Check the logical name in Maker portal.
+
+### A numeric calculation is rejected
+
+`sum`, `avg`, `min`, and `max` require a numeric or money column. Use `count`
+or `countcolumn` for text, choice, lookup, status, and identifier fields.
+
+### The reporting payload already exists
+
+The wizard protects existing local payloads. Review:
+
+```text
+payloads/scenarios/<scenario>/reporting-<scenario>.json
+```
+
+Use a different scenario slug, or use `-Force` only after approving
+replacement.
+
+### Chart or dashboard ownership collision
+
+A same-name Dataverse component exists but is not marked as owned by the
+scenario. Do not bypass the check. Rename the generated artifact or review the
+existing component and solution ownership.
+
+### Deployment succeeded but users cannot see data
+
+Report deployment does not grant table privileges. Confirm that affected users
+have:
+
+- access to the model-driven app;
+- an appropriate security role;
+- read privilege for the underlying tables; and
+- field-level access for selected columns.
+
+## Validation
+
+Run the focused simulation:
+
+```powershell
+pwsh .\scripts\ci\test-report-wizard.ps1
+```
+
+Run reporting regressions:
+
+```powershell
+pwsh .\scripts\ci\test-reporting-and-data-stages.ps1
+```
+
+Validate all JSON and reporting payloads:
+
+```powershell
+pwsh .\scripts\ci\test-json-schema.ps1
+```
+
+Validate PowerShell parsing and required runtime patterns:
+
+```powershell
+pwsh .\scripts\ci\test-script-smoke.ps1
+```
+
+Validate Copilot and Claude skill parity:
+
+```powershell
+pwsh -NoProfile -Command `
+  '$result = Invoke-Pester -Path .\scripts\ci\SkillParity.Tests.ps1 -PassThru; if ($result.FailedCount -gt 0) { exit 1 }'
+```
+
+Run contract and documentation checks:
+
+```powershell
+pwsh .\scripts\ci\test-contract-integrity.ps1
+pwsh .\scripts\ci\test-docs-consistency.ps1
+```
+
+Credential-free tests do not prove that a target tenant permits every live
+Dataverse operation. Validate against an authorized nonproduction environment
+before broader use.
+
+## Current limitations
+
+- One generated dashboard contains one to three generated charts.
+- Filters are joined with logical `and`.
+- Natural-language interpretation is heuristic and requires confirmation.
+- Common open/active and closed/inactive state filters are inferred; arbitrary
+  business vocabulary may require manual selection.
+- Cross-table joins and linked-entity FetchXML are not yet generated.
+- Date grouping and fiscal-period grouping are not yet exposed by the wizard.
+- Dashboard layout is generated rather than visually designed.
+- HTML web-resource reporting exists elsewhere in the starter runtime but is
+  not yet integrated into this focused wizard.
+- SSRS/RDL and Power BI report generation are outside the current scope.
+- A live Dataverse deployment must still be validated in each tenant because
+  permissions, installed applications, and metadata differ.
+
+## Contributing
+
+Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing runtime behavior.
+
+For report-wizard changes:
+
+1. preserve preview-before-deployment behavior;
+2. keep live transport injectable for credential-free tests;
+3. add or update simulation coverage;
+4. preserve schema compatibility with existing reporting payloads;
+5. keep Copilot and Claude skill contracts aligned;
+6. run the validation commands above; and
+7. never use production for integration testing.
+
+No repository license has been selected. Do not infer redistribution rights;
+choosing a license is an explicit repository-owner decision.

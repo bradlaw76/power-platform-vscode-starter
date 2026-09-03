@@ -5,6 +5,22 @@
   "required": ["Enabled", "Charts", "Dashboard"],
   "properties": {
     "Enabled": { "type": "boolean" },
+    "ReportRequest": {
+      "type": "string",
+      "minLength": 1
+    },
+    "TargetAppUniqueName": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "OutputTargets": {
+      "type": "array",
+      "items": {
+        "enum": ["fetchxml-preview", "native-chart-dashboard", "html-web-resource"]
+      },
+      "minItems": 1,
+      "uniqueItems": true
+    },
     "Charts": {
       "type": "array",
       "minItems": 1,
@@ -18,7 +34,20 @@
           "CategoryField": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "AggregateField": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
           "Aggregate": { "enum": ["count", "countcolumn", "sum", "avg", "min", "max"] },
-          "ChartType": { "enum": ["bar", "column", "pie", "doughnut"] }
+          "ChartType": { "enum": ["bar", "column", "pie", "doughnut"] },
+          "Filters": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["Field", "Operator"],
+              "properties": {
+                "Field": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+                "Operator": { "enum": ["eq", "ne", "gt", "ge", "lt", "le", "null", "not-null"] },
+                "Value": { "type": ["string", "number", "boolean", "null"] }
+              }
+            }
+          }
         }
       }
     },

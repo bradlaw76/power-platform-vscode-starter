@@ -57,6 +57,66 @@ Describe 'Copilot and Claude wizard skill parity' {
         $skillContent[$Skill] | Should -Match '(?i)authoritative|single source of truth'
     }
 
+    Describe 'Copilot and Claude Dataverse report skill parity' {
+        BeforeAll {
+            $reportSkillPaths = [ordered]@{
+                Copilot = Join-Path $repoRoot '.github/skills/dataverse-report-wizard/SKILL.md'
+                Claude  = Join-Path $repoRoot '.claude/skills/dataverse-report-wizard/SKILL.md'
+            }
+            $reportSkillContent = @{}
+            foreach ($entry in $reportSkillPaths.GetEnumerator()) {
+                $reportSkillContent[$entry.Key] = Get-Content -LiteralPath $entry.Value -Raw
+            }
+        }
+
+        It '<Skill> distinguishes skill availability from runtime installation' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $reportSkillContent[$Skill] | Should -Match '(?i)skill availability is not runtime installation'
+            $reportSkillContent[$Skill] | Should -Match '(?i)copied `SKILL\.md` does not'
+            $reportSkillContent[$Skill] | Should -Match '(?is)never overwrite existing\s+instructions, skills, scripts, specs, or payloads'
+        }
+
+        It '<Skill> names reporting runtime <RuntimeFile>' -ForEach @(
+            foreach ($skill in @('Copilot', 'Claude')) {
+                foreach ($runtimeFile in @(
+                    '08-report-wizard.ps1',
+                    '10-auth-connect.ps1',
+                    '64-build-charts-dashboard.ps1',
+                    'reporting-wizard.ps1',
+                    'reporting.schema.json',
+                    'test-report-wizard.ps1'
+                )) {
+                    @{ Skill = $skill; RuntimeFile = $runtimeFile }
+                }
+            }
+        ) {
+            $reportSkillContent[$Skill] | Should -Match ([regex]::Escape($RuntimeFile))
+        }
+
+        It '<Skill> defaults to simulation and gates live mutation' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $reportSkillContent[$Skill] | Should -Match '(?i)default to `?simulate'
+            $reportSkillContent[$Skill] | Should -Match '(?i)never use `-Deploy` without explicit approval'
+            $reportSkillContent[$Skill] | Should -Match '(?i)never describe a simulated deployment as a live deployment'
+            $reportSkillContent[$Skill] | Should -Match 'report-mappings\.md'
+            $reportSkillContent[$Skill] | Should -Match 'query-preview\.json|FetchXML preview'
+        }
+
+        It '<Skill> routes app or schema expansion to the full wizard' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $reportSkillContent[$Skill] | Should -Match '(?i)tables, columns, relationships, forms, views'
+            $reportSkillContent[$Skill] | Should -Match 'spec\.md'
+            $reportSkillContent[$Skill] | Should -Match 'plan\.md'
+            $reportSkillContent[$Skill] | Should -Match 'tasks\.md'
+        }
+    }
+
     It '<Skill> requires all planning artifacts before build scripts' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }

@@ -1,9 +1,11 @@
 # Skill Distribution
 
-The repository ships two aligned skill contracts:
+The repository ships two aligned skill families:
 
 - GitHub Copilot shared skill: `.github/skills/power-platform-wizard-init/`
 - Claude Code skill: `.claude/skills/power-platform-vscode-wizard/`
+- GitHub Copilot reporting skill: `.github/skills/dataverse-report-wizard/`
+- Claude Code reporting skill: `.claude/skills/dataverse-report-wizard/`
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 
@@ -23,6 +25,14 @@ For another compatible repository, copy the complete Copilot skill folder only a
 - every stage and helper named by the profile
 - `schemas/payloads/`
 - scenario-scoped `specs/` and `payloads/scenarios/` conventions
+
+The reporting skill additionally requires compatible versions of:
+
+- `scripts/bootstrap/08-report-wizard.ps1`
+- `scripts/bootstrap/64-build-charts-dashboard.ps1`
+- `scripts/bootstrap/helpers/reporting-wizard.ps1`
+- `schemas/payloads/reporting.schema.json`
+- `scripts/ci/test-report-wizard.ps1`
 
 If runtime files are missing, stop and present a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads automatically.
 
@@ -51,5 +61,9 @@ To uninstall a user-installed Claude skill, remove its folder under `~/.claude/s
 5. Complete planning and run `90-run-build.ps1 -Mode Preview` without Dataverse credentials.
 6. Confirm no Git branch, index, commit, or remote changed.
 7. Run `pwsh ./scripts/ci/SkillParity.Tests.ps1` and the repository credential-free test suite.
+
+For the reporting skill, also run
+`pwsh ./scripts/ci/test-report-wizard.ps1`. Confirm that it reports an offline
+simulation, exercises app attachment, and cleans up its temporary scenario.
 
 The Claude installer currently installs Claude skills only. Copilot uses the repository-shared `.github/skills` folder; neither path downloads a missing wizard runtime.

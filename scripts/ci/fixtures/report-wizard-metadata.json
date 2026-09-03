@@ -1,0 +1,42 @@
+{
+  "Apps": [
+    {
+      "AppModuleId": "11111111-1111-1111-1111-111111111111",
+      "Name": "Customer Service",
+      "UniqueName": "ppvs_customer_service"
+    }
+  ],
+  "Tables": [
+    {
+      "LogicalName": "incident",
+      "DisplayNameText": "Case",
+      "PrimaryIdAttribute": "incidentid",
+      "Attributes": [
+        {
+          "LogicalName": "incidentid",
+          "DisplayNameText": "Case",
+          "AttributeType": "Uniqueidentifier",
+          "IsValidForRead": true
+        },
+        {
+          "LogicalName": "prioritycode",
+          "DisplayNameText": "Priority",
+          "AttributeType": "Picklist",
+          "IsValidForRead": true
+        },
+        {
+          "LogicalName": "statecode",
+          "DisplayNameText": "Status",
+          "AttributeType": "State",
+          "IsValidForRead": true
+        },
+        {
+          "LogicalName": "estimatedvalue",
+          "DisplayNameText": "Estimated Value",
+          "AttributeType": "Money",
+          "IsValidForRead": true
+        }
+      ]
+    }
+  ]
+}
