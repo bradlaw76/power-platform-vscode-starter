@@ -41,7 +41,7 @@ Pick **one** of the two options below.
    https://github.com/bradlaw76/power-platform-vscode-starter.git
    ```
 
-5. VS Code opens a folder picker — the same kind of "Save As" window you've used before in other programs. Browse to (or create) the projects folder you decided on above, then use the picker's **New Folder** button to create a folder named after your project (for example `my-first-app`), and select that new folder as the destination.
+5. VS Code opens a folder picker — the same kind of "Save As" window you've used before in other programs. Browse to (or create) the projects folder you decided on above, then use the picker's **New Folder** button to create a folder named after your project (for example `my-first-app`). Open that new folder so it's the one showing in the picker, then click the confirm button at the bottom (it's usually labeled **Select Folder** or **Select as Repository Destination**, depending on your VS Code version).
 6. VS Code will ask if you want to open the cloned repository — click **Open**.
 7. VS Code will then show a dialog: **"Do you trust the authors of the files in this folder?"** Click **Yes, I trust the authors** — this is expected for a repository you just cloned yourself.
 
