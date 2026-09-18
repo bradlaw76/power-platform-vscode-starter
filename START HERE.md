@@ -4,6 +4,25 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 
 > The full, authoritative bootstrap sequence lives in [docs/onboarding.md](docs/onboarding.md). This file is a quick-start summary — if anything here ever conflicts with `docs/onboarding.md`, that file wins.
 
+## 0. Starting from the VS Code Welcome page
+
+If you just opened VS Code and see the **Welcome** tab (no folder open yet),
+you have two options:
+
+- **Use a terminal (recommended — matches the commands below):** go to
+  **Terminal > New Terminal** in the menu bar. A terminal opens at some
+  default location; `cd` to wherever you want your projects to live, then
+  continue with step 1 below.
+- **Use the Welcome page directly:** click **Clone Git Repository...** under
+  **Start**, paste
+  `https://github.com/bradlaw76/power-platform-vscode-starter.git`, and pick
+  a **new, empty folder** for your project when prompted (do not pick a
+  folder that already has another clone in it). VS Code will open it
+  automatically — skip to step 2.
+
+Ignore the **Recent** list for a new project; only reopen an entry there if
+you are returning to a project you already created.
+
 ## 1. Create a separate project folder from the starter
 
 `C:\path\to\Power Platform Projects` below is a placeholder — replace it with
