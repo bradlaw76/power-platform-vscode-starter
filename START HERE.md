@@ -119,6 +119,8 @@ reusable wizard code and documentation.
 
 When prompted, click **Install All**. If you miss the prompt, open Extensions (`Ctrl+Shift+X`), search `@recommended`, and install everything listed (GitHub Copilot, GitHub Copilot Chat, Power Platform Tools, PowerShell, JSON, Markdown lint, YAML).
 
+**Why these specific extensions?** Copilot Chat is what runs the wizard conversation in the next steps. Power Platform Tools and PowerShell let VS Code run the build scripts Copilot will call on your behalf. The rest (JSON, Markdown lint, YAML) just make the generated files easier to read and edit. See [README.md](README.md) for the full list of what this starter includes.
+
 **New to Copilot?** After installing, sign in when prompted (a browser tab opens for GitHub login). Once signed in, open the Copilot Chat panel using the icon in the top-right of the VS Code window (it looks like a chat bubble), or press `Ctrl+Alt+I`. This is where you'll type the commands in the next steps.
 
 ## 4. Choose the app type before continuing
@@ -132,6 +134,11 @@ building, then use the matching entry point:
 | Reports (charts, dashboards, FetchXML) for a model-driven app that already exists | `/dataverse-report-wizard` |
 | A Canvas app | Stop here and use the Canvas App workflow in Power Apps Studio or the Canvas App tooling; do not use the model-driven wizard. |
 | Something else | Describe the app type and desired outcome in Copilot Chat before selecting a workflow. |
+
+This matters because each app type uses a different wizard, different
+questions, and different scripts — picking the wrong one wastes time or
+builds the wrong thing. See [README.md](README.md) for the full list of
+supported workloads if you're not sure which row fits.
 
 Open Copilot Chat and type the slash command for your row above. If the slash
 command doesn't show up, type this instead:
@@ -154,14 +161,27 @@ Do not assume that I want a model-driven app.
 
 Before asking anything about your app, Copilot will:
 
-1. Confirm it's working in the repository you intended.
-2. Inspect the repo without modifying tracked files.
-3. Run the non-destructive prerequisite check (`00-prereq-check.ps1`) for VS Code, PowerShell 7, Azure CLI, PAC CLI, and Git.
-4. Explain and help resolve anything missing.
-5. Confirm the app type and workload.
-6. For a model-driven workflow, ask whether this is a **new build** or a **retrofit** of existing work, then whether to continue in **chat** or the **terminal**.
+1. **Confirm it's working in the repository you intended** — so it doesn't
+   accidentally read or write files in the wrong project.
+2. **Inspect the repo without modifying tracked files** — a read-only look
+   to understand what's already here before touching anything.
+3. **Run the non-destructive prerequisite check** (`00-prereq-check.ps1`) for
+   VS Code, PowerShell 7, Azure CLI, PAC CLI, and Git — catching missing
+   tools now, rather than mid-build later.
+4. **Explain and help resolve anything missing** — so you're not left
+   guessing what to install.
+5. **Confirm the app type and workload** — restating what you chose in Step 4
+   before it asks any app-specific questions.
+6. **For a model-driven workflow, ask whether this is a new build or a
+   retrofit** of existing work, then whether to continue in chat or the
+   terminal — so the questions that follow match your actual situation.
 
-This step does **not** sign in to Power Platform, create/change Dataverse resources, run build scripts, commit, or push. It only writes local progress telemetry under `.wizard-metrics/` (opt out with `WIZARD_METRICS_OPTOUT=1`).
+This step does **not** sign in to Power Platform, create/change Dataverse
+resources, run build scripts, commit, or push — it only inspects your machine
+and this repository. It writes local progress telemetry under
+`.wizard-metrics/` (opt out with `WIZARD_METRICS_OPTOUT=1`). See
+[README.md](README.md) for the complete list of what each script in this
+repository does.
 
 When the wizard asks where the build should run, provide the **Environment
 URL**. For example:
@@ -182,7 +202,12 @@ Once setup passes, the wizard moves into discovery questions and prepares the re
 - `plan.md`
 - `tasks.md`
 
-**Do not run build scripts before these planning files are complete.** This is a hard gate — see [SPEC.md](SPEC.md) and [docs/onboarding.md](docs/onboarding.md) for details.
+**Why this gate exists:** these files capture what you're building, why, and
+in what order, so build scripts create the right tables, forms, and
+relationships instead of guessing. **Do not run build scripts before these
+planning files are complete.** This is a hard gate — see
+[SPEC.md](SPEC.md) and [docs/onboarding.md](docs/onboarding.md) for details,
+or [README.md](README.md) for how planning fits into the overall workflow.
 
 ## Stuck installing Git, VS Code, or Copilot Chat?
 
