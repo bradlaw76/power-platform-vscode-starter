@@ -19,6 +19,8 @@ You need two free programs on your computer before Step 1 will work. If you're n
 
 Once both commands print a version number, continue to Step 1.
 
+> **If VS Code was already open when you installed Git**, closing and reopening a terminal isn't enough — VS Code's own Git features (like "Clone Git Repository...") only detect Git when VS Code itself starts, not while it's already running. Fully close **every** VS Code window, then open VS Code again, before continuing to Step 1. If you're not sure whether you had VS Code open during install, close it and reopen it anyway — it only takes a few seconds.
+
 ## 1. Get the repository onto your computer
 
 **Copilot can't help with this very first step.** Copilot Chat only becomes available once this repository is open in VS Code with its extensions installed — so this one step is manual, click-by-click. Every step after this one, Copilot guides you.
@@ -35,6 +37,16 @@ Pick **one** of the two options below.
 1. Open VS Code.
 2. You'll land on VS Code's **Welcome** tab, with a **Start** list on the left.
 3. Click **Clone Git Repository...**
+
+   > **Don't see "Clone Git Repository..." on the list?** This can happen if
+   > VS Code doesn't yet recognize that Git is installed. Try, in order:
+   > 1. Press `Ctrl+Shift+P` to open the Command Palette, type `Git: Clone`,
+   >    and select it if it appears.
+   > 2. If it still doesn't appear, fully close **every** VS Code window and
+   >    reopen VS Code — this refreshes its detection of Git (see the note
+   >    at the end of Step 0).
+   > 3. Still nothing? Use **Option B** below instead — it clones from a
+   >    terminal and doesn't depend on this VS Code feature.
 4. Paste this URL and press Enter:
 
    ```text
