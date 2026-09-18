@@ -47,11 +47,14 @@ Pick **one** of the two options below.
    >    at the end of Step 0).
    > 3. Still nothing? Use **Option B** below instead — it clones from a
    >    terminal and doesn't depend on this VS Code feature.
-4. Paste this URL and press Enter:
+4. A text box appears at the top of the window (it looks like a search bar). Paste this URL into it:
 
    ```text
    https://github.com/bradlaw76/power-platform-vscode-starter.git
    ```
+
+   A dropdown appears below the box with **Clone from URL** highlighted —
+   press **Enter** (or click that option) to continue.
 
 5. VS Code opens a folder picker — the same kind of "Save As" window you've used before in other programs. Browse to (or create) the projects folder you decided on above, then use the picker's **New Folder** button to create a folder named after your project (for example `my-first-app`). Open that new folder so it's the one showing in the picker, then click the confirm button at the bottom (it's usually labeled **Select Folder** or **Select as Repository Destination**, depending on your VS Code version).
 6. VS Code will ask if you want to open the cloned repository — click **Open**.
