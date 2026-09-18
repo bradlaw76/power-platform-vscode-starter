@@ -6,6 +6,19 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 
 > The full, authoritative bootstrap sequence lives in [docs/onboarding.md](docs/onboarding.md). This file is a quick-start summary — if anything here ever conflicts with `docs/onboarding.md`, that file wins.
 
+## 0. Before you begin: install VS Code and Git
+
+You need two free programs on your computer before Step 1 will work. If you're not sure whether you already have them, open a terminal (Windows: search "PowerShell" in the Start menu and open it) and type each command below one at a time.
+
+1. **VS Code** — the editor you'll do everything in.
+   - Check: `code --version`
+   - If you see an error instead of a version number, download and install it from [code.visualstudio.com](https://code.visualstudio.com), then close and reopen any terminal windows.
+2. **Git** — the tool that downloads ("clones") the project and tracks your changes. Both options in Step 1 need this installed, even the point-and-click one.
+   - Check: `git --version`
+   - If you see an error instead of a version number, download and install it from [git-scm.com/downloads](https://git-scm.com/downloads) (accept the default options), then close and reopen any terminal windows.
+
+Once both commands print a version number, continue to Step 1.
+
 ## 1. Get the repository onto your computer
 
 **Copilot can't help with this very first step.** Copilot Chat only becomes available once this repository is open in VS Code with its extensions installed — so this one step is manual, click-by-click. Every step after this one, Copilot guides you.
@@ -19,7 +32,7 @@ Pick **one** of the two options below.
 
 ### Option A — Point and click (recommended if you're new to VS Code)
 
-1. Open VS Code. If you don't have it yet, download it from [code.visualstudio.com](https://code.visualstudio.com) and install it first.
+1. Open VS Code.
 2. You'll land on VS Code's **Welcome** tab, with a **Start** list on the left.
 3. Click **Clone Git Repository...**
 4. Paste this URL and press Enter:
@@ -30,6 +43,7 @@ Pick **one** of the two options below.
 
 5. VS Code opens a folder picker — the same kind of "Save As" window you've used before in other programs. Browse to (or create) the projects folder you decided on above, then use the picker's **New Folder** button to create a folder named after your project (for example `my-first-app`), and select that new folder as the destination.
 6. VS Code will ask if you want to open the cloned repository — click **Open**.
+7. VS Code will then show a dialog: **"Do you trust the authors of the files in this folder?"** Click **Yes, I trust the authors** — this is expected for a repository you just cloned yourself.
 
 > **Checkpoint:** The title bar and the left-hand Explorer panel (click the top icon that looks like two overlapping pages, or press `Ctrl+Shift+E`) should show your project name (for example `my-first-app`) as the top-level folder, containing `README.md`, `docs`, and `scripts` directly — not nested one level deeper inside another folder of the same name.
 
@@ -58,6 +72,10 @@ code --new-window ".\contoso-case-tracker"
 
 `C:\path\to\Power Platform Projects` and `contoso-case-tracker` are
 placeholders — replace both with your own answers to the two questions above.
+
+VS Code may show a dialog: **"Do you trust the authors of the files in this
+folder?"** Click **Yes, I trust the authors** — this is expected for a
+repository you just cloned yourself.
 
 > **Checkpoint:** VS Code should open with your project folder (not its
 > parent folder) as the workspace root. Run `git remote -v` in the VS Code
@@ -166,9 +184,14 @@ Once setup passes, the wizard moves into discovery questions and prepares the re
 
 **Do not run build scripts before these planning files are complete.** This is a hard gate — see [SPEC.md](SPEC.md) and [docs/onboarding.md](docs/onboarding.md) for details.
 
-## Don't have Git, VS Code, or Copilot Chat yet?
+## Stuck installing Git, VS Code, or Copilot Chat?
 
-Follow the manual, first-time machine setup and full step-by-step sequence in [docs/onboarding.md](docs/onboarding.md). You can also download the repo as a ZIP from GitHub (**Code > Download ZIP**) and open the extracted folder in VS Code.
+See Step 0 above for installing Git and VS Code, and Step 3 for Copilot Chat.
+For a more detailed, full step-by-step machine setup sequence, see
+[docs/onboarding.md](docs/onboarding.md). If you'd rather not install Git at
+all, you can download the repo as a ZIP from GitHub (**Code > Download ZIP**)
+and open the extracted folder in VS Code — note this won't let you pull
+future updates or use source control until you initialize Git yourself.
 
 ## Where to go next
 
