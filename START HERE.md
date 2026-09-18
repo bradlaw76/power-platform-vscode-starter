@@ -6,6 +6,13 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 
 ## 1. Create a separate project folder from the starter
 
+`C:\path\to\Power Platform Projects` below is a placeholder — replace it with
+wherever **you** keep your own projects (for example
+`C:\Users\<you>\Projects`, `D:\Repos`, or `~/dev`). `contoso-case-tracker` is
+also just an example project name; use your own. There is no required
+directory structure — only that the project folder is not nested inside
+another clone of this repo (see step 2).
+
 Before you clone, confirm you are **not** already inside another Git repository
 (this is how nested-repo mix-ups happen):
 
@@ -26,13 +33,14 @@ git clone https://github.com/bradlaw76/power-platform-vscode-starter.git ".\cont
 code --new-window ".\contoso-case-tracker"
 ```
 
-Replace `contoso-case-tracker` with the project name.
+Replace `C:\path\to\Power Platform Projects` with your own parent folder and
+`contoso-case-tracker` with your project name.
 
-> **Checkpoint:** VS Code should open with `contoso-case-tracker` (not
-> `Power Platform Projects` or any other parent folder) as the workspace root.
-> Run `git remote -v` in the VS Code terminal — it should point at
-> `power-platform-vscode-starter` and the folder should contain `README.md`,
-> `docs/`, and `scripts/` directly (not one level deeper).
+> **Checkpoint:** VS Code should open with your project folder (not its
+> parent folder) as the workspace root. Run `git remote -v` in the VS Code
+> terminal — it should point at `power-platform-vscode-starter` and the
+> folder should contain `README.md`, `docs/`, and `scripts/` directly (not
+> one level deeper).
 >
 > If `code` isn't recognized, VS Code's command-line tools aren't on PATH yet.
 > Open VS Code manually, run **View > Command Palette > Shell Command: Install
@@ -44,19 +52,21 @@ Each clone from step 1 is its own project repository. Do not create a person's
 folder, customer documents, or another scenario folder inside that clone — and
 never clone a project into a folder that already contains another clone.
 
-Recommended layout:
+Example layout (your parent folder and project name will differ):
 
 ```text
-Power Platform Projects\
+Power Platform Projects\              # your own parent folder — any name/location
 ├── power-platform-vscode-starter\   # optional: clean copy of the starter for reference
 └── contoso-case-tracker\            # your project and its documents (from step 1)
 ```
 
-Keep source documents, requirements, payloads, planning artifacts, and
-generated solution files inside the project folder only. Do not put personal,
-customer, or scenario-specific documents in the reusable starter repository
-unless they are intentionally reusable starter assets — the starter should
-contain only reusable wizard code and documentation.
+The important part is not the exact names or drive — it's that each project
+is its own sibling folder, not nested inside another clone. Keep source
+documents, requirements, payloads, planning artifacts, and generated solution
+files inside the project folder only. Do not put personal, customer, or
+scenario-specific documents in the reusable starter repository unless they
+are intentionally reusable starter assets — the starter should contain only
+reusable wizard code and documentation.
 
 ## 3. Accept the recommended extensions
 
