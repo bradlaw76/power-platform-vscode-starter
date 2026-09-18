@@ -742,7 +742,7 @@ if ($Mode -eq 'demo-builder') {
     $dataToTrack = Read-RequiredValue "3. What business records or data should the app track? (comma-separated)"
     $experienceAndLifecycle = Read-RequiredValue "4. What should users see or do, including any lifecycle stages?"
     $successAndData = Read-RequiredValue "5. What makes the demo successful, and should it include synthetic sample data?"
-    $environmentAndOutput = Read-RequiredValue "6. What target environment and solution output do you expect?" "Development environment; unmanaged solution"
+    $environmentAndOutput = Read-RequiredValue "6. What Environment URL and solution output do you expect? (for example, https://your-org.crm.dynamics.com; unmanaged solution)" "Environment URL; unmanaged solution"
 
     $publisherPrefix = ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Substring(0, [Math]::Min(5, ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Length))
     $customTables = @(Split-ListValues -Value $dataToTrack)
@@ -911,7 +911,7 @@ if ($Retrofit) {
     $answers["DataEntities"] = Read-RequiredValue "R1. What tables or entities have already been created? (comma-separated)"
     $answers["ArtifactsNeeded"] = Read-RequiredValue "R3. What forms, views, flows, or copilots are currently built or in progress?"
     $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful demo of this app look like?"
-    $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment is it currently built in?"
+    $answers["BuildEnvironment"] = Read-RequiredValue "9. What Environment URL is it currently built in?"
     $answers["NeedsDemoData"] = Read-RequiredValue "10. Does it need demo data?" "Yes"
     $answers["SolutionType"] = Read-RequiredValue "11. Is the solution managed or unmanaged?" "Unmanaged"
 
@@ -938,7 +938,7 @@ if ($Retrofit) {
     $answers["DataEntities"] = Read-RequiredValue "6. What data tables or entities are needed?"
     $answers["ArtifactsNeeded"] = Read-RequiredValue "7. What screens, forms, views, pages, flows, or copilots are needed?"
     $answers["SuccessLooksLike"] = Read-RequiredValue "8. What does a successful demo look like?"
-    $answers["BuildEnvironment"] = Read-RequiredValue "9. What environment should it be built in?"
+    $answers["BuildEnvironment"] = Read-RequiredValue "9. What Environment URL should it be built in?"
     $answers["NeedsDemoData"] = Read-RequiredValue "10. Does it need demo data?" "Yes"
     $answers["SolutionType"] = Read-RequiredValue "11. Should the output be a managed or unmanaged solution?" "Unmanaged"
 

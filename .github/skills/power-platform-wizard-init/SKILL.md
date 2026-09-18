@@ -42,7 +42,7 @@ Before intake, inspect the target repository without modifying it. Report presen
 Before asking discovery questions or listing build commands, give the user a short startup preview with these exact headings:
 
 - `Initial setup`: preview that, after confirmation, you will inspect the target repository without modifying tracked project files and run the non-destructive prerequisite check.
-- `Before discovery`: explain that the user will identify a new build or retrofit first, then choose chat or terminal.
+- `Before discovery`: explain that the user will identify the application type first, then identify a new build or retrofit, and then choose chat or terminal.
 - `What will change`: state that initial setup writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but does not authenticate, create Dataverse resources, run build scripts, commit, or push. Planning files are created only after intake begins and the user approves the path.
 - `First decision`: ask the user to confirm the target repository. Ask only this one question in the first response.
 
@@ -66,6 +66,13 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Do not create a branch, stage files, commit, or push during intake.
 
 2. Select scenario type and wizard mode before the start path
+- Select the application type before asking model-driven-specific discovery questions:
+  - Model-driven Power App or Dynamics 365 extension: continue with this wizard.
+  - Canvas app: do not start the model-driven intake; direct the user to the Canvas App workflow.
+  - Existing model-driven app reporting: direct the user to the Dataverse Report Wizard.
+  - Any other workload: ask the user to identify the appropriate Power Platform workflow before continuing.
+- Never infer that the user wants a model-driven app from the repository, a Dataverse requirement, or the phrase "Power App".
+- When asking for the build target, label it **Environment URL** and request the Dataverse/Power Platform URL (for example, `https://your-org.crm.dynamics.com`), not a friendly environment name.
 - Greenfield: define scope, mappings, and target solution identity.
 - Retrofit: inventory what already exists first, then define only remaining work.
 - Default to `demo-builder`. Use `advanced-builder` or `framework-acceptance` only after explicit selection.
