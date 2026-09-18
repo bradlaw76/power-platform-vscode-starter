@@ -25,12 +25,23 @@ you are returning to a project you already created.
 
 ## 1. Create a separate project folder from the starter
 
-`C:\path\to\Power Platform Projects` below is a placeholder — replace it with
-wherever **you** keep your own projects (for example
-`C:\Users\<you>\Projects`, `D:\Repos`, or `~/dev`). `contoso-case-tracker` is
-also just an example project name; use your own. There is no required
-directory structure — only that the project folder is not nested inside
-another clone of this repo (see step 2).
+Two ways to do this — pick whichever fits how you like to work:
+
+- **Ask Copilot to walk you through it (recommended for new users):** open
+  Copilot Chat and say `Start the Power Platform wizard in this repository.`
+  or type `/power-platform-wizard-init` (if the repo is already open). Before
+  giving you any commands, Copilot will ask **where you want to keep your
+  projects** (a parent folder path) and **what to name this project**, then
+  give you exact commands built from your answers.
+- **Do it yourself in a terminal:** decide those same two things yourself —
+  a parent folder (for example `C:\Users\<you>\Projects`, `D:\Repos`, or
+  `~/dev`) and a project name (for example `contoso-case-tracker`) — then
+  adapt the commands below. There is no required directory structure; the
+  only rule is that the project folder is not nested inside another clone
+  of this repo (see step 2).
+
+`C:\path\to\Power Platform Projects` and `contoso-case-tracker` below are
+placeholders — replace both with your own answers to the two questions above.
 
 Before you clone, confirm you are **not** already inside another Git repository
 (this is how nested-repo mix-ups happen):

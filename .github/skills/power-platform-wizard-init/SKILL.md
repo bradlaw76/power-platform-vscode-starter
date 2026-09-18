@@ -46,7 +46,7 @@ Before asking discovery questions or listing build commands, give the user a sho
 - `What will change`: state that initial setup writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but does not authenticate, create Dataverse resources, run build scripts, commit, or push. Planning files are created only after intake begins and the user approves the path.
 - `First decision`: ask the user to confirm the target repository. Ask only this one question in the first response.
 
-Keep this preview beginner-safe. Expand `PAC CLI`, `Dataverse`, and `Spec Kit` the first time each term appears. If the user arrived from the GitHub URL and has not cloned the repository, give only the clone/open commands first, then tell them to enter `/power-platform-wizard-init` in Copilot Chat. Also accept the natural-language fallback: `Start the Power Platform wizard in this repository.`
+Keep this preview beginner-safe. Expand `PAC CLI`, `Dataverse`, and `Spec Kit` the first time each term appears. If the user arrived from the GitHub URL and has not cloned the repository, do not assume a folder location or project name. Ask the user two things first: (1) where they want to keep their Power Platform projects (a parent folder path), and (2) what to name this project (used as the clone's folder name). Only after they answer, give the exact clone/open commands built from their answers, then tell them to enter `/power-platform-wizard-init` in Copilot Chat. Also accept the natural-language fallback: `Start the Power Platform wizard in this repository.`
 
 After repository confirmation, do not ask for confirmation again. Perform the repository preflight and run:
 
