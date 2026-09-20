@@ -8,9 +8,31 @@ Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough
 
 This is the beginner-safe, step-by-step path for building standalone model-driven Power Apps and Dynamics 365 extensions from VS Code.
 
+Use [START HERE.md](../START%20HERE.md) first when you need the beginner-safe
+choice of workload, cloning path, and VS Code setup. This onboarding guide is
+the authoritative detailed sequence after the authoring workspace is open.
+
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+
+---
+
+## Is This the Right Guide?
+
+This onboarding guide supports the model-driven app and existing-app reporting
+workloads in this starter.
+
+- For a model-driven Power App or Dynamics 365 extension, continue.
+- For charts, dashboards, or FetchXML against an existing model-driven app,
+  continue and use `/dataverse-report-wizard`.
+- For a Canvas app, stop and use the Canvas App workflow instead. This starter
+  does not create Canvas App authoring workspaces.
+- For another workload, review [README.md](../README.md) before continuing.
+
+The full clone created below is a local **authoring workspace** for the
+reusable wizard. Follow the workflow in this repository; the wizard manages
+its reusable capabilities and each build's generated artifacts.
 
 ---
 

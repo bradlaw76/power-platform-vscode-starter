@@ -7,6 +7,11 @@ building Power Platform solutions from VS Code using the Power Platform CLI and
 Dataverse Web API. Use it to build a model-driven app or add native Dataverse
 reporting to an existing app through guided, source-controlled workflows.
 
+This is a **reusable authoring wizard**, not a repository for one particular
+application, customer, or demonstration. A person can use the same starter to
+create many different builds; the wizard organizes each build's generated
+artifacts as part of its guided workflow.
+
 > [!IMPORTANT]
 > **Spec Kit planning is a mandatory gate for model-driven app builds.** Do not run app build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The app wizard helps you create them. For reporting against an existing app, use the focused [Dataverse Report Wizard guide](docs/dataverse-report-wizard.md).
 
@@ -30,9 +35,24 @@ separate implementation.
 
 ## Start here
 
-> **New to this repo?** [START HERE.md](START%20HERE.md) is a condensed
-> quick-start walkthrough for creating a local authoring workspace from this
-> starter. This section is the detailed version.
+> **New to this repo?** Start with [START HERE.md](START%20HERE.md). It
+> explains how to determine whether this is the right workflow, install the
+> needed tools, create a local authoring workspace, choose a Copilot or
+> terminal route, verify the clone in the VS Code Explorer, install
+> extensions, select the workload, and complete planning before a build.
+
+### What happens when you use this starter
+
+1. You create a local **authoring workspace**: a full clone of this reusable
+   wizard.
+2. The wizard checks prerequisites, confirms the workload, asks discovery
+   questions, and prepares planning artifacts before it runs any build steps.
+3. It can then guide or run the model-driven build sequence for the specific
+   application, extension, or reporting work you chose.
+
+The wizard keeps generic capabilities, templates, and workflow instructions
+separate from each build's generated artifacts. Follow the guided workflow;
+it determines where its planning and build artifacts belong.
 
 If Git, VS Code, and Copilot Chat are already available, clone this canonical
 repository:
@@ -112,6 +132,8 @@ Use this starter when you want to:
 - Replace manual portal clicks with repeatable, source-controlled scripts
 - Plan work with Spec Kit artifacts before writing any metadata
 - Package and promote results as a Power Platform solution across environments
+- Reuse one project-neutral authoring tool across many separate demonstrations
+  or applications
 
 **Core outcome:** Select the appropriate workload and move from requirements to
 reviewable Dataverse artifacts that use the same solution, application,
