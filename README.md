@@ -209,7 +209,12 @@ The recommended path is the guided start above: open the repository and enter `/
 
 ### 1. Install required tools
 
+This wizard uses **Visual Studio Code (VS Code)**, not the full Visual Studio
+IDE. If you have used Visual Studio before, install VS Code separately unless
+`code --version` already returns a version number.
+
 ```powershell
+winget install Microsoft.VisualStudioCode
 winget install Microsoft.PowerShell
 winget install Microsoft.AzureCLI
 winget install Microsoft.PowerPlatformCLI
