@@ -6,14 +6,18 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 
 > The full, authoritative bootstrap sequence lives in [docs/onboarding.md](docs/onboarding.md). This file is a quick-start summary — if anything here ever conflicts with `docs/onboarding.md`, that file wins.
 
-## 0. Before you begin: install VS Code and Git
+## 0. Before you begin: install VS Code, Git, and Copilot Chat
 
-You need two free programs on your computer before Step 1 will work. If you're not sure whether you already have them, open a terminal (Windows: search "PowerShell" in the Start menu and open it) and type each command below one at a time.
+You need VS Code, Git, and GitHub Copilot Chat before Step 1 will work.
+If you're not sure whether you already have VS Code or Git, open a terminal
+(Windows: search "PowerShell" in the Start menu and open it) and type each
+command below one at a time.
 
 1. **VS Code** — the editor you'll do everything in.
    - Check: `code --version`
    - If you see an error instead of a version number, download and install it from [code.visualstudio.com](https://code.visualstudio.com), then close and reopen any terminal windows.
-2. **Git** — the tool that downloads ("clones") the project and tracks your changes. Both options in Step 1 need this installed, even the point-and-click one.
+2. **Git** — the tool that downloads ("clones") repositories and tracks
+   changes. Both Step 1 paths need Git installed.
    - Check: `git --version`
    - If you see an error instead of a version number, download and install it from [git-scm.com/downloads](https://git-scm.com/downloads) (accept the default options), then close and reopen any terminal windows.
 
@@ -21,122 +25,150 @@ Once both commands print a version number, continue to Step 1.
 
 > **If VS Code was already open when you installed Git**, closing and reopening a terminal isn't enough — VS Code's own Git features (like "Clone Git Repository...") only detect Git when VS Code itself starts, not while it's already running. Fully close **every** VS Code window, then open VS Code again, before continuing to Step 1. If you're not sure whether you had VS Code open during install, close it and reopen it anyway — it only takes a few seconds.
 
-## 1. Get the repository onto your computer
+3. **GitHub Copilot Chat** — Copilot will run the clone command in Step 1
+   after showing you what it plans to do.
+   - In VS Code, open **Extensions** with `Ctrl+Shift+X`, search for
+     `GitHub Copilot`, and install both **GitHub Copilot** and
+     **GitHub Copilot Chat**.
+   - Sign in to GitHub when prompted. A browser tab opens for the sign-in.
+   - Open the Copilot Chat panel with `Ctrl+Alt+I`. If it opens, this step is
+     complete.
 
-**Copilot can't help with this very first step.** Copilot Chat only becomes available once this repository is open in VS Code with its extensions installed — so this one step is manual, click-by-click. Every step after this one, Copilot guides you.
+## 1. Create an authoring workspace
+
+Choose **one** path below:
+
+- **Path A — Create the authoring workspace folder first, then let Copilot
+  clone into it.** This is the guided option: you choose the folder name and
+  open the empty folder before Copilot runs the clone command.
+- **Path B — Clone directly from a terminal.** This is the faster option if
+  you are comfortable pasting commands: Git creates the named workspace folder
+  for you.
+
+Do not do both paths for the same build. Both produce the same result: one
+authoring workspace containing the full wizard files directly, with no nested
+clone.
 
 First, decide two things (write them down or just keep them in mind):
 
-1. **Where** you want to keep your projects on your computer — for example a `Projects` folder inside your Documents, like `C:\Users\<you>\Documents\Projects`. It doesn't need to exist yet.
-2. **What to name this project** — a short name with no spaces, for example `my-first-app` or `contoso-case-tracker`. This becomes the folder name for your project.
+1. **Where** you want to keep your authoring workspaces on your computer — for
+   example a `Power Platform Projects` folder inside your Documents, like
+   `C:\Users\<you>\Documents\Power Platform Projects`. It doesn't need to
+   exist yet.
+2. **What to name this authoring workspace** — a short name with no spaces,
+   for example `my-first-app-authoring` or `contoso-case-tracker-authoring`.
+   This becomes the folder name for the full local wizard copy.
 
-Pick **one** of the two options below.
+### Path A — Create the authoring workspace folder first, then ask Copilot to clone
 
-### Option A — Point and click (recommended if you're new to VS Code)
-
-1. Open VS Code.
-2. You'll land on VS Code's **Welcome** tab, with a **Start** list on the left.
-3. Click **Clone Git Repository...**
-
-   > **Don't see "Clone Git Repository..." on the list?** This can happen if
-   > VS Code doesn't yet recognize that Git is installed. Try, in order:
-   > 1. Press `Ctrl+Shift+P` to open the Command Palette, type `Git: Clone`,
-   >    and select it if it appears.
-   > 2. If it still doesn't appear, fully close **every** VS Code window and
-   >    reopen VS Code — this refreshes its detection of Git (see the note
-   >    at the end of Step 0).
-   > 3. Still nothing? Use **Option B** below instead — it clones from a
-   >    terminal and doesn't depend on this VS Code feature.
-4. A text box appears at the top of the window (it looks like a search bar). Paste this URL into it:
+1. In VS Code, choose **File > Open Folder...**.
+2. In the Windows folder picker, browse to your authoring-workspaces location.
+   Click **New folder**, give it your chosen authoring workspace name, then
+   open that new folder and click **Select Folder**.
+3. If VS Code shows **"Do you trust the authors of the files in this
+   folder?"**, click **Trust Folder & Continue**. You created this empty
+   folder yourself.
+4. Open Copilot Chat (`Ctrl+Alt+I`) and paste this request:
 
    ```text
-   https://github.com/bradlaw76/power-platform-vscode-starter.git
+   Clone https://github.com/bradlaw76/power-platform-vscode-starter.git
+   into the current empty authoring workspace. First verify that the folder
+   is empty and is not already a Git repository. Do not create a nested
+   folder. Show me the exact command before running it.
    ```
 
-   A dropdown appears below the box with **Clone from URL** highlighted —
-   press **Enter** (or click that option) to continue.
+5. Review Copilot's command. It should use `git clone` with `.` as the final
+   destination, which means "this current empty folder." Approve the command
+   only if it does not create another folder inside your authoring workspace.
+6. When it finishes, the Explorer should refresh to show `README.md`, `docs`,
+   and `scripts` directly inside your authoring workspace. If it does not
+   refresh, choose **Developer: Reload Window** from the Command Palette
+   (`Ctrl+Shift+P`).
 
-5. VS Code opens a folder picker — the same kind of "Save As" window you've used before in other programs. Browse to (or create) the projects folder you decided on above, then use the picker's **New Folder** button to create a folder named after your project (for example `my-first-app`). Open that new folder so it's the one showing in the picker, then click the confirm button at the bottom (it's usually labeled **Select Folder** or **Select as Repository Destination**, depending on your VS Code version).
-6. VS Code will ask if you want to open the cloned repository — click **Open**.
-7. VS Code will then show a dialog: **"Do you trust the authors of the files in this folder?"** Click **Yes, I trust the authors** — this is expected for a repository you just cloned yourself.
+> **Checkpoint:** In the Explorer on the left, your authoring workspace name
+> (for example `my-first-app-authoring`) should appear as the top-level folder.
+> Expand it to confirm that the full copied wizard folders and files—such as
+> `.github`, `docs`, `payloads`, `requirements`, `scripts`, `README.md`, and
+> `START HERE.md`—are directly inside it, not inside another folder.
 
-> **Checkpoint:** The title bar and the left-hand Explorer panel (click the top icon that looks like two overlapping pages, or press `Ctrl+Shift+E`) should show your project name (for example `my-first-app`) as the top-level folder, containing `README.md`, `docs`, and `scripts` directly — not nested one level deeper inside another folder of the same name.
-
-### Option B — Use a terminal (if you're comfortable typing commands)
-
-A **terminal** is a text window for typing commands instead of clicking. In VS Code: menu bar → **Terminal > New Terminal**.
-
-Before you clone, confirm you are **not** already inside another Git repository (this is how nested-repo mix-ups happen):
-
-```powershell
-cd "C:\path\to\Power Platform Projects"
-git rev-parse --is-inside-work-tree 2>$null
-```
-
-If that prints `true`, you are inside an existing repo — `cd ..` up to a plain
-folder (like `Power Platform Projects` above) before continuing.
-
-Now clone into a new, dedicated project folder:
+### Path B — Clone directly from a terminal
 
 ```powershell
 mkdir "C:\path\to\Power Platform Projects" -Force
 cd "C:\path\to\Power Platform Projects"
-git clone https://github.com/bradlaw76/power-platform-vscode-starter.git ".\contoso-case-tracker"
-code --new-window ".\contoso-case-tracker"
+git clone https://github.com/bradlaw76/power-platform-vscode-starter.git ".\contoso-case-tracker-authoring"
+code --new-window ".\contoso-case-tracker-authoring"
 ```
 
-`C:\path\to\Power Platform Projects` and `contoso-case-tracker` are
-placeholders — replace both with your own answers to the two questions above.
+Replace both placeholders with your authoring-workspaces location and
+authoring workspace name. This creates the folder and clones the full wizard
+into it in one step; do not create or open that folder first.
 
-VS Code may show a dialog: **"Do you trust the authors of the files in this
-folder?"** Click **Yes, I trust the authors** — this is expected for a
-repository you just cloned yourself.
+> **Checkpoint:** In the Explorer on the left, your authoring workspace folder
+> (not its parent folder) is the top-level folder. Expand it to confirm that
+> the full copied wizard folders and files—such as `.github`, `docs`,
+> `payloads`, `requirements`, `scripts`, `README.md`, and `START HERE.md`—are
+> directly inside it, not one level deeper.
 
-> **Checkpoint:** VS Code should open with your project folder (not its
-> parent folder) as the workspace root. Run `git remote -v` in the VS Code
-> terminal — it should point at `power-platform-vscode-starter` and the
-> folder should contain `README.md`, `docs/`, and `scripts/` directly (not
-> one level deeper).
->
-> If `code` isn't recognized, VS Code's command-line tools aren't on PATH yet.
-> Open VS Code manually, run **View > Command Palette > Shell Command: Install
-> 'code' command in PATH**, restart the terminal, and re-run the command above.
+## 2. Know what this clone is—and is not
 
-Once this repository is open and you complete step 3 below (installing
-extensions, including Copilot Chat), you can ask Copilot for help with
-**future** projects the same way: say `Start the Power Platform wizard in
-this repository.` in Copilot Chat, and it will ask you the same two
-questions (where and what to name it) before giving you commands.
+The folder you just created is an **authoring workspace**: a local copy of the
+full reusable wizard. It is where you currently run the guided planning and
+build process.
 
-## 2. Keep the starter separate from your project
+It is **not** yet a clean, finished project repository. If you push this clone
+to GitHub, it includes the wizard's generic scripts, skills, prompts, and
+template documentation as well as any project-specific files you add.
 
-Each clone from step 1 is its own project repository. Do not create a person's
-folder, customer documents, or another scenario folder inside that clone — and
-never clone a project into a folder that already contains another clone.
+The intended end state for every build is a separate, clean target project
+repository that persists only its project-specific artifacts, such as:
 
-Example layout (your parent folder and project name will differ):
+- approved requirements and planning files;
+- scenario payloads and build definitions;
+- project documentation and build evidence; and
+- exported and unpacked solution source.
+
+The target project repository should not retain generic wizard scripts,
+generic skills/prompts, template-only documentation, or local wizard telemetry.
+
+> **Current limitation:** the starter does not yet automate writing
+> project-specific artifacts directly to a separate target project repository.
+> Until that capability is added, use this authoring workspace for the guided
+> build process. Do not treat this full clone as the clean project repository
+> you intend to publish.
+
+Example current local layout (your folder names will differ):
 
 ```text
 Power Platform Projects\              # your own parent folder — any name/location
-├── power-platform-vscode-starter\   # optional: clean copy of the starter for reference
-└── contoso-case-tracker\            # your project and its documents (from step 1)
+└── contoso-case-tracker-authoring\  # full local wizard copy used while building
 ```
 
-The important part is not the exact names or drive — it's that each project
-is its own sibling folder, not nested inside another clone. Keep source
-documents, requirements, payloads, planning artifacts, and generated solution
-files inside the project folder only. Do not put personal, customer, or
-scenario-specific documents in the reusable starter repository unless they
-are intentionally reusable starter assets — the starter should contain only
-reusable wizard code and documentation.
+When the separate target-project capability is available, the durable layout
+will become:
 
-## 3. Accept the recommended extensions
+```text
+Power Platform Projects\
+├── power-platform-vscode-starter\   # reusable local wizard/tooling
+└── contoso-case-tracker\            # clean project repository to publish
+```
 
-When prompted, click **Install All**. If you miss the prompt, open Extensions (`Ctrl+Shift+X`), search `@recommended`, and install everything listed (GitHub Copilot, GitHub Copilot Chat, Power Platform Tools, PowerShell, JSON, Markdown lint, YAML).
+## 3. Install the remaining recommended extensions
 
-**Why these specific extensions?** Copilot Chat is what runs the wizard conversation in the next steps. Power Platform Tools and PowerShell let VS Code run the build scripts Copilot will call on your behalf. The rest (JSON, Markdown lint, YAML) just make the generated files easier to read and edit. See [README.md](README.md) for the full list of what this starter includes.
+When VS Code opens the cloned repository, it may prompt you to install
+recommended extensions. Click **Install All**. If you miss the prompt, open
+Extensions (`Ctrl+Shift+X`), search `@recommended`, and install everything
+listed.
 
-**New to Copilot?** After installing, sign in when prompted (a browser tab opens for GitHub login). Once signed in, open the Copilot Chat panel using the icon in the top-right of the VS Code window (it looks like a chat bubble), or press `Ctrl+Alt+I`. This is where you'll type the commands in the next steps.
+You already installed GitHub Copilot and GitHub Copilot Chat in Step 0, so VS
+Code will skip them if they appear in the recommendations. Power Platform Tools
+and PowerShell let VS Code run the build scripts Copilot will call on your
+behalf. The other recommendations (JSON, Markdown lint, YAML) make the
+generated files easier to read and edit. See [README.md](README.md) for the
+full list of what this starter includes.
+
+**New to Copilot?** You signed in and opened Copilot Chat in Step 0. Use that
+same panel for the commands in the next steps.
 
 ## 4. Choose the app type before continuing
 

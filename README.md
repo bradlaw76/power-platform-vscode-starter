@@ -31,8 +31,8 @@ separate implementation.
 ## Start here
 
 > **New to this repo?** [START HERE.md](START%20HERE.md) is a condensed
-> quick-start walkthrough (including how to keep your project folder separate
-> from the starter repo). This section is the detailed version.
+> quick-start walkthrough for creating a local authoring workspace from this
+> starter. This section is the detailed version.
 
 If Git, VS Code, and Copilot Chat are already available, clone this canonical
 repository:
