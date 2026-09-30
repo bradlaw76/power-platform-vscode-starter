@@ -451,6 +451,7 @@ This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests
 - `demo-walkthrough.md` (engineer/operator runbook)
 - `demo-talk-track.md` (presenter narrative)
 - `demo-script.md` (compatibility copy of the talk track)
+- `<scenario-slug>-demo-presenter.html` (standalone interactive presenter with duration-scaled detail, Dynamics blue default styling, light/dark toggle, progress checklists, and standard What to say / Key line / Transition / On screen guidance)
 
 Add payload files to `payloads/` before running scripts:
 
@@ -703,8 +704,8 @@ This repo includes `.github/skills/power-platform-wizard-init`. In Copilot Chat,
 ```text
 VS Code shared skill (primary) -> path selection + progress monitoring -> same planning artifacts -> build scripts
 Direct wizard routes            -> same planning artifacts              -> build scripts
-Terminal wizard               -> spec.md, plan.md, tasks.md -> demo-walkthrough.md + demo-talk-track.md -> build scripts
-Copilot Chat                  -> same planning artifacts     -> demo-walkthrough.md + demo-talk-track.md -> build scripts
+Terminal wizard               -> spec.md, plan.md, tasks.md -> Markdown + interactive HTML presenter -> build scripts
+Copilot Chat                  -> same planning artifacts     -> Markdown + interactive HTML presenter -> build scripts
 Claude Code skill (available) -> guides the entire flow      -> inline help at each step
 ```
 
@@ -760,7 +761,7 @@ Release and rollback references for this update bundle:
 | `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
 | `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
 | `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
-| `06-demo-script-wizard.ps1` | Generate scenario-aware `demo-walkthrough.md` and `demo-talk-track.md` (plus compatibility `demo-script.md`) | No | Yes (prompts before overwrite) |
+| `06-demo-script-wizard.ps1` | Generate scenario-aware walkthrough/talk-track Markdown and `<scenario-slug>-demo-presenter.html` with a duration-driven timer and theme toggle | No | Yes (prompts before overwrite) |
 | `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
 | `08-report-wizard.ps1` | Design and preview native Dataverse reporting for an existing model-driven app; deploy only with explicit approval | Only with `-Deploy` | Yes (`-Force` is required to replace generated local artifacts) |
 | `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |

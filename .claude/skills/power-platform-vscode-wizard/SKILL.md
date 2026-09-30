@@ -102,7 +102,7 @@ Follow this exact sequence — do not skip validation checkpoints:
 | 0 | Clone repo, open in VS Code, install extensions | Extensions installed via `@recommended` |
 | 1 | Start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose mode and chat or terminal intake; default terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Mode-specific discovery and source-control plan captured |
 | 2 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
-| 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | `demo-script.md` exists and matches the scenario story |
+| 3 | Generate presenter artifacts: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | Markdown scripts and `<scenario-slug>-demo-presenter.html` exist and match the scenario story and selected timer duration |
 | 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` | `demo-dry-run.md` captures rehearsal notes |
 | 5 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1` | All tools show PASS |
 | 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |

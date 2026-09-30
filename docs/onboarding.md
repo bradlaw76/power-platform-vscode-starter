@@ -229,9 +229,13 @@ What this step does:
 
 - Reads `spec.md` and `answers.md` from `specs/<scenario-slug>/`.
 - Suggests a generic business use case based on the scenario that was built.
-- Asks for the hero record, audience emphasis, timing, and presenter setup.
+- Asks for the hero record, audience emphasis, timer duration, and presenter setup.
 - Generates `demo-walkthrough.md` (engineer runbook) and `demo-talk-track.md` (presenter script).
 - Writes `demo-script.md` as a compatibility copy of the talk track for existing tooling.
+- Generates `<scenario-slug>-demo-presenter.html`, a standalone interactive companion with Dynamics blue default styling, light/dark toggle, duration-driven timer, section progress, and presenter checklists.
+- Scales the run of show by duration: short demos use 5 focused sections, medium demos use 8, and demos longer than 25 minutes use 12 detailed sections.
+- Standardizes each timed section as **What to say** and **On screen** columns, with a derived **Key line** and **Transition** beneath the spoken content.
+- Builds **What to say** as speaker-ready prose derived from the current project's scenario, problem, audience, workflow, entities, artifacts, hero record, and success criteria. Instructional cues remain in the section summary and On screen checklist instead of appearing as the spoken script.
 
 Optional rehearsal step:
 
@@ -241,7 +245,9 @@ pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>
 
 Validation checkpoint:
 
-- `demo-walkthrough.md` and `demo-talk-track.md` exist under `specs/<scenario-slug>/`.
+- `demo-walkthrough.md`, `demo-talk-track.md`, and `<scenario-slug>-demo-presenter.html` exist under `specs/<scenario-slug>/`.
+- The HTML presenter opens locally, starts at the selected duration, uses Dynamics blue by default, and switches between light and dark themes.
+- A 45-minute presenter contains 12 sections and each section includes What to say, Key line, Transition, and On screen content.
 - The story, hero record, and talking points reflect the business problem and success criteria.
 
 ---

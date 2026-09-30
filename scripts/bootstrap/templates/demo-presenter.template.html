@@ -1,0 +1,428 @@
+<!--
+=============================================================================
+COMPONENT:    Demo Presenter Template
+FILE:         scripts/bootstrap/templates/demo-presenter.template.html
+VERSION:      0.1.0
+AUTHOR:       Power Platform VS Code Starter
+LAST UPDATED: 2026-09-22
+ENVIRONMENT:  Modern browser | Standalone HTML
+
+OVERVIEW
+Generates the interactive, scenario-specific companion used while presenting
+a demo. The bootstrap wizard replaces the JSON placeholder before writing the
+artifact under specs/<scenario-slug>/.
+
+NON-NEGOTIABLES
+- Remain standalone with no network or package dependencies.
+- Use Dynamics blue as the default accent color.
+- Preserve timer, theme-toggle, checklist, and print behavior.
+=============================================================================
+-->
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Demo Presenter</title>
+  <link rel="icon" href="data:,">
+  <script>
+    (() => {
+      const requestedTheme = new URLSearchParams(window.location.search).get("presenterTheme");
+      const savedTheme = localStorage.getItem("demo-presenter-theme");
+      document.documentElement.dataset.theme = requestedTheme || savedTheme || "light";
+    })();
+  </script>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --surface-soft: #eef4fb;
+      --border: #d5dce5;
+      --text: #242424;
+      --muted: #5f6b7a;
+      --accent: #0078d4;
+      --accent-hover: #106ebe;
+      --accent-soft: #e5f1fb;
+      --accent-fg: #ffffff;
+      --success: #107c10;
+      --warning: #d83b01;
+      --danger: #d13438;
+      --shadow: 0 16px 40px rgba(0, 45, 85, .12);
+    }
+    html[data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #161b22;
+      --surface: #20262e;
+      --surface-soft: #28323d;
+      --border: #3c4858;
+      --text: #f3f2f1;
+      --muted: #c8c6c4;
+      --accent: #2899f5;
+      --accent-hover: #3aa0f3;
+      --accent-soft: #123d5f;
+      --accent-fg: #ffffff;
+      --success: #54b054;
+      --warning: #ff8c00;
+      --danger: #ff6b6f;
+      --shadow: 0 16px 40px rgba(0, 0, 0, .35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--text); font-family: "Segoe UI", Aptos, Arial, sans-serif; }
+    button { font: inherit; color: inherit; }
+    .topbar {
+      position: sticky; top: 0; z-index: 20; display: grid;
+      grid-template-columns: minmax(240px, 1fr) auto auto; align-items: center; gap: 18px;
+      min-height: 76px; padding: 10px 22px; background: color-mix(in srgb, var(--surface) 94%, transparent);
+      border-bottom: 1px solid var(--border); backdrop-filter: blur(12px);
+    }
+    .brand h1 { margin: 2px 0 0; font-size: 1.05rem; }
+    .eyebrow, .label { color: var(--muted); font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .timer { display: flex; align-items: center; gap: 12px; }
+    .timer-display { min-width: 110px; font-size: 1.35rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .timer-display.overtime { color: var(--danger); }
+    .controls { display: flex; align-items: center; gap: 8px; }
+    .button {
+      min-height: 38px; padding: 0 13px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface); cursor: pointer; font-weight: 600;
+    }
+    .button:hover { border-color: var(--accent); background: var(--surface-soft); }
+    .button.primary { color: var(--accent-fg); background: var(--accent); border-color: var(--accent); }
+    .button.primary:hover { background: var(--accent-hover); }
+    .time-progress { position: absolute; inset: auto 0 -1px; height: 4px; background: var(--border); }
+    .time-progress span { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s; }
+    .shell { display: grid; grid-template-columns: 280px minmax(0, 1fr); max-width: 1500px; margin: 0 auto; }
+    .sidebar {
+      position: sticky; top: 76px; height: calc(100vh - 76px); padding: 18px 12px;
+      overflow-y: auto; background: var(--surface); border-right: 1px solid var(--border);
+    }
+    .sidebar h2 { margin: 3px 8px 14px; font-size: .95rem; }
+    .nav-item {
+      width: 100%; display: grid; grid-template-columns: 30px 1fr; gap: 9px; align-items: center;
+      margin-bottom: 5px; padding: 9px; text-align: left; border: 1px solid transparent;
+      border-radius: 6px; background: transparent; cursor: pointer;
+    }
+    .nav-item:hover, .nav-item.active { background: var(--accent-soft); border-color: var(--accent); }
+    .nav-number {
+      width: 28px; height: 28px; display: grid; place-items: center; border: 1px solid var(--border);
+      border-radius: 50%; color: var(--muted); font-size: .75rem; font-weight: 700;
+    }
+    .nav-item.done .nav-number { color: white; background: var(--success); border-color: var(--success); }
+    .nav-copy { min-width: 0; }
+    .nav-copy strong, .nav-copy small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .nav-copy strong { font-size: .8rem; }
+    .nav-copy small { margin-top: 2px; color: var(--muted); font-size: .68rem; }
+    main { min-width: 0; padding: 28px; }
+    .orientation {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(360px, .85fr); gap: 20px; padding: 20px;
+      border: 1px solid var(--border); border-top: 5px solid var(--accent); border-radius: 10px;
+      background: var(--surface); box-shadow: var(--shadow);
+    }
+    .orientation h2 { margin: 3px 0 7px; font-size: 1.35rem; }
+    .orientation p { margin: 0; color: var(--muted); line-height: 1.5; }
+    .facts { display: grid; grid-template-columns: repeat(2, minmax(120px, 1fr)); gap: 10px; min-width: 0; }
+    .fact { min-width: 0; padding: 10px; overflow-wrap: anywhere; border-radius: 6px; background: var(--surface-soft); }
+    .fact strong { display: block; margin-top: 3px; font-size: .83rem; }
+    .guardrail {
+      margin: 16px 0 24px; padding: 13px 16px; border-left: 4px solid var(--accent);
+      background: var(--accent-soft); color: var(--text); line-height: 1.45;
+    }
+    .section {
+      scroll-margin-top: 92px; margin-bottom: 16px; overflow: hidden;
+      border: 1px solid var(--border); border-radius: 10px; background: var(--surface);
+    }
+    .section.complete { border-color: var(--success); }
+    .section-header {
+      display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px;
+      width: 100%; min-height: 96px; padding: 16px 18px; border: 0; background: transparent; text-align: left; cursor: pointer;
+    }
+    .section-number {
+      width: 44px; height: 44px; display: grid; place-items: center; border: 2px solid var(--border);
+      border-radius: 50%; color: var(--muted); font-weight: 800;
+    }
+    .complete .section-number { color: white; background: var(--success); border-color: var(--success); }
+    .section-header h2 { margin: 2px 0 4px; font-size: 1.2rem; }
+    .section-header p { margin: 0; color: var(--muted); font-size: .83rem; }
+    .section-time { color: var(--muted); font-size: .8rem; font-weight: 700; }
+    .section-content {
+      display: grid; grid-template-columns: minmax(340px, 1fr) minmax(380px, 1.1fr);
+      gap: 26px; padding: 22px; border-top: 1px solid var(--border); background: var(--surface-soft);
+    }
+    .section.collapsed .section-content { display: none; }
+    .section-content h3 { margin: 0 0 12px; font-size: .8rem; letter-spacing: .06em; text-transform: uppercase; }
+    .checklist { display: grid; gap: 8px; }
+    .check {
+      display: grid; grid-template-columns: auto 1fr; gap: 9px; align-items: start;
+      padding: 10px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer;
+    }
+    .check input { margin-top: 3px; accent-color: var(--accent); }
+    .check:has(input:checked) { color: var(--muted); text-decoration: line-through; }
+    .spoken-script { padding-left: 17px; border-left: 4px solid var(--accent); }
+    .say-line { margin: 0 0 12px; line-height: 1.6; font-size: .92rem; }
+    .say-line::before { content: "“"; color: var(--accent); font-weight: 800; }
+    .say-line::after { content: "”"; color: var(--accent); font-weight: 800; }
+    .key-line, .transition {
+      margin-top: 12px; padding: 12px 14px; border: 1px solid var(--border);
+      border-radius: 6px; background: var(--surface);
+    }
+    .key-line { border-left: 4px solid var(--warning); }
+    .transition { border-left: 4px solid var(--accent); }
+    .key-line strong, .transition p { display: block; margin: 4px 0 0; line-height: 1.45; font-size: .85rem; }
+    .transition p { color: var(--muted); }
+    .on-screen { min-width: 0; }
+    .on-screen .button { margin-top: 14px; }
+    .footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 22px; }
+    @media (max-width: 900px) {
+      .topbar { grid-template-columns: 1fr auto; }
+      .controls .secondary-control { display: none; }
+      .shell { grid-template-columns: 1fr; }
+      .sidebar { position: static; width: auto; height: auto; border-right: 0; border-bottom: 1px solid var(--border); }
+      .facts, .section-content { grid-template-columns: 1fr; }
+      .orientation { grid-template-columns: 1fr; }
+      main { padding: 16px; }
+    }
+    @media print {
+      .topbar, .sidebar, .footer-actions { display: none; }
+      .shell { display: block; }
+      main { padding: 0; }
+      .section { break-inside: avoid; }
+      .section.collapsed .section-content { display: grid; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="eyebrow">Interactive demo companion</span>
+      <h1 id="page-title">Demo Presenter</h1>
+    </div>
+    <div class="timer">
+      <div>
+        <span class="label">Demo timer</span>
+        <div id="timer-display" class="timer-display">00:00</div>
+      </div>
+      <button id="timer-toggle" class="button primary" type="button">Start</button>
+    </div>
+    <div class="controls">
+      <button id="theme-toggle" class="button secondary-control" type="button" aria-label="Toggle light and dark theme">Dark mode</button>
+      <button id="reset-button" class="button secondary-control" type="button">Reset</button>
+    </div>
+    <div class="time-progress"><span id="time-progress"></span></div>
+  </header>
+  <div class="shell">
+    <aside class="sidebar">
+      <span class="label">Presentation flow</span>
+      <h2 id="sidebar-progress">0 of 0 complete</h2>
+      <nav id="section-nav" aria-label="Demo sections"></nav>
+    </aside>
+    <main>
+      <section class="orientation">
+        <div>
+          <span class="label">Presenter orientation</span>
+          <h2 id="scenario-name"></h2>
+          <p id="problem-statement"></p>
+        </div>
+        <div class="facts">
+          <div class="fact"><span class="label">Audience</span><strong id="audience"></strong></div>
+          <div class="fact"><span class="label">Hero record</span><strong id="hero-record"></strong></div>
+          <div class="fact"><span class="label">Planned time</span><strong id="planned-time"></strong></div>
+          <div class="fact"><span class="label">Success signal</span><strong id="success-signal"></strong></div>
+        </div>
+      </section>
+      <div class="guardrail"><strong>Presenter setup:</strong> <span id="presenter-setup"></span></div>
+      <div id="sections"></div>
+      <div class="footer-actions">
+        <button id="print-button" class="button" type="button">Print companion</button>
+        <button id="complete-all-button" class="button primary" type="button">Mark all complete</button>
+      </div>
+    </main>
+  </div>
+  <script>
+    const data = __DEMO_DATA_JSON__;
+    const storageKey = `demo-presenter:${data.scenarioSlug}`;
+    const state = {
+      completed: new Set(),
+      checkedActions: new Set(),
+      elapsedSeconds: 0,
+      running: false,
+      interval: null
+    };
+
+    const byId = (id) => document.getElementById(id);
+    const formatTime = (seconds) => {
+      const absolute = Math.abs(seconds);
+      const minutes = Math.floor(absolute / 60).toString().padStart(2, "0");
+      const remainder = (absolute % 60).toString().padStart(2, "0");
+      return `${seconds < 0 ? "+" : ""}${minutes}:${remainder}`;
+    };
+    const saveState = () => localStorage.setItem(storageKey, JSON.stringify({
+      completed: [...state.completed],
+      checkedActions: [...state.checkedActions],
+      elapsedSeconds: state.elapsedSeconds
+    }));
+    const restoreState = () => {
+      try {
+        const saved = JSON.parse(localStorage.getItem(storageKey) || "{}");
+        state.completed = new Set(saved.completed || []);
+        state.checkedActions = new Set(saved.checkedActions || []);
+        state.elapsedSeconds = Number.isFinite(saved.elapsedSeconds) ? saved.elapsedSeconds : 0;
+      } catch {
+        localStorage.removeItem(storageKey);
+      }
+    };
+    const updateTimer = () => {
+      const totalSeconds = data.durationMinutes * 60;
+      const remaining = totalSeconds - state.elapsedSeconds;
+      byId("timer-display").textContent = formatTime(remaining);
+      byId("timer-display").classList.toggle("overtime", remaining < 0);
+      byId("time-progress").style.width = `${Math.min(100, (state.elapsedSeconds / totalSeconds) * 100)}%`;
+    };
+    const updateProgress = () => {
+      byId("sidebar-progress").textContent = `${state.completed.size} of ${data.steps.length} complete`;
+      document.querySelectorAll("[data-step]").forEach((element) => {
+        element.classList.toggle("complete", state.completed.has(element.dataset.step));
+        element.classList.toggle("done", state.completed.has(element.dataset.step));
+      });
+      saveState();
+    };
+    const toggleStep = (stepId) => {
+      state.completed.has(stepId) ? state.completed.delete(stepId) : state.completed.add(stepId);
+      updateProgress();
+    };
+    const render = () => {
+      document.title = `${data.scenarioName} - Demo Presenter`;
+      byId("page-title").textContent = data.scenarioName;
+      byId("scenario-name").textContent = data.scenarioName;
+      byId("problem-statement").textContent = data.problemStatement;
+      byId("audience").textContent = data.audience;
+      byId("hero-record").textContent = data.heroRecord;
+      byId("planned-time").textContent = `${data.durationMinutes} minutes`;
+      byId("success-signal").textContent = data.successCriteria;
+      byId("presenter-setup").textContent = data.preDemoSetup;
+
+      data.steps.forEach((step, index) => {
+        const stepId = `step-${index + 1}`;
+        const nav = document.createElement("button");
+        nav.type = "button";
+        nav.className = "nav-item";
+        nav.dataset.step = stepId;
+        nav.innerHTML = `<span class="nav-number">${index + 1}</span><span class="nav-copy"><strong></strong><small>${step.minutes} min</small></span>`;
+        nav.querySelector("strong").textContent = step.title;
+        nav.addEventListener("click", () => byId(stepId).scrollIntoView({ behavior: "smooth" }));
+        byId("section-nav").appendChild(nav);
+
+        const section = document.createElement("section");
+        section.id = stepId;
+        section.className = "section";
+        section.dataset.step = stepId;
+        const header = document.createElement("button");
+        header.type = "button";
+        header.className = "section-header";
+        header.innerHTML = `<span class="section-number">${index + 1}</span><span><span class="label">Demo section</span><h2></h2><p></p></span><span class="section-time">${step.minutes} min</span>`;
+        header.querySelector("h2").textContent = step.title;
+        header.querySelector("p").textContent = step.narrative;
+        header.addEventListener("click", () => section.classList.toggle("collapsed"));
+
+        const content = document.createElement("div");
+        content.className = "section-content";
+        const spoken = document.createElement("div");
+        spoken.className = "spoken-script";
+        const spokenHeading = document.createElement("h3");
+        spokenHeading.textContent = "What to say";
+        spoken.appendChild(spokenHeading);
+        step.sayLines.forEach((line) => {
+          const paragraph = document.createElement("p");
+          paragraph.className = "say-line";
+          paragraph.textContent = line;
+          spoken.appendChild(paragraph);
+        });
+        const keyLine = document.createElement("div");
+        keyLine.className = "key-line";
+        keyLine.innerHTML = "<span class=\"label\">Key line</span>";
+        const keyLineText = document.createElement("strong");
+        keyLineText.textContent = step.keyLine;
+        keyLine.appendChild(keyLineText);
+        const transition = document.createElement("div");
+        transition.className = "transition";
+        transition.innerHTML = "<span class=\"label\">Transition</span>";
+        const transitionText = document.createElement("p");
+        transitionText.textContent = step.transition;
+        transition.appendChild(transitionText);
+        spoken.append(keyLine, transition);
+
+        const actions = document.createElement("div");
+        actions.className = "on-screen";
+        actions.innerHTML = "<h3>On screen</h3>";
+        const checklist = document.createElement("div");
+        checklist.className = "checklist";
+        step.actions.forEach((action, actionIndex) => {
+          const actionId = `${stepId}-action-${actionIndex + 1}`;
+          const label = document.createElement("label");
+          label.className = "check";
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.checked = state.checkedActions.has(actionId);
+          checkbox.addEventListener("change", () => {
+            checkbox.checked ? state.checkedActions.add(actionId) : state.checkedActions.delete(actionId);
+            saveState();
+          });
+          const copy = document.createElement("span");
+          copy.textContent = action;
+          label.append(checkbox, copy);
+          checklist.appendChild(label);
+        });
+        actions.appendChild(checklist);
+        const complete = document.createElement("button");
+        complete.type = "button";
+        complete.className = "button primary";
+        complete.textContent = "Toggle section complete";
+        complete.addEventListener("click", () => toggleStep(stepId));
+        actions.appendChild(complete);
+
+        content.append(spoken, actions);
+        section.append(header, content);
+        byId("sections").appendChild(section);
+      });
+    };
+
+    restoreState();
+    render();
+    updateTimer();
+    updateProgress();
+
+    byId("timer-toggle").addEventListener("click", () => {
+      state.running = !state.running;
+      byId("timer-toggle").textContent = state.running ? "Pause" : "Start";
+      if (state.running) {
+        state.interval = window.setInterval(() => {
+          state.elapsedSeconds += 1;
+          updateTimer();
+          if (state.elapsedSeconds % 5 === 0) saveState();
+        }, 1000);
+      } else {
+        window.clearInterval(state.interval);
+        saveState();
+      }
+    });
+    byId("theme-toggle").addEventListener("click", () => {
+      const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+      document.documentElement.dataset.theme = next;
+      localStorage.setItem("demo-presenter-theme", next);
+      byId("theme-toggle").textContent = next === "dark" ? "Light mode" : "Dark mode";
+    });
+    byId("theme-toggle").textContent = document.documentElement.dataset.theme === "dark" ? "Light mode" : "Dark mode";
+    byId("reset-button").addEventListener("click", () => {
+      if (!window.confirm("Reset the timer and all presenter progress?")) return;
+      window.clearInterval(state.interval);
+      localStorage.removeItem(storageKey);
+      window.location.reload();
+    });
+    byId("complete-all-button").addEventListener("click", () => {
+      data.steps.forEach((_, index) => state.completed.add(`step-${index + 1}`));
+      updateProgress();
+    });
+    byId("print-button").addEventListener("click", () => window.print());
+  </script>
+</body>
+</html>

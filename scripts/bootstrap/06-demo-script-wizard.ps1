@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Demo Script Wizard
 FILE:         scripts/bootstrap/06-demo-script-wizard.ps1
-VERSION:      0.1.1
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-07-19
 ENVIRONMENT:  PowerShell 7 | VS Code | Demo Walkthrough Generation
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.0  2026-09-22  Added interactive HTML presenter with timer and theme toggle.
 v0.1.1  2026-08-18  Made demo duration an explicit positive-minute intake question.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
@@ -60,6 +61,7 @@ NON-NEGOTIABLES
     artifacts back to the same folder:
     - `demo-walkthrough.md` (engineer/operator walkthrough)
     - `demo-talk-track.md` (presenter script)
+    - `<scenario-slug>-demo-presenter.html` (interactive presenter companion)
 
     For compatibility, it also writes `demo-script.md` as a copy of the
     talk track.
@@ -207,6 +209,8 @@ function Get-ChecklistItems {
 
 function Get-DemoSteps {
     param(
+        [string]$ScenarioName,
+        [string]$ProblemStatement,
         [string[]]$Entities,
         [string[]]$Artifacts,
         [string]$HeroRecord,
@@ -219,7 +223,10 @@ function Get-DemoSteps {
         [string]$TalkTrackStyle = "verbose"
     )
 
-    $artifactSummary = if ($Artifacts.Count -gt 0) { $Artifacts -join ", " } else { "the scenario artifacts" }
+    $artifactSummary = if ($Artifacts.Count -gt 0) { Get-CompactText -Text ($Artifacts -join ", ") -MaximumLength 220 } else { "the scenario artifacts" }
+    $successSummary = Get-CompactText -Text $SuccessCriteria -MaximumLength 180
+    $problemSummary = Get-CompactText -Text $ProblemStatement -MaximumLength 180
+    $entitySummary = if ($Entities.Count -gt 0) { $Entities -join ", " } else { "the connected business records" }
     $secondaryEntity = if ($Entities.Count -gt 1) { $Entities[1] } elseif ($Entities.Count -gt 0) { $Entities[0] } else { $HeroRecord }
     $normalizedStyle = ($TalkTrackStyle ?? "verbose").Trim().ToLowerInvariant()
     $pace = switch ($DurationMinutes) {
@@ -229,76 +236,307 @@ function Get-DemoSteps {
         default { "Show the primary workflow, supporting artifacts, and one exception path." }
     }
 
-    $steps = @(
-        [ordered]@{
-            Title = "Open with the business problem"
-            Narrative = "Explain why this scenario exists, who it helps, and what outcome the audience should watch for. $pace"
+    $steps = New-Object System.Collections.Generic.List[object]
+    $steps.Add([ordered]@{
+        Title = "Opening and positioning"
+        Narrative = "Frame the scenario around the business problem, the people affected, and the outcome the audience should watch for. $pace"
+        Actions = @(
+            "Keep the starting experience visible without opening a record",
+            "Point out where the workflow begins",
+            "Confirm the audience can see the primary app or page"
+        )
+        KeyPoints = @(
+            "The demo proves a business outcome, not just a collection of features",
+            "Target audience: $Audience",
+            "Success signal: $successSummary"
+        )
+    })
+
+    if ($DurationMinutes -gt 10) {
+        $steps.Add([ordered]@{
+            Title = "User and workload context"
+            Narrative = "Explain how $Audience works with this workload, what creates urgency, and why a guided experience matters before showing individual features."
             Actions = @(
-                "State the workflow being demoed: $Workflow",
-                "Anchor the audience on the hero record: $HeroRecord",
-                "Call out the target audience: $Audience"
+                "Show the landing page, work queue, or starting view",
+                "Identify the volume, priority, owner, or status signals available to the user",
+                "Explain how the user decides what to work next"
             )
             KeyPoints = @(
-                "Business value: $SuccessCriteria",
-                "Primary assets in scope: $artifactSummary"
+                "The experience should make the next best piece of work obvious",
+                "The workflow begins with context rather than navigation"
             )
-        },
-        [ordered]@{
-            Title = "Start from the hero record"
-            Narrative = "Show how a user begins work with $HeroRecord and why that record matters to the scenario."
+        })
+    }
+
+    if ($DurationMinutes -gt 25) {
+        $steps.Add([ordered]@{
+            Title = "Experience and data orientation"
+            Narrative = "Orient the audience to the scenario structure before entering the transaction, using the planned entities and artifacts as the map for the story."
             Actions = @(
-                "Navigate to the app area or page where $HeroRecord is managed",
-                "Open the relevant form, view, or page for $HeroRecord",
-                "Explain which fields or data points matter most"
+                "Identify the primary experience and its major regions",
+                "Show where $HeroRecord, $secondaryEntity, and related information appear",
+                "Connect the visible experience to the planned scenario artifacts"
             )
             KeyPoints = @(
-                "Hero record drives the rest of the workflow",
-                "The design should reduce friction for $Audience"
+                "The experience organizes connected business data around the user's task",
+                "Scenario assets in scope: $artifactSummary"
             )
-        },
-        [ordered]@{
-            Title = "Walk through the core workflow"
-            Narrative = "Demonstrate the main business use case from start to finish using $HeroRecord and $secondaryEntity."
+        })
+    }
+
+    $steps.Add([ordered]@{
+        Title = "Hero record selection"
+        Narrative = "Introduce $HeroRecord as the anchor for the story and explain why this record deserves attention now."
+        Actions = @(
+            "Navigate to the area where $HeroRecord is managed",
+            "Select or open the prepared hero record",
+            "Point out the fields or signals that establish priority and ownership"
+        )
+        KeyPoints = @(
+            "$HeroRecord gives the audience a concrete thread to follow",
+            "The design should reduce friction for $Audience"
+        )
+    })
+
+    if ($DurationMinutes -gt 25) {
+        $steps.Add([ordered]@{
+            Title = "Related data and full context"
+            Narrative = "Build confidence that the user has enough connected context to act without leaving the workflow or reconstructing the story manually."
             Actions = @(
-                "Create or update the record needed for the workflow",
-                "Show how related data or artifacts support the process",
-                "Narrate the expected business outcome at each point"
+                "Show the relationship between $HeroRecord and $secondaryEntity",
+                "Review the related history, evidence, activity, or supporting information available",
+                "Call out which information is authoritative for the next decision"
             )
             KeyPoints = @(
-                "Workflow outcome: $Workflow",
-                "Show evidence that the process is controlled and repeatable"
+                "Connected context reduces searching and prevents avoidable handoffs",
+                "The user can explain why the record is in its current state"
             )
-        },
-        [ordered]@{
-            Title = "Show supporting experience"
-            Narrative = "Use the scenario artifacts to prove that the workflow is operational, visible, and useful to the business."
+        })
+    }
+
+    $steps.Add([ordered]@{
+        Title = "Core workflow execution"
+        Narrative = "Demonstrate the central business action using $HeroRecord and show how the experience guides the user from the current state toward the intended outcome."
+        Actions = @(
+            "Create or update the information required by the workflow",
+            "Show validation, guidance, or required fields that shape the action",
+            "Save the change and confirm the visible state reflects it"
+        )
+        KeyPoints = @(
+            "Workflow outcome: $Workflow",
+            "The process is controlled, repeatable, and visible"
+        )
+    })
+
+    if ($DurationMinutes -gt 10) {
+        $steps.Add([ordered]@{
+            Title = "Evidence and decision support"
+            Narrative = "Show how related information helps the user make a defensible decision, and distinguish supporting insight from the human decision itself."
             Actions = @(
-                "Show the most important artifact from: $artifactSummary",
-                "Explain how users monitor or act on the workflow",
-                "Call out any automation, views, dashboards, or copilots involved"
+                "Open the most relevant supporting record, artifact, or insight",
+                "Connect that information to the decision being made",
+                "Return to $HeroRecord and record or explain the resulting action"
             )
             KeyPoints = @(
-                "Audience should see how the app supports day-to-day work",
-                "Use the artifacts to reinforce the business problem being solved"
+                "Supporting information is useful when it is connected to a specific decision",
+                "The user remains accountable for the business outcome"
             )
-        },
-        [ordered]@{
-            Title = "Close with success and next step"
-            Narrative = "Tie the workflow back to the business problem and tell the audience what to review next."
+        })
+    }
+
+    if ($DurationMinutes -gt 25) {
+        $steps.Add([ordered]@{
+            Title = "Exception path and guardrails"
+            Narrative = "Demonstrate how the experience responds when information is incomplete, an exception appears, or the normal path should not continue."
             Actions = @(
-                "Restate the measurable success outcome",
-                "Summarize what changed for the user",
-                "Ask the reviewer to confirm edits or additional demo goals"
+                "Identify an exception, missing value, or alternate state in the prepared data",
+                "Show the visible warning, validation, or review path",
+                "Explain who owns the decision and how the exception is resolved"
             )
             KeyPoints = @(
-                "Review request: confirm that the demo flow and talking points match the intended story",
-                "Data approach during demo: $DataMode"
+                "A credible workflow makes exceptions visible instead of hiding them",
+                "Guardrails support judgment without replacing accountability"
             )
-        }
-    )
+        })
+    }
+
+    $steps.Add([ordered]@{
+        Title = "Supporting experience"
+        Narrative = "Use the planned artifacts to prove that the workflow is operational, discoverable, and useful beyond the single record."
+        Actions = @(
+            "Show the most important supporting experience from the scenario",
+            "Explain how users monitor, find, or act on work",
+            "Connect the artifact back to the business problem"
+        )
+        KeyPoints = @(
+            "Supporting experiences turn a transaction into an operating process",
+            "Primary assets in scope: $artifactSummary"
+        )
+    })
+
+    if ($DurationMinutes -gt 10) {
+        $steps.Add([ordered]@{
+            Title = "Oversight and measurable outcomes"
+            Narrative = "Move from the individual record to the management view and show how leaders understand workload, progress, and outcomes."
+            Actions = @(
+                "Open the relevant view, chart, dashboard, or summary",
+                "Connect the aggregate signal back to the hero record story",
+                "Identify the measure that demonstrates success"
+            )
+            KeyPoints = @(
+                "Operational visibility should lead to a clear management action",
+                "Measured outcome: $successSummary"
+            )
+        })
+    }
+
+    if ($DurationMinutes -gt 25) {
+        $steps.Add([ordered]@{
+            Title = "Scale, configuration, and governance"
+            Narrative = "Explain how the demonstrated pattern can be maintained and extended without claiming that every production decision is already complete."
+            Actions = @(
+                "Identify the configuration or administration surface relevant to the scenario",
+                "Explain how ownership, security, or controlled changes would be managed",
+                "Separate the demonstrated pattern from production rollout decisions"
+            )
+            KeyPoints = @(
+                "The demo is a working pattern that can be governed and extended",
+                "Production readiness requires validated security, data, ownership, and operating decisions"
+            )
+        })
+    }
+
+    $steps.Add([ordered]@{
+        Title = "Success recap and close"
+        Narrative = "Return to the original business problem, summarize what changed for the user, and close on the measurable result rather than the final screen."
+        Actions = @(
+            "Restate the problem and the completed workflow",
+            "Show the final state or outcome for $HeroRecord",
+            "Invite questions or confirm the next review decision"
+        )
+        KeyPoints = @(
+            "Close on the result: $successSummary",
+            "Data approach during the demo: $DataMode"
+        )
+    })
 
     if (-not [string]::IsNullOrWhiteSpace($TalkingPoints)) {
         $steps[0].KeyPoints += "Special emphasis: $TalkingPoints"
+    }
+
+    for ($index = 0; $index -lt $steps.Count; $index++) {
+        $step = $steps[$index]
+        $sayLines = switch ($step.Title) {
+            "Opening and positioning" {
+                @(
+                    "Today I am showing how $ScenarioName helps $Audience address this business problem: $problemSummary",
+                    "The story follows $HeroRecord through this workflow: $Workflow",
+                    "This is a working demonstration pattern grounded in the approved scenario artifacts; production decisions still require the appropriate business, security, data, and operating reviews.",
+                    "The outcome to watch for is: $successSummary"
+                )
+            }
+            "User and workload context" {
+                @(
+                    "For $Audience, the challenge is not simply opening a record. It is knowing what needs attention, who owns it, and what should happen next.",
+                    "The starting experience brings the active workload into one place so the user can begin with priority and context rather than navigation.",
+                    "The prepared data lets us follow one concrete example while keeping the broader workload visible."
+                )
+            }
+            "Experience and data orientation" {
+                @(
+                    "The experience connects $entitySummary around the work the user is trying to complete.",
+                    "The planned experience includes $artifactSummary",
+                    "These surfaces organize the same connected business data; they are not separate systems of record.",
+                    "As we move through the demo, the $HeroRecord remains the anchor that connects context, action, and outcome."
+                )
+            }
+            "Hero record selection" {
+                @(
+                    "This is the hero record for the walkthrough: $HeroRecord.",
+                    "Its visible status, priority, ownership, and related context explain why it deserves attention now.",
+                    "The record gives us one traceable story that we can follow from the initial review through the resulting business outcome."
+                )
+            }
+            "Related data and full context" {
+                @(
+                    "The related $secondaryEntity information gives the user context without requiring a separate search or an offline reconstruction of the story.",
+                    "History, activity, evidence, and other supporting records remain connected to $HeroRecord so the user can understand how the current state was reached.",
+                    "The purpose of this context is not to add more screens; it is to support a faster and more defensible decision."
+                )
+            }
+            "Core workflow execution" {
+                @(
+                    "Now I am carrying out the central workflow: $Workflow",
+                    "The experience keeps the required information and guidance close to the action, so the user can complete the work without losing context.",
+                    "When the record is saved, the visible state becomes part of the shared operational record rather than a private note or disconnected update.",
+                    "The important point is that the process is controlled, repeatable, and visible to the people who depend on the outcome."
+                )
+            }
+            "Evidence and decision support" {
+                @(
+                    "This supporting information helps the user understand the record and make a defensible decision.",
+                    "The insight is connected to a specific action; it does not replace the underlying record or the user's accountability.",
+                    "The user can verify the supporting detail, return to $HeroRecord, and record the resulting decision in the same workflow."
+                )
+            }
+            "Exception path and guardrails" {
+                @(
+                    "A credible business process must make exceptions visible instead of forcing every record through the happy path.",
+                    "When information is incomplete or a condition needs review, the experience exposes that issue and keeps ownership clear.",
+                    "The guardrail supports human judgment; it does not silently make the business decision on the user's behalf."
+                )
+            }
+            "Supporting experience" {
+                @(
+                    "The supporting experience extends the story beyond one record and helps users find, monitor, and act on the broader workload.",
+                    "For this project, the planned supporting assets are: $artifactSummary",
+                    "Each surface should lead back to the connected operational record when the user needs to investigate or take action."
+                )
+            }
+            "Oversight and measurable outcomes" {
+                @(
+                    "This view moves from the individual record to the operational picture that supervisors and leaders need.",
+                    "The aggregate signals show workload, ownership, progress, or outcomes while the underlying records remain available for review.",
+                    "The management question is not only what the number is, but what action that signal should prompt.",
+                    "The success measure for this scenario is: $successSummary"
+                )
+            }
+            "Scale, configuration, and governance" {
+                @(
+                    "What you are seeing is a configured demonstration baseline based on the current project plan, not a claim that every production decision is complete.",
+                    "The pattern can be extended through controlled configuration while security, ownership, data quality, and operating responsibilities remain explicit.",
+                    "A production rollout would validate those decisions with the appropriate business and technical owners before broader use."
+                )
+            }
+            "Success recap and close" {
+                @(
+                    "We started with this problem: $problemSummary",
+                    "We followed $HeroRecord through $Workflow and kept its context, actions, and outcome connected.",
+                    "The demonstrated result is: $successSummary",
+                    "The next decision is whether this story, level of detail, and operating pattern match what the project should take forward."
+                )
+            }
+            default {
+                @(
+                    "This section continues the $ScenarioName story using $HeroRecord as the anchor.",
+                    "The visible experience connects the user's action to the intended business outcome."
+                )
+            }
+        }
+
+        if ($normalizedStyle -eq "short" -and $sayLines.Count -gt 2) {
+            $sayLines = @($sayLines | Select-Object -First 2)
+        }
+
+        $step.SayLines = @($sayLines)
+        $step.KeyLine = $step.KeyPoints[0]
+        $step.Transition = if ($index -lt ($steps.Count - 1)) {
+            $nextTitle = $steps[$index + 1].Title.ToLowerInvariant()
+            "Next, shift to $nextTitle and keep the story anchored on $HeroRecord."
+        }
+        else {
+            "Pause on the outcome, invite questions, and confirm the next decision or follow-up."
+        }
     }
 
     if ($normalizedStyle -eq "short") {
@@ -312,7 +550,7 @@ function Get-DemoSteps {
         }
     }
 
-    return $steps
+    return $steps.ToArray()
 }
 
 function Get-TalkTrackStyle {
@@ -405,27 +643,38 @@ function Format-TalkTrackSteps {
         $stepLines.Add("### Step $($index + 1): $($step.Title) ($minutes min)")
 
         if ($normalizedStyle -eq "short") {
-            $stepLines.Add("**Say**")
-            $stepLines.Add($step.Narrative)
+            $stepLines.Add("**What to Say**")
+            foreach ($line in $step.SayLines) {
+                $stepLines.Add("> $line")
+                $stepLines.Add("")
+            }
+            $stepLines.Add("**Key Line**")
+            $stepLines.Add($step.KeyLine)
             $stepLines.Add("")
-            $stepLines.Add("**Show**")
+            $stepLines.Add("**On Screen**")
             foreach ($action in $step.Actions) {
                 $stepLines.Add("- $action")
             }
+            $stepLines.Add("")
+            $stepLines.Add("**Transition**")
+            $stepLines.Add($step.Transition)
         }
         else {
-            $stepLines.Add("**Narrative**")
-            $stepLines.Add($step.Narrative)
+            $stepLines.Add("**What to Say**")
+            foreach ($line in $step.SayLines) {
+                $stepLines.Add("> $line")
+                $stepLines.Add("")
+            }
+            $stepLines.Add("**Key Line**")
+            $stepLines.Add($step.KeyLine)
             $stepLines.Add("")
-            $stepLines.Add("**Actions**")
+            $stepLines.Add("**On Screen**")
             foreach ($action in $step.Actions) {
                 $stepLines.Add("- $action")
             }
             $stepLines.Add("")
-            $stepLines.Add("**Key Points**")
-            foreach ($point in $step.KeyPoints) {
-                $stepLines.Add("- $point")
-            }
+            $stepLines.Add("**Transition**")
+            $stepLines.Add($step.Transition)
         }
 
         $stepLines.Add("")
@@ -486,6 +735,24 @@ function Get-CompactWorkflowText {
     return ($trimmed.Substring(0, 157) + "...")
 }
 
+function Get-CompactText {
+    param(
+        [string]$Text,
+        [int]$MaximumLength = 180
+    )
+
+    if ([string]::IsNullOrWhiteSpace($Text)) {
+        return "the expected business outcome"
+    }
+
+    $compact = ($Text -replace '\s+', ' ').Trim()
+    if ($compact.Length -le $MaximumLength) {
+        return $compact
+    }
+
+    return ($compact.Substring(0, $MaximumLength - 3).TrimEnd() + "...")
+}
+
 function Normalize-MarkdownText {
     param([string]$Text)
 
@@ -518,6 +785,8 @@ $demoScriptPath = Join-Path $scenarioFolder "demo-script.md"
 $demoWalkthroughPath = Join-Path $scenarioFolder "demo-walkthrough.md"
 $demoTalkTrackPath = Join-Path $scenarioFolder "demo-talk-track.md"
 $demoAnswersPath = Join-Path $scenarioFolder "demo-script-answers.md"
+$demoPresenterPath = Join-Path $scenarioFolder "$ScenarioSlug-demo-presenter.html"
+$demoPresenterTemplatePath = Join-Path $PSScriptRoot "templates\demo-presenter.template.html"
 
 if (-not (Test-Path $specPath)) {
     throw "Missing spec file: $specPath"
@@ -535,7 +804,11 @@ if (-not (Test-Path $tasksPath)) {
     throw "Missing tasks file: $tasksPath"
 }
 
-$existingFiles = @($demoScriptPath, $demoWalkthroughPath, $demoTalkTrackPath, $demoAnswersPath | Where-Object { Test-Path $_ })
+if (-not (Test-Path $demoPresenterTemplatePath)) {
+    throw "Missing demo presenter template: $demoPresenterTemplatePath"
+}
+
+$existingFiles = @($demoScriptPath, $demoWalkthroughPath, $demoTalkTrackPath, $demoAnswersPath, $demoPresenterPath | Where-Object { Test-Path $_ })
 if ($existingFiles.Count -gt 0 -and -not $Force) {
     if (-not (Confirm-Overwrite -Paths $existingFiles)) {
         Write-Host ""
@@ -609,7 +882,7 @@ $heroRecord = Read-RequiredValue "1. What is the hero record for the demo?" $sug
 $workflow = Read-RequiredValue "2. Which business workflow should the demo follow?" $flowSuggestions[0]
 $audiencePersona = Read-RequiredValue "3. Who is watching this demo?" $targetAudience
 $demoScope = Read-RequiredValue "4. What should the demo include?" (($artifacts -join ', '))
-$durationChoice = Read-RequiredValue "5. How long should the demo be, in minutes?" "5"
+$durationChoice = Read-RequiredValue "5. How long should the demo timer run, in minutes?" "5"
 [int]$durationMinutes = 5
 if (-not [int]::TryParse($durationChoice, [ref]$durationMinutes) -or $durationMinutes -lt 1) {
     throw "Duration must be a positive whole number of minutes."
@@ -626,7 +899,7 @@ $talkingPoints = Read-MultilineValue "8. What key talking points should be empha
 $preDemoDefault = "Verify access to $environmentUrl, open the app, and queue any sample records needed for the $heroRecord story."
 $preDemoSetup = Read-MultilineValue "9. What should the presenter prepare before starting?" $preDemoDefault
 
-$steps = Get-DemoSteps -Entities $entities -Artifacts $artifacts -HeroRecord $heroRecord -Workflow $workflow -DataMode $dataMode -Audience $audiencePersona -SuccessCriteria $successCriteria -TalkingPoints $talkingPoints -DurationMinutes $durationMinutes -TalkTrackStyle $talkTrackStyle
+$steps = Get-DemoSteps -ScenarioName $scenarioName -ProblemStatement $problemStatement -Entities $entities -Artifacts $artifacts -HeroRecord $heroRecord -Workflow $workflow -DataMode $dataMode -Audience $audiencePersona -SuccessCriteria $successCriteria -TalkingPoints $talkingPoints -DurationMinutes $durationMinutes -TalkTrackStyle $talkTrackStyle
 $compactWorkflow = Get-CompactWorkflowText -Workflow $workflow
 $stepLines = Format-TalkTrackSteps -Steps $steps -DurationMinutes $durationMinutes -TalkTrackStyle $talkTrackStyle
 $openingLines = Get-TalkTrackOpening -Style $talkTrackStyle -ScenarioName $scenarioName -AudiencePersona $audiencePersona -ProblemStatement $problemStatement -SuccessCriteria $successCriteria -HeroRecord $heroRecord
@@ -650,7 +923,7 @@ $demoAnswersContent = @"
 7. Talk track style: $talkTrackStyle
 8. Key talking points: $talkingPoints
 9. Pre-demo setup: $preDemoSetup
-10. Output artifacts: demo-walkthrough.md and demo-talk-track.md
+10. Output artifacts: demo-walkthrough.md, demo-talk-track.md, and $ScenarioSlug-demo-presenter.html
 "@
 
 $artifactDisplay = if ($artifacts.Count -gt 0) { $artifacts[0] } else { "primary artifact" }
@@ -737,11 +1010,44 @@ $($closingLines -join [Environment]::NewLine)
 - [ ] End by restating measurable success criteria.
 "@
 
+$presenterSteps = for ($index = 0; $index -lt $steps.Count; $index++) {
+    $step = $steps[$index]
+    [ordered]@{
+        title = $step.Title
+        narrative = $step.Narrative
+        sayLines = @($step.SayLines)
+        actions = @($step.Actions)
+        keyPoints = @($step.KeyPoints)
+        keyLine = $step.KeyLine
+        transition = $step.Transition
+        minutes = Get-StepMinutes -DurationMinutes $durationMinutes -StepIndex $index -StepCount $steps.Count
+    }
+}
+$presenterData = [ordered]@{
+    scenarioName = $scenarioName
+    scenarioSlug = $ScenarioSlug
+    problemStatement = $problemStatement
+    audience = $audiencePersona
+    heroRecord = $heroRecord
+    durationMinutes = $durationMinutes
+    successCriteria = Get-CompactText -Text $successCriteria -MaximumLength 180
+    preDemoSetup = $preDemoSetup
+    steps = @($presenterSteps)
+}
+$presenterJson = $presenterData | ConvertTo-Json -Depth 8 -Compress
+$presenterJson = $presenterJson.Replace("<", "\u003c").Replace(">", "\u003e").Replace("&", "\u0026")
+$demoPresenterContent = Get-Content -Path $demoPresenterTemplatePath -Raw -Encoding UTF8
+if (-not $demoPresenterContent.Contains("__DEMO_DATA_JSON__")) {
+    throw "Demo presenter template is missing the __DEMO_DATA_JSON__ placeholder."
+}
+$demoPresenterContent = $demoPresenterContent.Replace("__DEMO_DATA_JSON__", $presenterJson)
+
 Set-Content -Path $demoAnswersPath -Value $demoAnswersContent -Encoding UTF8
 Set-Content -Path $demoWalkthroughPath -Value $demoWalkthroughContent -Encoding UTF8
 Set-Content -Path $demoTalkTrackPath -Value $demoTalkTrackContent -Encoding UTF8
 # Backward-compatible artifact used by existing dry-run tooling.
 Set-Content -Path $demoScriptPath -Value $demoTalkTrackContent -Encoding UTF8
+Set-Content -Path $demoPresenterPath -Value $demoPresenterContent -Encoding UTF8
 
 Write-Host ""
 Write-Host "Demo script output created:" -ForegroundColor Green
@@ -749,9 +1055,10 @@ Write-Host "  $demoAnswersPath"
 Write-Host "  $demoWalkthroughPath"
 Write-Host "  $demoTalkTrackPath"
 Write-Host "  $demoScriptPath (compatibility copy of talk track)"
+Write-Host "  $demoPresenterPath (interactive presenter companion)"
 Write-Host ""
 Write-Host "Next step:" -ForegroundColor Cyan
-Write-Host "  Review demo-walkthrough.md (engineer) and demo-talk-track.md (presenter) and ask for edits if you want different story, pacing, or emphasis."
+Write-Host "  Open $ScenarioSlug-demo-presenter.html for the timed interactive presentation, and review the Markdown artifacts for edits."
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Demo script artifacts generated."
 }
