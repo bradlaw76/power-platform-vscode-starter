@@ -19,6 +19,13 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
+$envFile = Join-Path $repoRoot '.env.ps1'
+if ($env:WIZARD_DATA_SKIP_MAIN -ne 'true' -and (Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+    . $envFile
+    $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    $AccessToken = $global:DV_TOKEN
+    if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) { $SolutionUniqueName = $global:DV_SOLUTION_NAME }
+}
 
 function Get-WizardDataPayload { param([string]$Folder) $files=@(Get-ChildItem -LiteralPath $Folder -Filter 'data-*.json' -File); if($files.Count -ne 1){throw "Expected exactly one data payload; found $($files.Count)."}; Get-Content $files[0].FullName -Raw -Encoding UTF8|ConvertFrom-Json }
 function ConvertTo-WizardFilterLiteral { param($Value) if($Value -is [bool]){return $Value.ToString().ToLowerInvariant()}; if($Value -is [int] -or $Value -is [long] -or $Value -is [double]){return "$Value"}; return "'$(ConvertTo-WizardODataLiteral "$Value")'" }

@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_redactiondecision",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Redaction Decision",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Redaction Decisions",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Controlled record-location redaction proposal and approval. FOIA-DAT-003; FOIA-REV-004; FOIA-CAS-005.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

@@ -398,7 +398,10 @@ function ConvertTo-SolutionExpectedCategoryMap {
     param([object]$ExpectedArtifacts)
 
     return @{
-        tables = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Tables'))
+        tables = @(
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Tables')) +
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'DependencyTables'))
+        )
         columns = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Columns'))
         relationships = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Relationships'))
         forms = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Forms'))

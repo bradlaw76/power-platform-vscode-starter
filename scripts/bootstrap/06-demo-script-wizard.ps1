@@ -336,9 +336,13 @@ function Get-TalkTrackOpening {
         [string]$HeroRecord
     )
 
+    $AudiencePersona = Get-SentenceFragment -Value $AudiencePersona
+    $ProblemStatement = Get-SentenceFragment -Value $ProblemStatement
+    $SuccessCriteria = Get-SentenceFragment -Value $SuccessCriteria
+
     if ($Style -eq "short") {
         return @(
-            '"Today I am showing how ' + $ScenarioName + ' helps ' + $AudiencePersona + ' handle ' + $ProblemStatement + '."',
+            '"Today I am showing how ' + $ScenarioName + ' helps ' + $AudiencePersona + ' address this need: ' + $ProblemStatement + '."',
             '"Watch for this result: ' + $SuccessCriteria + '."'
         )
     }
@@ -356,6 +360,9 @@ function Get-TalkTrackClosing {
         [string]$CompactWorkflow,
         [string]$SuccessCriteria
     )
+
+    $CompactWorkflow = Get-SentenceFragment -Value $CompactWorkflow
+    $SuccessCriteria = Get-SentenceFragment -Value $SuccessCriteria
 
     if ($Style -eq "short") {
         return @(
@@ -486,6 +493,13 @@ function Get-CompactWorkflowText {
     return ($trimmed.Substring(0, 157) + "...")
 }
 
+function Get-SentenceFragment {
+    param([string]$Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) { return "" }
+    return $Value.Trim().TrimEnd([char[]]@(".", "!", "?"))
+}
+
 function Normalize-MarkdownText {
     param([string]$Text)
 
@@ -554,6 +568,9 @@ $tasksContent = Get-Content -Path $tasksPath -Raw -Encoding UTF8
 
 $scenarioBlock = Get-MarkdownSectionValue -Content $answersContent -Heading "Scenario"
 $wizardBlock = Get-MarkdownSectionValue -Content $answersContent -Heading "Wizard Answers"
+$businessOutcomeBlock = Get-MarkdownSectionValue -Content $answersContent -Heading "Business Outcome And Audience"
+$applicationDataBlock = Get-MarkdownSectionValue -Content $answersContent -Heading "Application And Data Architecture"
+$applicationProfileBlock = Get-MarkdownSectionValue -Content $answersContent -Heading "Application Profile"
 
 $scenarioName = Get-ListValue -Block $scenarioBlock -Label "Name"
 if ([string]::IsNullOrWhiteSpace($scenarioName)) {
@@ -573,16 +590,45 @@ $planMapping = Get-MarkdownSectionValue -Content $planContent -Heading "Explicit
 $validationPlan = Get-MarkdownSectionValue -Content $planContent -Heading "Validation Plan"
 $taskItems = Get-ChecklistItems -Content $tasksContent
 
-$mappingText = if (-not [string]::IsNullOrWhiteSpace($specMapping)) { $specMapping } else { $planMapping }
-
-$entities = Split-Items -Value $requiredEntitiesText
-if ($entities.Count -eq 0) {
-    $entities = Split-Items -Value ([regex]::Match($wizardBlock, '(?m)^6\. Data entities:\s*(.+)$').Groups[1].Value)
+if ([string]::IsNullOrWhiteSpace($problemStatement)) {
+    $problemStatement = Get-ListValue -Block $businessOutcomeBlock -Label "Outcome"
+}
+if ([string]::IsNullOrWhiteSpace($targetAudience)) {
+    $targetAudience = Get-ListValue -Block $businessOutcomeBlock -Label "Audience"
+}
+if ([string]::IsNullOrWhiteSpace($users)) {
+    $users = $targetAudience
+}
+if ([string]::IsNullOrWhiteSpace($requiredEntitiesText)) {
+    $reusedTables = Get-ListValue -Block $applicationDataBlock -Label "Reused tables"
+    $customTables = Get-ListValue -Block $applicationDataBlock -Label "Custom tables"
+    $requiredEntitiesText = @($customTables, $reusedTables | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) -join ", "
+}
+if ([string]::IsNullOrWhiteSpace($artifactsText)) {
+    $artifactsText = Get-ListValue -Block $applicationProfileBlock -Label "Required App Artifacts"
+}
+if ([string]::IsNullOrWhiteSpace($successCriteria)) {
+    $successCriteria = Get-ListValue -Block $businessOutcomeBlock -Label "Primary success measure"
+}
+if ([string]::IsNullOrWhiteSpace($environmentUrl)) {
+    $environmentUrl = Get-ListValue -Block $scenarioBlock -Label "Environment URL"
+}
+if ([string]::IsNullOrWhiteSpace($demoDataRequirement)) {
+    $demoDataRequirement = if (-not [string]::IsNullOrWhiteSpace((Get-MarkdownSectionValue -Content $specContent -Heading "Synthetic Data"))) { "yes" } else { "no" }
 }
 
-$artifacts = Split-Items -Value $artifactsText
+$mappingText = if (-not [string]::IsNullOrWhiteSpace($specMapping)) { $specMapping } else { $planMapping }
+
+$entities = @(Split-Items -Value $requiredEntitiesText)
+if ($entities.Count -eq 0) {
+    $entities = @(Split-Items -Value ([regex]::Match($wizardBlock, '(?m)^6\. Data entities:\s*(.+)$').Groups[1].Value)
+    )
+}
+
+$artifacts = @(Split-Items -Value $artifactsText)
 if ($artifacts.Count -eq 0) {
-    $artifacts = Split-Items -Value ([regex]::Match($wizardBlock, '(?m)^7\. Needed artifacts:\s*(.+)$').Groups[1].Value)
+    $artifacts = @(Split-Items -Value ([regex]::Match($wizardBlock, '(?m)^7\. Needed artifacts:\s*(.+)$').Groups[1].Value)
+    )
 }
 
 $suggestedHero = if ($entities.Count -gt 0) { $entities[0] } else { "Primary record" }

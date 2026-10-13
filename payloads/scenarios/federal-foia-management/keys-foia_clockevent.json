@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_clockevent",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_ClockEvent_Identifier",
+      "DisplayName": "Clock Event Identifier",
+      "KeyAttributes": ["foia_eventidentifier"]
+    }
+  ]
+}

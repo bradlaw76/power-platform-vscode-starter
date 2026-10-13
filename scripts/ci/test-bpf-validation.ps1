@@ -10,7 +10,7 @@ function New-TestScenario {
     [scriptblock]$ProcessPayloadFactory
   )
 
-  $root = Join-Path ([System.IO.Path]::GetTempPath()) ("bpf-test-" + [guid]::NewGuid().ToString('N'))
+  $root = Join-Path $repoRoot (".wizard-metrics/ci/bpf-test-" + [guid]::NewGuid().ToString('N'))
   $payloadFolder = Join-Path $root "payloads/scenarios/$Name"
   $specFolder = Join-Path $root "specs/$Name"
   New-Item -ItemType Directory -Path $payloadFolder -Force | Out-Null
@@ -107,7 +107,15 @@ function Remove-TestScenario {
   param([string]$Path)
 
   if (Test-Path $Path) {
-    Remove-Item -Path $Path -Recurse -Force
+    for ($attempt = 1; $attempt -le 5; $attempt++) {
+      try {
+        Remove-Item -LiteralPath $Path -Recurse -Force -ErrorAction Stop
+        break
+      } catch {
+        if ($attempt -eq 5) { throw }
+        Start-Sleep -Milliseconds (100 * $attempt)
+      }
+    }
   }
 }
 
@@ -212,6 +220,45 @@ try {
   Remove-TestScenario -Path $incomplete.Root
 }
 
+$multi = New-TestScenario -Name 'multi' -ProcessPayloadFactory {
+  param($payloadFolder)
+  foreach ($fileName in @('process-02-second.json', 'process-01-first.json')) {
+    @'
+{
+  "Enabled": true,
+  "BusinessProcessFlowName": "Ordered Process",
+  "PrimaryProcessEntity": "incident",
+  "FormIntegration": { "TargetFormName": "Information" },
+  "StageDefinitions": [
+    { "Order": 1, "StageName": "Intake", "EntityLogicalName": "incident", "RequiredFields": ["title"], "EntryCriteria": "Created", "ExitCriteria": "Ready" },
+    { "Order": 2, "StageName": "Decision", "EntityLogicalName": "incident", "RequiredFields": ["statuscode"], "EntryCriteria": "Ready", "ExitCriteria": "Decided" }
+  ]
+}
+'@ | Set-Content -LiteralPath (Join-Path $payloadFolder $fileName) -Encoding UTF8
+  }
+  '{ invalid json' | Set-Content -LiteralPath (Join-Path $payloadFolder 'process-03-invalid.json') -Encoding UTF8
+}
+
+try {
+  $definitions = @(Get-BpfDefinitions -PayloadFolder $multi.PayloadFolder)
+  if ($definitions.Count -ne 3) {
+    throw "Expected every process payload to be discovered; found $($definitions.Count)."
+  }
+  if (@($definitions | ForEach-Object { [IO.Path]::GetFileName($_.__SourceFile) }) -join ',' -ne 'process-01-first.json,process-02-second.json,process-03-invalid.json') {
+    throw 'Process payload discovery order is not deterministic.'
+  }
+  if ((Get-BpfArtifactKey -SourceFile $definitions[0].__SourceFile) -ne '01-first') {
+    throw 'Process artifact key is not stable.'
+  }
+  $validResult = Test-BpfDefinition -Definition $definitions[0] -ArtifactText (Get-PlanningArtifactContent -Paths @((Join-Path $multi.SpecFolder 'spec.md'))) -PayloadFolder $multi.PayloadFolder
+  $invalidResult = Test-BpfDefinition -Definition $definitions[2] -ArtifactText '' -PayloadFolder $multi.PayloadFolder
+  if ($validResult.Status -ne 'passed' -or $invalidResult.Status -ne 'failed' -or $invalidResult.Failed.Count -eq 0) {
+    throw 'A malformed process payload must fail without hiding successful process validation.'
+  }
+} finally {
+  Remove-TestScenario -Path $multi.Root
+}
+
 if ((Get-BpfDesiredAction -ExistingProcess $null -PreferUpdateExistingBpf:$true) -ne 'designer-handoff-required') {
   throw 'Expected a missing process to require a supported designer handoff.'
 }
@@ -233,6 +280,11 @@ if ($bpfScript -notmatch 'PreviewOnly' -or $bpfScript -notmatch 'designer-handof
 if ($bpfScript -notmatch 'ConvertTo-WorkflowUniqueName\s+-Value\s+[^\r\n]+\s+-PublisherPrefix\s+\$PublisherPrefix' -or
     $bpfScript -notmatch 'return\s+"\$\{prefix\}_\$slug"') {
   throw 'BPF designer handoff and lookup must derive workflow unique names from the configured publisher prefix.'
+}
+foreach ($required in @('foreach ($definition in $processDefinitions)', 'business-process-flow-$key-report.json', 'ProcessCount', 'FailedCount')) {
+  if (-not $bpfScript.Contains($required)) {
+    throw "BPF stage is missing multi-process contract text: $required"
+  }
 }
 
 Write-Host 'BPF validation checks passed.' -ForegroundColor Green

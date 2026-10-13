@@ -55,8 +55,8 @@ function New-TestWizardRepo {
   @'
 # plan.md
 
-- Solution unique name: TestSolution
-- Publisher prefix: tst
+- Solution unique name: `TestSolution`
+- Publisher prefix: `tst`
 
 ## Explicit Entity Mapping (Required Before Payloads)
 
@@ -93,6 +93,17 @@ try {
   $validation = Test-WizardBuildContract -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -StrictMode $true
   if ($validation.Status -ne 'passed') {
     throw "Expected passed build contract validation, got '$($validation.Status)'."
+  }
+  if ($validation.SolutionName -cne 'TestSolution' -or $validation.PublisherPrefix -cne 'tst') {
+    throw 'Build contract identity parsing must remove Markdown inline-code markers.'
+  }
+
+  $scenarioPayloadPath = Join-Path $testRepo 'payloads/scenarios/test-scenario'
+  New-Item -ItemType Directory -Path $scenarioPayloadPath -Force | Out-Null
+  $scenarioContext = Get-WizardScenarioContext -RepoRoot $testRepo -PayloadsFolder 'payloads/scenarios/test-scenario'
+  if ($scenarioContext.ScenarioSlug -cne 'test-scenario' -or
+      -not $scenarioContext.ScenarioPayloadFolder.Equals($scenarioPayloadPath, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Scenario context must resolve a scenario-scoped relative payload folder without appending the path twice.'
   }
 
   $expected = New-WizardExpectedArtifacts -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -PublisherPrefix 'tst'

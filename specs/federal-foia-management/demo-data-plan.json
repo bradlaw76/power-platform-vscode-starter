@@ -1,0 +1,100 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "federal-foia-management",
+  "requirements": [
+    "FOIA-DAT-006",
+    "FOIA-TST-003",
+    "FOIA-SEC-008"
+  ],
+  "enabled": true,
+  "sourceTag": "federal-foia-synthetic-v1",
+  "privacy": {
+    "productionDerivedDataAllowed": false,
+    "documentContentCommitted": false,
+    "classification": "Synthetic-Unclassified"
+  },
+  "standardTablePolicy": {
+    "standardTaskActivitiesCreated": false,
+    "implicitSeedingAllowed": false,
+    "tables": [
+      {
+        "count": 7,
+        "logicalName": "contact",
+        "purpose": "One clearly synthetic requester per journey",
+        "naturalKey": "foia_syntheticrecordkey"
+      },
+      {
+        "count": 7,
+        "logicalName": "incident",
+        "purpose": "One clearly synthetic Customer Service Case per request",
+        "naturalKey": "foia_syntheticrecordkey"
+      }
+    ],
+    "mode": "explicit-create"
+  },
+  "bounds": {
+    "contacts": 7,
+    "plannedTotalRecords": 41,
+    "requests": 7,
+    "cases": 7,
+    "maximumTotalRecords": 50
+  },
+  "journeys": [
+    {
+      "id": "normal",
+      "trackingNumber": "SYN-FOIA-2026-001",
+      "expectedStage": "Review"
+    },
+    {
+      "id": "expedited",
+      "trackingNumber": "SYN-FOIA-2026-002",
+      "expectedStage": "Search"
+    },
+    {
+      "id": "overdue",
+      "trackingNumber": "SYN-FOIA-2026-003",
+      "expectedStage": "Review"
+    },
+    {
+      "id": "appealed",
+      "trackingNumber": "SYN-FOIA-2026-004",
+      "expectedStage": "Closure"
+    },
+    {
+      "id": "fee",
+      "trackingNumber": "SYN-FOIA-2026-005",
+      "expectedStage": "Approval"
+    },
+    {
+      "id": "exemption",
+      "trackingNumber": "SYN-FOIA-2026-006",
+      "expectedStage": "Redaction"
+    },
+    {
+      "id": "released",
+      "trackingNumber": "SYN-FOIA-2026-007",
+      "expectedStage": "Closure"
+    }
+  ],
+  "rerun": {
+    "updateExistingOwnedRecords": true,
+    "naturalKeysStable": true,
+    "deleteOnRerun": false,
+    "sourceOwnershipRequired": true
+  },
+  "expectedReportTotals": {
+    "requests": 7,
+    "feeWaived": 90,
+    "releasedPackages": 2,
+    "feeAssessed": 230,
+    "feeCollected": 140,
+    "expeditedRequested": 1,
+    "approvedExemptionDecisions": 1,
+    "openAppeals": 1
+  },
+  "notes": [
+    "All names, addresses, identifiers, paths, hashes, and narratives are deterministic synthetic values.",
+    "The payload explicitly creates only the bounded standard Contact and Case rows listed above; no standard Task activities are created.",
+    "No production, operational, classified, controlled, or personally identifiable source data is used."
+  ]
+}

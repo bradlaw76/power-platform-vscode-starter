@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_foiarequest",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "FOIA Request",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "FOIA Requests",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Authoritative request identity, intake, lifecycle, timing, fees, and disposition. FOIA-DAT-003; FOIA-INT-001..006; FOIA-CLK-001.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

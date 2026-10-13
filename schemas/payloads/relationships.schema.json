@@ -42,6 +42,16 @@
       "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
     },
     "relationshipDefinition": {
+      "oneOf": [
+        {
+          "$ref": "#/definitions/oneToManyRelationshipDefinition"
+        },
+        {
+          "$ref": "#/definitions/manyToManyRelationshipDefinition"
+        }
+      ]
+    },
+    "oneToManyRelationshipDefinition": {
       "type": "object",
       "required": [
         "SchemaName",
@@ -76,6 +86,58 @@
             "type": "string"
           }
         }
+      },
+      "additionalProperties": true
+    },
+    "manyToManyRelationshipDefinition": {
+      "type": "object",
+      "required": [
+        "@odata.type",
+        "SchemaName",
+        "Entity1LogicalName",
+        "Entity2LogicalName",
+        "IntersectEntityName"
+      ],
+      "properties": {
+        "@odata.type": {
+          "const": "Microsoft.Dynamics.CRM.ManyToManyRelationshipMetadata"
+        },
+        "SchemaName": {
+          "$ref": "#/definitions/logicalName"
+        },
+        "Entity1LogicalName": {
+          "$ref": "#/definitions/logicalName"
+        },
+        "Entity2LogicalName": {
+          "$ref": "#/definitions/logicalName"
+        },
+        "IntersectEntityName": {
+          "$ref": "#/definitions/logicalName"
+        }
+      },
+      "not": {
+        "anyOf": [
+          {
+            "required": [
+              "CascadeConfiguration"
+            ]
+          },
+          {
+            "required": [
+              "Lookup"
+            ]
+          },
+          {
+            "required": [
+              "ReferencingAttribute"
+            ]
+          },
+          {
+            "required": [
+              "ReferencedAttribute"
+            ]
+          }
+        ]
       },
       "additionalProperties": true
     }

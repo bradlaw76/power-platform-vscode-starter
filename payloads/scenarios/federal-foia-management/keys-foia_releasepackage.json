@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_releasepackage",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_ReleasePackage_NumberVersion",
+      "DisplayName": "Release Package Number and Version",
+      "KeyAttributes": ["foia_packagenumber", "foia_packageversion"]
+    }
+  ]
+}

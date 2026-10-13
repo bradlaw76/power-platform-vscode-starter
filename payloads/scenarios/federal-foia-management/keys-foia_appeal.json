@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_appeal",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_Appeal_Number",
+      "DisplayName": "Appeal Number",
+      "KeyAttributes": ["foia_appealnumber"]
+    }
+  ]
+}

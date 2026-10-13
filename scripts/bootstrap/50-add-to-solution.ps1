@@ -76,7 +76,8 @@ param(
     [bool]$StrictMode = $true,
     [bool]$AllowContaminatedSolution = $false,
     [switch]$InventoryOnly,
-    [switch]$EnforceExportGate
+    [switch]$EnforceExportGate,
+    [switch]$PublishScoped
 )
 
 Set-StrictMode -Version Latest
@@ -102,13 +103,27 @@ if (Test-Path $hardeningHelper) {
     . $hardeningHelper
 }
 
+$dataverseRuntimeHelper = Join-Path $PSScriptRoot "helpers\dataverse-runtime.ps1"
+if (-not (Test-Path -LiteralPath $dataverseRuntimeHelper -PathType Leaf)) {
+    throw "Dataverse runtime helper not found: $dataverseRuntimeHelper"
+}
+. $dataverseRuntimeHelper
+
 $envFile = Join-Path $repoRoot ".env.ps1"
-if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+if (Test-Path $envFile) {
     . $envFile
-    $EnvironmentUrl     = $global:DV_ENVIRONMENT_URL
-    $AccessToken        = $global:DV_TOKEN
-    $SolutionUniqueName = $SolutionUniqueName -ne "" ? $SolutionUniqueName : $global:DV_SOLUTION_NAME
-    $PublisherPrefix    = $PublisherPrefix    -ne "" ? $PublisherPrefix    : $global:DV_PUBLISHER_PREFIX
+    if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+        $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    }
+    if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+        $AccessToken = $global:DV_TOKEN
+    }
+    if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) {
+        $SolutionUniqueName = $global:DV_SOLUTION_NAME
+    }
+    if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
+        $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
+    }
 }
 
 foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName)) {
@@ -142,9 +157,40 @@ if ($EnableArtifactManifest -and (Get-Command Initialize-WizardArtifactManifest 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
     $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
             "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
+    $requestBody = if ([string]::IsNullOrWhiteSpace($Body)) { $null } else { $Body }
+    return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl `
+        -AccessToken $AccessToken -Body $requestBody
+}
+
+function Test-SolutionComponentMembership {
+    param(
+        [string]$SolutionId,
+        [string]$ObjectId,
+        [int]$ComponentType
+    )
+
+    $response = Invoke-Dv "Get" "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq $SolutionId and objectid eq $ObjectId and componenttype eq $ComponentType"
+    return @($response.value).Count -gt 0
+}
+
+function Add-SolutionComponentManifestItem {
+    param(
+        [string]$Name,
+        [string]$ComponentKind,
+        [string]$Status,
+        [string]$Reason = ""
+    )
+
+    if (-not $EnableArtifactManifest -or -not (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+        return
+    }
+    $details = @{ componentKind = $ComponentKind }
+    if (-not [string]::IsNullOrWhiteSpace($Reason)) {
+        $details.reason = $Reason
+    }
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName `
+        -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $Name -Status $Status `
+        -Step '50-add-to-solution.ps1' -Details $details | Out-Null
 }
 
 function Test-TruthyValue {
@@ -388,22 +434,24 @@ Write-Host ""
 $sol = (Invoke-Dv "Get" "solutions?`$filter=uniquename eq '$SolutionUniqueName'&`$select=solutionid,uniquename").value | Select-Object -First 1
 if ($null -eq $sol) {
     Write-Host "Solution '$SolutionUniqueName' not found in this environment." -ForegroundColor Red
-    Write-Host "Create it first in the Power Platform Maker portal or with: pac solution create"
+    Write-Host "Create it first in the Power Platform Maker portal or through an approved Dataverse Web API workflow; the installed PAC CLI does not provide an online solution-create command."
     exit 1
 }
 Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 
 $invokeDvGet = { param($path) Invoke-Dv "Get" $path }
-$entityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
+$allEntityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
+$expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+$entityNames = @($expectedArtifacts.Tables)
+$solutionEntityNames = @(@($expectedArtifacts.Tables) + @($expectedArtifacts.DependencyTables) | Sort-Object -Unique)
 $reportWebResourceNames = @(Get-ReportWebResourceNames -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PublisherPrefix $PublisherPrefix)
-$tableIsolationReport = Get-SolutionTableIsolationReport -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)" -ExpectedEntityNames $entityNames
+$tableIsolationReport = Get-SolutionTableIsolationReport -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)" -ExpectedEntityNames $solutionEntityNames
 
 if ($InventoryOnly) {
     if (-not (Get-Command New-WizardExpectedArtifacts -ErrorAction SilentlyContinue)) {
         throw 'Inventory-only mode requires scripts/bootstrap/helpers/wizard-hardening.ps1.'
     }
 
-    $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
     $expectedByCategory = ConvertTo-SolutionExpectedCategoryMap -ExpectedArtifacts $expectedArtifacts
     $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
     $failedArtifacts = @()
@@ -496,10 +544,14 @@ if ($entityNames.Count -eq 0 -and $reportWebResourceNames.Count -eq 0) {
 }
 
 Write-Host "  Payload-referenced entities found: $($entityNames.Count)"
+Write-Host "  Referenced dependency entities:   $($allEntityNames.Count)"
 Write-Host "  Report web resources found:      $($reportWebResourceNames.Count)"
 Write-Host ""
 
 $added = 0; $skipped = 0; $failed = 0
+$componentTypeMap = Get-SolutionComponentTypeMap
+$attributeComponentType = Get-ComponentTypeValue -Map $componentTypeMap -Labels @('Attribute') -Fallback 2
+$relationshipComponentType = Get-ComponentTypeValue -Map $componentTypeMap -Labels @('Entity Relationship', 'Relationship') -Fallback 10
 # ComponentType 1 = Entity
 foreach ($logicalName in $entityNames | Sort-Object) {
     Write-Host "  $logicalName " -NoNewline
@@ -515,7 +567,15 @@ foreach ($logicalName in $entityNames | Sort-Object) {
     }
 
     try {
-        $body = @{ ComponentId = $entity.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $true } | ConvertTo-Json -Compress
+        if (Test-SolutionComponentMembership -SolutionId "$($sol.solutionid)" -ObjectId "$($entity.MetadataId)" -ComponentType 1) {
+            Write-Host "(already in solution)" -ForegroundColor DarkGray
+            if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
+                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'skipped' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table'; reason = 'already in solution' } | Out-Null
+            }
+            $skipped++
+            continue
+        }
+        $body = @{ ComponentId = $entity.MetadataId; ComponentType = 1; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
         Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
         Write-Host "(added)" -ForegroundColor Green
         if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
@@ -534,6 +594,74 @@ foreach ($logicalName in $entityNames | Sort-Object) {
             if ($EnableArtifactManifest -and (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) {
                 Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'appcomponent' -Name $logicalName -Status 'failed' -Step '50-add-to-solution.ps1' -Details @{ componentKind = 'table'; error = $_.Exception.Message } | Out-Null
             }
+            $failed++
+        }
+    }
+}
+
+$columnPayloads = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'columns-*.json' -File -ErrorAction SilentlyContinue | Sort-Object Name)
+foreach ($file in $columnPayloads) {
+    $document = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    $table = "$($document.TableLogicalName)".Trim().ToLowerInvariant()
+    $escapedTable = ConvertTo-WizardODataLiteral -Value $table
+    foreach ($column in @($document.Columns)) {
+        $logicalName = "$($column.LogicalName)".Trim().ToLowerInvariant()
+        $componentName = "$table.$logicalName"
+        Write-Host "  $componentName " -NoNewline
+        try {
+            $escapedColumn = ConvertTo-WizardODataLiteral -Value $logicalName
+            $metadata = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$escapedTable')/Attributes(LogicalName='$escapedColumn')?`$select=LogicalName,MetadataId"
+            if ([string]::IsNullOrWhiteSpace("$($metadata.MetadataId)")) {
+                throw "Column metadata ID was not returned."
+            }
+            if (Test-SolutionComponentMembership -SolutionId "$($sol.solutionid)" -ObjectId "$($metadata.MetadataId)" -ComponentType $attributeComponentType) {
+                Write-Host "(already in solution)" -ForegroundColor DarkGray
+                Add-SolutionComponentManifestItem -Name $componentName -ComponentKind 'column' -Status 'skipped' -Reason 'already in solution'
+                $skipped++
+                continue
+            }
+            $body = @{ ComponentId = $metadata.MetadataId; ComponentType = $attributeComponentType; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
+            Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
+            Write-Host "(added)" -ForegroundColor Green
+            Add-SolutionComponentManifestItem -Name $componentName -ComponentKind 'column' -Status 'created'
+            $added++
+        } catch {
+            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+            Add-SolutionComponentManifestItem -Name $componentName -ComponentKind 'column' -Status 'failed' -Reason $_.Exception.Message
+            $failed++
+        }
+    }
+}
+
+$relationshipPayloads = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'relationships-*.json' -File -ErrorAction SilentlyContinue | Sort-Object Name)
+foreach ($file in $relationshipPayloads) {
+    $document = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+    foreach ($relationship in @($document.Relationships ?? $document)) {
+        $definition = $relationship.RelationshipDefinition ?? $relationship
+        $schemaName = "$($definition.SchemaName)".Trim()
+        Write-Host "  $schemaName " -NoNewline
+        try {
+            $escapedSchema = ConvertTo-WizardODataLiteral -Value $schemaName
+            $response = Invoke-Dv "Get" "RelationshipDefinitions?`$select=SchemaName,MetadataId&`$filter=SchemaName eq '$escapedSchema'"
+            $matches = @($response.value | Where-Object { "$($_.SchemaName)" -ieq $schemaName })
+            if ($matches.Count -ne 1) {
+                throw "Relationship metadata did not resolve uniquely."
+            }
+            $metadataId = "$($matches[0].MetadataId)"
+            if (Test-SolutionComponentMembership -SolutionId "$($sol.solutionid)" -ObjectId $metadataId -ComponentType $relationshipComponentType) {
+                Write-Host "(already in solution)" -ForegroundColor DarkGray
+                Add-SolutionComponentManifestItem -Name $schemaName -ComponentKind 'relationship' -Status 'skipped' -Reason 'already in solution'
+                $skipped++
+                continue
+            }
+            $body = @{ ComponentId = $metadataId; ComponentType = $relationshipComponentType; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress
+            Invoke-Dv "Post" "AddSolutionComponent" $body | Out-Null
+            Write-Host "(added)" -ForegroundColor Green
+            Add-SolutionComponentManifestItem -Name $schemaName -ComponentKind 'relationship' -Status 'created'
+            $added++
+        } catch {
+            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
+            Add-SolutionComponentManifestItem -Name $schemaName -ComponentKind 'relationship' -Status 'failed' -Reason $_.Exception.Message
             $failed++
         }
     }
@@ -590,9 +718,17 @@ if ($failed -gt 0) {
     }
     exit 1
 }
+if ($PublishScoped) {
+    $entityXml = @($allEntityNames | Sort-Object -Unique | ForEach-Object {
+        "<entity>$([System.Security.SecurityElement]::Escape($_))</entity>"
+    }) -join ""
+    $parameterXml = "<importexportxml><entities>$entityXml</entities></importexportxml>"
+    $publishBody = @{ ParameterXml = $parameterXml } | ConvertTo-Json -Compress
+    Invoke-Dv "Post" "PublishXml" $publishBody | Out-Null
+    Write-Host "Scoped publish completed for $(@($allEntityNames | Sort-Object -Unique).Count) entities." -ForegroundColor Green
+}
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/60-build-forms-views.ps1"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Solution component add completed."
 }
-

@@ -89,7 +89,17 @@ function Add-HashSetValues {
         if (-not [string]::IsNullOrWhiteSpace($value)) {
             [void]$Set.Add($value.Trim().ToLowerInvariant())
         }
+
     }
+}
+
+function Get-BpfPropertyValue {
+    param($Object, [string]$Name, $Default = $null)
+
+    if ($null -eq $Object) { return $Default }
+    $property = $Object.PSObject.Properties[$Name]
+    if ($null -eq $property) { return $Default }
+    return $property.Value
 }
 
 function Get-MarkdownSectionLines {
@@ -227,10 +237,10 @@ function Get-RelationshipIndex {
         $doc = Get-Content -Path $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
         $items = @($doc.Relationships ?? $doc)
         foreach ($item in $items) {
-            $definition = $item.RelationshipDefinition ?? $item
-            $schemaName = ($item.SchemaName ?? $definition.SchemaName ?? '').Trim().ToLowerInvariant()
-            $referencingEntity = ($definition.ReferencingEntity ?? '').Trim().ToLowerInvariant()
-            $referencedEntity = ($definition.ReferencedEntity ?? '').Trim().ToLowerInvariant()
+            $definition = Get-BpfPropertyValue -Object $item -Name 'RelationshipDefinition' -Default $item
+            $schemaName = "$(Get-BpfPropertyValue -Object $item -Name 'SchemaName' -Default (Get-BpfPropertyValue -Object $definition -Name 'SchemaName' -Default ''))".Trim().ToLowerInvariant()
+            $referencingEntity = "$(Get-BpfPropertyValue -Object $definition -Name 'ReferencingEntity' -Default '')".Trim().ToLowerInvariant()
+            $referencedEntity = "$(Get-BpfPropertyValue -Object $definition -Name 'ReferencedEntity' -Default '')".Trim().ToLowerInvariant()
             $relationships.Add([pscustomobject]@{
                 SchemaName        = $schemaName
                 ReferencingEntity = $referencingEntity
@@ -307,15 +317,39 @@ function Get-BpfDefinitions {
     param([string]$PayloadFolder)
 
     $definitions = New-Object System.Collections.Generic.List[object]
-    foreach ($file in @(Get-ChildItem -Path $PayloadFolder -Filter 'process-*.json' -ErrorAction SilentlyContinue | Sort-Object Name)) {
-        $doc = Get-Content -Path $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
-        if ($null -ne $doc) {
+    $files = @(Get-ChildItem -LiteralPath $PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue |
+        Sort-Object @{ Expression = { $_.Name }; Ascending = $true })
+    foreach ($file in $files) {
+        try {
+            $doc = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json -ErrorAction Stop
+            if ($null -eq $doc) {
+                throw 'The JSON document is empty.'
+            }
             $doc | Add-Member -NotePropertyName '__SourceFile' -NotePropertyValue $file.FullName -Force
             $definitions.Add($doc) | Out-Null
+        } catch {
+            $definitions.Add([pscustomobject]@{
+                Enabled = $true
+                BusinessProcessFlowName = $file.BaseName
+                PrimaryProcessEntity = ''
+                StageDefinitions = @()
+                __SourceFile = $file.FullName
+                __LoadError = $_.Exception.Message
+            }) | Out-Null
         }
     }
 
     return $definitions.ToArray()
+}
+
+function Get-BpfArtifactKey {
+    param([string]$SourceFile)
+
+    $baseName = [IO.Path]::GetFileNameWithoutExtension(($SourceFile ?? '').Trim()).ToLowerInvariant()
+    $key = [regex]::Replace($baseName, '^process-', '')
+    $key = [regex]::Replace($key, '[^a-z0-9]+', '-').Trim('-')
+    if ([string]::IsNullOrWhiteSpace($key)) { return 'process' }
+    return $key
 }
 
 function Get-BpfDesiredAction {
@@ -345,6 +379,12 @@ function Test-BpfDefinition {
 
     if ($null -eq $Definition) {
         $failed.Add('BPF definition is missing.') | Out-Null
+        return [pscustomobject]@{ Status = 'failed'; Passed = $passed.ToArray(); Failed = $failed.ToArray(); Warnings = $warnings.ToArray(); StageSummaries = @() }
+    }
+
+    $loadError = $Definition.PSObject.Properties['__LoadError']
+    if ($null -ne $loadError -and -not [string]::IsNullOrWhiteSpace("$($loadError.Value)")) {
+        $failed.Add("Process payload '$($Definition.__SourceFile)' is invalid JSON: $($loadError.Value)") | Out-Null
         return [pscustomobject]@{ Status = 'failed'; Passed = $passed.ToArray(); Failed = $failed.ToArray(); Warnings = $warnings.ToArray(); StageSummaries = @() }
     }
 

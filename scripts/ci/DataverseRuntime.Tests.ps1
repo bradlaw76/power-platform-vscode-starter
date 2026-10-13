@@ -79,6 +79,18 @@ Describe 'Invoke-WizardDataverseRequest' {
         $global:wizardTestRequestCount | Should -Be 2
     }
 
+    It 'retries a forcibly closed transport connection' {
+        $global:wizardTestRequestCount = 0
+        $result = Invoke-WizardDataverseRequest -Method Get -Path 'accounts' -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -RequestInvoker {
+            param($request)
+            $global:wizardTestRequestCount++
+            if ($global:wizardTestRequestCount -eq 1) { throw 'An existing connection was forcibly closed by the remote host.' }
+            return @{ ok = $true }
+        } -SleepAction { param($seconds) }
+        $result.ok | Should -BeTrue
+        $global:wizardTestRequestCount | Should -Be 2
+    }
+
     It 'does not retry terminal <StatusCode> responses' -TestCases @(
         @{ StatusCode = 403 }
         @{ StatusCode = 404 }

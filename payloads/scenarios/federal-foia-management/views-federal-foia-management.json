@@ -1,0 +1,108 @@
+{
+  "Views": [
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "Name": "Active FOIA Requests",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_trackingnumber", "foia_lifecyclestage", "foia_receiveddate", "foia_currentduedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_currentduedate", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_appeal",
+      "Name": "Active Appeals",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_appealnumber", "foia_stage", "foia_receiveddate", "foia_duedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_duedate", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_searchtask",
+      "Name": "Active Search Tasks",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_searchtasknumber", "foia_status", "foia_assigneddate", "foia_duedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_duedate", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "Name": "Active Responsive Records",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_recordidentifier", "foia_originalfilename", "foia_classification", "foia_reviewstate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_recordidentifier", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_reviewtask",
+      "Name": "Active Review Tasks",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_reviewtasknumber", "foia_reviewtype", "foia_status", "foia_duedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_duedate", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_exemptiondecision",
+      "Name": "Active Exemption Decisions",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_decisionnumber", "foia_authority", "foia_approvalstate", "foia_decisiondate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_decisionnumber", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_redactiondecision",
+      "Name": "Active Redaction Decisions",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_redactionnumber", "foia_recordlocation", "foia_finalstate", "foia_approveddate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_redactionnumber", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_releasepackage",
+      "Name": "Active Release Packages",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_packagenumber", "foia_packageversion", "foia_approvalstate", "foia_plannedreleasedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_plannedreleasedate", "Descending": false}
+    },
+    {
+      "TableLogicalName": "foia_clockevent",
+      "Name": "Active Clock Events",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_eventidentifier", "foia_clocktype", "foia_eventtype", "foia_effectivedatetime"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_effectivedatetime", "Descending": true}
+    },
+    {
+      "TableLogicalName": "foia_auditevent",
+      "Name": "Active Audit Events",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_eventidentifier", "foia_eventtype", "foia_eventdatetime", "foia_actorreference"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_eventdatetime", "Descending": true}
+    },
+    {
+      "TableLogicalName": "foia_aiassistancerecord",
+      "Name": "Active AI Assistance Records",
+      "Disposition": "adopt-generated-active",
+      "Columns": ["foia_assistanceidentifier", "foia_operationalstatus", "foia_provider", "foia_createddatetime"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_createddatetime", "Descending": true}
+    },
+    {
+      "TableLogicalName": "contact",
+      "Name": "FOIA Requesters",
+      "Disposition": "create-custom",
+      "Columns": ["fullname", "foia_requesterclassification", "foia_identityverified", "emailaddress1", "telephone1"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "fullname", "Descending": false}
+    },
+    {
+      "TableLogicalName": "incident",
+      "Name": "Active FOIA Case Work",
+      "Disposition": "create-custom",
+      "Columns": ["ticketnumber", "title", "customerid", "foia_caseworktype", "foia_statutoryduedate"],
+      "Filter": {"Attribute": "statecode", "Operator": "eq", "Value": 0},
+      "Sort": {"Attribute": "foia_statutoryduedate", "Descending": false}
+    }
+  ]
+}

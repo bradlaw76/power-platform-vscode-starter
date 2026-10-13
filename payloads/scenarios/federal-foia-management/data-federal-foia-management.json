@@ -1,0 +1,1110 @@
+{
+  "Enabled": true,
+  "SourceTag": "federal-foia-synthetic-v1",
+  "SourceTagField": "foia_syntheticsourcetag",
+  "Tables": [
+    {
+      "TableLogicalName": "contact",
+      "Records": [
+        {
+          "Key": "SYN-CONTACT-01",
+          "Values": {
+            "emailaddress1": "synthetic.requester1@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 1",
+            "foia_requesterclassification": "Other",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-02",
+          "Values": {
+            "emailaddress1": "synthetic.requester2@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 2",
+            "foia_requesterclassification": "News Media",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-03",
+          "Values": {
+            "emailaddress1": "synthetic.requester3@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 3",
+            "foia_requesterclassification": "Educational",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-04",
+          "Values": {
+            "emailaddress1": "synthetic.requester4@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 4",
+            "foia_requesterclassification": "Commercial",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-05",
+          "Values": {
+            "emailaddress1": "synthetic.requester5@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 5",
+            "foia_requesterclassification": "Other",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-06",
+          "Values": {
+            "emailaddress1": "synthetic.requester6@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 6",
+            "foia_requesterclassification": "News Media",
+            "foia_identityverified": true
+          }
+        },
+        {
+          "Key": "SYN-CONTACT-07",
+          "Values": {
+            "emailaddress1": "synthetic.requester7@example.invalid",
+            "firstname": "Synthetic",
+            "lastname": "Requester 7",
+            "foia_requesterclassification": "Other",
+            "foia_identityverified": true
+          }
+        }
+      ],
+      "NaturalKey": "foia_syntheticrecordkey"
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "Records": [
+        {
+          "Key": "SYN-FOIA-2026-001",
+          "Values": {
+            "foia_name": "Synthetic Normal Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-001",
+            "foia_intakechannel": "Agency Portal",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Review",
+            "foia_receiveddate": "2026-01-05T14:00:00Z",
+            "foia_perfecteddate": "2026-01-06",
+            "foia_currentduedate": "2026-02-03",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic normal journey using fictional records only.",
+            "foia_disposition": "Open",
+            "foia_feecategory": "Other",
+            "foia_feeassessed": 0,
+            "foia_feewaived": 0,
+            "foia_feecollected": 0,
+            "foia_acknowledgmentreference": "SYN-ACK-001",
+            "foia_fiscalperiod": "FY2026-Q2"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-01"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-002",
+          "Values": {
+            "foia_name": "Synthetic Expedited Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-002",
+            "foia_intakechannel": "Email",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Search",
+            "foia_receiveddate": "2026-02-02T15:00:00Z",
+            "foia_perfecteddate": "2026-02-02",
+            "foia_currentduedate": "2026-02-20",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": true,
+            "foia_requestscope": "Synthetic expedited journey using fictional records only.",
+            "foia_disposition": "Open",
+            "foia_feecategory": "News Media",
+            "foia_feeassessed": 0,
+            "foia_feewaived": 0,
+            "foia_feecollected": 0,
+            "foia_acknowledgmentreference": "SYN-ACK-002",
+            "foia_fiscalperiod": "FY2026-Q2",
+            "foia_expediteddecision": "Granted"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-02"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-003",
+          "Values": {
+            "foia_name": "Synthetic Overdue Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-003",
+            "foia_intakechannel": "Mail Room",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Review",
+            "foia_receiveddate": "2025-10-01T13:00:00Z",
+            "foia_perfecteddate": "2025-10-03",
+            "foia_currentduedate": "2025-11-03",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic overdue journey using fictional records only.",
+            "foia_disposition": "Open",
+            "foia_feecategory": "Other",
+            "foia_feeassessed": 25,
+            "foia_feewaived": 0,
+            "foia_feecollected": 25,
+            "foia_acknowledgmentreference": "SYN-ACK-003",
+            "foia_fiscalperiod": "FY2026-Q1"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-03"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-004",
+          "Values": {
+            "foia_name": "Synthetic Appealed Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-004",
+            "foia_intakechannel": "FOIA.gov",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Closure",
+            "foia_receiveddate": "2025-08-04T14:00:00Z",
+            "foia_perfecteddate": "2025-08-05",
+            "foia_currentduedate": "2025-09-03",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic appealed journey using fictional records only.",
+            "foia_disposition": "Partial Grant",
+            "foia_feecategory": "Commercial",
+            "foia_feeassessed": 75,
+            "foia_feewaived": 0,
+            "foia_feecollected": 75,
+            "foia_acknowledgmentreference": "SYN-ACK-004",
+            "foia_fiscalperiod": "FY2025-Q4",
+            "foia_closeddate": "2025-09-02"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-04"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-005",
+          "Values": {
+            "foia_name": "Synthetic Fee Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-005",
+            "foia_intakechannel": "Public Portal",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Approval",
+            "foia_receiveddate": "2026-03-02T16:00:00Z",
+            "foia_perfecteddate": "2026-03-03",
+            "foia_currentduedate": "2026-03-31",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic fee journey using fictional records only.",
+            "foia_disposition": "Open",
+            "foia_feecategory": "Educational",
+            "foia_feeassessed": 120,
+            "foia_feewaived": 80,
+            "foia_feecollected": 40,
+            "foia_acknowledgmentreference": "SYN-ACK-005",
+            "foia_fiscalperiod": "FY2026-Q2"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-05"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-006",
+          "Values": {
+            "foia_name": "Synthetic Exemption Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-006",
+            "foia_intakechannel": "Staff Assisted",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Redaction",
+            "foia_receiveddate": "2026-04-01T13:00:00Z",
+            "foia_perfecteddate": "2026-04-02",
+            "foia_currentduedate": "2026-04-30",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic exemption journey using fictional records only.",
+            "foia_disposition": "Open",
+            "foia_feecategory": "Other",
+            "foia_feeassessed": 10,
+            "foia_feewaived": 10,
+            "foia_feecollected": 0,
+            "foia_acknowledgmentreference": "SYN-ACK-006",
+            "foia_fiscalperiod": "FY2026-Q3"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-06"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-FOIA-2026-007",
+          "Values": {
+            "foia_name": "Synthetic Released Request",
+            "foia_trackingnumber": "SYN-FOIA-2026-007",
+            "foia_intakechannel": "API",
+            "foia_validationstate": "Perfected",
+            "foia_lifecyclestage": "Closure",
+            "foia_receiveddate": "2026-05-01T12:00:00Z",
+            "foia_perfecteddate": "2026-05-01",
+            "foia_currentduedate": "2026-05-29",
+            "foia_acknowledgmentsent": true,
+            "foia_duplicatesuspected": false,
+            "foia_expeditedrequested": false,
+            "foia_requestscope": "Synthetic released journey using fictional records only.",
+            "foia_disposition": "Full Grant",
+            "foia_feecategory": "News Media",
+            "foia_feeassessed": 0,
+            "foia_feewaived": 0,
+            "foia_feecollected": 0,
+            "foia_acknowledgmentreference": "SYN-ACK-007",
+            "foia_fiscalperiod": "FY2026-Q3",
+            "foia_closeddate": "2026-05-20"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_requesterid",
+              "TargetValue": "SYN-CONTACT-07"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_trackingnumber"
+    },
+    {
+      "TableLogicalName": "incident",
+      "Records": [
+        {
+          "Key": "SYN-CASE-01",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 1",
+            "foia_caseworktype": "Normal",
+            "foia_statutoryduedate": "2026-02-03"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-001"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-01"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-02",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 2",
+            "foia_caseworktype": "Expedited",
+            "foia_statutoryduedate": "2026-02-20"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-002"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-02"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-03",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 3",
+            "foia_caseworktype": "Overdue",
+            "foia_statutoryduedate": "2025-11-03"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-003"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-03"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-04",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 4",
+            "foia_caseworktype": "Appealed",
+            "foia_statutoryduedate": "2025-09-03"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-004"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-04"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-05",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 5",
+            "foia_caseworktype": "Fee",
+            "foia_statutoryduedate": "2026-03-31"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-005"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-05"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-06",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 6",
+            "foia_caseworktype": "Exemption",
+            "foia_statutoryduedate": "2026-04-30"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-006"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-06"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CASE-07",
+          "Values": {
+            "description": "Clearly synthetic case with no production-derived data.",
+            "title": "Synthetic FOIA Case 7",
+            "foia_caseworktype": "Released",
+            "foia_statutoryduedate": "2026-05-29"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            },
+            {
+              "TargetTable": "contact",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "customerid_contact",
+              "TargetValue": "SYN-CONTACT-07"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_syntheticrecordkey"
+    },
+    {
+      "TableLogicalName": "foia_searchtask",
+      "Records": [
+        {
+          "Key": "SYN-SEARCH-001",
+          "Values": {
+            "foia_duedate": "2026-01-15",
+            "foia_searchterms": "synthetic policy",
+            "foia_status": "Completed",
+            "foia_searchscope": "Fictional policy repository",
+            "foia_resultcount": 2,
+            "foia_evidencereference": "SYN-EVIDENCE-001",
+            "foia_collectionsourcesystem": "SharePoint",
+            "foia_completeddate": "2026-01-14T18:00:00Z",
+            "foia_custodianorsource": "Synthetic Custodian A",
+            "foia_assigneddate": "2026-01-07T14:00:00Z",
+            "foia_searchtasknumber": "SYN-SEARCH-001",
+            "foia_name": "Synthetic Normal Search"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-001"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-01"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-SEARCH-002",
+          "Values": {
+            "foia_duedate": "2026-02-10",
+            "foia_searchterms": "synthetic urgent",
+            "foia_status": "Completed",
+            "foia_searchscope": "Fictional urgent correspondence",
+            "foia_resultcount": 1,
+            "foia_evidencereference": "SYN-EVIDENCE-002",
+            "foia_collectionsourcesystem": "Exchange",
+            "foia_completeddate": "2026-02-09T20:00:00Z",
+            "foia_custodianorsource": "Synthetic Custodian B",
+            "foia_assigneddate": "2026-02-03T14:00:00Z",
+            "foia_searchtasknumber": "SYN-SEARCH-002",
+            "foia_name": "Synthetic Expedited Search"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-002"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-02"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-SEARCH-006",
+          "Values": {
+            "foia_duedate": "2026-04-10",
+            "foia_searchterms": "synthetic privileged",
+            "foia_status": "Completed",
+            "foia_searchscope": "Fictional legal review material",
+            "foia_resultcount": 1,
+            "foia_evidencereference": "SYN-EVIDENCE-006",
+            "foia_collectionsourcesystem": "OneDrive",
+            "foia_completeddate": "2026-04-09T20:00:00Z",
+            "foia_custodianorsource": "Synthetic Custodian C",
+            "foia_assigneddate": "2026-04-03T14:00:00Z",
+            "foia_searchtasknumber": "SYN-SEARCH-006",
+            "foia_name": "Synthetic Exemption Search"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-006"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-06"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-SEARCH-007",
+          "Values": {
+            "foia_duedate": "2026-05-08",
+            "foia_searchterms": "synthetic release",
+            "foia_status": "Completed",
+            "foia_searchscope": "Fictional releasable material",
+            "foia_resultcount": 1,
+            "foia_evidencereference": "SYN-EVIDENCE-007",
+            "foia_collectionsourcesystem": "SharePoint",
+            "foia_completeddate": "2026-05-07T20:00:00Z",
+            "foia_custodianorsource": "Synthetic Custodian D",
+            "foia_assigneddate": "2026-05-02T14:00:00Z",
+            "foia_searchtasknumber": "SYN-SEARCH-007",
+            "foia_name": "Synthetic Released Search"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-07"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_searchtasknumber"
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "Records": [
+        {
+          "Key": "SYN-RECORD-001",
+          "Values": {
+            "foia_siteidentifier": "synthetic-site",
+            "foia_itemidentifier": "synthetic/items/001",
+            "foia_itemversion": "1.0",
+            "foia_reviewstate": "Responsive",
+            "foia_recordidentifier": "SYN-RECORD-001",
+            "foia_classification": "Synthetic-Unclassified",
+            "foia_originalfilename": "synthetic-normal.pdf",
+            "foia_contenthash": "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+            "foia_name": "Synthetic Normal PDF",
+            "foia_accessstate": "Validated",
+            "foia_repository": "SharePoint",
+            "foia_sizebytes": 1024,
+            "foia_libraryidentifier": "synthetic-library",
+            "foia_mediatype": "application/pdf"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_searchtask",
+              "TargetKey": "foia_searchtasknumber",
+              "Field": "foia_searchtaskid",
+              "TargetValue": "SYN-SEARCH-001"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-001"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-RECORD-006",
+          "Values": {
+            "foia_siteidentifier": "synthetic-site",
+            "foia_itemidentifier": "synthetic/items/006",
+            "foia_itemversion": "1.0",
+            "foia_reviewstate": "Redacted",
+            "foia_recordidentifier": "SYN-RECORD-006",
+            "foia_classification": "Synthetic-Unclassified",
+            "foia_originalfilename": "synthetic-exemption.pdf",
+            "foia_contenthash": "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB",
+            "foia_name": "Synthetic Exemption PDF",
+            "foia_accessstate": "Validated",
+            "foia_repository": "SharePoint",
+            "foia_sizebytes": 2048,
+            "foia_libraryidentifier": "synthetic-library",
+            "foia_mediatype": "application/pdf"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_searchtask",
+              "TargetKey": "foia_searchtasknumber",
+              "Field": "foia_searchtaskid",
+              "TargetValue": "SYN-SEARCH-006"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-006"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-RECORD-007",
+          "Values": {
+            "foia_siteidentifier": "synthetic-site",
+            "foia_itemidentifier": "synthetic/items/007",
+            "foia_itemversion": "1.0",
+            "foia_reviewstate": "Released",
+            "foia_recordidentifier": "SYN-RECORD-007",
+            "foia_classification": "Synthetic-Unclassified",
+            "foia_originalfilename": "synthetic-released.pdf",
+            "foia_contenthash": "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC",
+            "foia_name": "Synthetic Released PDF",
+            "foia_accessstate": "ReleasedCopy",
+            "foia_repository": "SharePoint",
+            "foia_sizebytes": 4096,
+            "foia_libraryidentifier": "synthetic-library",
+            "foia_mediatype": "application/pdf"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_searchtask",
+              "TargetKey": "foia_searchtasknumber",
+              "Field": "foia_searchtaskid",
+              "TargetValue": "SYN-SEARCH-007"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_recordidentifier"
+    },
+    {
+      "TableLogicalName": "foia_reviewtask",
+      "Records": [
+        {
+          "Key": "SYN-REVIEW-001",
+          "Values": {
+            "foia_status": "In Progress",
+            "foia_name": "Synthetic Normal Review",
+            "foia_reviewtype": "Responsiveness",
+            "foia_reviewernotes": "Synthetic review notes only.",
+            "foia_duedate": "2026-01-22",
+            "foia_assigneddate": "2026-01-15T14:00:00Z",
+            "foia_reviewtasknumber": "SYN-REVIEW-001",
+            "foia_disposition": "Responsive"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-001"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-001"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-REVIEW-006",
+          "Values": {
+            "foia_disposition": "Partial Exemption",
+            "foia_status": "Completed",
+            "foia_duedate": "2026-04-17",
+            "foia_reviewtasknumber": "SYN-REVIEW-006",
+            "foia_reviewtype": "Legal",
+            "foia_assigneddate": "2026-04-10T14:00:00Z",
+            "foia_completeddate": "2026-04-16T19:00:00Z",
+            "foia_reviewernotes": "Synthetic legal rationale pointer.",
+            "foia_name": "Synthetic Legal Review"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-006"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-006"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-REVIEW-007",
+          "Values": {
+            "foia_disposition": "Approved for Release",
+            "foia_status": "Completed",
+            "foia_duedate": "2026-05-15",
+            "foia_reviewtasknumber": "SYN-REVIEW-007",
+            "foia_reviewtype": "Final Release",
+            "foia_assigneddate": "2026-05-08T14:00:00Z",
+            "foia_completeddate": "2026-05-14T19:00:00Z",
+            "foia_reviewernotes": "Synthetic final review.",
+            "foia_name": "Synthetic Final Release Review"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-007"
+            },
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_reviewtasknumber"
+    },
+    {
+      "TableLogicalName": "foia_exemptiondecision",
+      "Records": [
+        {
+          "Key": "SYN-EXEMPTION-006",
+          "Values": {
+            "foia_decisiondate": "2026-04-18T18:00:00Z",
+            "foia_proposeddate": "2026-04-16T19:00:00Z",
+            "foia_approveridentity": "Synthetic Supervisory Approver",
+            "foia_decisionnumber": "SYN-EXEMPTION-006",
+            "foia_authority": "5 U.S.C. 552(b)(5)",
+            "foia_scope": "Synthetic page 2 paragraphs 1-2",
+            "foia_proposeridentity": "Synthetic Legal Reviewer",
+            "foia_rationale": "Synthetic deliberative-process rationale.",
+            "foia_approvalstate": "Approved",
+            "foia_name": "Synthetic Exemption 5"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_reviewtask",
+              "TargetKey": "foia_reviewtasknumber",
+              "Field": "foia_reviewtaskid",
+              "TargetValue": "SYN-REVIEW-006"
+            },
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-006"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_decisionnumber"
+    },
+    {
+      "TableLogicalName": "foia_redactiondecision",
+      "Records": [
+        {
+          "Key": "SYN-REDACTION-006",
+          "Values": {
+            "foia_approveddate": "2026-04-18T18:00:00Z",
+            "foia_finalstate": "Applied",
+            "foia_recordlocation": "Page 2, paragraphs 1-2",
+            "foia_proposedbasis": "5 U.S.C. 552(b)(5)",
+            "foia_redactionnumber": "SYN-REDACTION-006",
+            "foia_proposeridentity": "Synthetic Reviewer",
+            "foia_proposeddate": "2026-04-17T14:00:00Z",
+            "foia_approveridentity": "Synthetic Supervisory Approver",
+            "foia_name": "Synthetic Approved Redaction"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-006"
+            },
+            {
+              "TargetTable": "foia_exemptiondecision",
+              "TargetKey": "foia_decisionnumber",
+              "Field": "foia_exemptiondecisionid",
+              "TargetValue": "SYN-EXEMPTION-006"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_redactionnumber"
+    },
+    {
+      "TableLogicalName": "foia_releasepackage",
+      "Records": [
+        {
+          "Key": "SYN-PACKAGE-004",
+          "Values": {
+            "foia_packageversion": 1,
+            "foia_releasedate": "2025-09-02T18:00:00Z",
+            "foia_responsecorrespondence": "SYN-RESPONSE-004",
+            "foia_recipientreference": "SYN-CONTACT-04",
+            "foia_packagenumber": "SYN-PACKAGE-004",
+            "foia_approveridentity": "Synthetic Release Approver",
+            "foia_packagehash": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
+            "foia_releasemethod": "Secure Portal",
+            "foia_approvalstate": "Released",
+            "foia_plannedreleasedate": "2025-09-02",
+            "foia_name": "Synthetic Appealed Package v1"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-004"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-PACKAGE-007",
+          "Values": {
+            "foia_packageversion": 1,
+            "foia_releasedate": "2026-05-20T18:00:00Z",
+            "foia_responsecorrespondence": "SYN-RESPONSE-007",
+            "foia_recipientreference": "SYN-CONTACT-07",
+            "foia_packagenumber": "SYN-PACKAGE-007",
+            "foia_approveridentity": "Synthetic Release Approver",
+            "foia_packagehash": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
+            "foia_releasemethod": "Secure Portal",
+            "foia_approvalstate": "Released",
+            "foia_plannedreleasedate": "2026-05-20",
+            "foia_name": "Synthetic Released Package v1"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_packagenumber"
+    },
+    {
+      "TableLogicalName": "foia_appeal",
+      "Records": [
+        {
+          "Key": "SYN-APPEAL-004",
+          "Values": {
+            "foia_outcome": "Open",
+            "foia_receiveddate": "2025-09-15T14:00:00Z",
+            "foia_name": "Synthetic Open Appeal",
+            "foia_appealnumber": "SYN-APPEAL-004",
+            "foia_duedate": "2025-10-14",
+            "foia_stage": "Reconsideration and Legal Review",
+            "foia_challengeddetermination": "Synthetic partial-grant determination",
+            "foia_decision": "Pending"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-004"
+            },
+            {
+              "TargetTable": "foia_releasepackage",
+              "TargetKey": "foia_packagenumber",
+              "Field": "foia_releasepackageid",
+              "TargetValue": "SYN-PACKAGE-004"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_appealnumber"
+    },
+    {
+      "TableLogicalName": "foia_clockevent",
+      "Records": [
+        {
+          "Key": "SYN-CLOCK-003-RECEIPT",
+          "Values": {
+            "foia_provenance": "synthetic-clock-v1",
+            "foia_actorreference": "Synthetic Clock Service",
+            "foia_eventtype": "Receipt",
+            "foia_effectivedatetime": "2025-10-01T13:00:00Z",
+            "foia_eventidentifier": "SYN-CLOCK-003-RECEIPT",
+            "foia_resultingduedate": "2025-10-29",
+            "foia_clocktype": "Request",
+            "foia_reason": "Synthetic receipt",
+            "foia_name": "Synthetic Overdue Receipt Event"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-003"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-03"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CLOCK-003-EXTENSION",
+          "Values": {
+            "foia_provenance": "synthetic-clock-v1",
+            "foia_actorreference": "Synthetic Clock Service",
+            "foia_eventtype": "Extension",
+            "foia_effectivedatetime": "2025-10-20T13:00:00Z",
+            "foia_eventidentifier": "SYN-CLOCK-003-EXTENSION",
+            "foia_priorduedate": "2025-10-29",
+            "foia_resultingduedate": "2025-11-03",
+            "foia_clocktype": "Request",
+            "foia_reason": "Synthetic extension",
+            "foia_name": "Synthetic Overdue Extension Event"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-003"
+            },
+            {
+              "TargetTable": "incident",
+              "TargetKey": "foia_syntheticrecordkey",
+              "Field": "foia_incidentid",
+              "TargetValue": "SYN-CASE-03"
+            }
+          ]
+        },
+        {
+          "Key": "SYN-CLOCK-004-APPEAL",
+          "Values": {
+            "foia_provenance": "synthetic-clock-v1",
+            "foia_actorreference": "Synthetic Clock Service",
+            "foia_eventtype": "Appeal Receipt",
+            "foia_effectivedatetime": "2025-09-15T14:00:00Z",
+            "foia_eventidentifier": "SYN-CLOCK-004-APPEAL",
+            "foia_resultingduedate": "2025-10-14",
+            "foia_clocktype": "Appeal",
+            "foia_reason": "Synthetic appeal receipt",
+            "foia_name": "Synthetic Appeal Receipt Event"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-004"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_eventidentifier"
+    },
+    {
+      "TableLogicalName": "foia_auditevent",
+      "Records": [
+        {
+          "Key": "SYN-AUDIT-007-RELEASE",
+          "Values": {
+            "foia_purpose": "Issue approved synthetic package",
+            "foia_eventidentifier": "SYN-AUDIT-007-RELEASE",
+            "foia_correlationidentifier": "SYN-CORR-007",
+            "foia_eventdatetime": "2026-05-20T18:00:00Z",
+            "foia_name": "Synthetic Release Audit Event",
+            "foia_eventtype": "Release",
+            "foia_scope": "SYN-PACKAGE-007",
+            "foia_actorreference": "Synthetic Release Officer"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-007"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_eventidentifier"
+    },
+    {
+      "TableLogicalName": "foia_aiassistancerecord",
+      "Records": [
+        {
+          "Key": "SYN-AI-001",
+          "Values": {
+            "foia_operationclassification": "Summarization",
+            "foia_revieweddatetime": "2026-01-16T14:05:00Z",
+            "foia_reviewerdisposition": "Rejected",
+            "foia_createddatetime": "2026-01-16T14:00:00Z",
+            "foia_provider": "DisabledAdapter",
+            "foia_sourcereferences": "SYN-RECORD-001",
+            "foia_output": "Disabled adapter returned no recommendation.",
+            "foia_assistanceidentifier": "SYN-AI-001",
+            "foia_operationalstatus": "Disabled",
+            "foia_name": "Synthetic Disabled AI Adapter Record"
+          },
+          "Lookups": [
+            {
+              "TargetTable": "foia_foiarequest",
+              "TargetKey": "foia_trackingnumber",
+              "Field": "foia_foiarequestid",
+              "TargetValue": "SYN-FOIA-2026-001"
+            },
+            {
+              "TargetTable": "foia_responsiverecord",
+              "TargetKey": "foia_recordidentifier",
+              "Field": "foia_responsiverecordid",
+              "TargetValue": "SYN-RECORD-001"
+            }
+          ]
+        }
+      ],
+      "NaturalKey": "foia_assistanceidentifier"
+    }
+  ]
+}

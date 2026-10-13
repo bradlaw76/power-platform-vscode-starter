@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_aiassistancerecord",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "AI Assistance Record",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "AI Assistance Records",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Assistive-only AI recommendation, provenance, output, and human disposition. FOIA-DAT-003; FOIA-AI-001..006.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

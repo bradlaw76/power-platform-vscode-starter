@@ -1,0 +1,129 @@
+{
+  "TableLogicalName": "contact",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_requesterclassification",
+      "LogicalName": "foia_requesterclassification",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Requester Classification",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Requester classification used for fee handling. FOIA-DAT-002; FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.BooleanAttributeMetadata",
+      "SchemaName": "foia_identityverified",
+      "LogicalName": "foia_identityverified",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Identity Verified",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Human-recorded verification state. FOIA-INT-002; FOIA-SEC-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "DefaultValue": false,
+      "OptionSet": {
+        "TrueOption": {
+          "Value": 1,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "Yes",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        },
+        "FalseOption": {
+          "Value": 0,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "No",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticrecordkey",
+      "LogicalName": "foia_syntheticrecordkey",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Synthetic Record Key",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Explicit bounded test natural key. FOIA-TST-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Explicit non-production ownership marker. FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

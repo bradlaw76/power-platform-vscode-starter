@@ -95,19 +95,29 @@ if (Test-Path $hardeningHelper) {
     . $hardeningHelper
 }
 
+$dataverseRuntimeHelper = Join-Path $PSScriptRoot "helpers\dataverse-runtime.ps1"
+if (-not (Test-Path $dataverseRuntimeHelper)) {
+    throw "Dataverse runtime helper not found: $dataverseRuntimeHelper"
+}
+. $dataverseRuntimeHelper
+
 # ── Load session env if not already set ───────────────────────────────────
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
-if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+if (Test-Path $envFile) {
     . $envFile
-    $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
-    $AccessToken    = $global:DV_TOKEN
+    if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+        $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    }
+    if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+        $AccessToken = $global:DV_TOKEN
+    }
 }
 
 $scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
     Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
 } else { $null }
-$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
-$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
+$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } elseif ($env:DV_SOLUTION_NAME) { $env:DV_SOLUTION_NAME } else { '' }
+$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } elseif ($env:DV_PUBLISHER_PREFIX) { $env:DV_PUBLISHER_PREFIX } else { '' }
 if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
@@ -136,16 +146,8 @@ if (Test-Path $tableDetectionHelper) {
 # ── Helpers ────────────────────────────────────────────────────────────────
 function Invoke-Dv {
     param([string]$Method, [string]$Path, [string]$Body = "")
-    $headers = @{
-        "Authorization"    = "Bearer $AccessToken"
-        "Content-Type"     = "application/json"
-        "OData-Version"    = "4.0"
-        "OData-MaxVersion" = "4.0"
-        "Accept"           = "application/json"
-    }
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $Body }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers
+    $requestBody = if ([string]::IsNullOrWhiteSpace($Body)) { $null } else { $Body }
+    return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body $requestBody
 }
 
 function Test-TableExists([string]$LogicalName) {
@@ -270,4 +272,3 @@ Write-Host "Next step: pwsh ./scripts/bootstrap/30-build-columns.ps1"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Table build completed."
 }
-

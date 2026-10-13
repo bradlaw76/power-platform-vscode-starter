@@ -142,9 +142,11 @@ else {
 Write-Host ""
 Write-Host "Verifying Azure session..." -ForegroundColor Cyan
 $account = az account show | ConvertFrom-Json
-Write-Host "  Signed in as: $($account.user.name)"
-Write-Host "  Tenant:       $($account.tenantId)"
-Write-Host "  Subscription: $($account.name)"
+if ($null -eq $account -or [string]::IsNullOrWhiteSpace([string]$account.tenantId)) {
+    Write-Host "Unable to verify the Azure session." -ForegroundColor Red
+    exit 1
+}
+Write-Host "Azure session verified." -ForegroundColor Green
 Write-Host ""
 
 # ── Get bearer token ───────────────────────────────────────────────────────
@@ -161,7 +163,12 @@ Write-Host "Token acquired." -ForegroundColor Green
 Write-Host ""
 Write-Host "Creating Power Platform CLI auth profile..."
 pac auth create --url $envUrl | Out-Null
-pac auth list
+$pacProfiles = pac auth list
+if ($LASTEXITCODE -ne 0 -or @($pacProfiles).Count -eq 0) {
+    Write-Host "Unable to verify the Power Platform CLI auth profile." -ForegroundColor Red
+    exit 1
+}
+Write-Host "Power Platform CLI auth profile verified." -ForegroundColor Green
 
 # ── Load any planning values written by 05-start-wizard.ps1 ─────────────────
 $_planEnvFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
@@ -189,19 +196,21 @@ function Get-ReusedScenarioTables {
     if (-not (Test-Path $answersPath)) { return @() }
 
     $answersText = Get-Content $answersPath -Raw
-    $tableStrategy = [regex]::Match($answersText, '(?im)^-\s*Table Strategy:\s*(.+)$').Groups[1].Value.Trim().ToLowerInvariant()
+    $tableStrategy = [regex]::Match($answersText, '(?im)^-\s*Table Strategy:\s*(.+)$').Groups[1].Value.Trim().Trim([char]96).ToLowerInvariant()
     if (@('oob-only', 'hybrid') -notcontains $tableStrategy) { return @() }
 
     $payloadRoot = Join-Path $RepositoryRoot 'payloads'
+    $scenarioPayloadRoot = Join-Path $payloadRoot (Join-Path 'scenarios' $Slug)
+    $payloadSearchRoot = if (Test-Path $scenarioPayloadRoot) { $scenarioPayloadRoot } else { $payloadRoot }
     $createdTables = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    foreach ($file in @(Get-ChildItem $payloadRoot -Filter 'table-*.json' -ErrorAction SilentlyContinue)) {
+    foreach ($file in @(Get-ChildItem $payloadSearchRoot -Filter 'table-*.json' -ErrorAction SilentlyContinue)) {
         $document = Get-Content $file.FullName -Raw | ConvertFrom-Json
         $schemaName = if ($null -ne $document.EntityDefinition) { $document.EntityDefinition.SchemaName } else { $document.SchemaName }
         if (-not [string]::IsNullOrWhiteSpace($schemaName)) { [void]$createdTables.Add($schemaName.ToLowerInvariant()) }
     }
 
     $reusedTables = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    foreach ($file in @(Get-ChildItem $payloadRoot -Filter 'columns-*.json' -ErrorAction SilentlyContinue)) {
+    foreach ($file in @(Get-ChildItem $payloadSearchRoot -Filter 'columns-*.json' -ErrorAction SilentlyContinue)) {
         $document = Get-Content $file.FullName -Raw | ConvertFrom-Json
         $tableName = [string]$document.TableLogicalName
         if (-not [string]::IsNullOrWhiteSpace($tableName) -and -not $createdTables.Contains($tableName)) {
@@ -342,7 +351,22 @@ if ($prefixChoice -ieq "existing") {
     $prefixPromptDefault = if ($plannedPrefix) { " [$plannedPrefix]" } else { "" }
     $publisherPrefix = Read-Host "New prefix (3-8 lowercase letters, e.g. cto, demo)$prefixPromptDefault"
     if ([string]::IsNullOrWhiteSpace($publisherPrefix)) { $publisherPrefix = $plannedPrefix }
+    if ($publisherPrefix -cnotmatch '^[a-z]{3,8}$') {
+        Write-Host "A new publisher prefix must contain 3-8 lowercase letters." -ForegroundColor Red
+        exit 1
+    }
+    $safePublisherPrefix = $publisherPrefix.Replace("'", "''")
+    $pubCheck = Invoke-DvGet "publishers?`$filter=customizationprefix eq '$safePublisherPrefix'&`$select=publisherid"
+    if ($pubCheck.value.Count -gt 0) {
+        Write-Host "  ERROR: publisher prefix '$publisherPrefix' already exists in this environment." -ForegroundColor Red
+        Write-Host "Choose a different prefix, or rerun this script and explicitly select 'existing' if reuse is intentional." -ForegroundColor Yellow
+        exit 1
+    }
     $publisherName = Read-Host "Publisher name (e.g. Contoso)"
+    if ([string]::IsNullOrWhiteSpace($publisherName)) {
+        Write-Host "A publisher name is required for a new prefix." -ForegroundColor Red
+        exit 1
+    }
 }
 
 # ── Write session env file ─────────────────────────────────────────────────
@@ -373,4 +397,3 @@ Write-Host "Next step: pwsh ./scripts/bootstrap/20-build-tables.ps1"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Authentication and environment configuration saved."
 }
-

@@ -93,6 +93,9 @@ if (-not (Test-Path $hardeningHelper)) {
 
 . $hardeningHelper
 
+$scenarioContext = Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
+$PayloadsFolder = $scenarioContext.ScenarioPayloadFolder
+
 $dataverseRuntimeHelper = Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1'
 if (-not (Test-Path $dataverseRuntimeHelper)) {
     Write-Host "Missing helper script: $dataverseRuntimeHelper" -ForegroundColor Red
@@ -124,20 +127,9 @@ function Invoke-Dv {
         })
     }
 
-    $headers = @{
-        Authorization = "Bearer $AccessToken"
-        'Content-Type' = 'application/json'
-        'OData-Version' = '4.0'
-        'OData-MaxVersion' = '4.0'
-        Accept = 'application/json'
-    }
-
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ([string]::IsNullOrWhiteSpace($Body)) {
-        return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers
-    }
-
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $Body
+    $requestBody = if ([string]::IsNullOrWhiteSpace($Body)) { $null } else { $Body }
+    return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl `
+        -AccessToken $AccessToken -Body $requestBody
 }
 
 function Get-AppModule {
@@ -148,7 +140,14 @@ function Get-AppModule {
 
     $safe = $UniqueName.Replace("'", "''")
     $safeDisplayName = $DisplayName.Replace("'", "''")
-    return @((Invoke-Dv -Method 'Get' -Path "appmodules?`$select=appmoduleid,name,uniquename,description&`$filter=uniquename eq '$safe' or name eq '$safeDisplayName'").value)
+    $published = @((Invoke-Dv -Method 'Get' -Path "appmodules?`$select=appmoduleid,name,uniquename,description,componentstate&`$filter=uniquename eq '$safe' or name eq '$safeDisplayName'").value)
+    if ($published.Count -gt 0) {
+        return $published
+    }
+
+    $unpublishedResponse = Invoke-Dv -Method 'Get' -Path "appmodules/Microsoft.Dynamics.CRM.RetrieveUnpublishedMultiple()?`$select=appmoduleid,name,uniquename,description,componentstate&`$filter=uniquename eq '$safe' or name eq '$safeDisplayName'"
+    $valueProperty = if ($null -eq $unpublishedResponse) { $null } else { $unpublishedResponse.PSObject.Properties['value'] }
+    return @(if ($null -ne $valueProperty) { @($valueProperty.Value) } else { @() })
 }
 
 function Test-ComponentInTargetSolution {
@@ -177,7 +176,11 @@ function Get-SolutionComponentTypeValue {
         }
     }
 
-    return $null
+    switch ($Label) {
+        'App Module' { return 80 }
+        'Site Map' { return 62 }
+        default { return $null }
+    }
 }
 
 function Add-AppToSolution {
@@ -272,7 +275,8 @@ function New-AppSiteMapXml {
     param(
         [string]$AppName,
         [string]$NavigationGroup,
-        [string[]]$Tables
+        [string[]]$Tables,
+        [object[]]$Dashboards = @()
     )
 
     $areaId = "area_$(ConvertTo-SiteMapIdPart -Value $AppName)"
@@ -281,10 +285,25 @@ function New-AppSiteMapXml {
         $safeTable = ConvertTo-XmlAttributeValue -Value $table
         "      <SubArea Id=`"subarea_$(ConvertTo-SiteMapIdPart -Value $table)`" Entity=`"$safeTable`" />"
     }
+    $dashboardGroup = ''
+    if (@($Dashboards).Count -gt 0) {
+        $dashboardSubAreas = foreach ($dashboard in @($Dashboards)) {
+            $dashboardId = ConvertTo-XmlAttributeValue -Value "$($dashboard.Id)"
+            $dashboardTitle = ConvertTo-XmlAttributeValue -Value "$($dashboard.Title)"
+            $subAreaId = "subarea_dashboard_$(ConvertTo-SiteMapIdPart -Value "$($dashboard.Name)")"
+            "      <SubArea Id=`"$subAreaId`" DescriptionResourceId=`"Dashboards_Description`" Icon=`"/_imgs/imagestrips/transparent_spacer.gif`" Url=`"/workplace/home_dashboards.aspx`" DefaultDashboard=`"$dashboardId`" Client=`"All,Outlook,OutlookLaptopClient,OutlookWorkstationClient,Web`" AvailableOffline=`"true`" PassParams=`"false`" Sku=`"All,OnPremise,Live,SPLA`"><Titles><Title LCID=`"1033`" Title=`"$dashboardTitle`" /></Titles></SubArea>"
+        }
+        $dashboardGroup = @"
+    <Group Id="group_dashboards" Title="Dashboards">
+$($dashboardSubAreas -join [Environment]::NewLine)
+    </Group>
+"@
+    }
 
     return @"
 <SiteMap>
   <Area Id="$areaId" Title="$(ConvertTo-XmlAttributeValue -Value $AppName)" ShowGroups="true">
+$dashboardGroup
     <Group Id="$groupId" Title="$(ConvertTo-XmlAttributeValue -Value $NavigationGroup)">
 $($subAreas -join [Environment]::NewLine)
     </Group>
@@ -301,7 +320,9 @@ function Get-AppSiteMap {
 
     $safe = $UniqueName.Replace("'", "''")
     $safeDisplayName = $DisplayName.Replace("'", "''")
-    return @((Invoke-Dv -Method 'Get' -Path "sitemaps?`$select=sitemapid,sitemapname,sitemapnameunique,sitemapxml&`$filter=sitemapnameunique eq '$safe' or sitemapname eq '$safeDisplayName'").value)
+    $response = Invoke-Dv -Method 'Get' -Path "sitemaps/Microsoft.Dynamics.CRM.RetrieveUnpublishedMultiple()?`$select=sitemapid,sitemapname,sitemapnameunique,sitemapxml,componentstate&`$filter=sitemapnameunique eq '$safe' or sitemapname eq '$safeDisplayName'"
+    $valueProperty = if ($null -eq $response) { $null } else { $response.PSObject.Properties['value'] }
+    return @(if ($null -ne $valueProperty) { @($valueProperty.Value) } else { @() })
 }
 
 function Set-AppSiteMap {
@@ -475,18 +496,31 @@ if ($upsertAction -eq 'update') {
     if ($existing[0].uniquename -cne $appConfig.UniqueName -or $existing[0].name -cne $appConfig.AppName -or $existing[0].description -cne $expectedDescription) {
         throw "Cannot update app '$($appConfig.AppName)': same-name or same-unique-name metadata does not match the scenario contract."
     }
-    if (-not (Test-ComponentInTargetSolution -ObjectId $appModuleId -ComponentTypeLabel 'App Module')) {
+    $componentStateProperty = $existing[0].PSObject.Properties['componentstate']
+    $isUnpublishedDraft = $null -ne $componentStateProperty -and [int]$componentStateProperty.Value -eq 1
+    if (-not $isUnpublishedDraft -and -not (Test-ComponentInTargetSolution -ObjectId $appModuleId -ComponentTypeLabel 'App Module')) {
         throw "Cannot update app '$($appConfig.AppName)': it is not uniquely owned by target solution '$SolutionUniqueName'."
     }
-    if (-not $PreviewOnly) {
-        $patchBody = @{ name = $appConfig.AppName; description = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'." } | ConvertTo-Json -Compress
+    if ($isUnpublishedDraft) {
+        $action = 'recovered'
+    }
+    if (-not $PreviewOnly -and -not $isUnpublishedDraft) {
+        $patchBody = @{
+            name = $appConfig.AppName
+            uniquename = $appConfig.UniqueName
+            description = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'."
+            webresourceid = '953b9fac-1e5e-e611-80d6-00155ded156f'
+        } | ConvertTo-Json -Compress
         Invoke-Dv -Method 'Patch' -Path "appmodules($appModuleId)" -Body $patchBody | Out-Null
     }
 } else {
     if (-not $PreviewOnly) {
         $createBody = @{ name = $appConfig.AppName; uniquename = $appConfig.UniqueName; webresourceid = '953b9fac-1e5e-e611-80d6-00155ded156f'; description = "Wizard-managed app for scenario '$($appConfig.ScenarioSlug)'." } | ConvertTo-Json -Compress
         $createResult = Invoke-Dv -Method 'Post' -Path 'appmodules' -Body $createBody
-        $appModuleId = ($createResult.appmoduleid ?? '')
+        $appModuleIdProperty = if ($null -eq $createResult) { $null } else { $createResult.PSObject.Properties['appmoduleid'] }
+        if ($null -ne $appModuleIdProperty) {
+            $appModuleId = "$($appModuleIdProperty.Value)"
+        }
     }
 
     if ([string]::IsNullOrWhiteSpace($appModuleId)) {
@@ -499,12 +533,13 @@ if ($upsertAction -eq 'update') {
 
 $componentRefs = New-Object System.Collections.Generic.List[object]
 $navigationItems = New-Object System.Collections.Generic.List[object]
+$dashboardNavigationItems = New-Object System.Collections.Generic.List[object]
 $localValidationIssues = New-Object System.Collections.Generic.List[string]
 foreach ($table in @($orderedTables.ToArray())) {
     try {
         $entity = Get-EntityDefinition -LogicalName $table
         if ($null -ne $entity -and -not [string]::IsNullOrWhiteSpace($entity.MetadataId)) {
-            $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.EntityMetadata' -IdProperty 'MetadataId' -IdValue $entity.MetadataId)) | Out-Null
+            $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.entity' -IdProperty 'entityid' -IdValue $entity.MetadataId)) | Out-Null
             $navigationItems.Add([pscustomobject]@{ group = $appConfig.NavigationGroup; type = 'table'; name = $table; isEntryPoint = ($table -eq $appConfig.EntryPointTable) }) | Out-Null
         }
     } catch {
@@ -561,19 +596,29 @@ if ($reportingPayloads.Count -gt 1) {
             $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.savedqueryvisualization' -IdProperty 'savedqueryvisualizationid' -IdValue $chartMatches[0].savedqueryvisualizationid)) | Out-Null
         }
     }
-    $safeDashboardName = $reporting.Dashboard.Name.Replace("'", "''")
-    $dashboardMatches = @((Invoke-Dv -Method 'Get' -Path "systemforms?`$select=formid,name,type&`$filter=name eq '$safeDashboardName' and type eq 0").value)
-    if ($dashboardMatches.Count -ne 1) {
-        $localValidationIssues.Add("Dashboard '$($reporting.Dashboard.Name)' must resolve exactly once; found $($dashboardMatches.Count).") | Out-Null
+    $dashboardDefinitions = if ($reporting.PSObject.Properties.Name -contains 'Dashboards' -and @($reporting.Dashboards).Count -gt 0) {
+        @($reporting.Dashboards)
     } else {
-        $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.systemform' -IdProperty 'formid' -IdValue $dashboardMatches[0].formid)) | Out-Null
+        @($reporting.Dashboard)
+    }
+    foreach ($dashboard in @($dashboardDefinitions)) {
+        $safeDashboardName = $dashboard.Name.Replace("'", "''")
+        $dashboardMatches = @((Invoke-Dv -Method 'Get' -Path "systemforms?`$select=formid,name,type&`$filter=name eq '$safeDashboardName' and type eq 0").value)
+        if ($dashboardMatches.Count -ne 1) {
+            $localValidationIssues.Add("Dashboard '$($dashboard.Name)' must resolve exactly once; found $($dashboardMatches.Count).") | Out-Null
+        } else {
+            $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.systemform' -IdProperty 'formid' -IdValue $dashboardMatches[0].formid)) | Out-Null
+            $dashboardTitle = "$($dashboard.Name)" -replace '^Federal FOIA\s+', ''
+            $dashboardNavigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; title=$dashboardTitle; id=$dashboardMatches[0].formid }) | Out-Null
+            $navigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; isEntryPoint=$false }) | Out-Null
+        }
     }
 }
 
 $siteMapResult = [pscustomobject]@{ Id = ''; Action = if ($PreviewOnly) { 'preview' } else { 'skipped' } }
 if ($orderedTables.Count -gt 0) {
     $siteMapUniqueName = "$(ConvertTo-SiteMapIdPart -Value $appConfig.UniqueName)_sitemap"
-    $siteMapXml = New-AppSiteMapXml -AppName $appConfig.AppName -NavigationGroup $appConfig.NavigationGroup -Tables @($orderedTables.ToArray())
+    $siteMapXml = New-AppSiteMapXml -AppName $appConfig.AppName -NavigationGroup $appConfig.NavigationGroup -Tables @($orderedTables.ToArray()) -Dashboards @($dashboardNavigationItems.ToArray())
     if (-not $PreviewOnly) {
         try {
             $siteMapResult = Set-AppSiteMap -UniqueName $siteMapUniqueName -DisplayName "$($appConfig.AppName) Site Map" -SiteMapXml $siteMapXml
@@ -588,8 +633,6 @@ $solutionAddStatus = 'skipped'
 if (-not $PreviewOnly -and -not [string]::IsNullOrWhiteSpace($appModuleId)) {
     Add-AppComponents -AppId $appModuleId -Components @($componentRefs.ToArray())
     $solutionAddStatus = Add-AppToSolution -AppModuleId $appModuleId
-    $publishXml = New-WizardAppModulePublishXml -AppModuleId $appModuleId
-    Invoke-Dv -Method 'Post' -Path 'PublishXml' -Body (@{ ParameterXml = $publishXml } | ConvertTo-Json -Compress) | Out-Null
 }
 
 $platformValidationResult = if ($PreviewOnly -or [string]::IsNullOrWhiteSpace($appModuleId)) {
@@ -605,6 +648,10 @@ $allValidationIssues = @($localValidationIssues.ToArray()) + @($platformValidati
 $validationResult = [pscustomobject]@{
     ValidationSuccess = ([bool]$platformValidationResult.ValidationSuccess -and $localValidationIssues.Count -eq 0)
     ValidationIssueList = @($allValidationIssues)
+}
+if (-not $PreviewOnly -and $validationResult.ValidationSuccess) {
+    $publishXml = New-WizardAppModulePublishXml -AppModuleId $appModuleId
+    Invoke-Dv -Method 'Post' -Path 'PublishXml' -Body (@{ ParameterXml = $publishXml } | ConvertTo-Json -Compress) | Out-Null
 }
 
 [ordered]@{

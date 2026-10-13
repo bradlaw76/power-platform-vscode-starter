@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_searchtask",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_SearchTask_Number",
+      "DisplayName": "Search Task Number",
+      "KeyAttributes": ["foia_searchtasknumber"]
+    }
+  ]
+}

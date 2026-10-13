@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_exemptiondecision",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Exemption Decision",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Exemption Decisions",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Controlled exemption determination with authority, rationale, and approval evidence. FOIA-DAT-003; FOIA-REV-003; FOIA-CAS-005.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}
