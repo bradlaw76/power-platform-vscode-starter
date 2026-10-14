@@ -49,17 +49,38 @@ if ($null -eq $solutionXmlPath) { throw 'Unpacked solution does not contain Solu
 $uniqueName = "$($solutionXml.ImportExportXml.SolutionManifest.UniqueName)"
 if ($uniqueName -cne $SolutionUniqueName) { throw "Unpacked solution identity '$uniqueName' does not match '$SolutionUniqueName'." }
 $normalizeId = { param($Value) "$Value".Trim().Trim('{','}').ToLowerInvariant() }
-$expectedComponents = @($membership.Items | ForEach-Object {
-    $objectId = & $normalizeId $_.ObjectId
-    if ([string]::IsNullOrWhiteSpace($objectId) -or $null -eq $_.ComponentType) { throw "Membership item '$($_.Category)|$($_.Name)' lacks a component type or stable object ID." }
-    [pscustomobject]@{ Key="$($_.ComponentType)|$objectId"; Category="$($_.Category)"; Name="$($_.Name)"; ComponentType="$($_.ComponentType)"; ObjectId=$objectId }
+$inheritedMembership = @($membership.Items | Where-Object {
+    [string]::IsNullOrWhiteSpace("$($_.ObjectId)") -or $null -eq $_.ComponentType
+})
+$invalidInheritedMembership = @($inheritedMembership | Where-Object {
+    "$($_.Reason)" -notlike 'Inherited from include-all table root*'
+})
+if ($invalidInheritedMembership.Count -gt 0) {
+    throw "Membership item '$($invalidInheritedMembership[0].Category)|$($invalidInheritedMembership[0].Name)' lacks explicit or inherited component evidence."
+}
+$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources')
+$schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources')
+$expectedComponents = @($membership.Items | Where-Object {
+    $_.Category -in $rootCategories -and -not [string]::IsNullOrWhiteSpace("$($_.ObjectId)") -and $null -ne $_.ComponentType
+} | ForEach-Object {
+    $identity = if ($_.Category -in $schemaIdentityCategories) {
+        "schema:$("$($_.Name)".Trim().ToLowerInvariant())"
+    } else {
+        "id:$(& $normalizeId $_.ObjectId)"
+    }
+    [pscustomobject]@{ Key="$($_.ComponentType)|$identity"; Category="$($_.Category)"; Name="$($_.Name)"; ComponentType="$($_.ComponentType)"; ObjectId=(& $normalizeId $_.ObjectId) }
 })
 $rootComponentsNode = $solutionXml.ImportExportXml.SolutionManifest.RootComponents
 $rootComponentNodes = if ($null -ne $rootComponentsNode -and $rootComponentsNode.PSObject.Properties.Name -contains 'RootComponent') { @($rootComponentsNode.RootComponent) } else { @() }
 $packageComponents = @($rootComponentNodes | ForEach-Object {
-    $objectId = & $normalizeId $_.id
-    if ([string]::IsNullOrWhiteSpace($objectId) -or [string]::IsNullOrWhiteSpace("$($_.type)")) { throw 'Unpacked Solution.xml contains a root component without a type and stable object ID.' }
-    [pscustomobject]@{ Key="$($_.type)|$objectId"; ComponentType="$($_.type)"; ObjectId=$objectId; SchemaName="$($_.schemaName)" }
+    $componentType = $_.GetAttribute('type')
+    $objectId = & $normalizeId $_.GetAttribute('id')
+    $schemaName = $_.GetAttribute('schemaName').Trim().ToLowerInvariant()
+    if ([string]::IsNullOrWhiteSpace($componentType) -or ([string]::IsNullOrWhiteSpace($objectId) -and [string]::IsNullOrWhiteSpace($schemaName))) {
+        throw 'Unpacked Solution.xml contains a root component without a type and stable ID or schema name.'
+    }
+    $identity = if (-not [string]::IsNullOrWhiteSpace($objectId)) { "id:$objectId" } else { "schema:$schemaName" }
+    [pscustomobject]@{ Key="$componentType|$identity"; ComponentType=$componentType; ObjectId=$objectId; SchemaName=$schemaName }
 })
 $duplicateExpected = @($expectedComponents | Group-Object Key | Where-Object Count -gt 1)
 $duplicatePackage = @($packageComponents | Group-Object Key | Where-Object Count -gt 1)
@@ -72,4 +93,4 @@ $unrelatedComponents = @($packageComponents | Where-Object { -not $expectedKeys.
 if ($missingComponents.Count -gt 0) { throw "Unpacked package is missing required component '$($missingComponents[0].Category)|$($missingComponents[0].Name)' ($($missingComponents[0].Key))." }
 if ($unrelatedComponents.Count -gt 0) { throw "Unpacked package contains unrelated component '$($unrelatedComponents[0].SchemaName)' ($($unrelatedComponents[0].Key))." }
 $files = @(Get-ChildItem -LiteralPath $unpackPath -File -Recurse | ForEach-Object { [IO.Path]::GetRelativePath($unpackPath,$_.FullName).Replace('\','/') } | Sort-Object)
-[ordered]@{ scenarioSlug=$ScenarioSlug; solution=$SolutionUniqueName; preview=$false; managed=$false; importPermitted=$false; zip=$zipPath; unpacked=$unpackPath; files=$files; membershipItemCount=@($membership.Items).Count; inspection=[ordered]@{ expected=$expectedComponents.Count; matched=$expectedComponents.Count; missing=@(); unrelated=@() } } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
+[ordered]@{ scenarioSlug=$ScenarioSlug; solution=$SolutionUniqueName; preview=$false; managed=$false; importPermitted=$false; zip=$zipPath; unpacked=$unpackPath; files=$files; membershipItemCount=@($membership.Items).Count; inheritedMembershipItemCount=$inheritedMembership.Count; inspection=[ordered]@{ expected=$expectedComponents.Count; matched=$expectedComponents.Count; missing=@(); unrelated=@() } } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding UTF8

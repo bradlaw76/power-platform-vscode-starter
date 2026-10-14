@@ -336,7 +336,7 @@ function New-SolutionMembershipReport {
             $matchState = Get-OptionalPropertyValue -InputObject $match -PropertyName 'State'
             $state = if ($failures.Count -gt 0) { 'Failed' } elseif ($null -eq $match) { 'Missing' } elseif ($matchState -eq 'Added') { 'Added' } else { 'Already in solution' }
             $failureReason = if ($failures.Count -eq 0) {
-                ''
+                if ($null -eq $match) { '' } else { "$(Get-OptionalPropertyValue -InputObject $match -PropertyName 'Reason')" }
             } else {
                 (Get-OptionalPropertyValue -InputObject $failures[0] -PropertyName 'Reason') ??
                     (Get-OptionalPropertyValue -InputObject $failures[0] -PropertyName 'Error') ??
@@ -394,13 +394,101 @@ function New-SolutionMembershipReport {
     }
 }
 
+function Expand-SolutionInheritedInventory {
+    param(
+        [hashtable]$ExpectedByCategory,
+        [object[]]$CurrentInventory = @(),
+        [hashtable]$RelationshipTables = @{}
+    )
+
+    $expanded = [System.Collections.Generic.List[object]]::new()
+    foreach ($item in @($CurrentInventory)) { [void]$expanded.Add($item) }
+
+    $includeAllRoots = @{}
+    foreach ($table in @($CurrentInventory | Where-Object {
+        (ConvertTo-SolutionInventoryCategory -Kind $_.Category) -eq 'tables' -and
+        [int](Get-OptionalPropertyValue -InputObject $_ -PropertyName 'RootComponentBehavior' -Default -1) -eq 0
+    })) {
+        $includeAllRoots[("$($table.Name)").Trim().ToLowerInvariant()] = $table
+    }
+
+    function Add-InheritedItem {
+        param([string]$Category, [string]$Name, [object]$Root)
+        $exists = @($expanded | Where-Object {
+            (ConvertTo-SolutionInventoryCategory -Kind $_.Category) -eq $Category -and
+            ("$($_.Name)").Trim().Equals($Name.Trim(), [System.StringComparison]::OrdinalIgnoreCase)
+        }).Count -gt 0
+        if ($exists) { return }
+        [void]$expanded.Add([pscustomobject]@{
+            Kind = $Category
+            Category = $Category
+            Name = $Name
+            ObjectId = ''
+            SolutionComponentId = "$($Root.SolutionComponentId)"
+            ComponentType = $null
+            State = 'Already in solution'
+            Reason = "Inherited from include-all table root '$($Root.Name)'."
+        })
+    }
+
+    foreach ($category in @('columns', 'forms', 'views', 'charts')) {
+        foreach ($name in @($ExpectedByCategory[$category])) {
+            $separator = if ($category -eq 'columns') { '.' } else { '|' }
+            $tableName = ("$name").Split($separator)[0].Trim().ToLowerInvariant()
+            if ($includeAllRoots.ContainsKey($tableName)) {
+                Add-InheritedItem -Category $category -Name "$name" -Root $includeAllRoots[$tableName]
+            }
+        }
+    }
+
+    foreach ($name in @($ExpectedByCategory.relationships)) {
+        $tables = @($RelationshipTables["$name"])
+        $root = @($tables | ForEach-Object {
+            $normalized = ("$_").Trim().ToLowerInvariant()
+            if ($includeAllRoots.ContainsKey($normalized)) { $includeAllRoots[$normalized] }
+        } | Select-Object -First 1)
+        if ($root.Count -gt 0) {
+            Add-InheritedItem -Category 'relationships' -Name "$name" -Root $root[0]
+        }
+    }
+
+    foreach ($name in @($ExpectedByCategory.tables)) {
+        $tableName = ("$name").Trim().ToLowerInvariant()
+        $hasTable = @($expanded | Where-Object {
+            (ConvertTo-SolutionInventoryCategory -Kind $_.Category) -eq 'tables' -and
+            ("$($_.Name)").Trim().Equals($tableName, [System.StringComparison]::OrdinalIgnoreCase)
+        }).Count -gt 0
+        if ($hasTable) { continue }
+        $subcomponent = @($expanded | Where-Object {
+            $category = ConvertTo-SolutionInventoryCategory -Kind $_.Category
+            $category -in @('columns', 'forms', 'views', 'charts') -and
+            ("$($_.Name)").Trim().ToLowerInvariant() -match "^$([regex]::Escape($tableName))[\.\|]"
+        } | Select-Object -First 1)
+        if ($subcomponent.Count -gt 0) {
+            [void]$expanded.Add([pscustomobject]@{
+                Kind = 'table'
+                Category = 'tables'
+                Name = "$name"
+                ObjectId = ''
+                SolutionComponentId = "$($subcomponent[0].SolutionComponentId)"
+                ComponentType = 1
+                State = 'Already in solution'
+                Reason = "Represented by explicit solution subcomponents for dependency table '$name'."
+            })
+        }
+    }
+
+    return @($expanded.ToArray())
+}
+
 function ConvertTo-SolutionExpectedCategoryMap {
     param([object]$ExpectedArtifacts)
 
     return @{
         tables = @(
             @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Tables')) +
-            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'DependencyTables'))
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'DependencyTables')) +
+            @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'BpfTables'))
         )
         columns = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Columns'))
         relationships = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Relationships'))

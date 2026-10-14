@@ -133,7 +133,10 @@ foreach ($v in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName)) {
     }
 }
 
-if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+if (-not [string]::IsNullOrWhiteSpace($ScenarioSlug) -and (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue)) {
+    $scenarioContext = Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
+    $PayloadsFolder = $scenarioContext.ScenarioPayloadFolder
+} elseif ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
     $PayloadsFolder = Join-Path $repoRoot "payloads"
 }
 
@@ -323,7 +326,7 @@ function Get-SolutionComponentInventory {
     $chartType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query Visualization', 'SavedQueryVisualization') -Fallback 59
 
     $items = New-Object System.Collections.Generic.List[object]
-    $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype")
+    $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype,rootcomponentbehavior")
     foreach ($component in $components) {
         if (("$($component._solutionid_value)").Trim().ToLowerInvariant() -ne $SolutionId.Trim().ToLowerInvariant()) {
             continue
@@ -335,7 +338,7 @@ function Get-SolutionComponentInventory {
         if ($componentType -eq $entityType) {
             $entity = Get-EntityDefinitionByMetadataId -InvokeGet $InvokeGet -MetadataId $objectId
             if ($null -ne $entity) {
-                $items.Add([pscustomobject]@{ Kind = 'table'; Category = 'tables'; Name = $entity.LogicalName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+                $items.Add([pscustomobject]@{ Kind = 'table'; Category = 'tables'; Name = $entity.LogicalName; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType; RootComponentBehavior = $component.rootcomponentbehavior }) | Out-Null
             }
             continue
         }
@@ -454,6 +457,26 @@ if ($InventoryOnly) {
 
     $expectedByCategory = ConvertTo-SolutionExpectedCategoryMap -ExpectedArtifacts $expectedArtifacts
     $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
+    $relationshipTables = @{}
+    foreach ($file in @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'relationships-*.json' -File -ErrorAction SilentlyContinue)) {
+        $document = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        foreach ($relationship in @($document.Relationships)) {
+            $definition = Get-WizardOptionalPropertyValue -InputObject $relationship -PropertyName 'RelationshipDefinition'
+            $schemaName = (Get-WizardOptionalPropertyValue -InputObject $relationship -PropertyName 'SchemaName') ??
+                (Get-WizardOptionalPropertyValue -InputObject $definition -PropertyName 'SchemaName')
+            if ([string]::IsNullOrWhiteSpace($schemaName)) { continue }
+            $relationshipEntities = [System.Collections.Generic.List[string]]::new()
+            foreach ($propertyName in @('ReferencedEntity', 'ReferencingEntity', 'Entity1LogicalName', 'Entity2LogicalName')) {
+                $entityName = (Get-WizardOptionalPropertyValue -InputObject $relationship -PropertyName $propertyName) ??
+                    (Get-WizardOptionalPropertyValue -InputObject $definition -PropertyName $propertyName)
+                if (-not [string]::IsNullOrWhiteSpace($entityName)) {
+                    [void]$relationshipEntities.Add($entityName)
+                }
+            }
+            $relationshipTables[$schemaName] = @($relationshipEntities.ToArray())
+        }
+    }
+    $inventory = @(Expand-SolutionInheritedInventory -ExpectedByCategory $expectedByCategory -CurrentInventory $inventory -RelationshipTables $relationshipTables)
     $failedArtifacts = @()
     $artifactPaths = Get-WizardArtifactPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
     if (Test-Path -LiteralPath $artifactPaths.ManifestJsonPath) {
@@ -467,8 +490,9 @@ if ($InventoryOnly) {
         })
     }
     $membershipReport = New-SolutionMembershipReport -ExpectedByCategory $expectedByCategory -CurrentInventory $inventory -FailedArtifacts $failedArtifacts -Strict:$StrictMode
-    $membershipJsonPath = Join-Path $artifactPaths.ContaminationFolder 'solution-membership-report.json'
-    $membershipMarkdownPath = Join-Path $artifactPaths.ContaminationFolder 'solution-membership-report.md'
+    $membershipFolder = Join-Path $artifactPaths.ArtifactRoot "contamination/$(ConvertTo-WizardManifestScenarioSlug -ScenarioSlug $ScenarioSlug)"
+    $membershipJsonPath = Join-Path $membershipFolder 'solution-membership-report.json'
+    $membershipMarkdownPath = Join-Path $membershipFolder 'solution-membership-report.md'
     $writtenReport = Write-SolutionMembershipReport -Report $membershipReport -JsonPath $membershipJsonPath -MarkdownPath $membershipMarkdownPath
 
     Write-Host "  Membership JSON:     $($writtenReport.JsonPath)" -ForegroundColor DarkGray

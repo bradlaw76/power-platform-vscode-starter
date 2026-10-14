@@ -44,6 +44,8 @@ try {
     try { & (Join-Path $repoRoot 'scripts/bootstrap/85-verify-idempotency.ps1') -ScenarioSlug $scenario -Phase Verify; throw 'Expected changed-ID failure.' } catch { if ($_.Exception.Message -notmatch 'ID changed') { throw } }
     $data.records[0].id='record-1'; $data | ConvertTo-Json -Depth 10 | Set-Content $dataPath
 
+    $membership.Items += @{ Category='columns'; Name='sample.sample_priority'; ObjectId=''; SolutionComponentId='sample-table-component'; ComponentType=$null; State='Already in solution'; Reason="Inherited from include-all table root 'sample'." }
+    $membership | ConvertTo-Json -Depth 10 | Set-Content $membershipPath
     $outputFolder = Join-Path $repoRoot ".wizard-metrics/exports/$scenario"
     $pacCalls = [Collections.Generic.List[string]]::new()
     $includeUnrelatedComponent = $false
@@ -58,8 +60,8 @@ try {
         } elseif ($Arguments[1] -eq 'unpack') {
             $folder = $Arguments[[Array]::IndexOf($Arguments,'--folder') + 1]
             New-Item -ItemType Directory -Path $folder -Force | Out-Null
-            $expected = if ($omitExpectedComponent) { '' } else { '<RootComponent type="80" id="{0}" schemaName="sample_app" />' -f $appId }
-            $extra = if ($includeUnrelatedComponent) { '<RootComponent type="1" id="22222222-2222-2222-2222-222222222222" schemaName="foreign_table" />' } else { '' }
+            $expected = if ($omitExpectedComponent) { '' } else { '<RootComponent type="80" schemaName="sample_app" />' }
+            $extra = if ($includeUnrelatedComponent) { '<RootComponent type="1" schemaName="foreign_table" />' } else { '' }
             ('<ImportExportXml><SolutionManifest><UniqueName>UnitSolution</UniqueName><RootComponents>{0}{1}</RootComponents></SolutionManifest></ImportExportXml>' -f $expected,$extra) | Set-Content -LiteralPath (Join-Path $folder 'Solution.xml')
         }
     }
@@ -67,7 +69,7 @@ try {
     if ($pacCalls.Count -ne 2 -or $pacCalls[0] -notmatch '--managed false' -or $pacCalls[1] -notmatch '--packagetype Unmanaged') { throw 'Export stage did not issue exact unmanaged export/unpack commands.' }
     if (@($pacCalls | Where-Object { $_ -match '(?i)\bimport\b' }).Count -ne 0) { throw 'Export stage attempted import.' }
     $exportEvidence = Get-Content -LiteralPath (Join-Path $artifactRoot "export/$scenario.json") -Raw | ConvertFrom-Json
-    if ($exportEvidence.inspection.expected -ne 1 -or $exportEvidence.inspection.matched -ne 1) { throw 'Export stage did not record exact package inspection evidence.' }
+    if ($exportEvidence.inspection.expected -ne 1 -or $exportEvidence.inspection.matched -ne 1 -or $exportEvidence.inheritedMembershipItemCount -ne 1) { throw 'Export stage did not record exact explicit and inherited package inspection evidence.' }
     $omitExpectedComponent = $true
     try { & (Join-Path $repoRoot 'scripts/bootstrap/95-export-unmanaged-solution.ps1') -ScenarioSlug $scenario -SolutionUniqueName UnitSolution -OutputFolder $outputFolder -PacInvoker $pacInvoker; throw 'Expected missing-component failure.' } catch { if ($_.Exception.Message -notmatch 'missing required component') { throw } }
     $omitExpectedComponent = $false

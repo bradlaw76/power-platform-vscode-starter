@@ -249,6 +249,19 @@ function Get-WizardJsonFiles {
     return @(Get-ChildItem -Path $Folder -Filter $Filter -File -ErrorAction SilentlyContinue | Sort-Object Name)
 }
 
+function ConvertTo-WizardWorkflowUniqueName {
+    param(
+        [string]$Value,
+        [string]$PublisherPrefix
+    )
+
+    $slug = [regex]::Replace(($Value ?? '').Trim().ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_')
+    $prefix = [regex]::Replace(($PublisherPrefix ?? '').Trim().ToLowerInvariant(), '[^a-z0-9]+', '')
+    if ([string]::IsNullOrWhiteSpace($prefix)) { $prefix = 'wizard' }
+    if ([string]::IsNullOrWhiteSpace($slug)) { return "${prefix}_bpf" }
+    return "${prefix}_$slug"
+}
+
 function Get-WizardPayloadSummary {
     param([string]$PayloadsFolder)
 
@@ -760,7 +773,7 @@ function New-WizardExpectedArtifacts {
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
 
     $reportWebResources = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    foreach ($reportName in @($featureConfig.SelectedReports)) {
+    foreach ($reportName in @($featureConfig.SelectedReports | Where-Object { $_ -and $_.Trim().ToLowerInvariant() -notin @('none', 'no', 'n/a') })) {
         $slug = ConvertTo-WizardSafeSlug -Value $reportName
         if (-not [string]::IsNullOrWhiteSpace($prefix) -and -not [string]::IsNullOrWhiteSpace($slug)) {
             [void]$reportWebResources.Add("$prefix`_reports/$slug.html")
@@ -799,7 +812,12 @@ function New-WizardExpectedArtifacts {
         )
         Columns = @($payloadSummary.ColumnReferences)
         Relationships = @($payloadSummary.Relationships)
-        Bpfs = @($payloadSummary.ProcessNames)
+        Bpfs = @($payloadSummary.ProcessNames | ForEach-Object {
+            ConvertTo-WizardWorkflowUniqueName -Value $_ -PublisherPrefix $PublisherPrefix
+        })
+        BpfTables = @($payloadSummary.ProcessNames | ForEach-Object {
+            ConvertTo-WizardWorkflowUniqueName -Value $_ -PublisherPrefix $PublisherPrefix
+        })
         WebResources = @($reportWebResources | Sort-Object)
         Forms = @($payloadSummary.Tables | ForEach-Object { "$($_)|main" })
         Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })

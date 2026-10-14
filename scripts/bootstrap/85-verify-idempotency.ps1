@@ -43,7 +43,7 @@ function Get-WizardEvidenceSnapshot {
             'manifest' { @($document.items | ForEach-Object { [pscustomobject]@{ identity="manifest|$($_.kind)|$($_.name)"; id="$($_.details.id ?? $_.details.objectId ?? $_.details.ObjectId)"; action="$($_.status)" } }) }
             'reporting' { @($document.items | ForEach-Object { [pscustomobject]@{ identity="reporting|$($_.kind)|$($_.name)"; id="$($_.id)"; action="$($_.action)" } }) }
             'data' { @($document.records | ForEach-Object { [pscustomobject]@{ identity="data|$($_.table)|$($_.key)"; id="$($_.id)"; action="$($_.action)" } }) }
-            'membership' { @($document.Items | Where-Object State -ne 'Unauthorized' | ForEach-Object { [pscustomobject]@{ identity="membership|$($_.Category)|$($_.Name)"; id="$($_.ObjectId)"; action="$($_.State)" } }) }
+            'membership' { @($document.Items | Where-Object State -ne 'Unauthorized' | ForEach-Object { [pscustomobject]@{ identity="membership|$($_.Category)|$($_.Name)"; id="$($_.ObjectId ?? $_.SolutionComponentId)"; action="$($_.State)" } }) }
         }
         foreach ($entry in $entries) { $identities.Add($entry) }
     }

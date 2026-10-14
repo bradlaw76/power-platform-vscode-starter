@@ -1,7 +1,7 @@
 {
   "manifestContractVersion": "1.0.0",
   "manifestId": "foia-fedciv-gcc-dev-bootstrap-20261008",
-  "status": "stage-64-complete",
+  "status": "stage-95-export-inspection-passed",
   "scenario": {
     "slug": "federal-foia-management",
     "designVersion": "FOIA-DD-1.0",
@@ -54,6 +54,32 @@
     "authorizationReferences": [
       "interactive-approval-2026-10-07-publisher-and-solution-only"
     ]
+  },
+  "finalMembershipGate": {
+    "verifiedAtUtc": "2026-10-13T17:42:27.0854572Z",
+    "strictIsolation": true,
+    "exportAllowed": true,
+    "counts": {
+      "added": 0,
+      "alreadyInSolution": 232,
+      "failed": 0,
+      "missing": 0,
+      "unauthorized": 0
+    },
+    "reportPath": ".wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json"
+  },
+  "unmanagedExportInspection": {
+    "verifiedAtUtc": "2026-10-13T19:00:52.3934893Z",
+    "managed": false,
+    "importPermitted": false,
+    "membershipItemCount": 232,
+    "inheritedMembershipItemCount": 198,
+    "rootComponentsExpected": 24,
+    "rootComponentsMatched": 24,
+    "missingRootComponents": 0,
+    "unrelatedRootComponents": 0,
+    "unpackedFileCount": 214,
+    "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
   },
   "target": {
     "environmentClassification": "FEDCIV_GCC",
