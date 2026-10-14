@@ -194,6 +194,24 @@
 | FOIA-ALM-007 | Unmanaged development output and separately approved managed-release stage | Package; Governance | Unmanaged package inspection; managed package field remains unapproved initially |
 | FOIA-ALM-008 | Explicit staging and separate commit/push/PR approvals | Static; Governance | Sanitized status/diff/validation review and recorded approvals at each boundary |
 
+## Verified Implementation Evidence
+
+This section records verified development-environment evidence without changing the
+planned scope or claiming production readiness. Detailed runtime paths and results
+are indexed in `evidence-index.md`.
+
+| Requirement | Status | Verified result |
+| --- | --- | --- |
+| FOIA-RPT-001 | Partially verified | Eight native charts and five dashboards exist, render in the published review app, and retained stable identities on rerun. Certified annual/quarterly runs remain pending. |
+| FOIA-TST-003 | Verified for the current demo dataset | The approved synthetic payload created 41 records across 13 tables. The second pass updated the same 41 identities with no duplicate candidate. |
+| FOIA-ALM-002 | Verified for export gating | Export was blocked until explicit approval and until the strict final membership report passed. Managed package and release authorization remain false. |
+| FOIA-ALM-003 | Verified | Stage 85 compared 673 identities after rerunning stages 64, 62, 66, and 50; stable IDs passed with zero failures and zero duplicate candidates. |
+| FOIA-ALM-004 | Partially verified | Scoped metadata and app publication completed and post-publish app/chart behavior was validated. A production release publish record remains pending. |
+| FOIA-ALM-005 | Verified | Strict membership reported 232 already in solution, zero failed, zero missing, and zero unauthorized. |
+| FOIA-ALM-006 | Partially verified | Planning, manifest, rollback, build-log, tasks, tests, and evidence links are present. Security, accessibility, performance, and full E2E evidence remain open. |
+| FOIA-ALM-007 | Verified for unmanaged development output | Stage 95 exported and unpacked the unmanaged solution; all 24 expected root components matched with zero missing or unrelated components. No import occurred. |
+| FOIA-ALM-008 | Verified through local commits | Three reviewed local commits exist. Push, pull request, merge, managed release, and deployment remain separately gated. |
+
 ## Completeness Check
 
 The authoritative baseline contains 84 unique `FOIA-*` IDs. Validation must compare

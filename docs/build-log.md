@@ -4,6 +4,34 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Federal FOIA Management - 2026-10-14
+
+| Field | Result |
+| --- | --- |
+| Runner | Human operator with Copilot SDK in VS Code |
+| Environment | FedCiv GCC Development; DoD IL5 portability target |
+| Build type | Reusable synthetic-data demonstration |
+| Scenario | `federal-foia-management` |
+| Solution | `FederalFOIAManagement` (unmanaged) |
+| Publisher | `FederalFOIA`; prefix `foia` |
+| Scripts completed | `15`, `20`, `30`, `40`, `50`, `55`, `60`, `64`, `62`, `66`, `85`, `95` |
+| Tables | 11 custom tables plus reused Contact and Case |
+| Columns and keys | 134 columns; 11 active alternate keys |
+| Relationships | 20 one-to-many; 1 many-to-many |
+| Forms and views | 13 main forms; 13 public views |
+| Business Process Flows | 2 active, solution-owned, and app-linked |
+| Native reporting | 8 charts and 5 dashboards; second pass skipped all 13 stable surfaces |
+| Model-driven app | Published; platform validation passed; FOIA Request landing experience and five-dashboard navigation verified |
+| Synthetic data | 41 approved records across 13 tables; second pass updated the same 41 records |
+| Final membership | Strict gate passed: 232 already in solution, 0 failed, 0 missing, 0 unauthorized |
+| Idempotency | 673 identities stable; 0 failures; 0 duplicate candidates |
+| Export | Unmanaged export and local unpack completed |
+| Package inspection | 24/24 expected root components matched; 0 missing; 0 unrelated; 214 unpacked files |
+| Import | No import performed or authorized |
+| Source control | `49cc130`, `3e2c430`, `bbef403`; no push performed |
+| Evidence | `specs/federal-foia-management/evidence-index.md` |
+| Remaining release gates | Security roles/access tests, flows/integrations, accessibility, performance, complete E2E journeys, documentation sign-off, push/PR approval, and any managed-release approval |
+
 ## Wizard Behavior Versions
 
 Record wizard version changes here so you can trace which behavior applied to each build.

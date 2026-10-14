@@ -5,6 +5,26 @@
 **Non-authorization:** This checklist does not authorize authentication, mutation,
 deployment, package import, deletion, or records disposition.
 
+## Current Development Checkpoint
+
+This checkpoint is evidence for comparison and forward-fix planning; it does not
+authorize rollback or import.
+
+- Branch: `feature/federal-foia-management`
+- Known local commits: `49cc130`, `3e2c430`, and `bbef403`
+- Solution: unmanaged `FederalFOIAManagement`
+- Strict membership baseline: 232 already in solution; zero failed, missing, or
+  unauthorized
+- Idempotency baseline: 673 stable identities; zero failures and duplicate
+  candidates
+- Unmanaged package inspection: 24 of 24 expected root components matched; zero
+  missing or unrelated components
+- Synthetic-data baseline: 41 source-tagged records; rerun updates the same
+  identities
+- Runtime evidence locations are listed in `evidence-index.md`
+- No managed release, import, push, pull request, or production deployment is
+  represented by this checkpoint
+
 ## Non-Negotiable Preservation Rules
 
 - Never delete, overwrite, deactivate, or truncate Clock Events, Audit Events,
