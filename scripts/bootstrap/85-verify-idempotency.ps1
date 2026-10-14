@@ -22,6 +22,22 @@ $verificationRoot = Join-Path $artifactRoot "idempotency/$ScenarioSlug"
 $baselinePath = Join-Path $verificationRoot 'baseline.json'
 $resultPath = Join-Path $verificationRoot 'verification.json'
 
+function Get-EvidencePropertyValue {
+    param(
+        [object]$InputObject,
+        [string[]]$PropertyNames
+    )
+
+    if ($null -eq $InputObject) { return $null }
+    foreach ($propertyName in $PropertyNames) {
+        $property = $InputObject.PSObject.Properties[$propertyName]
+        if ($null -ne $property -and $null -ne $property.Value) {
+            return $property.Value
+        }
+    }
+    return $null
+}
+
 function Get-WizardEvidenceSnapshot {
     param([string]$ArtifactRoot, [string]$ScenarioSlug)
     $sources = [ordered]@{
@@ -40,10 +56,17 @@ function Get-WizardEvidenceSnapshot {
         }
         $document = Get-Content -LiteralPath $path -Raw -Encoding UTF8 | ConvertFrom-Json
         $entries = switch ($sourceName) {
-            'manifest' { @($document.items | ForEach-Object { [pscustomobject]@{ identity="manifest|$($_.kind)|$($_.name)"; id="$($_.details.id ?? $_.details.objectId ?? $_.details.ObjectId)"; action="$($_.status)" } }) }
+            'manifest' { @($document.items | ForEach-Object {
+                $manifestId = Get-EvidencePropertyValue -InputObject $_.details -PropertyNames @('id', 'objectId', 'ObjectId')
+                [pscustomobject]@{ identity="manifest|$($_.kind)|$($_.name)"; id="$manifestId"; action="$($_.status)" }
+            }) }
             'reporting' { @($document.items | ForEach-Object { [pscustomobject]@{ identity="reporting|$($_.kind)|$($_.name)"; id="$($_.id)"; action="$($_.action)" } }) }
             'data' { @($document.records | ForEach-Object { [pscustomobject]@{ identity="data|$($_.table)|$($_.key)"; id="$($_.id)"; action="$($_.action)" } }) }
-            'membership' { @($document.Items | Where-Object State -ne 'Unauthorized' | ForEach-Object { [pscustomobject]@{ identity="membership|$($_.Category)|$($_.Name)"; id="$($_.ObjectId ?? $_.SolutionComponentId)"; action="$($_.State)" } }) }
+            'membership' { @($document.Items | Where-Object State -ne 'Unauthorized' | ForEach-Object {
+                $membershipId = "$($_.ObjectId)"
+                if ([string]::IsNullOrWhiteSpace($membershipId)) { $membershipId = "$($_.SolutionComponentId)" }
+                [pscustomobject]@{ identity="membership|$($_.Category)|$($_.Name)"; id=$membershipId; action="$($_.State)" }
+            }) }
         }
         foreach ($entry in $entries) { $identities.Add($entry) }
     }

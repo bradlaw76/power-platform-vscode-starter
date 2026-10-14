@@ -1,7 +1,7 @@
 {
   "manifestContractVersion": "1.0.0",
   "manifestId": "foia-fedciv-gcc-dev-bootstrap-20261008",
-  "status": "stage-95-export-inspection-passed",
+  "status": "stage-85-idempotency-verified",
   "scenario": {
     "slug": "federal-foia-management",
     "designVersion": "FOIA-DD-1.0",
@@ -80,6 +80,19 @@
     "unrelatedRootComponents": 0,
     "unpackedFileCount": 214,
     "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
+  },
+  "idempotencyVerification": {
+    "baselineCapturedAtUtc": "2026-10-14T14:55:23.9027802Z",
+    "verifiedAtUtc": "2026-10-14T15:34:18.2383652Z",
+    "identityCount": 673,
+    "stableIds": true,
+    "duplicateCount": 0,
+    "failureCount": 0,
+    "secondPassActions": {
+      "reportingSkipped": 13,
+      "syntheticDataUpdated": 41
+    },
+    "evidencePath": ".wizard-metrics/artifacts/idempotency/federal-foia-management/verification.json"
   },
   "target": {
     "environmentClassification": "FEDCIV_GCC",

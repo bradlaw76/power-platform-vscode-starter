@@ -24,11 +24,17 @@ $manifestPath = Join-Path $testPaths[0] 'generated-artifact-manifest.json'
 $reportingPath = Join-Path $testPaths[1] "$scenario.json"
 $dataPath = Join-Path $testPaths[2] "$scenario.json"
 $membershipPath = Join-Path $testPaths[3] 'solution-membership-report.json'
-$manifest = @{ items=@(@{ kind='appmodule'; name='sample_app'; status='updated'; details=@{ id='app-1' } }) }
+$manifest = @{ items=@(
+    @{ kind='appmodule'; name='sample_app'; status='updated'; details=@{ id='app-1' } },
+    @{ kind='publish'; name='scoped_components'; status='completed'; details=@{} }
+) }
 $reporting = @{ items=@(@{ kind='chart'; name='Sample Chart'; id='chart-1'; action='created' }) }
 $data = @{ records=@(@{ table='sample'; key='KEY-1'; id='record-1'; action='created' }) }
 $appId = '11111111-1111-1111-1111-111111111111'
-$membership = @{ ExportAllowed=$true; Items=@(@{ Category='model-driven-apps'; Name='sample_app'; ObjectId=$appId; ComponentType=80; State='Already in solution' }) }
+$membership = @{ ExportAllowed=$true; Items=@(
+    @{ Category='model-driven-apps'; Name='sample_app'; ObjectId=$appId; ComponentType=80; State='Already in solution' },
+    @{ Category='columns'; Name='sample.sample_priority'; ObjectId=''; SolutionComponentId='sample-table-component'; ComponentType=$null; State='Already in solution'; Reason="Inherited from include-all table root 'sample'." }
+) }
 $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
 $reporting | ConvertTo-Json -Depth 10 | Set-Content $reportingPath
 $data | ConvertTo-Json -Depth 10 | Set-Content $dataPath
@@ -44,8 +50,6 @@ try {
     try { & (Join-Path $repoRoot 'scripts/bootstrap/85-verify-idempotency.ps1') -ScenarioSlug $scenario -Phase Verify; throw 'Expected changed-ID failure.' } catch { if ($_.Exception.Message -notmatch 'ID changed') { throw } }
     $data.records[0].id='record-1'; $data | ConvertTo-Json -Depth 10 | Set-Content $dataPath
 
-    $membership.Items += @{ Category='columns'; Name='sample.sample_priority'; ObjectId=''; SolutionComponentId='sample-table-component'; ComponentType=$null; State='Already in solution'; Reason="Inherited from include-all table root 'sample'." }
-    $membership | ConvertTo-Json -Depth 10 | Set-Content $membershipPath
     $outputFolder = Join-Path $repoRoot ".wizard-metrics/exports/$scenario"
     $pacCalls = [Collections.Generic.List[string]]::new()
     $includeUnrelatedComponent = $false
