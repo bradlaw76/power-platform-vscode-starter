@@ -498,6 +498,10 @@ pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if enabled by profile + planning selection
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
+# Optional security-role contract; preview is the default
+pwsh ./scripts/bootstrap/68-build-security-roles.ps1 -ScenarioSlug <scenario-slug>
+# Apply requires separate approval
+pwsh ./scripts/bootstrap/68-build-security-roles.ps1 -ScenarioSlug <scenario-slug> -Mode Apply
 # Final read-only inventory and export gate
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
@@ -526,6 +530,7 @@ Solution isolation behavior:
 - `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
 - `64-build-charts-dashboard.ps1` creates native Dataverse charts and dashboards from scenario payloads; it is not the HTML web-resource stage.
 - `66-seed-synthetic-data.ps1` safely upserts source-tagged records by stable natural key and exact relationship references.
+- `68-build-security-roles.ps1` previews by default and applies exact, solution-owned Dataverse role privileges only with `-Mode Apply`; identity creation, assignments, field security, and SharePoint remain out of scope.
 - `85-verify-idempotency.ps1` proves stable component/record IDs and zero second-pass creates.
 - `95-export-unmanaged-solution.ps1` performs gated unmanaged export and local unpack/inspection only; it never imports the package.
 - The final inventory-only pass records all mandatory and optional categories with Dataverse IDs and blocks export when required membership fails. Strict mode also blocks unauthorized components.

@@ -324,6 +324,7 @@ function Get-SolutionComponentInventory {
     $appModuleType = Get-ComponentTypeValue -Map $typeMap -Labels @('App Module', 'Model-driven App') -Fallback 80
     $siteMapType = Get-ComponentTypeValue -Map $typeMap -Labels @('Site Map', 'SiteMap') -Fallback 62
     $chartType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query Visualization', 'SavedQueryVisualization') -Fallback 59
+    $roleType = Get-ComponentTypeValue -Map $typeMap -Labels @('Role', 'Security Role') -Fallback 20
 
     $items = New-Object System.Collections.Generic.List[object]
     $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype,rootcomponentbehavior")
@@ -419,6 +420,14 @@ function Get-SolutionComponentInventory {
             try {
                 $chart = Invoke-Dv "Get" "savedqueryvisualizations($objectId)?`$select=name,primaryentitytypecode"
                 $items.Add([pscustomobject]@{ Kind = 'chart'; Category = 'charts'; Name = "$($chart.primaryentitytypecode)|$($chart.name)"; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+            } catch {}
+            continue
+        }
+
+        if ($componentType -eq $roleType) {
+            try {
+                $role = Invoke-Dv "Get" "roles($objectId)?`$select=name"
+                $items.Add([pscustomobject]@{ Kind = 'role'; Category = 'security-roles'; Name = "$($role.name)"; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
             } catch {}
         }
     }

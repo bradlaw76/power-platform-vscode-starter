@@ -274,6 +274,7 @@ function Get-WizardPayloadSummary {
         RelationshipEntities = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         Relationships = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         ProcessNames = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        SecurityRoleNames = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         ParseErrors = New-Object System.Collections.Generic.List[string]
     }
 
@@ -367,6 +368,21 @@ function Get-WizardPayloadSummary {
         }
     }
 
+    foreach ($file in Get-WizardJsonFiles -Folder $PayloadsFolder -Filter 'security-roles-*.json') {
+        try {
+            $doc = Get-Content -Path $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+            if ($doc.Enabled) {
+                foreach ($role in @($doc.Roles)) {
+                    if (-not [string]::IsNullOrWhiteSpace("$($role.Name)")) {
+                        [void]$summary.SecurityRoleNames.Add("$($role.Name)".Trim())
+                    }
+                }
+            }
+        } catch {
+            $summary.ParseErrors.Add("[$($file.Name)] $($_.Exception.Message)") | Out-Null
+        }
+    }
+
     return [pscustomobject]@{
         Tables               = @($summary.Tables | Sort-Object)
         TableFiles           = @($summary.TableFiles)
@@ -376,6 +392,7 @@ function Get-WizardPayloadSummary {
         RelationshipEntities = @($summary.RelationshipEntities | Sort-Object)
         Relationships        = @($summary.Relationships | Sort-Object)
         ProcessNames         = @($summary.ProcessNames | Sort-Object)
+        SecurityRoleNames    = @($summary.SecurityRoleNames | Sort-Object)
         ParseErrors          = @($summary.ParseErrors.ToArray())
     }
 }
@@ -823,6 +840,7 @@ function New-WizardExpectedArtifacts {
         Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })
         Dashboards = $nativeDashboards
         Charts = $nativeCharts
+        SecurityRoles = @($payloadSummary.SecurityRoleNames)
         Flows = @()
         AppModules = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @($featureConfig.AppUniqueName) } else { @() }
         SiteMaps = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @("$([regex]::Replace($featureConfig.AppUniqueName.ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_'))_sitemap") } else { @() }
@@ -850,6 +868,7 @@ function New-WizardContaminationVerdict {
         chart = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         flow = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         bpf = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        role = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     }
 
     foreach ($name in @(@($ExpectedArtifacts.Tables) + @($ExpectedArtifacts.DependencyTables))) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
@@ -864,6 +883,7 @@ function New-WizardContaminationVerdict {
     foreach ($name in @($ExpectedArtifacts.Charts)) { [void]$expected.chart.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Flows)) { [void]$expected.flow.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Bpfs)) { [void]$expected.bpf.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @($ExpectedArtifacts.SecurityRoles)) { [void]$expected.role.Add(($name ?? '').Trim().ToLowerInvariant()) }
 
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
     $expectedItems = New-Object System.Collections.Generic.List[object]

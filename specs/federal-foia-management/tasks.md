@@ -118,7 +118,9 @@
 - [x] Create or update the Federal FOIA Management review app with FOIA Request first and Active FOIA Requests as the landing view.
 - [x] Add all required app-addressable artifacts and role-appropriate navigation for all 13 custom/reused tables, both BPFs, eight charts, and five dashboards.
 - [x] Approve a bounded demo-security scope: three Dataverse role definitions, no user creation or assignment, no field-security profiles, and no SharePoint provisioning.
-- [ ] Define and create `FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer` after separate apply approval.
+- [x] Define the exact Business Unit privilege matrix and validated payload for `FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer`.
+- [x] Preview the three roles with zero Dataverse calls and retain the local preview evidence.
+- [ ] Create the three roles only after separate apply approval.
 - [ ] Validate idempotent role creation, solution membership, and coarse processing/approval/release table-privilege boundaries.
 - [ ] Defer the full 10-role model, field-security profiles, ownership/team/share design, auditing/export controls, and user assignments to a separately approved production-hardening increment.
 - [ ] Defer proposer/approver identity enforcement, controlled transitions, immutable-event guards, and unauthorized-release tests until server-side controlled actions are implemented.

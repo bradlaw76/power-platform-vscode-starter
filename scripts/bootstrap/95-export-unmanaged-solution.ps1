@@ -58,7 +58,7 @@ $invalidInheritedMembership = @($inheritedMembership | Where-Object {
 if ($invalidInheritedMembership.Count -gt 0) {
     throw "Membership item '$($invalidInheritedMembership[0].Category)|$($invalidInheritedMembership[0].Name)' lacks explicit or inherited component evidence."
 }
-$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources')
+$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'security-roles')
 $schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources')
 $expectedComponents = @($membership.Items | Where-Object {
     $_.Category -in $rootCategories -and -not [string]::IsNullOrWhiteSpace("$($_.ObjectId)") -and $null -ne $_.ComponentType
