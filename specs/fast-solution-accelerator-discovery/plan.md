@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** FAST-003 implemented; architectural review required
+**Status:** FAST-004 implemented; architectural review required
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -150,11 +150,22 @@ Exact schemas are defined in
 
 ### FAST-004 - Matching and delta planning
 
-- Requirement normalization.
-- Deterministic retrieval and optional local semantic index.
-- Per-requirement classification.
-- Architecture alternatives and ADR generation.
-- Golden matching fixtures.
+- Natural-language and structured requirement normalization with stable IDs.
+- Deterministic, evidence-grounded catalog retrieval without remote semantic
+  services or arbitrary numeric confidence scores.
+- Independent package-component correlation after documented functional
+  relevance is established.
+- REUSE, EXTEND, BUILD, INTEGRATE, and VERIFY dispositions with component-level
+  gaps, schema deltas, risks, acceptance criteria, and task references.
+- Transitive dependency resolution, physical-edge deduplication, cycle
+  detection, and fail-closed version handling.
+- FAST-based, Hybrid, and Fully Custom alternatives with environment readiness
+  evaluated separately from architectural suitability.
+- Schema-valid machine-readable artifacts plus Markdown matrix and ADR
+  projection.
+- Golden matching fixtures covering new modules, unavailable sources,
+  documented-only capabilities, ambiguity, GCC Core absence, and deterministic
+  reruns.
 
 ### FAST-005 - Wizard integration
 
@@ -272,7 +283,7 @@ workflow, not an importer.
 - [x] Cache invalidation for environment, catalog, package, dependency, and TTL.
 - [x] Mocked authentication, permission, throttling, timeout, and nonmutation
   tests.
-- [ ] Architectural review approval.
+- [x] Architectural review approval.
 
 ## FAST-003A validation deliverables
 
@@ -285,10 +296,26 @@ workflow, not an importer.
 - [x] Record a sanitized readiness report with no tenant, user, or token
   identifiers.
 - [x] Keep the FAST build gate closed because Core is missing.
-- [ ] Architectural review approval.
+- [x] Architectural review approval.
+
+## FAST-004 deliverables
+
+- [x] Provider-neutral local requirements-analysis service.
+- [x] Explicit standalone entry point with opt-in enable switch.
+- [x] Stable natural-language and structured requirement normalization.
+- [x] Evidence-grounded documented matching and package component correlation.
+- [x] REUSE, EXTEND, BUILD, INTEGRATE, and VERIFY delta decisions.
+- [x] Transitive dependency grouping, deduplication, cycle detection, and
+  fail-closed unresolved/version handling.
+- [x] Optional FAST-003 evidence consumption without a live connection.
+- [x] FAST-based, Hybrid, and Fully Custom recommendations.
+- [x] Versioned schema plus structured Spec Kit artifact projections.
+- [x] Representative offline acceptance scenarios and deterministic reruns.
+- [x] FAST-disabled, no-network, no-Dataverse, and wizard-isolation proof.
+- [ ] Architectural review approval before FAST-005.
 
 ## Stop condition
 
-Stop after FAST-003 review handoff. Do not begin FAST-004 matching, wizard
-prompts, runtime-stage integration, package installation, or Dataverse
-mutation without further authorization.
+Stop after FAST-004 review handoff. Do not begin FAST-005 wizard prompts,
+runtime-stage integration, package installation, or Dataverse mutation without
+further authorization.

@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-003 implemented; architectural review required
-**Phase boundary:** Stop after FAST-003
+**Status:** FAST-004 implemented; architectural review required
+**Phase boundary:** Stop after FAST-004
 
 ## Problem statement
 
@@ -156,18 +156,19 @@ The evaluator shall normalize requirements to stable IDs with actors,
 workflows, entities, relationships, acceptance criteria, integrations,
 security, and nonfunctional constraints.
 
-Each requirement shall receive one decision:
+Each requirement shall receive one or more dispositions:
 
-- `reuse`
-- `extend`
-- `build-new`
-- `integrate`
-- `verify`
-- `not-applicable`
+- `REUSE`
+- `EXTEND`
+- `BUILD`
+- `INTEGRATE`
+- `VERIFY`
 
 Every decision shall include the candidate module/component, source citation,
-evidence tier, confidence, gaps, constraints, dependency implications, and
-estimated customization class.
+evidence tier, fit explanation, gaps, constraints, dependency implications,
+effort assumptions, risks, acceptance criteria, and proposed Spec Kit task
+references. Functional coverage shall not be inferred from package component
+names or arbitrary numeric confidence scores.
 
 ### FR-009 Architecture options
 
@@ -317,7 +318,7 @@ Acceptance requires:
 - a reusable build-gate decision with fully custom bypass;
 - no non-GET Dataverse request and no solution import.
 
-FAST-004 matching and wizard integration remain unauthorized.
+FAST-003 and FAST-003A were accepted before FAST-004 authorization.
 
 ## FAST-003A live GCC acceptance
 
@@ -340,3 +341,30 @@ scope:
 
 The sanitized acceptance record is
 [`evidence/fast-003a-gcc-validation.md`](evidence/fast-003a-gcc-validation.md).
+
+## FAST-004 implementation boundary
+
+FAST-004 adds an explicitly invoked, provider-neutral requirements-analysis
+service after requirements normalization and before any future architecture
+confirmation integration. It:
+
+- accepts natural-language and structured requirements without adding wizard
+  questions;
+- evaluates every catalog module dynamically from documented evidence;
+- correlates package-verified tables, attributes, relationships, Choices,
+  forms, views, and applications only after functional relevance is
+  established;
+- produces REUSE, EXTEND, BUILD, INTEGRATE, and VERIFY dispositions;
+- computes transitive, deduplicated module and component dependencies and
+  blocks cyclic, unresolved, or version-unverified FAST execution;
+- consumes optional FAST-003 evidence without initiating a live preflight;
+- keeps architectural suitability separate from environment readiness;
+- always preserves the fully custom option and final user choice; and
+- writes schema-valid coverage, delta, dependency, readiness, recommendation,
+  ADR, task, and acceptance-traceability projections.
+
+The standalone command requires explicit
+`-EnableAcceleratorAnalysis`. It reads local files only, is not registered in
+the wizard profile or build orchestrator, leaves the provider disabled by
+default, and has no PAC, Dataverse, HTTP, import, or mutation capability.
+FAST-005 wizard integration remains unauthorized.

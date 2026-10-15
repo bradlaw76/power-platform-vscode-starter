@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog and live read-only preflight tooling; no wizard runtime stage is registered | Explicit enable flag; immutable snapshots; offline package inspection; authenticated GET-only Dataverse metadata preflight; no import or modification |
+| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog, requirements analysis, and live read-only preflight tooling; no wizard runtime stage is registered | Explicit enable flags; immutable snapshots; evidence-grounded REUSE/EXTEND/BUILD/INTEGRATE/VERIFY analysis; offline package inspection; authenticated GET-only Dataverse metadata preflight; no import or modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -234,7 +234,20 @@ only bounded Dataverse metadata reads, and caches no credentials. FAST-003 does
 not change the current build sequence, profile, modes, or deployment behavior.
 FAST-003A validated the GET-only path against an explicitly confirmed GCC
 environment and does not claim FAST product support or importability in GCC.
-FAST-004 and wizard runtime integration require separate authorization.
+FAST-004 adds standalone, local requirements matching and delta analysis. It
+does not add wizard questions or stages, automatically connect to Dataverse, or
+authorize deployment. FAST-005 wizard runtime integration requires separate
+authorization.
+
+```powershell
+# Explicit local analysis; no wizard stage invokes this command.
+pwsh ./scripts/accelerators/invoke-accelerator-requirements-analysis.ps1 `
+  -EnableAcceleratorAnalysis `
+  -RequirementsPath <requirements-json-or-markdown> `
+  -CatalogSnapshotPath <snapshot-path> `
+  -PackageMetadataPaths <package-index-paths> `
+  -OutputFolder <analysis-folder>
+```
 
 ```powershell
 # Explicit read-only inspection; no wizard stage invokes this command.

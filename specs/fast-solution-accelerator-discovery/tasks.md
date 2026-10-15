@@ -92,7 +92,7 @@
   catalog/package/dependency changes, environment switching, disabled mode,
   and nonmutation.
 - [x] Preserve fully custom planning and the reusable readiness gate.
-- [ ] Obtain FAST-003 architectural review approval.
+- [x] Obtain FAST-003 architectural review approval.
 
 ## FAST-003A - Authorized GCC validation
 
@@ -109,7 +109,7 @@
   classification, and duplicate dependency identities.
 - [x] Record sanitized GCC evidence without tenant, user, or token identifiers.
 - [x] Confirm Core is missing and the FAST build gate remains closed.
-- [ ] Obtain FAST-003A review approval before FAST-004.
+- [x] Obtain FAST-003A review approval before FAST-004.
 
 ## FAST-003 follow-up dependency intelligence (not authorized)
 
@@ -122,16 +122,25 @@
 - [x] Build a Core component manifest from verified evidence.
 - [x] Keep environment verification behind explicit standalone invocation.
 
-## FAST-004 - Matching and delta analysis (not authorized)
+## FAST-004 - Matching and delta analysis
 
-- [ ] Normalize requirements to stable IDs.
-- [ ] Implement deterministic candidate filtering.
-- [ ] Evaluate a local semantic retrieval option and privacy boundary.
-- [ ] Implement per-requirement decision classification.
-- [ ] Produce FAST foundation, hybrid, and custom alternatives.
-- [ ] Generate machine-readable decisions and ADR projections.
-- [ ] Add strong, partial, zero, ambiguous, overlap, stale, and custom-override
-  golden fixtures.
+- [x] Normalize natural-language and structured requirements to stable IDs.
+- [x] Implement deterministic, evidence-grounded candidate filtering.
+- [x] Keep retrieval local and document the privacy boundary; do not require a
+  remote semantic service.
+- [x] Correlate verified physical components without treating names as process
+  coverage.
+- [x] Implement REUSE, EXTEND, BUILD, INTEGRATE, and VERIFY dispositions.
+- [x] Produce FAST-based, Hybrid, and Fully Custom alternatives.
+- [x] Compute transitive dependencies, deduplicate physical edges, detect
+  cycles, and leave unsupported version compatibility unverified.
+- [x] Consume optional FAST-003 evidence without initiating live inspection.
+- [x] Generate machine-readable decisions, coverage, delta, schema,
+  dependency, readiness, task, acceptance, and ADR projections.
+- [x] Add strong, partial, zero, ambiguous, overlap, unavailable, new-module,
+  repeated-run, GCC Core-missing, and disabled-mode fixtures.
+- [x] Prove no wizard registration, Dataverse mutation, or network dependency.
+- [ ] Obtain FAST-004 architectural review approval before FAST-005.
 
 ## FAST-005 - Wizard integration (not authorized)
 

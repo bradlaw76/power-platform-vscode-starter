@@ -1,7 +1,8 @@
 # FAST Catalog and Decision Contracts
 
 **Status:** FAST-001 conceptual contract  
-**Implementation:** FAST-002 catalog contracts and FAST-003 preflight report
+**Implementation:** FAST-002 catalog contracts, FAST-003 preflight report, and
+FAST-004 requirements analysis
 
 ## Design rules
 
@@ -196,13 +197,12 @@ scenarioSlug
 statement
 acceptanceCriteria[]
 actors[]
-workflows[]
 entities[]
-relationships[]
 integrations[]
-securityConstraints[]
-nonfunctionalConstraints[]
+requiredCapabilities[]
 priority
+uncertainties[]
+normalizedTerms[]
 ```
 
 Requirements remain local to the scenario and are not uploaded to FAST sources.
@@ -211,23 +211,56 @@ Requirements remain local to the scenario and are not uploaded to FAST sources.
 
 ```text
 requirementId
-decision: reuse | extend | build-new | integrate | verify | not-applicable
-candidateItemId
-candidateComponentIdentity
-evidenceIds[]
-evidenceTier
-confidence
-functionalFit
-deployability
+dispositions[]: REUSE | EXTEND | BUILD | INTEGRATE | VERIFY
+candidateModuleId
+candidateVersion
+candidates[]
+fitExplanation
+evidenceLevel
 gaps[]
-constraints[]
-dependencyImplications[]
-customizationClass
-rationale
+proposedSchemaChanges
+integrations[]
+dependencies[]
+effortAssumptions[]
+risks[]
+unresolvedQuestions[]
+acceptanceCriteria[]
+taskReferences[]
 ```
 
-Functional fit and deployability are scored separately. A relevant archived
-reference module may have strong functional fit but blocked deployability.
+Functional fit and environment readiness are evaluated separately. Ordinal,
+explainable evidence bands replace arbitrary numeric confidence scores. A
+relevant archived reference module may have architectural value while its
+source or deployment readiness remains blocked.
+
+## Requirements analysis
+
+The version `1.0` requirements-analysis document binds normalized requirements
+to a provider and immutable snapshot. It contains:
+
+```text
+analysisId
+providerId
+snapshotId
+scenarioSlug
+requirementsHash
+requirements[]
+coverageMatrix[]
+componentDeltaAnalysis[]
+schemaPlan
+dependencyManifest
+environmentReadiness
+architectureOptions[]
+recommendedOption
+finalChoiceRequired: true
+acceptanceTraceability[]
+limitations[]
+```
+
+The analysis ID excludes evaluation-time noise and is reproducible for the
+same normalized requirements, catalog snapshot, package metadata, and
+environment-reference inputs. Environment evidence is optional and never
+causes a live request.
 
 ## Accelerator decision
 

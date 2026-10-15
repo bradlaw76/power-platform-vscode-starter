@@ -1,0 +1,158 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Provider-Neutral Accelerator Requirements Analysis",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "analysisId",
+    "providerId",
+    "snapshotId",
+    "scenarioSlug",
+    "status",
+    "evaluatedAtUtc",
+    "requirementsHash",
+    "requirements",
+    "coverageMatrix",
+    "componentDeltaAnalysis",
+    "schemaPlan",
+    "dependencyManifest",
+    "environmentReadiness",
+    "architectureOptions",
+    "recommendedOption",
+    "finalChoiceRequired",
+    "acceptanceTraceability",
+    "limitations"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "analysisId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "providerId": {"type": "string", "minLength": 1},
+    "snapshotId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "scenarioSlug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "status": {"enum": ["evaluated", "disabled"]},
+    "sourceState": {"type": "string"},
+    "evaluatedAtUtc": {"type": "string", "format": "date-time"},
+    "requirementsHash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "requirements": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/requirement"}
+    },
+    "coverageMatrix": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/coverage"}
+    },
+    "componentDeltaAnalysis": {"type": "array"},
+    "schemaPlan": {"type": "object"},
+    "dependencyManifest": {"type": "object"},
+    "environmentReadiness": {"type": "object"},
+    "architectureOptions": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/architectureOption"}
+    },
+    "recommendedOption": {
+      "enum": ["fast-based", "hybrid", "fully-custom"]
+    },
+    "finalChoiceRequired": {"const": true},
+    "acceptanceTraceability": {"type": "array"},
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  },
+  "$defs": {
+    "requirement": {
+      "type": "object",
+      "required": [
+        "requirementId",
+        "statement",
+        "acceptanceCriteria",
+        "actors",
+        "entities",
+        "integrations",
+        "requiredCapabilities",
+        "uncertainties",
+        "normalizedTerms"
+      ],
+      "properties": {
+        "requirementId": {"type": "string", "minLength": 1},
+        "scenarioSlug": {"type": "string"},
+        "statement": {"type": "string", "minLength": 1},
+        "acceptanceCriteria": {"type": "array"},
+        "actors": {"type": "array"},
+        "entities": {"type": "array"},
+        "integrations": {"type": "array"},
+        "requiredCapabilities": {"type": "array"},
+        "priority": {"type": "string"},
+        "uncertainties": {"type": "array"},
+        "normalizedTerms": {"type": "array"}
+      }
+    },
+    "coverage": {
+      "type": "object",
+      "required": [
+        "requirementId",
+        "description",
+        "dispositions",
+        "candidates",
+        "fitExplanation",
+        "evidenceLevel",
+        "gaps",
+        "proposedSchemaChanges",
+        "integrations",
+        "effortAssumptions",
+        "risks",
+        "unresolvedQuestions",
+        "acceptanceCriteria",
+        "taskReferences"
+      ],
+      "properties": {
+        "requirementId": {"type": "string"},
+        "description": {"type": "string"},
+        "dispositions": {
+          "type": "array",
+          "items": {"enum": ["REUSE", "EXTEND", "BUILD", "INTEGRATE", "VERIFY"]}
+        },
+        "candidateModuleId": {"type": "string"},
+        "candidateVersion": {"type": "string"},
+        "candidates": {"type": "array"},
+        "fitExplanation": {"type": "string"},
+        "evidenceLevel": {
+          "enum": ["conceptual", "package-verified", "environment-verified", "unverified"]
+        },
+        "gaps": {"type": "array"},
+        "proposedSchemaChanges": {"type": "object"},
+        "integrations": {"type": "array"},
+        "dependencies": {"type": "array"},
+        "effortAssumptions": {"type": "array"},
+        "risks": {"type": "array"},
+        "unresolvedQuestions": {"type": "array"},
+        "acceptanceCriteria": {"type": "array"},
+        "taskReferences": {"type": "array"}
+      }
+    },
+    "architectureOption": {
+      "type": "object",
+      "required": [
+        "optionId",
+        "rank",
+        "architectureSuitable",
+        "executionGateOpen",
+        "status",
+        "rationale",
+        "dependencies",
+        "userMaySelect"
+      ],
+      "properties": {
+        "optionId": {"enum": ["fast-based", "hybrid", "fully-custom"]},
+        "rank": {"type": "integer", "minimum": 1, "maximum": 3},
+        "architectureSuitable": {"type": "boolean"},
+        "executionGateOpen": {"type": "boolean"},
+        "status": {"type": "string"},
+        "rationale": {"type": "string"},
+        "dependencies": {"type": "string"},
+        "userMaySelect": {"const": true}
+      }
+    }
+  }
+}
