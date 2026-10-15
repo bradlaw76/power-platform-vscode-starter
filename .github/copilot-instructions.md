@@ -29,6 +29,17 @@ Use `advanced-builder` only when the user explicitly requests technical control 
 
 Use `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention, separately approved destructive cleanup, and acceptance evidence planning.
 
+Accelerator recommendations remain disabled by default. When the operator
+explicitly enables them with `FAST_ENABLED=true` or the terminal wizard's
+`-EnableAcceleratorRecommendations` switch, evaluate the already collected
+requirements after discovery and before architecture finalization. Do not add
+an upfront FAST screen or mandatory discovery question. Demo Builder includes
+FAST-based, Hybrid, and Fully Custom selection in its existing consolidated
+confirmation; detailed modes show requirement coverage, evidence, schema
+deltas, dependencies, and readiness. Persist the explicit decision under the
+scenario's `accelerator/` folder. Never treat this planning decision as
+Dataverse build, import, or deployment authorization.
+
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
 Optional UI enhancement stages are

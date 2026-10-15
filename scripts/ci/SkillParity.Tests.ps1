@@ -49,6 +49,18 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    It '<Skill> preserves default-off accelerator planning boundaries' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match 'EnableAcceleratorRecommendations'
+        $skillContent[$Skill] | Should -Match '(?i)disabled by default'
+        $skillContent[$Skill] | Should -Match '(?i)Fully\s+Custom'
+        $skillContent[$Skill] | Should -Match '(?is)after.*requirements discovery|after.*discovery'
+        $skillContent[$Skill] | Should -Match '(?i)before architecture finalization'
+        $skillContent[$Skill] | Should -Match '(?i)must not invoke Dataverse generation|never invoke Dataverse generation'
+    }
+
     Describe 'Copilot and Claude Dataverse form formatter skill parity' {
         BeforeAll {
             $formatterSkillPaths = [ordered]@{

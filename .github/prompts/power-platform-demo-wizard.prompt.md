@@ -17,6 +17,15 @@ Use this behavior:
 - Default to `demo-builder`: ask six business questions plus one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
 - Enter `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
+- Keep accelerator recommendations disabled by default. When explicitly
+  enabled through `FAST_ENABLED=true` or
+  `-EnableAcceleratorRecommendations`, reuse the provider-neutral matcher after
+  normal discovery and before architecture finalization. Do not add an upfront
+  FAST screen or discovery question. Include FAST-based, Hybrid, and Fully
+  Custom in Demo Builder's existing consolidated confirmation; detailed modes
+  show requirement coverage, evidence, deltas, dependencies, and environment
+  readiness. Persist explicit selection under `specs/<slug>/accelerator/` and
+  do not authorize Dataverse generation or solution import.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.

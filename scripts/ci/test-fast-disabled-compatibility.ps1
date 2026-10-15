@@ -18,16 +18,20 @@ if (@($registry.providers | Where-Object enabled).Count -ne 0) {
     throw 'An accelerator provider is enabled by default.'
 }
 
-$wizardProfile = Get-Content -LiteralPath (Join-Path $repoRoot 'wizard.profile.json') -Raw
-if ($wizardProfile -match '(?i)\bfast\b|accelerator') {
-    throw 'FAST-002 must not alter the active wizard profile.'
+$wizardProfile = Get-Content -LiteralPath (Join-Path $repoRoot 'wizard.profile.json') -Raw | ConvertFrom-Json
+if ([bool]$wizardProfile.acceleratorRecommendations.enabled -or
+    [bool]$wizardProfile.acceleratorRecommendations.dataverseGenerationConnected) {
+    throw 'Accelerator recommendations must remain default-off and disconnected from Dataverse generation.'
 }
 
 $bootstrapFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap') -Filter '*.ps1' -File -Recurse)
 foreach ($file in $bootstrapFiles) {
     $source = Get-Content -LiteralPath $file.FullName -Raw
     if ($source -match '(?i)scripts[\\/]accelerators|sync-fast-catalog|microsoft-fast') {
-        throw "FAST-002 is wired into an existing wizard runtime stage: $($file.Name)"
+        if ($file.Name -ne '05-start-wizard.ps1' -or
+            $source -notmatch 'EnableAcceleratorRecommendations') {
+            throw "FAST is wired into an unauthorized wizard runtime stage: $($file.Name)"
+        }
     }
 }
 

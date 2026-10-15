@@ -115,8 +115,8 @@
 
 - [ ] Discover and evaluate newer or alternate Core releases dynamically rather
   than pinning `1.2.1.0`.
-- [ ] Build the evidence-carrying dependency DAG.
-- [ ] Add cycle, missing dependency, and version conflict validation.
+- [x] Build the evidence-carrying dependency DAG.
+- [x] Add cycle, missing dependency, and version conflict validation.
 - [x] Implement safe offline package metadata inspection.
 - [ ] Define package hash/signature verification policy.
 - [x] Build a Core component manifest from verified evidence.
@@ -140,19 +140,24 @@
 - [x] Add strong, partial, zero, ambiguous, overlap, unavailable, new-module,
   repeated-run, GCC Core-missing, and disabled-mode fixtures.
 - [x] Prove no wizard registration, Dataverse mutation, or network dependency.
-- [ ] Obtain FAST-004 architectural review approval before FAST-005.
+- [x] Obtain FAST-004 architectural review approval before FAST-005.
 
-## FAST-005 - Wizard integration (not authorized)
+## FAST-005 - Wizard integration
 
-- [ ] Add default-off `FAST_ENABLED` provider registration.
-- [ ] Integrate after requirements normalization and before final architecture.
-- [ ] Preserve Demo Builder question budget and consolidated recommendation.
-- [ ] Add Advanced Builder detail without changing existing core questions.
-- [ ] Add Framework Acceptance FAST evidence scenarios.
-- [ ] Pin selected snapshot and module versions in scenario artifacts.
-- [ ] Refuse FAST-dependent generation unless current Level 2 or Level 3
+- [x] Add default-off `FAST_ENABLED` and explicit-switch integration gates.
+- [x] Integrate after requirements normalization and before final architecture.
+- [x] Preserve Demo Builder question budget and consolidated recommendation.
+- [x] Add Advanced Builder detail without changing existing core questions.
+- [x] Add Framework Acceptance FAST evidence and deterministic rerun scenarios.
+- [x] Pin selected snapshot, module versions, and package hashes in scenario
+  artifacts.
+- [x] Require explicit architecture selection and approval for decision changes.
+- [x] Refuse FAST-dependent generation unless current Level 2 or Level 3
   evidence opens the mandatory build gate.
-- [ ] Prove disabled mode produces baseline-equivalent planning outputs.
+- [x] Preserve Fully Custom during catalog outage or user override.
+- [x] Prove disabled mode produces baseline-equivalent planning outputs.
+- [x] Prove no Dataverse mutation, solution import, or build-stage invocation.
+- [ ] Obtain FAST-005 architectural review approval before FAST-006.
 
 ## FAST-006 - Failure, rollback, and rollout (not authorized)
 

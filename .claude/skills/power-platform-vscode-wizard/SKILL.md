@@ -50,6 +50,17 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 - `advanced-builder` requires explicit selection. Expose application profile, table strategy, form strategy, entry point, landing view, entity mapping, user tasks, relationships, reporting, demo data, solution identity, and source-control controls. Do not ask framework-acceptance or cleanup questions.
 - `framework-acceptance` requires explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an acceptance evidence plan.
 
+Accelerator recommendations are disabled by default. When explicitly enabled
+with `FAST_ENABLED=true` or terminal
+`-EnableAcceleratorRecommendations`, run the provider-neutral analysis after
+the existing requirements discovery and before architecture finalization. Do
+not add an upfront accelerator screen or mandatory discovery question. Demo
+Builder folds FAST-based, Hybrid, and Fully Custom selection into its existing
+consolidated confirmation; detailed modes show requirement coverage, evidence,
+schema deltas, dependencies, risks, and environment readiness. Persist the
+explicit decision under `specs/<slug>/accelerator/`. This is planning-only and
+must not invoke Dataverse generation, solution import, or deployment.
+
 Demo Builder may infer a modern table-level Power Apps grid for high-frequency
 operational views inside its consolidated recommendation; do not add a seventh
 business question. Advanced Builder and Framework Acceptance explicitly capture

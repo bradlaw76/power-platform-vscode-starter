@@ -77,12 +77,39 @@ foreach ($requiredMode in @('demo-builder', 'advanced-builder', 'framework-accep
 if (-not [bool]$wizardProfile.discovery.modes.'framework-acceptance'.explicitSelectionRequired) {
     Add-ContractFailure 'Framework Acceptance must require explicit selection.'
 }
+if ([bool]$wizardProfile.acceleratorRecommendations.enabled) {
+    Add-ContractFailure 'Accelerator recommendations must remain disabled by default.'
+}
+if ($wizardProfile.acceleratorRecommendations.integrationPoint -ne 'post-discovery-pre-architecture-finalization' -or
+    -not [bool]$wizardProfile.acceleratorRecommendations.requiresExplicitArchitectureApproval -or
+    -not [bool]$wizardProfile.acceleratorRecommendations.fullyCustomAlwaysAvailable -or
+    [bool]$wizardProfile.acceleratorRecommendations.dataverseGenerationConnected) {
+    Add-ContractFailure 'Accelerator recommendation integration contract is incomplete or unsafe.'
+}
+foreach ($acceleratorPath in @(
+    "$($wizardProfile.acceleratorRecommendations.service)",
+    "$($wizardProfile.acceleratorRecommendations.analysisSchema)",
+    "$($wizardProfile.acceleratorRecommendations.decisionSchema)"
+)) {
+    Test-RequiredPath -RelativePath $acceleratorPath -Description 'Accelerator recommendation runtime'
+}
 
 $wizardScriptPath = Join-Path $bootstrapFolder '05-start-wizard.ps1'
 $wizardScriptText = Get-Content -LiteralPath $wizardScriptPath -Raw
 if ($wizardScriptText -notmatch "\[string\]\`$Mode\s*=\s*'demo-builder'" -or
     $wizardScriptText -notmatch "ValidateSet\('demo-builder',\s*'advanced-builder',\s*'framework-acceptance'\)") {
     Add-ContractFailure '05-start-wizard.ps1 must expose the three modes and default to demo-builder.'
+}
+foreach ($acceleratorToken in @(
+    'EnableAcceleratorRecommendations',
+    'ConvertTo-WizardAcceleratorRequirements',
+    'Invoke-WizardAcceleratorEvaluation',
+    'New-WizardAcceleratorDecision',
+    'ApproveAcceleratorDecisionChange'
+)) {
+    if ($wizardScriptText -notmatch [regex]::Escape($acceleratorToken)) {
+        Add-ContractFailure "05-start-wizard.ps1 is missing accelerator integration token '$acceleratorToken'."
+    }
 }
 
 foreach ($folderProperty in @('payloadFolder', 'scenarioFolder', 'bootstrapFolder')) {

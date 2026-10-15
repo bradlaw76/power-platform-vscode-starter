@@ -28,6 +28,21 @@ For another compatible repository, copy the complete Copilot skill folder only a
 - `schemas/payloads/`
 - scenario-scoped `specs/` and `payloads/scenarios/` conventions
 
+The optional accelerator recommendation integration additionally requires
+compatible versions of:
+
+- `accelerator.providers.json`
+- `scripts/accelerators/requirements-matching.ps1`
+- `scripts/accelerators/wizard-accelerator-integration.ps1`
+- `schemas/accelerators/requirements-analysis.schema.json`
+- `schemas/accelerators/architecture-decision.schema.json`
+- `scripts/ci/test-accelerator-requirements-matching.ps1`
+- `scripts/ci/test-wizard-accelerator-integration.ps1`
+
+It remains disabled by default and is planning-only. A copied skill must not
+assume that accelerator runtime files are installed, enable the feature, or
+connect it to build orchestration.
+
 The reporting skill additionally requires compatible versions of:
 
 - `scripts/bootstrap/08-report-wizard.ps1`

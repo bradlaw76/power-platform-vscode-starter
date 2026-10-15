@@ -17,6 +17,7 @@ Record wizard version changes here so you can trace which behavior applied to ea
 | 2026-07-17 | v2.0.1 | Made `80-post-build-analysis.ps1` generic and parameterized (`SpecPath`, `PlanPath`, `TasksPath`, `PayloadFolder`, `ReadmePath`) with marker-safe README updates, preview mode, and branch-aware push confirmation. |
 | 2026-07-17 | v2.0.2 | Added disclosed local wizard telemetry (`.wizard-metrics/events.jsonl`) plus `81-build-progress-matrix.ps1` to summarize step completion/drop-off across runs. |
 | 2026-09-30 | Form formatter v1 | Added optional, hash-approved form-layout Preview/Apply for active, customizable, wizard-owned custom Main forms after app assembly. |
+| 2026-10-15 | Contract v1.13.0 | Added default-off, planning-only accelerator recommendations after discovery and before architecture finalization. |
 
 ## Release Process
 
@@ -41,6 +42,13 @@ Date:
 Runner:
 Environment URL: https://<org>.crm.dynamics.com
 Build Type (Demo/Prod):
+Accelerator Recommendations Enabled (yes/no):
+Accelerator Analysis ID / Catalog Snapshot:
+Accelerator Recommended / Selected Architecture:
+Accelerator Selected Packages (version/hash):
+Accelerator Environment Readiness / Evidence Expiry:
+FAST-Dependent Execution Gate (open/closed/not applicable):
+Accelerator Decision Change Approval (yes/no/not applicable):
 Scripts Run (15,20,30,optional 35,40,50,55,60,optional 61,64,62,optional 63,65,66,80,85,95):
 Tables (created/skipped/failed):
 Columns (created/skipped/failed):

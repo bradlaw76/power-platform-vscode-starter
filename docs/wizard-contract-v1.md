@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.12.0
+Version: 1.13.0
 
 ## Purpose
 
@@ -15,16 +15,18 @@ All wizard entry points must follow this contract:
 ## Canonical Flow
 
 1. Wizard mode selection (`demo-builder` by default)
-2. Mode-specific discovery and technical-design confirmation
-3. Optional extension blocks (selected by profile)
-4. Source-control plan for the app or demo being created
-5. Spec Kit planning gate (`spec.md`, `plan.md`, `tasks.md`)
-6. Optional demo script generation
-7. Core bootstrap execution modules with approved commit checkpoints
-8. Solution inventory and sync
-9. Publish and usability validation
-10. Optional execution modules
-11. Validation, push verification, pull request preparation, and handoff
+2. Mode-specific discovery and requirements normalization
+3. Optional default-off accelerator evaluation and explicit architecture
+   selection
+4. Technical-design confirmation and optional extension blocks
+5. Source-control plan for the app or demo being created
+6. Spec Kit planning gate (`spec.md`, `plan.md`, `tasks.md`)
+7. Optional demo script generation
+8. Core bootstrap execution modules with approved commit checkpoints
+9. Solution inventory and sync
+10. Publish and usability validation
+11. Optional execution modules
+12. Validation, push verification, pull request preparation, and handoff
 
 ## Wizard Mode Contract
 
@@ -51,6 +53,34 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 - Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`.
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
+
+## Accelerator Recommendation Contract
+
+Accelerator recommendations are disabled by default. A controlled planning run
+may opt in with `-EnableAcceleratorRecommendations` or `FAST_ENABLED=true`.
+Evaluation occurs after the existing mode-specific requirements are collected
+and normalized and before architecture is finalized.
+
+- No upfront accelerator selection or FAST-specific discovery question is
+  permitted.
+- Demo Builder retains six business questions and uses its one consolidated
+  approval to select FAST-based, Hybrid, or Fully Custom architecture.
+- Advanced Builder shows requirement coverage, evidence classifications,
+  reusable components, schema deltas, dependencies, and risks.
+- Framework Acceptance adds deterministic decision, provenance, outage,
+  stale-evidence, missing-Core, and rerun evidence.
+- Fully Custom is always selectable.
+- A selected FAST-based or Hybrid architecture is planning evidence only.
+- FAST-dependent execution remains blocked unless fresh matching environment
+  evidence opens the readiness gate.
+- The integration does not authenticate, import packages, call Dataverse, or
+  register a build stage.
+
+Enabled runs write immutable analysis projections and an explicitly approved
+`accelerator/accelerator-decision.json`. A changed decision ID requires the
+separate `-ApproveAcceleratorDecisionChange` switch after review. Disabled runs
+write no accelerator section or artifact and retain the existing custom-only
+output contract.
 
 ## Architecture Intent Contract
 

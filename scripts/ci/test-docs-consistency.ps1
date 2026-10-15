@@ -64,6 +64,22 @@ foreach ($contentCheck in @($readme, $onboarding, $prompt, $contract, $initSkill
     if ($contentCheck -notmatch [regex]::Escape($requiredMode)) {
       throw "Wizard contract surface is missing mode guidance: $requiredMode"
     }
+
+    foreach ($contentCheck in @($readme, $onboarding, $prompt, $contract, $initSkill, $copilotInstructions)) {
+      foreach ($acceleratorPattern in @(
+        'EnableAcceleratorRecommendations',
+        'Fully\s+Custom',
+        '(?:disabled by default|default-off)'
+      )) {
+        if ($contentCheck -notmatch $acceleratorPattern) {
+          throw "Wizard contract surface is missing accelerator guidance: $acceleratorPattern"
+        }
+      }
+    }
+    if ([bool]$wizardContract.acceleratorRecommendations.enabled -or
+        [bool]$wizardContract.acceleratorRecommendations.dataverseGenerationConnected) {
+      throw 'Accelerator profile must remain default-off and disconnected from Dataverse generation.'
+    }
   }
 }
 

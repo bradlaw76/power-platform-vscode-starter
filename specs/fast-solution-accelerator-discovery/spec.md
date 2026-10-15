@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-004 implemented; architectural review required
-**Phase boundary:** Stop after FAST-004
+**Status:** FAST-005 implemented; architectural review required
+**Phase boundary:** Stop after FAST-005
 
 ## Problem statement
 
@@ -367,4 +367,34 @@ The standalone command requires explicit
 `-EnableAcceleratorAnalysis`. It reads local files only, is not registered in
 the wizard profile or build orchestrator, leaves the provider disabled by
 default, and has no PAC, Dataverse, HTTP, import, or mutation capability.
-FAST-005 wizard integration remains unauthorized.
+FAST-004 was accepted before FAST-005 authorization.
+
+## FAST-005 implementation boundary
+
+FAST-005 integrates the FAST-004 service into the terminal wizard after each
+mode completes normal requirements discovery and before architecture
+finalization. It:
+
+- remains disabled unless `-EnableAcceleratorRecommendations` or
+  `FAST_ENABLED=true` is supplied;
+- adds no upfront accelerator screen, mandatory discovery question, or fourth
+  mode;
+- keeps Demo Builder within six business questions plus one consolidated
+  architecture approval;
+- gives Advanced Builder and Framework Acceptance requirement-level evidence,
+  deltas, dependencies, risks, and readiness;
+- requires explicit FAST-based, Hybrid, or Fully Custom selection;
+- writes normalized requirements, analysis, coverage, delta, dependency,
+  readiness, recommendation, traceability, package version/hash, and approved
+  decision artifacts under `specs/<scenario>/accelerator/`;
+- requires separate approval when a stable decision ID would change;
+- preserves custom-only planning during catalog outage; and
+- keeps FAST-dependent execution blocked when environment evidence is absent,
+  stale, incompatible, or action-required.
+
+The provider registry and wizard profile remain disabled by default. No
+Dataverse generation stage, package installation, solution import, or live
+preflight is invoked. The current GCC evidence has no installed Core or
+specialty modules, so FAST-based and Hybrid planning remain available while
+their execution gate stays closed. FAST-006 build integration and rollout
+remain unauthorized.

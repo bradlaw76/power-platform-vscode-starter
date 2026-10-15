@@ -89,6 +89,16 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Advanced Builder asks the 11 core questions and exposes architecture controls directly. Do not ask framework-acceptance or cleanup questions.
 - Framework Acceptance includes Advanced Builder plus explicit environment authorization, isolated timestamped names, acceptance source tags/hero labels, deterministic rerun evidence, retention, separately approved cleanup, and evidence capture.
 - All three modes emit compatible planning artifacts for the same shared build pipeline.
+- Accelerator recommendations remain disabled by default. With explicit
+  `FAST_ENABLED=true` or terminal
+  `-EnableAcceleratorRecommendations`, evaluate normalized requirements after
+  discovery and before architecture finalization without adding an upfront accelerator
+  screen or mandatory discovery question. Demo Builder uses its existing
+  consolidated approval; Advanced Builder and Framework Acceptance expose
+  coverage, evidence, schema deltas, dependencies, risks, and readiness. Fully
+  Custom always remains selectable. Persist the approved decision under
+  `specs/<slug>/accelerator/`; never invoke Dataverse generation or import from
+  this planning integration.
 - Architecture intent captured directly or confirmed from Demo Builder recommendations includes:
   - OOB extension only, custom tables only, or hybrid?
   - If OOB extension: update forms in place or clone new business forms?

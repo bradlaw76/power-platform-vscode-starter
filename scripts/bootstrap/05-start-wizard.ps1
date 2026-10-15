@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.7.0
+VERSION:      0.8.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
@@ -45,6 +45,7 @@ v0.4.0  2026-08-18  Added report scoping, mapping artifact, and critical-table g
 v0.5.0  2026-08-18  Added entry-table resolution and landing-view action planning.
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
+v0.8.0  2026-10-15  Added default-off accelerator architecture recommendations.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -114,17 +115,31 @@ param(
     [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
-    [string]$WorkspaceRoot
+    [string]$WorkspaceRoot,
+    [switch]$EnableAcceleratorRecommendations,
+    [string]$AcceleratorCatalogSnapshotPath = '',
+    [string[]]$AcceleratorPackageMetadataPaths = @(),
+    [string]$AcceleratorEnvironmentValidationPath = '',
+    [ValidateSet('', 'fast-based', 'hybrid', 'fully-custom')]
+    [string]$AcceleratorArchitectureChoice = '',
+    [string]$AcceleratorDecisionRationale = '',
+    [switch]$ApproveAcceleratorDecisionChange,
+    [datetime]$AcceleratorEvaluationTimeUtc = [DateTime]::UtcNow
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$implementationRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
-    Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+    $implementationRoot
 } else {
     [System.IO.Path]::GetFullPath($WorkspaceRoot)
 }
+$acceleratorIntegrationPath = Join-Path $PSScriptRoot '..\accelerators\wizard-accelerator-integration.ps1'
+. $acceleratorIntegrationPath
+$acceleratorRecommendationsEnabled = Test-WizardAcceleratorRecommendationsEnabled `
+    -ExplicitEnable:$EnableAcceleratorRecommendations
 $scriptedAnswers = $null
 $scriptedAnswerIndex = 0
 if (-not [string]::IsNullOrWhiteSpace($AnswersFile)) {
@@ -765,11 +780,6 @@ if ($Mode -eq 'demo-builder') {
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
     Write-Host "  Power Apps grid for all $entryPointTable views: $recommendModernGrid; inline editing: $recommendGridEditing"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
-    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
-    if ($recommendationConfirmation -ne 'yes') {
-        throw "Demo Builder recommendations were not approved. Rerun with -Mode advanced-builder to control the technical design."
-    }
-
     $answers["ScenarioName"] = $scenarioName
     $answers["ScenarioSlug"] = $scenarioSlug
     $answers["ApplicationProfile"] = 'standalone-model-driven'
@@ -1144,6 +1154,69 @@ $customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToC
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
 
+$acceleratorEvaluation = $null
+$acceleratorDecision = $null
+$acceleratorAnswersBlock = ''
+$acceleratorSpecBlock = ''
+$acceleratorPlanBlock = ''
+$acceleratorTasksBlock = ''
+$acceleratorOutputFolder = Join-Path $scenarioFolder 'accelerator'
+$acceleratorDecisionPath = Join-Path $acceleratorOutputFolder 'accelerator-decision.json'
+$acceleratorDecisionMarkdownPath = Join-Path $acceleratorOutputFolder 'accelerator-decision.md'
+if ($acceleratorRecommendationsEnabled) {
+    $acceleratorRequirements = ConvertTo-WizardAcceleratorRequirements `
+        -Answers $answers `
+        -ScenarioSlug $scenarioSlug
+    $acceleratorEvaluation = Invoke-WizardAcceleratorEvaluation `
+        -Requirements $acceleratorRequirements `
+        -WorkspaceRoot $repoRoot `
+        -ScenarioSlug $scenarioSlug `
+        -CatalogSnapshotPath $AcceleratorCatalogSnapshotPath `
+        -PackageMetadataPaths $AcceleratorPackageMetadataPaths `
+        -EnvironmentValidationPath $AcceleratorEnvironmentValidationPath `
+        -EvaluationTimeUtc $AcceleratorEvaluationTimeUtc
+    Show-WizardAcceleratorEvaluation -Evaluation $acceleratorEvaluation -Mode $Mode
+    $availableArchitectureOptions = @($acceleratorEvaluation.options | ForEach-Object { "$($_.optionId)" })
+    $selectedArchitecture = if ([string]::IsNullOrWhiteSpace($AcceleratorArchitectureChoice)) {
+        Read-ChoiceValue `
+            -Prompt $(if ($Mode -eq 'demo-builder') {
+                '7. Select and approve the consolidated architecture'
+            } else {
+                'A-accelerator. Select and approve the architecture'
+            }) `
+            -AllowedValues $availableArchitectureOptions `
+            -Default "$($acceleratorEvaluation.recommendedOption)"
+    } else {
+        if ($availableArchitectureOptions -notcontains $AcceleratorArchitectureChoice) {
+            throw "Architecture option '$AcceleratorArchitectureChoice' is unavailable. Choose one of: $($availableArchitectureOptions -join ', ')."
+        }
+        $AcceleratorArchitectureChoice
+    }
+    $acceleratorDecision = New-WizardAcceleratorDecision `
+        -Evaluation $acceleratorEvaluation `
+        -SelectedOption $selectedArchitecture `
+        -ScenarioSlug $scenarioSlug `
+        -Mode $Mode `
+        -Rationale $AcceleratorDecisionRationale `
+        -RecordedAtUtc $AcceleratorEvaluationTimeUtc
+    Assert-WizardAcceleratorDecisionChange `
+        -Decision $acceleratorDecision `
+        -DecisionPath $acceleratorDecisionPath `
+        -ApproveDecisionChange:$ApproveAcceleratorDecisionChange
+    $acceleratorProjection = Get-WizardAcceleratorPlanningProjection `
+        -Evaluation $acceleratorEvaluation `
+        -Decision $acceleratorDecision
+    $acceleratorAnswersBlock = $acceleratorProjection.Answers
+    $acceleratorSpecBlock = $acceleratorProjection.Spec
+    $acceleratorPlanBlock = $acceleratorProjection.Plan
+    $acceleratorTasksBlock = $acceleratorProjection.Tasks
+} elseif ($Mode -eq 'demo-builder') {
+    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
+    if ($recommendationConfirmation -ne 'yes') {
+        throw "Demo Builder recommendations were not approved. Rerun with -Mode advanced-builder to control the technical design."
+    }
+}
+
 # Write planning values to .env.ps1 so 10-auth-connect.ps1 can use them as defaults.
 # 10-auth-connect.ps1 will overwrite this file with full auth + config when it runs.
 $envFilePath = Join-Path $repoRoot ".env.ps1"
@@ -1328,6 +1401,9 @@ if ($null -ne $demoDataPlanObject) {
 if ($bpf.Enabled) {
     $targetFiles += $bpfPayloadPath
 }
+if ($acceleratorRecommendationsEnabled) {
+    $targetFiles += @($acceleratorDecisionPath, $acceleratorDecisionMarkdownPath)
+}
 $existingFiles = @($targetFiles | Where-Object { Test-Path $_ })
 if ($existingFiles.Count -gt 0 -and -not $Force) {
     if (-not (Confirm-Overwrite -Paths $existingFiles)) {
@@ -1463,6 +1539,8 @@ $($answers["RelationshipRequirements"])
 - Cleanup/reset instructions: $($answers["DemoDataCleanup"])
 
 $bpfSummaryBlock
+
+$acceleratorAnswersBlock
 "@
 
 $retrofitLabel = if ($Retrofit) { " [RETROFIT — reflects current state]" } else { "" }
@@ -1590,6 +1668,8 @@ $($answers["SolutionType"])
 - Solution: $($answers["SolutionName"]) ($($answers["SolutionChoice"]))
 - Publisher prefix: $($answers["PublisherPrefix"]) ($($answers["PrefixChoice"]))
 
+$acceleratorSpecBlock
+
 ## Acceptance Criteria
 - The scenario is clear and approved.
 - Required entities and artifacts are identified.
@@ -1608,6 +1688,8 @@ $planContent = @"
 - Solution type: $($answers["SolutionType"])
 - Solution unique name: $($answers["SolutionName"]) ($($answers["SolutionChoice"]))
 - Publisher prefix: $($answers["PublisherPrefix"]) ($($answers["PrefixChoice"]))
+
+$acceleratorPlanBlock
 
 ## Model-Driven App Plan
 - Review app mode: $($answers["ReviewAppMode"])
@@ -1743,6 +1825,7 @@ $tasksContent = @"
 - [ ] Review 'answers.md' with stakeholder
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
 - [ ] Confirm application profile '$($answers["ApplicationProfile"])' and architecture intent
+$acceleratorTasksBlock
 - [ ] Confirm entry point '$($answers["EntryPointTable"])' opens with '$($answers["EntryPointLandingView"])'
 - [ ] Execute landing-view action '$($answers["EntryPointLandingViewPlan"])' for '$($answers["EntryPointLandingView"])' on '$($answers["EntryPointTable"])' before app assembly
 - [ ] Verify the named landing view resolves to a saved query before running '62-build-app-module.ps1'
@@ -1812,6 +1895,15 @@ if ($bpf.Enabled) {
     New-Item -ItemType Directory -Path $scenarioPayloadFolder -Force | Out-Null
     Set-Content -Path $bpfPayloadPath -Value $bpfPayloadJson -Encoding UTF8
 }
+if ($acceleratorRecommendationsEnabled) {
+    $acceleratorDecisionSchemaPath = Join-Path $implementationRoot 'schemas\accelerators\architecture-decision.schema.json'
+    $null = Write-WizardAcceleratorPlanningArtifacts `
+        -Evaluation $acceleratorEvaluation `
+        -Decision $acceleratorDecision `
+        -OutputFolder $acceleratorOutputFolder `
+        -SchemaPath $acceleratorDecisionSchemaPath `
+        -ApproveDecisionChange:$ApproveAcceleratorDecisionChange
+}
 
 Write-Host ""
 Write-Host "Wizard output created:" -ForegroundColor Green
@@ -1829,6 +1921,10 @@ if ($null -ne $demoDataPlanObject) {
 }
 if ($bpf.Enabled) {
     Write-Host "  $bpfPayloadPath"
+}
+if ($acceleratorRecommendationsEnabled) {
+    Write-Host "  $acceleratorDecisionPath"
+    Write-Host "  $acceleratorDecisionMarkdownPath"
 }
 Write-Host "  $envFilePath  (planning values for 10-auth-connect.ps1)"
 Write-Host ""

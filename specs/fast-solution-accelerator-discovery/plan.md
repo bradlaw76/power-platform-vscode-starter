@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** FAST-004 implemented; architectural review required
+**Status:** FAST-005 implemented; architectural review required
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -312,10 +312,28 @@ workflow, not an importer.
 - [x] Versioned schema plus structured Spec Kit artifact projections.
 - [x] Representative offline acceptance scenarios and deterministic reruns.
 - [x] FAST-disabled, no-network, no-Dataverse, and wizard-isolation proof.
-- [ ] Architectural review approval before FAST-005.
+- [x] Architectural review approval before FAST-005.
+
+## FAST-005 deliverables
+
+- [x] Default-off profile contract and `FAST_ENABLED`/explicit-switch opt-in.
+- [x] Common post-discovery/pre-finalization integration for all three modes.
+- [x] Demo Builder six-question budget plus one consolidated architecture
+  approval.
+- [x] Advanced and Framework requirement-level evidence presentation.
+- [x] Explicit FAST-based, Hybrid, or Fully Custom selection.
+- [x] Stable schema-valid architecture decision with package versions/hashes.
+- [x] Scenario-scoped analysis, coverage, delta, dependency, readiness,
+  recommendation, ADR, decision, and traceability artifacts.
+- [x] Decision-change approval gate and deterministic rerun behavior.
+- [x] Catalog-unavailable fallback to the existing Fully Custom workflow.
+- [x] Missing/stale GCC evidence blocks FAST execution without blocking
+  planning.
+- [x] No Dataverse transport, import, build-stage registration, or fourth mode.
+- [ ] Architectural review approval before FAST-006.
 
 ## Stop condition
 
-Stop after FAST-004 review handoff. Do not begin FAST-005 wizard prompts,
-runtime-stage integration, package installation, or Dataverse mutation without
-further authorization.
+Stop after FAST-005 review handoff. Do not begin FAST-006 build integration,
+package installation, Dataverse mutation, or rollout without further
+authorization.

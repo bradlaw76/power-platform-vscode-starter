@@ -321,17 +321,36 @@ Canonical contract sources:
 - `docs/wizard-contract-v1.md`
 - `wizard.profile.json`
 
-### Proposed FAST accelerator enhancement (instructions only)
+### Optional accelerator recommendations (default off)
 
 The reviewed
 [`FAST Solution Builder implementation instructions`](fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md)
-describe a future, optional accelerator-discovery capability after requirements
-discovery and before architecture finalization. That capability is not currently
-implemented or registered in the wizard runtime. Do not add FAST questions,
-catalog calls, dependencies, or deployment steps to a normal run. Any
-implementation effort must start with the directive's FAST-000 and FAST-001
-baseline and Spec Kit approval gates, while preserving the existing
-custom-only flow.
+define an optional accelerator recommendation capability after requirements
+discovery and before architecture finalization. It remains disabled during a
+normal run and does not add FAST-specific discovery questions, Dataverse calls,
+package imports, or build stages.
+
+Accelerator recommendations are disabled by default.
+
+For controlled local acceptance testing, pass
+`-EnableAcceleratorRecommendations` together with a reviewed catalog snapshot,
+package indexes, and optional environment evidence. `FAST_ENABLED=true` is the
+equivalent process-level feature flag. Enabled runs require explicit
+FAST-based, Hybrid, or Fully Custom selection and write planning evidence under
+`specs/<scenario-slug>/accelerator/`.
+
+```powershell
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 `
+  -EnableAcceleratorRecommendations `
+  -AcceleratorCatalogSnapshotPath <snapshot.json> `
+  -AcceleratorPackageMetadataPaths <package-index.json>
+```
+
+Fully Custom always remains selectable. Missing, archived, stale, or
+unavailable evidence cannot authorize FAST-dependent execution. The current
+GCC acceptance evidence has no installed Core or specialty modules, so
+FAST-based and Hybrid planning are available but their execution gate remains
+closed.
 
 Supported application profiles:
 
@@ -343,7 +362,7 @@ Supported application profiles:
 
 ### Demo Builder (default)
 
-The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
+The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written. When accelerator recommendations are explicitly enabled, the same confirmation selects FAST-based, Hybrid, or Fully Custom architecture; no eighth prompt is added.
 
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 
@@ -383,6 +402,11 @@ Then complete optional extension blocks based on profile and project needs:
 Validation checkpoint:
 
 - The selected mode's intake is complete and reviewed by the demo/app owner; Demo Builder stays within seven prompts, while Advanced Builder uses the 11 core questions and technical extensions.
+- When accelerator recommendations are enabled, confirm the decision artifact
+  pins the analysis ID, catalog snapshot, package versions and hashes,
+  readiness evidence, recommendation, explicit selection, and rationale.
+- Treat `fastDependentExecutionAllowed: false` as a hard planning boundary. Do
+  not run FAST-dependent generation, installation, or import.
 - Selected extension blocks are complete.
 - For table-strategy, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
 - Add an explicit entity mapping block before payload work:

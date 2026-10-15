@@ -52,6 +52,16 @@ Validation checkpoint:
 
 Use `demo-builder` by default. Ask six business questions and present one inferred technical recommendation for confirmation. Use `advanced-builder` explicitly to ask and capture the following detailed answers before Step 1. Use `framework-acceptance` explicitly to add environment authorization, isolated naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
 
+Accelerator recommendations are a default-off planning extension. When
+explicitly enabled with `FAST_ENABLED=true` or
+`-EnableAcceleratorRecommendations`, evaluate the existing discovery answers
+after requirements normalization and before final architecture approval. Do
+not add a FAST-specific discovery question. Require explicit FAST-based,
+Hybrid, or Fully Custom selection, persist the decision and evidence under
+`specs/<slug>/accelerator/`, and keep FAST-dependent generation blocked unless
+fresh environment evidence is ready. This step never imports a solution or
+modifies Dataverse.
+
 Advanced Builder questionnaire:
 
 1. What type of demo or app are you building?

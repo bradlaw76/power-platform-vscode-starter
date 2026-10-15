@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog, requirements analysis, and live read-only preflight tooling; no wizard runtime stage is registered | Explicit enable flags; immutable snapshots; evidence-grounded REUSE/EXTEND/BUILD/INTEGRATE/VERIFY analysis; offline package inspection; authenticated GET-only Dataverse metadata preflight; no import or modification |
+| **FAST Solution Accelerator Discovery** *(planning integration; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Optional post-discovery/pre-architecture recommendation in stage 05 plus standalone catalog, analysis, and read-only preflight tooling; no build stage is registered | Explicit enable flag and architecture approval; immutable snapshots; evidence-grounded REUSE/EXTEND/BUILD/INTEGRATE/VERIFY analysis; decision-change approval; no import or modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -222,7 +222,7 @@ matching the Power Apps maker experience. Set `optionSetColors: true` in the
 matching grid contract when the pastel backgrounds must also appear in table
 views.
 
-The FAST entry remains unavailable to the active wizard. FAST-000 baseline
+FAST recommendations remain unavailable during the default wizard run. FAST-000 baseline
 evidence is recorded in
 [`docs/fast-integration/baseline.md`](docs/fast-integration/baseline.md), and
 the FAST architecture and FAST-003 contracts are under
@@ -234,10 +234,29 @@ only bounded Dataverse metadata reads, and caches no credentials. FAST-003 does
 not change the current build sequence, profile, modes, or deployment behavior.
 FAST-003A validated the GET-only path against an explicitly confirmed GCC
 environment and does not claim FAST product support or importability in GCC.
-FAST-004 adds standalone, local requirements matching and delta analysis. It
-does not add wizard questions or stages, automatically connect to Dataverse, or
-authorize deployment. FAST-005 wizard runtime integration requires separate
-authorization.
+FAST-004 adds standalone, local requirements matching and delta analysis.
+FAST-005 adds a controlled, default-off post-discovery recommendation seam in
+`05-start-wizard.ps1`. It reuses the FAST-004 service, does not add mandatory
+discovery questions, and requires an explicit FAST-based, Hybrid, or Fully
+Custom architecture selection. Enabled runs persist analysis and the approved
+decision under `specs/<scenario-slug>/accelerator/`. The integration never
+connects to Dataverse, imports a package, or registers FAST with
+`90-run-build.ps1`; build integration remains deferred to FAST-006.
+
+```powershell
+# Controlled planning-only wizard integration.
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 `
+  -EnableAcceleratorRecommendations `
+  -AcceleratorCatalogSnapshotPath <snapshot-path> `
+  -AcceleratorPackageMetadataPaths <package-index-paths> `
+  -AcceleratorEnvironmentValidationPath <optional-preflight-report>
+```
+
+`FAST_ENABLED=true` is the process-level equivalent of the explicit switch.
+Both mechanisms are off by default. Changing an approved decision requires
+`-ApproveAcceleratorDecisionChange`. The current GCC evidence keeps
+FAST-dependent execution blocked because Core and specialty modules are not
+installed; Fully Custom remains available.
 
 ```powershell
 # Explicit local analysis; no wizard stage invokes this command.
@@ -933,13 +952,16 @@ power-platform-vscode-starter/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
     how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
   schemas/
-    accelerators/             -- FAST registry, snapshot, package, and environment evidence contracts
+    accelerators/             -- FAST registry, analysis, decision, package, and environment evidence contracts
   scripts/
     accelerators/
       accelerator-catalog.ps1 -- Provider-neutral immutable catalog snapshots
       fast-provider.ps1       -- Dynamic FAST source/release and offline package adapter
       environment-compatibility.ps1 -- Three-level compatibility and build gate
+      requirements-matching.ps1 -- Provider-neutral requirement coverage and delta analysis
+      wizard-accelerator-integration.ps1 -- Default-off post-discovery planning seam
       dataverse-environment-inspector.ps1 -- Authenticated read-only Level 2 evidence
+      invoke-accelerator-requirements-analysis.ps1 -- Explicit standalone local analysis
       invoke-fast-environment-preflight.ps1 -- Explicit standalone live preflight
       sync-fast-catalog.ps1   -- Explicit standalone catalog synchronization
     ci/
@@ -949,6 +971,8 @@ power-platform-vscode-starter/
       test-fast-environment-preflight.ps1 -- Mocked compatibility and build-gate cases
       test-fast-live-environment-preflight.ps1 -- Mocked live Dataverse/cache failures
       test-fast-disabled-compatibility.ps1 -- Default-off wizard isolation
+      test-accelerator-requirements-matching.ps1 -- FAST-004 evidence and delta scenarios
+      test-wizard-accelerator-integration.ps1 -- FAST-005 mode, decision, and safety scenarios
       test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
       test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
   specs/
