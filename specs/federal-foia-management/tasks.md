@@ -117,9 +117,11 @@
 
 - [x] Create or update the Federal FOIA Management review app with FOIA Request first and Active FOIA Requests as the landing view.
 - [x] Add all required app-addressable artifacts and role-appropriate navigation for all 13 custom/reused tables, both BPFs, eight charts, and five dashboards.
-- [ ] Create least-privilege security roles and field-security profiles for all 10 required roles.
-- [ ] Configure ownership, teams, queues, sharing, auditing, and export tracking.
-- [ ] Test that proposers cannot self-approve controlled decisions and unauthorized users cannot release packages.
+- [x] Approve a bounded demo-security scope: three Dataverse role definitions, no user creation or assignment, no field-security profiles, and no SharePoint provisioning.
+- [ ] Define and create `FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer` after separate apply approval.
+- [ ] Validate idempotent role creation, solution membership, and coarse processing/approval/release table-privilege boundaries.
+- [ ] Defer the full 10-role model, field-security profiles, ownership/team/share design, auditing/export controls, and user assignments to a separately approved production-hardening increment.
+- [ ] Defer proposer/approver identity enforcement, controlled transitions, immutable-event guards, and unauthorized-release tests until server-side controlled actions are implemented.
 - [x] Complete operator dashboard usability validation of the published scoped app; automated platform validation, publication, entry-point, landing-view, five-link dashboard group, sitemap, and solution-membership checks pass.
 
 ## Synthetic Data And End-To-End Validation

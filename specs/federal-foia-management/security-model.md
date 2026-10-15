@@ -1,7 +1,31 @@
 # Federal FOIA Management Security Model
 
 **Security model ID:** `FOIA-SEC-MODEL-1.0`
-**Authorization status:** Design only; no tenant or live access authorized
+**Authorization status:** Full model is design only. Planning is approved for a
+bounded three-role demo increment; no role mutation or assignment is authorized
+until a separate apply approval.
+
+## Current Demo Implementation Boundary
+
+The production-oriented model in this document remains authoritative for future
+hardening. The current demo implements only:
+
+- `FOIA Demo Processor`
+- `FOIA Demo Approver`
+- `FOIA Demo Release Officer`
+
+The demo increment creates role definitions only. It does not create tenant
+identities, assign roles, create teams or business units, configure queues, create
+field-security profiles, provision SharePoint, or automate SharePoint permissions.
+Existing approved test accounts may be assigned later through a separate operator
+step.
+
+The three roles demonstrate coarse table and action boundaries. They do not, by
+themselves, enforce proposer/approver identity separation, controlled status
+transitions, immutable Clock/Audit Events, or document access. Those controls
+remain deferred to server-side commands and plug-ins plus independent SharePoint
+authorization. Synthetic data is mandatory, and this increment must not be
+represented as production security readiness.
 
 ## Security Principles
 

@@ -32,6 +32,12 @@
 - Forms and views status: stage 60 completed on 2026-10-12 with 13 wizard-owned main forms and 13 explicit public views created or adopted, scoped publication across all 13 tables, zero under-populated surfaces, and a stable rerun of 13 form skips and 13 view skips. Request and Appeal use `FOIA Request Main` and `FOIA Appeal Main`; the remaining tables retain `Starter Main Form`.
 - Native reporting status: stage 64 passed on 2026-10-13. Eight chart records and five dashboards have verified `FederalFOIAManagement` membership, complete native dashboard controls, exact native per-type presentation templates, unaliased category nodes, and successful aggregate FetchXML execution. After stage 66 populated all six source tables, the operator confirmed that the charts render in the published app. A stable rerun skips all eight charts and five dashboards.
 - Review app status: stage 62 completed on 2026-10-13. The published `Federal FOIA Management` app (`foia_federal_foia_management`) and its sitemap have stable IDs, component types 80 and 62 in `FederalFOIAManagement`, 13 custom/reused table navigation entries, a generated five-link Dashboards group, `foia_foiarequest` as the entry point, `Active FOIA Requests` as the landing view, both BPFs, all eight charts, and all five dashboards. Platform validation, operator dashboard validation, and the idempotent rerun passed.
+- Demo security scope approved on 2026-10-15: create three Dataverse role definitions (`FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer`) only after a separate apply approval.
+- Demo identity boundary: do not create users or assign roles in this phase; assignments may later use separately approved existing test accounts.
+- Demo field-security boundary: create no field-security profiles; synthetic data remains mandatory and the production field-security design remains deferred.
+- Demo SharePoint boundary: do not provision SharePoint libraries, locations, groups, permissions, or automation in this phase. Retain SharePoint as an independently secured production design boundary.
+- Demo enforcement boundary: role privileges demonstrate coarse table/action separation only. Same-user proposal/approval checks, controlled status transitions, immutable-event enforcement, and document authorization require later server-side and SharePoint implementation.
+- Security readiness statement: this bounded demo scope does not establish production security readiness.
 - Deployment: never automatic
 
 ## Business Outcome And Audience

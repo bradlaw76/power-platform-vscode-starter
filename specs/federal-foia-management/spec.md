@@ -181,6 +181,28 @@ The same rule applies to appeals: the BPF chevrons are authoritative for interac
 - SharePoint groups and item/folder permissions are mapped and tested independently.
 - Platform auditing plus immutable Audit Events cover reads/exports where required, decision changes, approvals, package creation, and release.
 
+### Current Demo Security Increment
+
+The full security model above remains the production-oriented target. The
+currently approved demo increment is intentionally narrower:
+
+- Create three Dataverse role definitions: `FOIA Demo Processor`, `FOIA Demo
+  Approver`, and `FOIA Demo Release Officer`.
+- Do not create tenant users or assign roles. A later approved operator step may
+  assign the roles to existing test accounts.
+- Do not create field-security profiles. Use only conspicuously synthetic data and
+  record field security as a production gap.
+- Do not provision SharePoint sites, libraries, locations, groups, permissions,
+  or permission automation.
+- Demonstrate coarse role boundaries: ordinary processing does not grant approval
+  or release authority, approval does not grant ordinary release authority, and
+  release access is isolated to the release role.
+- Do not claim that role metadata alone enforces proposer/approver identity
+  separation, controlled status transitions, immutable records, or document
+  access. Those controls remain deferred to server-side actions, plug-ins, and
+  independently validated SharePoint authorization.
+- Do not represent this increment as production security readiness.
+
 ## Reporting
 
 Required native surfaces include:
