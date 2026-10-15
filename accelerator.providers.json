@@ -1,0 +1,18 @@
+{
+  "$schema": "./schemas/accelerators/provider-registry.schema.json",
+  "version": "1.0",
+  "providers": [
+    {
+      "id": "microsoft-fast",
+      "displayName": "Microsoft FAST",
+      "enabled": false,
+      "adapter": "scripts/accelerators/fast-provider.ps1",
+      "sourceHosts": [
+        "api.github.com",
+        "raw.githubusercontent.com",
+        "github.com",
+        "microsoft.github.io"
+      ]
+    }
+  ]
+}

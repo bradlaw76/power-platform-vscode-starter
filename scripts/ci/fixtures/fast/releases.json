@@ -1,0 +1,36 @@
+[
+  {
+    "id": 1,
+    "tag_name": "core/v1.2.1.0",
+    "html_url": "https://github.com/microsoft/industry-apps/releases/tag/core%2Fv1.2.1.0",
+    "published_at": "2025-01-01T00:00:00Z",
+    "prerelease": false,
+    "assets": [
+      {
+        "id": 11,
+        "name": "App-Base-Core-Managed-v1.2.1.0.zip",
+        "size": 587310,
+        "digest": "sha256:f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3",
+        "browser_download_url": "https://github.com/microsoft/industry-apps/releases/download/core%2Fv1.2.1.0/App-Base-Core-Managed-v1.2.1.0.zip",
+        "download_count": 1
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "tag_name": "future-module/v2.0.0.0",
+    "html_url": "https://github.com/microsoft/industry-apps/releases/tag/future-module%2Fv2.0.0.0",
+    "published_at": "2026-01-01T00:00:00Z",
+    "prerelease": false,
+    "assets": [
+      {
+        "id": 21,
+        "name": "Future-Module-Managed-v2.0.0.0.zip",
+        "size": 1024,
+        "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+        "browser_download_url": "https://github.com/microsoft/industry-apps/releases/download/future-module%2Fv2.0.0.0/Future-Module-Managed-v2.0.0.0.zip",
+        "download_count": 0
+      }
+    ]
+  }
+]

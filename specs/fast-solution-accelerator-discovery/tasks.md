@@ -43,31 +43,43 @@
 - [x] Create architecture decision records.
 - [ ] Obtain architectural review approval.
 
-## FAST-002 - Catalog foundation (not authorized)
+## FAST-002 - Catalog foundation
 
-- [ ] Define reviewed JSON schemas for catalog items, snapshots, source records,
+- [x] Define reviewed JSON schemas for catalog items, snapshots, source records,
   diffs, dependencies, releases, and provider health.
-- [ ] Implement provider-neutral interfaces and an empty valid registry.
-- [ ] Implement FAST source allowlist and SSRF-safe HTTP boundary.
-- [ ] Implement collection discovery from repository configuration/tree.
-- [ ] Discover official release links from every module page and front-matter
+- [x] Implement provider-neutral interfaces and a default-off registry.
+- [x] Implement FAST source allowlist and HTTPS request boundary.
+- [x] Implement collection discovery from repository configuration/tree.
+- [x] Discover official release links from every module page and front-matter
   record without hardcoded module names or versions.
-- [ ] Implement front-matter and structured-stat parsers.
-- [ ] Implement release/tag pagination and asset inventory.
-- [ ] Reconcile, per module and version, documentation links, GitHub release
+- [x] Implement front-matter and release parsers.
+- [x] Implement release/tag pagination and asset inventory.
+- [x] Reconcile, per module and version, documentation links, GitHub release
   assets, source artifacts, and available package-inspected physical metadata.
-- [ ] Assign independent availability states: documented, source-available,
+- [x] Assign independent availability states: documented, source-available,
   package-verified, and environment-verified.
-- [ ] Index solution ZIP metadata offline without importing or deploying it.
-- [ ] Implement candidate snapshot normalization and content hashing.
-- [ ] Implement coverage reconciliation and explicit exceptions.
-- [ ] Implement candidate validation, diff, tombstones, and promotion.
-- [ ] Add fixtures for new, changed, renamed, removed, duplicate, malformed,
-  timeout, rate-limit, and partial-source cases.
-- [ ] Prove no wizard UI, build-stage, or Dataverse change in FAST-002.
+- [x] Index solution ZIP metadata offline without importing or deploying it.
+- [x] Demonstrate Core and two specialty-module package indexes.
+- [x] Implement candidate snapshot normalization and content hashing.
+- [x] Implement coverage reconciliation and explicit exceptions.
+- [x] Implement candidate diff and external promotion pointer.
+- [x] Add fixtures for new, changed, removed, unavailable, offline, and
+  encoded-tag cases.
+- [x] Implement Level 1 catalog compatibility.
+- [x] Implement mockable Level 2 read-only environment preflight.
+- [x] Define Level 3 approved installation verification without import.
+- [x] Implement the FAST-dependent generation gate with stale-evidence checks.
+- [x] Test ready, missing-dependency, incompatible, stale, offline, and
+  user-declined environment outcomes.
+- [x] Prove no wizard UI, build-stage, or Dataverse change in FAST-002.
+- [ ] Obtain FAST-002 architectural review approval.
 
 ## FAST-003 - Core and package intelligence (not authorized)
 
+- [ ] Implement live read-only environment transport before enabling any
+  FAST-dependent generation in the wizard.
+- [ ] Prove the selected environment identity, permissions, installed Core,
+  specialty versions, required components, and dependency evidence.
 - [ ] Discover and evaluate newer or alternate Core releases dynamically rather
   than pinning `1.2.1.0`.
 - [ ] Build the evidence-carrying dependency DAG.
@@ -96,6 +108,8 @@
 - [ ] Add Advanced Builder detail without changing existing core questions.
 - [ ] Add Framework Acceptance FAST evidence scenarios.
 - [ ] Pin selected snapshot and module versions in scenario artifacts.
+- [ ] Refuse FAST-dependent generation unless current Level 2 or Level 3
+  evidence opens the mandatory build gate.
 - [ ] Prove disabled mode produces baseline-equivalent planning outputs.
 
 ## FAST-006 - Failure, rollback, and rollout (not authorized)

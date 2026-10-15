@@ -41,6 +41,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $schemaRoot = Join-Path $repoRoot 'schemas/payloads'
+$acceleratorSchemaRoot = Join-Path $repoRoot 'schemas/accelerators'
 $schemaByFamily = [ordered]@{
     'table'         = Join-Path $schemaRoot 'table.schema.json'
     'columns'       = Join-Path $schemaRoot 'columns.schema.json'
@@ -55,6 +56,7 @@ $schemaByFamily = [ordered]@{
 $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
 $validatedPayloadCount = 0
+$validatedAcceleratorCount = 0
 
 foreach ($schemaPath in $schemaByFamily.Values) {
     if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
@@ -74,6 +76,26 @@ foreach ($file in $jsonFiles) {
         $parsedCount++
     } catch {
         $failures.Add("Invalid JSON in ${relativePath}: $($_.Exception.Message)") | Out-Null
+        continue
+    }
+
+    $acceleratorSchemaPath = if ($relativePath -ceq 'accelerator.providers.json') {
+        Join-Path $acceleratorSchemaRoot 'provider-registry.schema.json'
+    } elseif ($relativePath -match '^specs[\\/]fast-solution-accelerator-discovery[\\/]evidence[\\/]pkg[\\/](?:core|investigations|training-certification)\.json$') {
+        Join-Path $acceleratorSchemaRoot 'package-metadata.schema.json'
+    } else {
+        $null
+    }
+    if ($null -ne $acceleratorSchemaPath) {
+        try {
+            if (-not (Test-Json -Json $json -SchemaFile $acceleratorSchemaPath -ErrorAction Stop)) {
+                $failures.Add("Accelerator schema validation failed for $relativePath.") | Out-Null
+            } else {
+                $validatedAcceleratorCount++
+            }
+        } catch {
+            $failures.Add("Accelerator schema validation failed for ${relativePath}: $($_.Exception.Message)") | Out-Null
+        }
         continue
     }
 
@@ -109,4 +131,4 @@ if ($failures.Count -gt 0) {
     throw "JSON validation failed with $($failures.Count) issue(s):`n - $($failures -join "`n - ")"
 }
 
-Write-Host "JSON validation passed: $parsedCount documents parsed; $validatedPayloadCount payloads matched schemas." -ForegroundColor Green
+Write-Host "JSON validation passed: $parsedCount documents parsed; $validatedPayloadCount payloads and $validatedAcceleratorCount accelerator documents matched schemas." -ForegroundColor Green

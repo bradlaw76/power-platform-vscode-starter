@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** Proposed for architectural review  
+**Status:** FAST-002 implemented; architectural review required
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -126,20 +126,22 @@ Exact schemas are defined in
 
 ### FAST-002 - Catalog foundation
 
-- Provider contracts and registry.
-- FAST source adapter.
+- Provider contracts and default-off registry.
+- Dynamic FAST source and release adapter.
 - Automatic official module-page release-link discovery.
-- Catalog JSON schemas.
-- Fixture-based parsing.
-- Cross-source reconciliation for documentation, releases, source, and
-  package-inspected metadata.
-- Candidate snapshot, validation, diff, and promotion.
-- No wizard UX and no Dataverse access.
+- Catalog, package, registry, and environment evidence JSON schemas.
+- Fixture-based discovery and encoded-tag parsing.
+- Offline package indexing for Core and two specialty modules.
+- Candidate snapshot, deterministic hash, diff, immutable write, and promotion
+  pointer.
+- Level 1 catalog compatibility and mockable Level 2 read-only preflight.
+- Level 3 installation verification plan only.
+- No wizard UX, Dataverse transport, environment mutation, or import.
 
-### FAST-003 - Dependency and physical metadata
+### FAST-003 - Dependency intelligence and approved integration preparation
 
-- Core and specialty dependency graph.
-- Package inventory and safe offline package inspection.
+- Complete Core and specialty dependency graph.
+- Broader version/package inventory and reconciliation.
 - Evidence-tier promotion.
 - Compatibility matrix contract.
 - No automatic import.
@@ -199,8 +201,10 @@ Exact schemas are defined in
 
 ### Environment verification
 
-Deferred to an approved development or sandbox environment. It is not part of
-FAST-001 and requires separate authorization.
+FAST-002 implements the transport-neutral three-level contract in
+[`environment-validation.md`](environment-validation.md). Level 2 uses
+mocked/injected read-only evidence; no live Dataverse connection is present.
+Level 3 remains a separately authorized future workflow, not an importer.
 
 ## Compatibility
 
@@ -238,8 +242,22 @@ FAST-001 and requires separate authorization.
 - [x] Provider, evidence/Core, and isolation ADRs.
 - [ ] Architectural review approval.
 
+## FAST-002 deliverables
+
+- [x] Default-off provider registry and provider-neutral catalog functions.
+- [x] Dynamic documentation and release discovery without module registration.
+- [x] Encoded slash-tag and future-module fixtures.
+- [x] Immutable, reproducible content-addressed snapshots and promotion pointer.
+- [x] Offline package parser and normalized Core plus two specialty indexes.
+- [x] Core four-dependency handling.
+- [x] Level 1 compatibility and mockable Level 2 preflight.
+- [x] Level 3 installation-verification plan with execution disabled.
+- [x] Mandatory FAST-dependent build gate.
+- [x] FAST-disabled runtime isolation regression test.
+- [ ] Architectural review approval.
+
 ## Stop condition
 
-Stop after review handoff. Do not implement provider interfaces, crawlers,
-schemas, scheduling, matching logic, wizard prompts, or Dataverse behavior
-until FAST-002 is explicitly approved.
+Stop after FAST-002 review handoff. Do not begin FAST-003, matching, wizard
+prompts, runtime-stage integration, live Dataverse inspection, or package
+installation without further authorization.

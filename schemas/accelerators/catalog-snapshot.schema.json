@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Accelerator Catalog Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "providerId",
+    "snapshotId",
+    "contentHash",
+    "createdAtUtc",
+    "status",
+    "sourceState",
+    "sourceManifest",
+    "items",
+    "releases",
+    "packages"
+  ],
+  "properties": {
+    "schemaVersion": {"type": "string", "minLength": 1},
+    "providerId": {"type": "string", "minLength": 1},
+    "snapshotId": {
+      "type": "string",
+      "pattern": "^sha256:[a-f0-9]{64}$"
+    },
+    "contentHash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "createdAtUtc": {"type": "string", "format": "date-time"},
+    "status": {
+      "enum": ["candidate", "validated", "promoted", "rejected", "retired"]
+    },
+    "sourceState": {
+      "enum": ["available", "partial", "unavailable", "retired"]
+    },
+    "sourceManifest": {"type": "array"},
+    "items": {"type": "array"},
+    "releases": {"type": "array"},
+    "packages": {"type": "array"},
+    "coverage": {"type": "object"},
+    "validationResults": {"type": "array"},
+    "previousPromotedSnapshotId": {
+      "type": ["string", "null"]
+    }
+  }
+}

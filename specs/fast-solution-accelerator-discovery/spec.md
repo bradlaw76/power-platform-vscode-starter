@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** Proposed for architectural review  
-**Phase boundary:** FAST-000 and FAST-001 only
+**Status:** FAST-002 implemented; architectural review required
+**Phase boundary:** Stop after FAST-002
 
 ## Problem statement
 
@@ -204,6 +204,21 @@ The system shall support provider disable, provider removal, source retirement,
 catalog rollback, code rollback, and historic artifact retention independently.
 Managed-solution uninstall is explicitly outside automated rollback.
 
+### FR-014 Environment compatibility and build gate
+
+Compatibility shall use three distinct levels:
+
+1. credential-free catalog compatibility;
+2. read-only environment preflight;
+3. explicitly approved installation verification.
+
+Requirements analysis may continue with an unverified environment.
+FAST-dependent Dataverse generation shall remain blocked until fresh `ready`
+Level 2 or Level 3 evidence matches the selected snapshot, environment, package
+IDs, versions, and hashes. A fully custom architecture does not require FAST
+evidence. The complete contract is in
+[`environment-validation.md`](environment-validation.md).
+
 ## Security and compliance requirements
 
 1. Restrict fetches to configured HTTPS hosts and approved repository owners.
@@ -266,9 +281,16 @@ Managed-solution uninstall is explicitly outside automated rollback.
   rollback scenarios preserve custom-only behavior.
 - Existing scenario runs stay pinned to their selected snapshot.
 - No FAST test imports or uninstalls a Dataverse solution.
+- Core and two specialty packages are indexed offline without deployment.
+- Ready, missing-dependency, incompatible, stale, offline, and user-declined
+  environment evidence produce explicit compatibility outcomes.
+- Changing the environment, catalog snapshot, package version/hash, or evidence
+  validity closes the FAST-dependent build gate.
 
-## Approval gate
+## FAST-002 implementation boundary
 
-FAST-002 may begin only after this specification, the plan, tasks, contracts,
-research evidence, and ADRs are reviewed and approved. No runtime implementation
-is authorized by this document alone.
+FAST-002 provides an explicit, default-off catalog synchronization command,
+offline package inspection, immutable snapshots, and transport-neutral
+environment compatibility evaluation. It is not wired into wizard discovery,
+planning, or build stages and has no Dataverse transport or import capability.
+FAST-003 and runtime integration require separate authorization.

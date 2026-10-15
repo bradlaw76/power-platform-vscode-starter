@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Accelerator Dataverse Package Metadata",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "evidenceType",
+    "providerId",
+    "moduleId",
+    "packageId",
+    "fileName",
+    "sizeBytes",
+    "sha256",
+    "solution",
+    "publisher",
+    "rootComponents",
+    "tables",
+    "relationships",
+    "declaredDependencies",
+    "forms",
+    "views"
+  ],
+  "properties": {
+    "evidenceType": {
+      "const": "package-verified"
+    },
+    "providerId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "moduleId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "packageId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "releaseTag": {
+      "type": ["string", "null"]
+    },
+    "releaseUrl": {
+      "type": ["string", "null"],
+      "format": "uri"
+    },
+    "assetUrl": {
+      "type": ["string", "null"],
+      "format": "uri"
+    },
+    "fileName": {
+      "type": "string",
+      "pattern": "(?i)\\.zip$"
+    },
+    "sizeBytes": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "zipEntryCount": {
+      "type": "integer",
+      "minimum": 2
+    },
+    "solution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["uniqueName", "displayName", "version", "managed"],
+      "properties": {
+        "uniqueName": {"type": "string", "minLength": 1},
+        "displayName": {"type": "string"},
+        "version": {"type": "string", "minLength": 1},
+        "managed": {"type": "boolean"},
+        "packageVersion": {"type": "string"},
+        "sourceOrganizationVersion": {"type": "string"}
+      }
+    },
+    "publisher": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "uniqueName",
+        "displayName",
+        "customizationPrefix",
+        "optionValuePrefix"
+      ],
+      "properties": {
+        "uniqueName": {"type": "string", "minLength": 1},
+        "displayName": {"type": "string"},
+        "description": {"type": "string"},
+        "customizationPrefix": {"type": "string", "minLength": 1},
+        "optionValuePrefix": {"type": "integer"}
+      }
+    },
+    "rootComponents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["type", "schemaName", "behavior"],
+        "properties": {
+          "type": {"type": "string"},
+          "schemaName": {"type": "string"},
+          "behavior": {"type": "string"}
+        }
+      }
+    },
+    "tables": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "schemaName",
+          "logicalName",
+          "displayName",
+          "attributes"
+        ],
+        "properties": {
+          "schemaName": {"type": "string"},
+          "logicalName": {"type": "string"},
+          "displayName": {"type": "string"},
+          "attributes": {"type": "array"}
+        }
+      }
+    },
+    "relationships": {"type": "array"},
+    "optionSets": {"type": "array"},
+    "forms": {"type": "array"},
+    "views": {"type": "array"},
+    "apps": {"type": "array"},
+    "declaredDependencies": {"type": "array"},
+    "limitations": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

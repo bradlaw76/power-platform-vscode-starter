@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery** *(instructions only)* | [`docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md`](docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md) | Proposed after requirements discovery and before architecture finalization; no runtime stage is registered yet | Requires a verified pre-FAST Git baseline, Spec Kit assessment, explicit approval gates, provider isolation, and proof that custom-only operation remains unchanged |
+| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog tooling only; no wizard runtime stage is registered | Explicit catalog enable flag; immutable snapshots; offline package inspection; read-only compatibility contract; no Dataverse connection, import, or modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -222,15 +222,17 @@ matching the Power Apps maker experience. Set `optionSetColors: true` in the
 matching grid contract when the pastel backgrounds must also appear in table
 views.
 
-The FAST entry registers a reviewed implementation directive, not a completed
-wizard capability. FAST-000 baseline evidence is recorded in
+The FAST entry remains unavailable to the active wizard. FAST-000 baseline
+evidence is recorded in
 [`docs/fast-integration/baseline.md`](docs/fast-integration/baseline.md), and
-the FAST-001 architecture is under
+the FAST architecture and FAST-002 contracts are under
 [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/).
-It does not change the current build sequence, profile, contract version,
-scripts, or deployment behavior. FAST-002 requires architectural approval and
-must satisfy the checklist below before any runtime capability is described as
-available.
+The provider registry remains disabled by default. The standalone
+`scripts/accelerators/sync-fast-catalog.ps1` command requires explicit
+`-EnableFast`, writes only to an explicit snapshot folder, and never connects
+to Dataverse. FAST-002 does not change the current build sequence, profile,
+contract version, modes, or deployment behavior. FAST-003 and wizard runtime
+integration require separate authorization.
 
 ### Required checklist for future enhancements
 
@@ -895,6 +897,7 @@ power-platform-vscode-starter/
   .vscode/
     extensions.json           -- Recommended extensions (installs on first open)
   .gitignore                  -- Protects .env.ps1 and .wizard-metrics/ from accidental commits
+  accelerator.providers.json  -- Default-off accelerator provider registry
   docs/
     onboarding.md             -- Step-by-step setup guide for new builders
     build-log.md              -- Log template for recording each build run
@@ -906,11 +909,24 @@ power-platform-vscode-starter/
   requirements/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
     how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
+  schemas/
+    accelerators/             -- FAST registry, snapshot, package, and environment evidence contracts
   scripts/
+    accelerators/
+      accelerator-catalog.ps1 -- Provider-neutral immutable catalog snapshots
+      fast-provider.ps1       -- Dynamic FAST source/release and offline package adapter
+      environment-compatibility.ps1 -- Three-level compatibility and build gate
+      sync-fast-catalog.ps1   -- Explicit standalone catalog synchronization
     ci/
       test-docs-consistency.ps1  -- Guardrail: docs/prompt question-contract consistency
+      test-fast-catalog.ps1      -- FAST discovery, snapshots, diff, and offline fallback
+      test-fast-package-indexing.ps1 -- Offline managed solution metadata indexing
+      test-fast-environment-preflight.ps1 -- Mocked compatibility and build-gate cases
+      test-fast-disabled-compatibility.ps1 -- Default-off wizard isolation
       test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
       test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
+  specs/
+    fast-solution-accelerator-discovery/ -- FAST Spec Kit, ADRs, contracts, and package evidence
   scripts/
     bootstrap/
       00-prereq-check.ps1          -- Verify tools are installed (no changes made)

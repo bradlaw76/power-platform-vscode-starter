@@ -1,7 +1,7 @@
 # FAST Integration — Implementation Instructions for the Existing Solution Builder / Wizard
 
 > [!IMPORTANT]
-> **Repository status:** FAST-000 and FAST-001 were completed on 2026-10-15. See the [baseline evidence](../baseline.md) and [review-ready Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/). FAST-002 runtime development has not started. The FAST discovery engine, provider, catalog synchronization, matching, and deployment behavior described below are not yet implemented. Until those capabilities pass their stated approval gates, the current wizard contract and the authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
+> **Repository status:** FAST-000 through FAST-002 were completed on 2026-10-15 and await architectural review. See the [baseline evidence](../baseline.md), [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), and [environment compatibility contract](../../../specs/fast-solution-accelerator-discovery/environment-validation.md). FAST-002 adds default-off, standalone catalog synchronization, offline package indexing, immutable snapshots, and mockable environment compatibility contracts. It is not wired into the wizard runtime and cannot connect to, import into, or modify Dataverse. Matching, wizard integration, and deployment behavior remain unimplemented. The current wizard contract and authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
 
 **Instruction ID:** FAST-IMPLEMENTATION-001  
 **Intended executor:** GitHub Copilot Agent in Visual Studio Code, working in the existing wizard repository  
