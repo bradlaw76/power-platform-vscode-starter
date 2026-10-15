@@ -1,7 +1,37 @@
 # Federal FOIA Management Security Model
 
 **Security model ID:** `FOIA-SEC-MODEL-1.0`
-**Authorization status:** Design only; no tenant or live access authorized
+**Authorization status:** Full model is design only. The bounded three-role demo
+increment was separately approved and applied on 2026-10-15. Role assignment and
+all broader production-security work remain unauthorized.
+
+## Current Demo Implementation Boundary
+
+The production-oriented model in this document remains authoritative for future
+hardening. The current demo implements only:
+
+- `FOIA Demo Processor`
+- `FOIA Demo Approver`
+- `FOIA Demo Release Officer`
+
+The demo increment creates role definitions only. It does not create tenant
+identities, assign roles, create teams or business units, configure queues, create
+field-security profiles, provision SharePoint, or automate SharePoint permissions.
+Existing approved test accounts may be assigned later through a separate operator
+step.
+
+Dataverse automatically attaches four Global SharePoint integration metadata
+privileges to newly created roles: `Create/Read/Write SharePointData` and
+`Read SharePointDocument`. Stage 68 reports but does not manage this platform
+baseline. These privileges do not provision SharePoint or grant access to
+SharePoint sites, libraries, folders, or documents.
+
+The three roles demonstrate coarse table and action boundaries. They do not, by
+themselves, enforce proposer/approver identity separation, controlled status
+transitions, immutable Clock/Audit Events, or document access. Those controls
+remain deferred to server-side commands and plug-ins plus independent SharePoint
+authorization. Synthetic data is mandatory, and this increment must not be
+represented as production security readiness.
 
 ## Security Principles
 

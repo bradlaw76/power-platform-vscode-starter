@@ -13,11 +13,11 @@ authorize rollback or import.
 - Branch: `feature/federal-foia-management`
 - Known local commits: `49cc130`, `3e2c430`, and `bbef403`
 - Solution: unmanaged `FederalFOIAManagement`
-- Strict membership baseline: 232 already in solution; zero failed, missing, or
+- Strict membership baseline: 235 already in solution; zero failed, missing, or
   unauthorized
-- Idempotency baseline: 673 stable identities; zero failures and duplicate
+- Idempotency baseline: 676 stable identities; zero failures and duplicate
   candidates
-- Unmanaged package inspection: 24 of 24 expected root components matched; zero
+- Unmanaged package inspection: 27 of 27 expected root components matched; zero
   missing or unrelated components
 - Synthetic-data baseline: 41 source-tagged records; rerun updates the same
   identities

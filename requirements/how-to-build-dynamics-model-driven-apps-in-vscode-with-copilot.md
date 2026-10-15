@@ -87,6 +87,7 @@ Why this matters:
 - Relationship intake records cardinality, requiredness, existing/new status, cascade behavior, and the task or surface each relationship supports.
 - When demo data is enabled, `demo-data-plan.json` records the approved target tables, counts, hero records and their demo purpose, and bounded Task activity choices. Standard reused tables require an explicit create/reuse decision and are never seeded implicitly. Task activities default to the latest 10 eligible parent records and only target every record when `all` is explicitly approved.
 - Demo-data discovery produces a validated `data-*.json` contract. `66-seed-synthetic-data.ps1` executes only approved source-tagged records through stable natural keys and exact lookup resolution.
+- Bounded demo-security discovery can produce `security-roles-*.json`. `68-build-security-roles.ps1` defaults to preview and requires explicit `-Mode Apply`; user creation, role assignment, field security, and SharePoint provisioning remain separate approvals.
 
 - Native chart/dashboard definitions use `reporting-*.json` and `64-build-charts-dashboard.ps1`; HTML report web resources remain a separate optional capability.
 - Framework Acceptance uses `85-verify-idempotency.ps1` around a controlled second pass and `95-export-unmanaged-solution.ps1` for gated unmanaged export/unpack/inspection. The acceptance package is never imported.

@@ -160,12 +160,34 @@ Flows consume authoritative Dataverse state, use idempotency/correlation values,
 
 ## Document Security Work
 
+The following work is deferred from the current demo-security increment. No
+SharePoint mutation is authorized by the three-role demo plan.
+
 1. Define SharePoint site/library/location naming without embedding tenant-specific values.
 2. Define request/case folder or document-set provisioning and permission inheritance rules.
 3. Map Dataverse roles/teams to explicit SharePoint access groups or approved access automation.
 4. Record repository item IDs, versions, hashes, classifications, and access state in Responsive Record and Release Package metadata.
 5. Test positive and negative access independently in Dataverse and SharePoint.
 6. Track download, export, package inclusion, and release events.
+
+## Demo Security Increment
+
+1. Define only three Dataverse security roles:
+   - `FOIA Demo Processor` for request and operational work without approval or
+     release authority;
+   - `FOIA Demo Approver` for scoped read and approval-oriented access without
+     release authority;
+   - `FOIA Demo Release Officer` for scoped release-package and release access
+     without ordinary decision-proposal authority.
+2. Keep role creation idempotent, solution-owned, inventoried, and rerun safe.
+3. Do not create users, teams, business units, queues, role assignments, or
+   field-security profiles in this increment.
+4. Do not provision or mutate SharePoint.
+5. Validate role metadata and table privilege boundaries without claiming that
+   roles enforce same-user separation, status-transition guards, immutable-event
+   behavior, or document permissions.
+6. Record all deferred production controls and retain synthetic-only test data.
+7. Require a separate apply approval before creating the three roles.
 
 ## Optional Adapter Work
 
@@ -200,8 +222,8 @@ The default implementation is a disabled adapter that reports `Disabled` explici
 | Test layer | Minimum evidence |
 | --- | --- |
 | Unit | Plug-in services, clock calculator, validators, adapters, report calculations, and client logic |
-| Integration | Dataverse metadata/data operations, SharePoint security boundary, flows, queues, routing, SLAs, and approved connectors |
-| Security | Role/privilege matrix, field security, record access, separation of duties, export audit, immutable-event protection, and SharePoint negative tests |
+| Integration | Current demo: Dataverse role metadata and table-privilege inspection. Deferred production scope: SharePoint security boundary, flows, queues, routing, SLAs, and approved connectors |
+| Security | Current demo: three-role privilege matrix and coarse processing/approval/release boundaries. Deferred production scope: field security, user assignment, record-level access, same-user separation, export audit, immutable-event protection, and SharePoint negative tests |
 | Accessibility | Keyboard, focus, labels, errors, contrast, zoom/reflow, screen-reader names, and model-driven/custom surface checks |
 | Performance | Active work views, clock writes/calculation, bulk metadata, dashboards, package assembly, and representative concurrent workload |
 | End to end | Intake-to-closure, clarification, expedited, overdue, no-records, exemption/redaction, release, fee, and appeal journeys |

@@ -1,0 +1,226 @@
+{
+  "Enabled": true,
+  "Scope": "demo-credible",
+  "BusinessUnitScope": "Local",
+  "RequiresBasicUserRole": true,
+  "AssignmentsEnabled": false,
+  "FieldSecurityProfilesEnabled": false,
+  "SharePointProvisioningEnabled": false,
+  "DeleteAllowed": false,
+  "ShareAllowed": false,
+  "Roles": [
+    {
+      "Name": "FOIA Demo Processor",
+      "Description": "Federal FOIA demo role for Business Unit operational processing. No approval, release, share, or delete authority. Requires the platform Basic User role.",
+      "TablePrivileges": [
+        {
+          "TableLogicalName": "contact",
+          "PrivilegeStem": "Contact",
+          "Actions": ["Read", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "incident",
+          "PrivilegeStem": "Incident",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_foiarequest",
+          "PrivilegeStem": "foia_foiarequest",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_searchtask",
+          "PrivilegeStem": "foia_searchtask",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_responsiverecord",
+          "PrivilegeStem": "foia_responsiverecord",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_reviewtask",
+          "PrivilegeStem": "foia_reviewtask",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_exemptiondecision",
+          "PrivilegeStem": "foia_exemptiondecision",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_redactiondecision",
+          "PrivilegeStem": "foia_redactiondecision",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_releasepackage",
+          "PrivilegeStem": "foia_releasepackage",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_appeal",
+          "PrivilegeStem": "foia_appeal",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_clockevent",
+          "PrivilegeStem": "foia_clockevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_auditevent",
+          "PrivilegeStem": "foia_auditevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_aiassistancerecord",
+          "PrivilegeStem": "foia_aiassistancerecord",
+          "Actions": ["Read"]
+        }
+      ]
+    },
+    {
+      "Name": "FOIA Demo Approver",
+      "Description": "Federal FOIA demo role for Business Unit approval-oriented access. Coarse table Write does not enforce same-user separation or controlled transitions.",
+      "TablePrivileges": [
+        {
+          "TableLogicalName": "contact",
+          "PrivilegeStem": "Contact",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "incident",
+          "PrivilegeStem": "Incident",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_foiarequest",
+          "PrivilegeStem": "foia_foiarequest",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_searchtask",
+          "PrivilegeStem": "foia_searchtask",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_responsiverecord",
+          "PrivilegeStem": "foia_responsiverecord",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_reviewtask",
+          "PrivilegeStem": "foia_reviewtask",
+          "Actions": ["Read", "Write"]
+        },
+        {
+          "TableLogicalName": "foia_exemptiondecision",
+          "PrivilegeStem": "foia_exemptiondecision",
+          "Actions": ["Read", "Write"]
+        },
+        {
+          "TableLogicalName": "foia_redactiondecision",
+          "PrivilegeStem": "foia_redactiondecision",
+          "Actions": ["Read", "Write"]
+        },
+        {
+          "TableLogicalName": "foia_releasepackage",
+          "PrivilegeStem": "foia_releasepackage",
+          "Actions": ["Read", "Write"]
+        },
+        {
+          "TableLogicalName": "foia_appeal",
+          "PrivilegeStem": "foia_appeal",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_clockevent",
+          "PrivilegeStem": "foia_clockevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_auditevent",
+          "PrivilegeStem": "foia_auditevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_aiassistancerecord",
+          "PrivilegeStem": "foia_aiassistancerecord",
+          "Actions": ["Read"]
+        }
+      ]
+    },
+    {
+      "Name": "FOIA Demo Release Officer",
+      "Description": "Federal FOIA demo role for Business Unit release-package preparation and release access. Decision tables remain read-only.",
+      "TablePrivileges": [
+        {
+          "TableLogicalName": "contact",
+          "PrivilegeStem": "Contact",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "incident",
+          "PrivilegeStem": "Incident",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_foiarequest",
+          "PrivilegeStem": "foia_foiarequest",
+          "Actions": ["Read", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_searchtask",
+          "PrivilegeStem": "foia_searchtask",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_responsiverecord",
+          "PrivilegeStem": "foia_responsiverecord",
+          "Actions": ["Read", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_reviewtask",
+          "PrivilegeStem": "foia_reviewtask",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_exemptiondecision",
+          "PrivilegeStem": "foia_exemptiondecision",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_redactiondecision",
+          "PrivilegeStem": "foia_redactiondecision",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_releasepackage",
+          "PrivilegeStem": "foia_releasepackage",
+          "Actions": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+        },
+        {
+          "TableLogicalName": "foia_appeal",
+          "PrivilegeStem": "foia_appeal",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_clockevent",
+          "PrivilegeStem": "foia_clockevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_auditevent",
+          "PrivilegeStem": "foia_auditevent",
+          "Actions": ["Read"]
+        },
+        {
+          "TableLogicalName": "foia_aiassistancerecord",
+          "PrivilegeStem": "foia_aiassistancerecord",
+          "Actions": ["Read"]
+        }
+      ]
+    }
+  ]
+}

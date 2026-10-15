@@ -459,6 +459,10 @@ pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
+# Optional when a validated security-roles-*.json payload exists; defaults to preview
+pwsh ./scripts/bootstrap/68-build-security-roles.ps1 -ScenarioSlug <scenario-slug>
+# Apply only after separate approval
+pwsh ./scripts/bootstrap/68-build-security-roles.ps1 -ScenarioSlug <scenario-slug> -Mode Apply
 # Final read-only inventory and export gate
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
@@ -493,6 +497,7 @@ Payload rules for Step 10:
 - `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
 - `64-build-charts-dashboard.ps1` reads `reporting-*.json`, safely upserts native charts and a dashboard, and adds them to the selected solution before app assembly.
 - `66-seed-synthetic-data.ps1` reads `data-*.json` and upserts only source-tagged records through stable natural keys and exact lookup resolution.
+- `68-build-security-roles.ps1` reads `security-roles-*.json`, defaults to non-mutating preview, and creates or updates exact solution-owned role privileges only with `-Mode Apply`. It never creates users, assigns roles, creates field-security profiles, or provisions SharePoint.
 - `85-verify-idempotency.ps1` compares first- and second-pass identity-to-ID evidence and fails on changed IDs, new identities, missing identities, or second-pass creates.
 - `95-export-unmanaged-solution.ps1` requires a passing final membership report, exports unmanaged, unpacks locally, and inspects solution identity. It never imports.
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.

@@ -1,7 +1,7 @@
 {
   "manifestContractVersion": "1.0.0",
   "manifestId": "foia-fedciv-gcc-dev-bootstrap-20261008",
-  "status": "stage-85-idempotency-verified",
+  "status": "stage-95-export-verified",
   "scenario": {
     "slug": "federal-foia-management",
     "designVersion": "FOIA-DD-1.0",
@@ -28,7 +28,8 @@
       "50-add-to-solution:sync-approved-schema-components-and-publish-13-scoped-entities",
       "55-build-business-process-flows:validate-two-process-payloads-and-integrate-only-existing-designer-authored-bpfs",
       "60-build-forms-views:create-13-wizard-owned-main-forms-and-implement-13-explicit-public-views",
-      "64-build-charts-dashboard:create-8-native-charts-and-5-native-dashboards"
+      "64-build-charts-dashboard:create-8-native-charts-and-5-native-dashboards",
+      "68-build-security-roles:create-three-bounded-demo-roles-without-assignments"
     ],
     "schemaApplyAuthorized": true,
     "authorizedSchemaStages": [
@@ -42,26 +43,32 @@
     ],
     "columnApplyAuthorized": true,
     "relationshipApplyAuthorized": true,
+    "securityRoleApplyAuthorized": true,
+    "authorizedSecurityStages": [
+      "68-build-security-roles"
+    ],
     "dataApplyAuthorized": false,
     "appApplyAuthorized": false,
     "flowApplyAuthorized": false,
     "publishAuthorized": true,
-    "exportAuthorized": false,
+    "exportAuthorized": true,
     "managedPackageAuthorized": false,
     "releaseAuthorized": false,
     "commitAuthorized": false,
     "pushAuthorized": false,
     "authorizationReferences": [
-      "interactive-approval-2026-10-07-publisher-and-solution-only"
+      "interactive-approval-2026-10-07-publisher-and-solution-only",
+      "interactive-approval-2026-10-15-bounded-demo-security-roles",
+      "interactive-approval-2026-10-15-updated-unmanaged-export"
     ]
   },
   "finalMembershipGate": {
-    "verifiedAtUtc": "2026-10-13T17:42:27.0854572Z",
+    "verifiedAtUtc": "2026-10-15T20:46:06.6415583Z",
     "strictIsolation": true,
     "exportAllowed": true,
     "counts": {
       "added": 0,
-      "alreadyInSolution": 232,
+      "alreadyInSolution": 235,
       "failed": 0,
       "missing": 0,
       "unauthorized": 0
@@ -69,30 +76,47 @@
     "reportPath": ".wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json"
   },
   "unmanagedExportInspection": {
-    "verifiedAtUtc": "2026-10-13T19:00:52.3934893Z",
+    "verifiedAtUtc": "2026-10-15T21:07:02.2329330Z",
     "managed": false,
     "importPermitted": false,
-    "membershipItemCount": 232,
+    "membershipItemCount": 235,
     "inheritedMembershipItemCount": 198,
-    "rootComponentsExpected": 24,
-    "rootComponentsMatched": 24,
+    "rootComponentsExpected": 27,
+    "rootComponentsMatched": 27,
     "missingRootComponents": 0,
     "unrelatedRootComponents": 0,
-    "unpackedFileCount": 214,
+    "unpackedFileCount": 217,
     "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
   },
   "idempotencyVerification": {
-    "baselineCapturedAtUtc": "2026-10-14T14:55:23.9027802Z",
-    "verifiedAtUtc": "2026-10-14T15:34:18.2383652Z",
-    "identityCount": 673,
+    "baselineCapturedAtUtc": "2026-10-15T20:32:01.7289571Z",
+    "verifiedAtUtc": "2026-10-15T20:46:08.7957224Z",
+    "identityCount": 676,
     "stableIds": true,
     "duplicateCount": 0,
     "failureCount": 0,
     "secondPassActions": {
       "reportingSkipped": 13,
-      "syntheticDataUpdated": 41
+      "syntheticDataUpdated": 41,
+      "securityRolesSkipped": 3
     },
     "evidencePath": ".wizard-metrics/artifacts/idempotency/federal-foia-management/verification.json"
+  },
+  "securityRoleVerification": {
+    "verifiedAtUtc": "2026-10-15T20:46:08.7957224Z",
+    "roleCount": 3,
+    "plannedPrivilegeCounts": {
+      "FOIA Demo Processor": 39,
+      "FOIA Demo Approver": 17,
+      "FOIA Demo Release Officer": 20
+    },
+    "platformManagedPrivilegeCountPerRole": 4,
+    "assignmentsCreated": 0,
+    "fieldSecurityProfilesCreated": 0,
+    "sharePointProvisioned": false,
+    "solutionMembership": "verified",
+    "secondPassMutations": 0,
+    "evidencePath": ".wizard-metrics/artifacts/security-roles/federal-foia-management.json"
   },
   "target": {
     "environmentClassification": "FEDCIV_GCC",

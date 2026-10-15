@@ -1,6 +1,6 @@
 {
-  "profileVersion": "1.3",
-  "contractVersion": "1.9.0",
+  "profileVersion": "1.4",
+  "contractVersion": "1.10.0",
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -180,6 +180,10 @@
       "demo-dry-run": {
         "enabled": true,
         "script": "07-demo-dry-run.ps1"
+      },
+      "security-roles": {
+        "enabled": true,
+        "script": "68-build-security-roles.ps1"
       }
     },
     "telemetry": {
@@ -206,6 +210,7 @@
         "64": 20,
         "65": 20,
         "66": 15,
+        "68": 15,
         "85": 10,
         "95": 10,
         "80": 10

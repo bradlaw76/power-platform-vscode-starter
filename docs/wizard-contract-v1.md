@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.9.0
+Version: 1.10.0
 
 ## Purpose
 
@@ -192,23 +192,27 @@ Required gate before execution:
 11. `62-build-app-module.ps1`, including declared chart/dashboard components
 12. Optional profile-driven web resources
 13. Optional `66-seed-synthetic-data.ps1` from `data-*.json`
-14. First `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
-15. `85-verify-idempotency.ps1 -Phase CaptureBaseline`
-16. Controlled second pass of forms/views, reporting, app/sitemap, and synthetic data
-17. Final membership gate and `85-verify-idempotency.ps1 -Phase Verify`
-18. `95-export-unmanaged-solution.ps1`
-19. `80-post-build-analysis.ps1`
+14. Optional preview-first `68-build-security-roles.ps1` from `security-roles-*.json`
+15. First `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
+16. `85-verify-idempotency.ps1 -Phase CaptureBaseline`
+17. Controlled second pass of forms/views, reporting, app/sitemap, synthetic data, and security roles
+18. Final membership gate and `85-verify-idempotency.ps1 -Phase Verify`
+19. `95-export-unmanaged-solution.ps1`
+20. `80-post-build-analysis.ps1`
 
 ### Optional Modules (profile-driven)
 
 - `65-build-web-resources.ps1`
 - `64-build-charts-dashboard.ps1`
 - `66-seed-synthetic-data.ps1`
+- `68-build-security-roles.ps1`
 - `06-demo-script-wizard.ps1`
 - `07-demo-dry-run.ps1`
 - future execution modules: AI summary and integration adapters
 
 Synthetic data is created only from a validated `data-*.json` payload. The stage requires a source tag and stable natural keys, resolves entity-set names from metadata, fails on duplicate or foreign same-key records, resolves lookups exactly once, and updates the same IDs on rerun.
+
+Bounded demo security roles are created only from a validated `security-roles-*.json` payload. `68-build-security-roles.ps1` defaults to preview, requires explicit `-Mode Apply`, replaces only the exact payload-defined privilege set of scenario-owned roles, verifies component-type 20 solution membership, and never creates identities, assigns roles, creates field-security profiles, or provisions SharePoint. Verification separately permits only Dataverse's four Global, platform-managed SharePoint integration privileges (`Create/Read/Write SharePointData` and `Read SharePointDocument`) that are automatically attached to new roles; these do not provision SharePoint or replace SharePoint document permissions.
 
 Native charts and dashboards are distinct from HTML web resources. `64-build-charts-dashboard.ps1` creates or updates only wizard-owned `savedqueryvisualization` and dashboard `systemform` identities declared in `reporting-*.json`, adds those exact components to the selected solution, and publishes only their scenario tables.
 

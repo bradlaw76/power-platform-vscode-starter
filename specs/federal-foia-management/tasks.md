@@ -117,9 +117,13 @@
 
 - [x] Create or update the Federal FOIA Management review app with FOIA Request first and Active FOIA Requests as the landing view.
 - [x] Add all required app-addressable artifacts and role-appropriate navigation for all 13 custom/reused tables, both BPFs, eight charts, and five dashboards.
-- [ ] Create least-privilege security roles and field-security profiles for all 10 required roles.
-- [ ] Configure ownership, teams, queues, sharing, auditing, and export tracking.
-- [ ] Test that proposers cannot self-approve controlled decisions and unauthorized users cannot release packages.
+- [x] Approve a bounded demo-security scope: three Dataverse role definitions, no user creation or assignment, no field-security profiles, and no SharePoint provisioning.
+- [x] Define the exact Business Unit privilege matrix and validated payload for `FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer`.
+- [x] Preview the three roles with zero Dataverse calls and retain the local preview evidence.
+- [x] Create the three roles after separate apply approval; verify stable IDs, exact planned privileges plus the reported Dataverse-managed baseline, explicit solution membership, and a mutation-free second pass.
+- [ ] Validate idempotent role creation, solution membership, and coarse processing/approval/release table-privilege boundaries.
+- [ ] Defer the full 10-role model, field-security profiles, ownership/team/share design, auditing/export controls, and user assignments to a separately approved production-hardening increment.
+- [ ] Defer proposer/approver identity enforcement, controlled transitions, immutable-event guards, and unauthorized-release tests until server-side controlled actions are implemented.
 - [x] Complete operator dashboard usability validation of the published scoped app; automated platform validation, publication, entry-point, landing-view, five-link dashboard group, sitemap, and solution-membership checks pass.
 
 ## Synthetic Data And End-To-End Validation
@@ -134,10 +138,10 @@
 
 - [x] Collect all required and optional artifact categories with logical names and IDs.
 - [x] Synchronize components into `FederalFOIAManagement` and report Added, Already in solution, Failed with reason, and Missing after sync.
-- [x] Capture the 673-identity idempotency baseline, rerun approved experience/data stages, refresh strict membership, and complete stage `85`.
+- [x] Capture the 676-identity idempotency baseline, rerun approved experience/data/security-role stages, refresh strict membership, and complete stage `85`.
 - [x] Prove stable IDs with zero failures and zero duplicate candidates; the second pass skipped all 13 reporting surfaces and updated the same 41 synthetic records.
-- [x] Verify final membership with strict isolation: 232 already in solution, zero failed, zero missing, zero unauthorized, and export allowed.
-- [x] Run stage `95` for the explicitly approved unmanaged export and local unpack/inspection; all 24 expected root components matched, with zero missing or unrelated components and no import permitted.
+- [x] Verify final membership with strict isolation: 235 already in solution, zero failed, zero missing, zero unauthorized, and export allowed.
+- [x] Run stage `95` for the explicitly approved unmanaged export and local unpack/inspection; all 27 expected root components, including three security roles, matched with zero missing or unrelated components and no import permitted.
 - [x] Update `docs/build-log.md`, requirement traceability, deployment manifest, rollback instructions, and evidence index with verified membership, export, and idempotency results.
 - [ ] Obtain approval before explicit staging, commit, push, or pull-request creation.
 - [ ] Produce a managed release artifact only through a separately approved release workflow.

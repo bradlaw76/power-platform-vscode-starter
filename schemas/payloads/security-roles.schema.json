@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "Enabled",
+    "Scope",
+    "BusinessUnitScope",
+    "RequiresBasicUserRole",
+    "AssignmentsEnabled",
+    "FieldSecurityProfilesEnabled",
+    "SharePointProvisioningEnabled",
+    "DeleteAllowed",
+    "ShareAllowed",
+    "Roles"
+  ],
+  "properties": {
+    "Enabled": {
+      "type": "boolean"
+    },
+    "Scope": {
+      "const": "demo-credible"
+    },
+    "BusinessUnitScope": {
+      "enum": ["Basic", "Local", "Deep", "Global"]
+    },
+    "RequiresBasicUserRole": {
+      "const": true
+    },
+    "AssignmentsEnabled": {
+      "const": false
+    },
+    "FieldSecurityProfilesEnabled": {
+      "const": false
+    },
+    "SharePointProvisioningEnabled": {
+      "const": false
+    },
+    "DeleteAllowed": {
+      "const": false
+    },
+    "ShareAllowed": {
+      "const": false
+    },
+    "Roles": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["Name", "Description", "TablePrivileges"],
+        "properties": {
+          "Name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Description": {
+            "type": "string",
+            "minLength": 1
+          },
+          "TablePrivileges": {
+            "type": "array",
+            "minItems": 1,
+            "uniqueItems": true,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["TableLogicalName", "PrivilegeStem", "Actions"],
+              "properties": {
+                "TableLogicalName": {
+                  "type": "string",
+                  "pattern": "^[a-z][a-z0-9_]*$"
+                },
+                "PrivilegeStem": {
+                  "type": "string",
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "Actions": {
+                  "type": "array",
+                  "minItems": 1,
+                  "uniqueItems": true,
+                  "items": {
+                    "enum": ["Create", "Read", "Write", "Assign", "Append", "AppendTo"]
+                  },
+                  "contains": {
+                    "const": "Read"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

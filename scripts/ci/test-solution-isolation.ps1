@@ -154,7 +154,7 @@ $secondStableResult = @($membershipRerun.Items | Sort-Object Category, Name | Se
 if ($firstStableResult -ne $secondStableResult -or $membership.ExportAllowed -ne $membershipRerun.ExportAllowed) {
     throw 'Repeated inventory collection should preserve identities, states, and export-gate verdict without duplicates.'
 }
-if ($membership.Categories.Count -ne 11) {
+if ($membership.Categories.Count -ne 12) {
     throw 'Membership report should always include all mandatory and optional categories.'
 }
 $addedTable = @($membership.Items | Where-Object { $_.Category -eq 'tables' -and $_.Name -eq 'cct_case' })

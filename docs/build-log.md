@@ -23,10 +23,10 @@ Use this to document what was planned, built, validated, and promoted.
 | Native reporting | 8 charts and 5 dashboards; second pass skipped all 13 stable surfaces |
 | Model-driven app | Published; platform validation passed; FOIA Request landing experience and five-dashboard navigation verified |
 | Synthetic data | 41 approved records across 13 tables; second pass updated the same 41 records |
-| Final membership | Strict gate passed: 232 already in solution, 0 failed, 0 missing, 0 unauthorized |
-| Idempotency | 673 identities stable; 0 failures; 0 duplicate candidates |
+| Final membership | Strict gate passed: 235 already in solution, 0 failed, 0 missing, 0 unauthorized |
+| Idempotency | 676 identities stable; 0 failures; 0 duplicate candidates |
 | Export | Unmanaged export and local unpack completed |
-| Package inspection | 24/24 expected root components matched; 0 missing; 0 unrelated; 214 unpacked files |
+| Package inspection | 27/27 expected root components matched, including 3 security roles; 0 missing; 0 unrelated; 217 unpacked files |
 | Import | No import performed or authorized |
 | Source control | `49cc130`, `3e2c430`, `bbef403`; no push performed |
 | Evidence | `specs/federal-foia-management/evidence-index.md` |
