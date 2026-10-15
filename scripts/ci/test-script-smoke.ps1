@@ -7,7 +7,17 @@ $relationships = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/40-build-re
 $addToSolution = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/50-add-to-solution.ps1') -Raw
 $solutionIsolation = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/helpers/solution-isolation.ps1') -Raw
 $formsViews = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/60-build-forms-views.ps1') -Raw
+$gridControl = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/61-configure-power-apps-grid.ps1') -Raw
 $demoScriptWizard = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/06-demo-script-wizard.ps1') -Raw
+
+foreach ($required in @('Microsoft.PowerApps.PowerAppsOneGrid', 'CustomControlDefaultConfigs', 'UnpackedSolutionFolder', 'maker-handoff.md', 'verification-report.json', 'pac solution export', 'pac solution unpack')) {
+  if ($gridControl -notmatch [regex]::Escape($required)) {
+    throw "Power Apps grid verification gate appears incomplete: missing $required."
+  }
+}
+if ($gridControl -match '(?i)(PATCH|POST|DELETE).+customcontroldefaultconfigs') {
+  throw 'Power Apps grid stage contains unsupported internal metadata mutation.'
+}
 
 foreach ($required in @('How long should the demo be, in minutes?', '$durationMinutes -lt 1', 'Duration minutes: $durationMinutes', 'Duration: $durationMinutes minutes')) {
   if ($demoScriptWizard -notmatch [regex]::Escape($required)) {

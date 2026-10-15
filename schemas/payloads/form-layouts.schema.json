@@ -1,0 +1,186 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://power-platform-vscode-starter.local/schemas/payloads/form-layouts.schema.json",
+  "title": "Version 1 Dataverse form formatting layout",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "forms"],
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "forms": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/form"
+      }
+    }
+  },
+  "$defs": {
+    "logicalName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "key": {
+      "type": "string",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "field": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/logicalName"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["logicalName"],
+          "properties": {
+            "logicalName": {
+              "$ref": "#/$defs/logicalName"
+            },
+            "label": {
+              "type": "string",
+              "minLength": 1
+            },
+            "component": {
+              "enum": ["toggle", "option-set-wrapper"]
+            }
+          }
+        }
+      ]
+    },
+    "section": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label", "columns", "fields"],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/key"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "visible": {
+          "type": "boolean"
+        },
+        "fields": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/field"
+          }
+        }
+      }
+    },
+    "tab": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["key", "label", "sections"],
+      "oneOf": [
+        {
+          "required": ["layout"]
+        },
+        {
+          "required": ["columns"]
+        }
+      ],
+      "properties": {
+        "key": {
+          "$ref": "#/$defs/key"
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "layout": {
+          "enum": ["one-column", "two-column", "three-column"]
+        },
+        "columns": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 3
+        },
+        "collapsed": {
+          "type": "boolean"
+        },
+        "sections": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/section"
+          }
+        }
+      }
+    },
+    "preserve": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "unlistedControls",
+        "eventHandlers",
+        "formLibraries",
+        "headersAndFooters"
+      ],
+      "properties": {
+        "unlistedControls": {
+          "const": true
+        },
+        "eventHandlers": {
+          "const": true
+        },
+        "formLibraries": {
+          "const": true
+        },
+        "headersAndFooters": {
+          "const": true
+        }
+      }
+    },
+    "form": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tableLogicalName", "formName", "ownership", "tabs", "preserve"],
+      "properties": {
+        "tableLogicalName": {
+          "$ref": "#/$defs/logicalName"
+        },
+        "formName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "formId": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "ownership": {
+          "const": "wizard-owned-only"
+        },
+        "intent": {
+          "type": "string",
+          "minLength": 1
+        },
+        "primaryPersona": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tabs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/tab"
+          }
+        },
+        "preserve": {
+          "$ref": "#/$defs/preserve"
+        }
+      }
+    }
+  }
+}

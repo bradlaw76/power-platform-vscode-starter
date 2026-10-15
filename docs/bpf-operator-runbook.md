@@ -79,6 +79,8 @@ Run the bootstrap scripts in this order:
 ```powershell
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
+# Optional when choice-presentations-*.json exists; approve and apply stage 35 before relationships
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>

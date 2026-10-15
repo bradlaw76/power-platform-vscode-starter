@@ -1,11 +1,13 @@
 # Skill Distribution
 
-The repository ships two aligned skill families:
+The repository ships three aligned skill families:
 
 - GitHub Copilot shared skill: `.github/skills/power-platform-wizard-init/`
 - Claude Code skill: `.claude/skills/power-platform-vscode-wizard/`
 - GitHub Copilot reporting skill: `.github/skills/dataverse-report-wizard/`
 - Claude Code reporting skill: `.claude/skills/dataverse-report-wizard/`
+- GitHub Copilot form-formatting skill: `.github/skills/dataverse-form-formatter/`
+- Claude Code form-formatting skill: `.claude/skills/dataverse-form-formatter/`
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 
@@ -34,6 +36,31 @@ The reporting skill additionally requires compatible versions of:
 - `schemas/payloads/reporting.schema.json`
 - `scripts/ci/test-report-wizard.ps1`
 
+The form-formatting skill additionally requires compatible versions of:
+
+- `scripts/bootstrap/60-build-forms-views.ps1`
+- `scripts/bootstrap/35-style-choice-options.ps1`
+- `scripts/bootstrap/61-configure-power-apps-grid.ps1`
+- `scripts/bootstrap/62-build-app-module.ps1`
+- `scripts/bootstrap/63-format-forms.ps1`
+- `scripts/bootstrap/90-run-build.ps1`
+- `schemas/payloads/form-layouts.schema.json`
+- `schemas/payloads/choice-presentations.schema.json`
+- `schemas/payloads/grid-controls.schema.json`
+- `schemas/examples/form-layouts.example.json`
+- `schemas/examples/choice-presentations.example.json`
+- `schemas/examples/grid-controls.example.json`
+- `scripts/ci/test-form-formatting.ps1`
+- `scripts/ci/test-choice-presentations.ps1`
+- `scripts/ci/test-power-apps-grid.ps1`
+
+Version 1 formats only active, customizable, wizard-owned custom Main forms
+using existing baseline fields/controls, tabs, sections, and one-, two-, or
+three-column layouts. Preview emits artifacts plus a SHA-256 hash; Apply is
+hash-gated. Boolean Toggle and Choice OptionSet Wrapper components are
+type-checked and supported for web, tablet, and phone. Other components and OOB
+forms are deferred.
+
 If runtime files are missing, stop and present a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads automatically.
 
 ## Compatibility preflight
@@ -49,6 +76,21 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 ## Versioning and updates
 
 Distribute skills from a tagged release or a reviewed commit. Record the source commit and verify provenance with `git rev-parse HEAD`; release publishers may also publish SHA-256 checksums for packaged archives. To update, compare the installed folder and runtime contract, review changes, run `scripts/ci/SkillParity.Tests.ps1`, then replace only approved files.
+
+Every runtime enhancement must also follow the
+[README enhancement registry and maintenance policy](../README.md#enhancement-registry-and-maintenance-policy).
+In the same reviewed change:
+
+1. Update `docs/onboarding.md` first because it owns build order.
+2. Update the README registry, script reference, sequence, and repository tree.
+3. Keep `wizard.profile.json` and `docs/wizard-contract-v1.md` contract versions
+   aligned.
+4. Update both Copilot and Claude skills/instructions and both requirements
+   guides.
+5. Update schemas, examples, build-log evidence fields, compatibility lists,
+   and stage-specific tests.
+6. Run schema, contract, docs, order, Preview non-mutation, parity, and relevant
+   behavior/idempotency tests before distributing the updated skill.
 
 To uninstall a user-installed Claude skill, remove its folder under `~/.claude/skills/`. The repo-shared Copilot skill is removed through a reviewed repository change. Uninstalling either skill does not remove the wizard runtime or generated scenario files.
 
@@ -66,4 +108,18 @@ For the reporting skill, also run
 `pwsh ./scripts/ci/test-report-wizard.ps1`. Confirm that it reports an offline
 simulation, exercises app attachment, and cleans up its temporary scenario.
 
+For the form-formatting skill, also run
+`pwsh ./scripts/ci/test-form-formatting.ps1`. Confirm Preview is non-mutating,
+emits a SHA-256 plan hash, and Apply rejects a missing or mismatched approval
+hash.
+
+Also run `pwsh ./scripts/ci/test-choice-presentations.ps1` and
+`pwsh ./scripts/ci/test-power-apps-grid.ps1`. Confirm Choice icons remain inline
+label prefixes, colors pass readback/idempotency, and grid configuration remains
+a maker handoff plus exported-metadata verification gate.
+
 The Claude installer currently installs Claude skills only. Copilot uses the repository-shared `.github/skills` folder; neither path downloads a missing wizard runtime.
+
+The installer includes the Claude `dataverse-form-formatter` skill. Anthropic's
+official `frontend-design` skill is not installed; it may be used only as
+optional advice when separately installed and reviewed.

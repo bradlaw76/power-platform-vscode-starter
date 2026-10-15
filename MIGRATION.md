@@ -51,5 +51,10 @@ Add `wizard.profile.json` with:
 - `wizard.profile.json` exists and has required keys.
 - `docs/onboarding.md` sequence matches profile core module order.
 - Discovery model matches contract in README, onboarding, and prompt.
-- Payload path resolves to root `payloads/` in scripts 20/30/40/50/60.
+- Core payload paths resolve to root `payloads/`; optional Choice presentation
+  payloads run at stage 35, while grid and form-layout contracts resolve from
+  `specs/<scenario-slug>/` for stages 61 and 63.
+- The README enhancement registry, `docs/onboarding.md`, profile/contract
+  versions, paired skills, requirements guides, and related CI checks are
+  synchronized for every runtime enhancement.
 - Optional web resources module only appears when selected.

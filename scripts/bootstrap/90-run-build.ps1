@@ -49,6 +49,9 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder = '',
+    [string]$ApprovedChoicePresentationPlanHash = '',
+    [string]$ApprovedFormFormattingPlanHash = '',
+    [string]$GridControlUnpackedSolutionFolder = '',
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
     [scriptblock]$RequestInvoker
@@ -80,7 +83,12 @@ $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'proc
 $reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b'
 $hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
-$idempotencyEnabled = $hasReportingPayload -or $hasDataPayload
+$hasChoicePresentation = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'choice-presentations-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
+$formLayoutPath = Join-Path $paths.ScenarioFolder 'form-layouts.json'
+$hasFormLayout = Test-Path -LiteralPath $formLayoutPath -PathType Leaf
+$gridControlPath = Join-Path $paths.ScenarioFolder 'grid-controls.json'
+$hasGridControl = Test-Path -LiteralPath $gridControlPath -PathType Leaf
+$idempotencyEnabled = $hasReportingPayload -or $hasDataPayload -or $hasChoicePresentation -or $hasFormLayout -or $hasGridControl
 
 $runRoot = Join-Path $repoRoot ".wizard-metrics/runs/$ScenarioSlug"
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
@@ -102,19 +110,25 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'validate'; Script = '15-dry-validate.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadsFolder = $paths.PayloadFolder; PublisherPrefixOverride = $PublisherPrefix; PreviewOnly = $true } }
     [pscustomobject]@{ Name = 'tables'; Script = '20-build-tables.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
     [pscustomobject]@{ Name = 'columns'; Script = '30-build-columns.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
+    [pscustomobject]@{ Name = 'choice-presentations'; Script = '35-style-choice-options.ps1'; Optional = $true; Enabled = $hasChoicePresentation; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; ApprovedPlanHash = $ApprovedChoicePresentationPlanHash; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'relationships'; Script = '40-build-relationships.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
     [pscustomobject]@{ Name = 'solution'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; FailIfSolutionHasForeignTables = [bool]$StrictSolutionIsolation } }
     [pscustomobject]@{ Name = 'business-process-flow'; Script = '55-build-business-process-flows.ps1'; Optional = $true; Enabled = $hasBpfPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'forms-views'; Script = '60-build-forms-views.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'grid-control'; Script = '61-configure-power-apps-grid.ps1'; Optional = $true; Enabled = $hasGridControl; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = $(if ($Mode -eq 'Preview') { 'Preview' } else { 'Verify' }); UnpackedSolutionFolder = $GridControlUnpackedSolutionFolder; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
     [pscustomobject]@{ Name = 'native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'app-module'; Script = '62-build-app-module.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'form-formatting'; Script = '63-format-forms.ps1'; Optional = $true; Enabled = $hasFormLayout; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = $Mode; ApprovedPlanHash = $ApprovedFormFormattingPlanHash; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'web-resources'; Script = '65-build-web-resources.ps1'; Optional = $true; Enabled = $reportsEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-first-pass'; Script = '50-add-to-solution.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-baseline'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'CaptureBaseline' } }
+    [pscustomobject]@{ Name = 'rerun-choice-presentations'; Script = '35-style-choice-options.ps1'; Optional = $true; Enabled = $hasChoicePresentation; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; ApprovedPlanHash = $ApprovedChoicePresentationPlanHash; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'rerun-forms-views'; Script = '60-build-forms-views.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'rerun-grid-control'; Script = '61-configure-power-apps-grid.ps1'; Optional = $true; Enabled = $hasGridControl; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = $(if ($Mode -eq 'Preview') { 'Preview' } else { 'Verify' }); UnpackedSolutionFolder = $GridControlUnpackedSolutionFolder; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix } }
     [pscustomobject]@{ Name = 'rerun-native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'rerun-app-module'; Script = '62-build-app-module.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'rerun-form-formatting'; Script = '63-format-forms.ps1'; Optional = $true; Enabled = $hasFormLayout; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = $Mode; ApprovedPlanHash = $ApprovedFormFormattingPlanHash; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'rerun-synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
@@ -173,7 +187,7 @@ foreach ($stage in $stageDefinitions) {
         continue
     }
 
-    $previewExecutableStages = @('validate', 'app-module', 'native-reporting', 'synthetic-data', 'idempotency-baseline', 'idempotency-verification', 'unmanaged-export', 'post-build')
+    $previewExecutableStages = @('validate', 'choice-presentations', 'rerun-choice-presentations', 'grid-control', 'rerun-grid-control', 'app-module', 'native-reporting', 'synthetic-data', 'idempotency-baseline', 'idempotency-verification', 'unmanaged-export', 'post-build')
     if ($Mode -eq 'Preview' -and $stage.Name -notin $previewExecutableStages) {
         $details = @()
         if ($stage.Name -eq 'forms-views') {
@@ -182,6 +196,9 @@ foreach ($stage in $stageDefinitions) {
                 $viewContract = Get-Content -LiteralPath $viewContractPath -Raw -Encoding UTF8 | ConvertFrom-Json
                 $details = @($viewContract.Views | ForEach-Object { "$($_.TableLogicalName)|$($_.Name)|$($_.Disposition)" })
             }
+        } elseif ($stage.Name -eq 'form-formatting') {
+            $layoutContract = Get-Content -LiteralPath $formLayoutPath -Raw -Encoding UTF8 | ConvertFrom-Json
+            $details = @($layoutContract.forms | ForEach-Object { "$($_.tableLogicalName)|$($_.formName)|$($_.ownership)" })
         }
         $result = [pscustomobject]@{ name = $stage.Name; script = $stage.Script; status = 'planned'; reason = 'mutation suppressed in preview mode'; details = $details; durationSeconds = 0 }
         $results.Add($result) | Out-Null
@@ -191,7 +208,9 @@ foreach ($stage in $stageDefinitions) {
 
     $scriptPath = Join-Path $PSScriptRoot $stage.Script
     $arguments = @{} + $stage.Arguments
-    if ($Mode -eq 'Preview' -and $stage.Name -in $previewExecutableStages) { $arguments.PreviewOnly = $true }
+    if ($Mode -eq 'Preview' -and $stage.Name -in $previewExecutableStages -and $stage.Name -notin @('grid-control', 'rerun-grid-control')) {
+        $arguments.PreviewOnly = $true
+    }
     $started = [DateTime]::UtcNow
     Write-Host "RUN:  $($stage.Script)" -ForegroundColor Yellow
     try {

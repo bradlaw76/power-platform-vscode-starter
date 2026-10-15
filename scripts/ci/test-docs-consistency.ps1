@@ -10,6 +10,9 @@ $contract = Get-Content (Join-Path $repoRoot 'docs/wizard-contract-v1.md') -Raw
 $wizardContract = Get-Content (Join-Path $repoRoot 'wizard.profile.json') -Raw | ConvertFrom-Json
 $startWizard = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/05-start-wizard.ps1') -Raw
 $initSkill = Get-Content (Join-Path $repoRoot '.github/skills/power-platform-wizard-init/SKILL.md') -Raw
+$copilotInstructions = Get-Content (Join-Path $repoRoot '.github/copilot-instructions.md') -Raw
+$bpfRunbook = Get-Content (Join-Path $repoRoot 'docs/bpf-operator-runbook.md') -Raw
+$skillDistribution = Get-Content (Join-Path $repoRoot 'docs/skill-distribution.md') -Raw
 $sourceControlStandardsPath = Join-Path $repoRoot 'requirements/GithubInstructions_General.md'
 
 $requiredQuestions = [int]$wizardContract.discovery.coreQuestions
@@ -71,6 +74,72 @@ if (-not [bool]$wizardContract.discovery.optionalQuestionModules.'source-control
 foreach ($moduleName in @('user-tasks', 'demo-data')) {
   if (-not [bool]$wizardContract.discovery.optionalQuestionModules.$moduleName) {
     throw "Profile does not enable the $moduleName extension block."
+  }
+}
+
+if (-not [bool]$wizardContract.discovery.optionalQuestionModules.'grid-controls') {
+  throw 'Profile does not enable the grid-controls extension block.'
+}
+foreach ($contentCheck in @($readme, $onboarding, $contract, $initSkill)) {
+  foreach ($requiredGridText in @('61-configure-power-apps-grid.ps1', 'Microsoft.PowerApps.PowerAppsOneGrid')) {
+    if ($contentCheck -notmatch [regex]::Escape($requiredGridText)) {
+      throw "Wizard contract surface is missing Power Apps grid guidance: $requiredGridText"
+    }
+  }
+}
+
+foreach ($requiredRegistryText in @(
+  '## Enhancement registry and maintenance policy',
+  'Required checklist for future enhancements',
+  '35-style-choice-options.ps1',
+  '61-configure-power-apps-grid.ps1',
+  '63-format-forms.ps1',
+  'docs/onboarding.md',
+  'wizard.profile.json',
+  'SkillParity.Tests.ps1',
+  'git diff --check'
+)) {
+  if ($readme -notmatch [regex]::Escape($requiredRegistryText)) {
+    throw "README enhancement registry is missing required maintenance guidance: $requiredRegistryText"
+  }
+}
+
+foreach ($instructionContent in @($copilotInstructions, $prompt)) {
+  foreach ($requiredEnhancementStage in @(
+    '35-style-choice-options.ps1',
+    '61-configure-power-apps-grid.ps1',
+    '63-format-forms.ps1'
+  )) {
+    if ($instructionContent -notmatch [regex]::Escape($requiredEnhancementStage)) {
+      throw "Wizard instruction surface is missing optional enhancement stage: $requiredEnhancementStage"
+    }
+  }
+}
+
+if ($bpfRunbook -notmatch [regex]::Escape('35-style-choice-options.ps1')) {
+  throw 'BPF runbook dependency sequence is missing optional Choice presentation stage 35.'
+}
+
+foreach ($requiredDistributionText in @(
+  'grid-controls.schema.json',
+  'grid-controls.example.json',
+  'test-choice-presentations.ps1',
+  'test-power-apps-grid.ps1',
+  'README enhancement registry and maintenance policy'
+)) {
+  if ($skillDistribution -notmatch [regex]::Escape($requiredDistributionText)) {
+    throw "Skill distribution guide is missing enhancement compatibility guidance: $requiredDistributionText"
+  }
+}
+
+if (-not [bool]$wizardContract.discovery.optionalQuestionModules.'choice-presentations') {
+  throw 'Profile does not enable the choice-presentations extension block.'
+}
+foreach ($contentCheck in @($readme, $onboarding, $contract, $initSkill)) {
+  foreach ($requiredChoiceText in @('35-style-choice-options.ps1', 'choice-presentations-*.json')) {
+    if ($contentCheck -notmatch [regex]::Escape($requiredChoiceText)) {
+      throw "Wizard contract surface is missing Choice presentation guidance: $requiredChoiceText"
+    }
   }
 }
 

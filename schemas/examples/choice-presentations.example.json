@@ -1,0 +1,27 @@
+{
+  "version": "1.0",
+  "TableLogicalName": "contoso_case",
+  "ColumnLogicalName": "contoso_allegationtype",
+  "Ownership": "wizard-owned-unmanaged-local-choice",
+  "LanguageCode": 1033,
+  "Options": [
+    {
+      "Value": 100000000,
+      "Label": "Unreported Earnings",
+      "ColorToken": "pastel-peach",
+      "Icon": "triangle-filled"
+    },
+    {
+      "Value": 100000001,
+      "Label": "Late-Reported Earnings",
+      "ColorToken": "pastel-lavender",
+      "Icon": "diamond-filled"
+    },
+    {
+      "Value": 100000002,
+      "Label": "Suspicious Wage Report",
+      "ColorToken": "pastel-blue",
+      "Icon": "info"
+    }
+  ]
+}

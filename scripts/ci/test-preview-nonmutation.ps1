@@ -75,7 +75,16 @@ if ($LASTEXITCODE -ne 0) {
 $environmentBefore = $env:DV_ENVIRONMENT_URL
 $solutionBefore = $env:DV_SOLUTION_NAME
 $prefixBefore = $env:DV_PUBLISHER_PREFIX
+$gridContractPath = Join-Path $repoRoot 'specs/gcc-framework-acceptance/grid-controls.json'
+$choicePresentationPath = Join-Path $repoRoot 'payloads/scenarios/gcc-framework-acceptance/choice-presentations-ppvs-checkoutrequest.json'
 try {
+    [ordered]@{
+        version = '1.0'
+        TableLogicalName = 'ppvs_checkoutrequest'
+        ColumnLogicalName = 'ppvs_requeststatus'
+        Ownership = 'wizard-owned-unmanaged-local-choice'
+        Options = @([ordered]@{ Value = 100000000; Label = 'Requested'; ColorToken = 'pastel-blue'; Icon = 'info' })
+    } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $choicePresentationPath -Encoding UTF8
     $env:DV_ENVIRONMENT_URL = 'https://preview.invalid'
     $env:DV_TOKEN = 'preview-no-token'
     $env:DV_SOLUTION_NAME = 'LabEquipmentCheckoutAcceptance20260826'
@@ -86,13 +95,51 @@ try {
     }
     $previewSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
     $formsViewsPreview = @($previewSummary.stages | Where-Object { $_.name -eq 'forms-views' })[0]
+    $gridPreview = @($previewSummary.stages | Where-Object { $_.name -eq 'grid-control' })[0]
+    $choicePreview = @($previewSummary.stages | Where-Object { $_.name -eq 'choice-presentations' })[0]
+    if ($choicePreview.status -ne 'completed') {
+        throw "Choice-presentation Preview did not complete: $($choicePreview.reason)"
+    }
+    $choicePreviewReport = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/artifacts/choice-presentations/gcc-framework-acceptance/choice-presentation-plan.json') -Raw | ConvertFrom-Json
+    if ($choicePreviewReport.applied) {
+        throw 'Choice-presentation Preview incorrectly reported metadata as applied.'
+    }
+    if ($gridPreview.status -ne 'skipped') {
+        throw 'Grid-control stage changed behavior when grid-controls.json was absent.'
+    }
     if (@($formsViewsPreview.details) -notcontains 'ppvs_checkoutrequest|Active Checkout Requests|adopt-generated-active') {
         throw 'Credential-free preview did not report generated Active-view adoption.'
     }
     if (@($formsViewsPreview.details) -notcontains 'ppvs_labasset|Available Lab Assets|create-custom') {
         throw 'Credential-free preview did not report the custom availability view.'
     }
+
+    [ordered]@{
+        version = '1.0'
+        tables = @([ordered]@{
+            tableLogicalName = 'ppvs_checkoutrequest'; scope = 'all-views'; enableEditing = $false
+            filtering = $true; sorting = $true; grouping = $false; aggregation = $false
+            columnReordering = $false; multiselect = $true; rangeSelection = $true
+            jumpBar = $false; pagination = $false; optionSetColors = $false
+            statusIcons = $true; typeIcons = $false
+        })
+    } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $gridContractPath -Encoding UTF8
+    & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation
+    if ($LASTEXITCODE -ne 0) {
+        throw "Grid-enabled orchestrated preview failed with exit code $LASTEXITCODE."
+    }
+    $gridEnabledSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
+    $gridEnabledPreview = @($gridEnabledSummary.stages | Where-Object { $_.name -eq 'grid-control' })[0]
+    if ($gridEnabledPreview.status -ne 'completed') {
+        throw "Grid-enabled orchestrated preview did not complete stage 61: $($gridEnabledPreview.reason)"
+    }
+    $gridPreviewReport = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/artifacts/grid-controls/gcc-framework-acceptance/preview-report.json') -Raw | ConvertFrom-Json
+    if ($gridPreviewReport.applied) {
+        throw 'Grid-enabled orchestrated preview incorrectly reported maker configuration as applied.'
+    }
 } finally {
+    Remove-Item -LiteralPath $gridContractPath -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $choicePresentationPath -Force -ErrorAction SilentlyContinue
     $env:DV_ENVIRONMENT_URL = $environmentBefore
     $env:DV_TOKEN = $tokenBefore
     $env:DV_SOLUTION_NAME = $solutionBefore

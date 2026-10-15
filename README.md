@@ -108,6 +108,7 @@ This initial setup writes local progress telemetry under `.wizard-metrics/` unle
 - [Who this is for](#who-this-is-for)
 - [Key concepts](#key-concepts)
 - [How it works](#how-it-works)
+- [Enhancement registry and maintenance policy](#enhancement-registry-and-maintenance-policy)
 - [Visual walkthrough](docs/wizard-walkthrough.html)
 - [Getting started](#getting-started)
 - [Install Spec Kit tooling](#install-spec-kit-tooling)
@@ -200,6 +201,62 @@ See the [Dataverse Report Wizard guide](docs/dataverse-report-wizard.md) for the
 complete reporting workflow, safety gates, generated artifacts, and CI usage.
 
 Disclosed local usage metrics are available for wizard runs. Bootstrap scripts log non-identifying step progress to `.wizard-metrics/events.jsonl`, print a telemetry notice when they do so, and support opt-out with `WIZARD_METRICS_OPTOUT=1`.
+
+---
+
+## Enhancement registry and maintenance policy
+
+The following optional enhancements extend the baseline wizard without making a
+valid app depend on them:
+
+| Enhancement | Contract | Runtime position | Approval and verification |
+| --- | --- | --- | --- |
+| **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
+| **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
+| **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
+| **FAST Solution Accelerator Discovery** *(instructions only)* | [`docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md`](docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md) | Proposed after requirements discovery and before architecture finalization; no runtime stage is registered yet | Requires a verified pre-FAST Git baseline, Spec Kit assessment, explicit approval gates, provider isolation, and proof that custom-only operation remains unchanged |
+
+Choice presentation supports controlled pastel colors and optional inline label
+icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
+matching the Power Apps maker experience. Set `optionSetColors: true` in the
+matching grid contract when the pastel backgrounds must also appear in table
+views.
+
+The FAST entry registers a reviewed implementation directive, not a completed
+wizard capability. It does not change the current build sequence, profile,
+contract version, scripts, or deployment behavior. Future FAST implementation
+work must begin with FAST-000 and FAST-001 in the directive and satisfy the
+checklist below before any runtime capability is described as available.
+
+### Required checklist for future enhancements
+
+When adding or materially changing a wizard enhancement, update every applicable
+surface in the same change:
+
+1. Update the authoritative sequence and behavior in `docs/onboarding.md`.
+2. Update this enhancement registry, build sequence, script reference, and repo
+   tree in `README.md`.
+3. Increment `contractVersion` in `wizard.profile.json` and the matching
+   `Version` in `docs/wizard-contract-v1.md` when the runtime contract changes.
+4. Register the module, contract path, execution order, Preview/Apply behavior,
+   rerun behavior, and approval parameters in `wizard.profile.json` and
+   `90-run-build.ps1`.
+5. Update both Copilot and Claude instruction surfaces, including
+   `.github/copilot-instructions.md`, the shared prompt/skills, and any
+   capability-specific paired skills.
+6. Update both model-driven-app requirements guides, `docs/build-log.md`, and
+   `docs/skill-distribution.md`.
+7. Add or update the JSON schema, example payload, stage-specific regression
+   tests, orchestrated Preview non-mutation coverage, script-order checks,
+   documentation consistency checks, contract integrity checks, and skill
+   parity checks (`scripts/ci/SkillParity.Tests.ps1`).
+8. Re-run the smallest affected suites, then the complete related regression
+   set and `git diff --check`. Record any intentional unsupported boundary.
+9. Keep `docs/onboarding.md` authoritative. If another document conflicts with
+   it, fix that document rather than creating another sequence.
+
+An enhancement is not documentation-complete until the checklist above is
+satisfied and the credential-free consistency/parity tests pass.
 
 ---
 
@@ -483,6 +540,12 @@ Forms and labels rules:
 - Missing labels fall back to friendly title-case labels from logical names (prefix removed, underscores replaced with spaces).
 - If Starter Main Form exists, reruns patch its form XML to apply payload field/label changes.
 - If a non-starter Main form exists, starter form creation/update is skipped.
+- Optional Version 1 form formatting uses `specs/<scenario-slug>/form-layouts.json`, validated by `schemas/payloads/form-layouts.schema.json`, only after the baseline app is assembled.
+- Start from `schemas/examples/form-layouts.example.json`, then replace every sample table, form, field, persona, and label with scenario-approved values.
+- Formatting is limited to active, customizable, wizard-owned custom Main forms and existing baseline controls/fields. It supports tabs, sections, one-, two-, or three-column layouts, Boolean Toggle components, and Choice OptionSet Wrapper components. Component requests are type-checked and configured for web, tablet, and phone; other components and OOB forms are deferred.
+- Preview emits review artifacts and a SHA-256 plan hash. Apply requires that exact hash through `-ApprovedPlanHash`.
+- Optional Choice presentation payloads use `choice-presentations-*.json`. Stage 35 applies allowlisted pastel colors and optional inline Unicode prefixes such as `▲`, `◆`, `⚠`, and `ℹ` to existing options on wizard-owned unmanaged local Choice columns. The icon is part of the displayed Choice label, as in Power Apps maker, and is never separate icon metadata.
+- Set `optionSetColors: true` in the table's `grid-controls.json` contract when those pastel backgrounds must appear in Power Apps grid views.
 
 Run build scripts in order:
 
@@ -490,12 +553,22 @@ Run build scripts in order:
 pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
+# Apply only with the exact approved SHA-256 hash emitted by Preview
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -ApprovedPlanHash <sha256>
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
 pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+# After the maker completes and publishes the table-level all-views setup:
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Verify
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
+# Optional when specs/<scenario-slug>/form-layouts.json exists; run Preview first
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+# Apply only after approving the emitted SHA-256 hash
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Apply -ApprovedPlanHash <sha256>
 # Optional if enabled by profile + planning selection
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
@@ -515,6 +588,13 @@ pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 
 After each script: check that the failed count is zero before running the next. All scripts are idempotent -- safe to rerun after fixing any failure.
 
+The preferred orchestrator, `90-run-build.ps1`, enables stage 63 after app
+assembly when `form-layouts.json` exists. Credential-free Preview lists the
+planned form target. Orchestrated Apply requires
+`-ApprovedFormFormattingPlanHash <sha256>`. Anthropic's official
+`frontend-design` skill is optional design advice only and is not installed by
+this repository.
+
 Solution isolation behavior:
 
 - `50-add-to-solution.ps1` derives the expected table set from payload references and fails fast if the target solution already contains foreign table components.
@@ -524,6 +604,14 @@ Solution isolation behavior:
 - `55-build-business-process-flows.ps1` validates explicit `process-*.json` input and generates a Power Apps designer handoff. Apply mode requires the matching category-4 process to exist through that supported designer/solution path; the script then validates, activates, adds, and links it without fabricating workflow definition metadata.
 - If the scenario only defines CRUD tables without a staged business progression, script 55 skips BPF generation and explains why in its report artifact.
 - `60-build-forms-views.ps1` applies quality gates to forms and views and writes population artifacts for both.
+- Views do not automatically guarantee the modern OneGrid runtime. Optional
+  stage 61 consumes `specs/<scenario-slug>/grid-controls.json` after step 60
+  and before reporting/app assembly. Preview produces a classic solution
+  explorer handoff (table-level means all views, and editing is explicit);
+  Verify uses exported unmanaged solution metadata to require
+  `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties. No internal
+  metadata or solution XML is mutated. Subgrid support remains deferred. See
+  [Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).
 - `62-build-app-module.ps1` creates or updates the scenario-aware model-driven app shell and validates its attached components.
 - `64-build-charts-dashboard.ps1` creates native Dataverse charts and dashboards from scenario payloads; it is not the HTML web-resource stage.
 - `66-seed-synthetic-data.ps1` safely upserts source-tagged records by stable natural key and exact relationship references.
@@ -768,11 +856,14 @@ Release and rollback references for this update bundle:
 | `15-dry-validate.ps1` | Validate planning artifacts, payload prerequisites, optional report/BPF/app inputs, and emit contract artifacts before mutation | No | Yes |
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
 | `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
+| `35-style-choice-options.ps1` | Preview or apply hash-approved pastel colors and inline icon prefixes from `choice-presentations-*.json` | Apply only | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
 | `50-add-to-solution.ps1` | Add payload entities; in `-InventoryOnly` mode, read all-category membership, preserve IDs, and enforce the export gate without Dataverse mutation | Yes, except inventory-only mode | Yes |
 | `55-build-business-process-flows.ps1` | Validate optional `process-*.json`, generate the supported designer handoff, and validate/activate/add/link an existing designer-authored BPF | Yes in apply mode; preview is local only | Yes |
 | `60-build-forms-views.ps1` | Build payload-driven Starter Main Forms (create/update/skip) and Active views for payload-defined custom entities, then publish customizations | Yes | Yes |
+| `61-configure-power-apps-grid.ps1` | Produce the classic solution explorer all-views maker handoff, then verify `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties from exported solution metadata | Export only in Verify | Yes |
 | `62-build-app-module.ps1` | Create or update the scenario-aware model-driven app shell, attach intended components, and validate the resulting app | Yes | Yes |
+| `63-format-forms.ps1` | Preview or apply an approved, hash-bound `form-layouts.json` layout to eligible wizard-owned custom Main forms after app assembly | Apply only | Yes |
 | `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
 | `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
 | `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
@@ -804,6 +895,9 @@ power-platform-vscode-starter/
     onboarding.md             -- Step-by-step setup guide for new builders
     build-log.md              -- Log template for recording each build run
     wizard-contract-v1.md     -- Canonical workflow contract (discovery/planning/execution)
+    fast-integration/
+      instructions/
+        FAST_Solution_Builder_Implementation_Instructions.md -- Reviewed FAST enhancement implementation directive
   payloads/                   -- Add table-*.json, columns-*.json, relationships-*.json here
   requirements/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
@@ -822,10 +916,12 @@ power-platform-vscode-starter/
       15-dry-validate.ps1         -- Validate planning artifacts and payload prerequisites before mutation
       20-build-tables.ps1          -- Create tables from payloads/table-*.json
       30-build-columns.ps1         -- Add columns from payloads/columns-*.json
+      35-style-choice-options.ps1  -- Apply approved pastel colors and inline icon label prefixes
       40-build-relationships.ps1   -- Create lookups from payloads/relationships-*.json
       50-add-to-solution.ps1       -- Add payload-referenced entities to target solution
       55-build-business-process-flows.ps1 -- Validate and build optional Business Process Flows
       60-build-forms-views.ps1     -- Build payload-driven Starter Main Forms and Active views, then publish
+      61-configure-power-apps-grid.ps1 -- Maker handoff and exported-metadata OneGrid verification gate
       62-build-app-module.ps1      -- Create or update the scenario-aware model-driven app shell
       65-build-web-resources.ps1   -- Generate optional scenario-driven HTML report web resources and add to solution
       70-build-web-resources.ps1   -- Canonical optional reporting module entrypoint (wrapper)
@@ -865,6 +961,7 @@ power-platform-vscode-starter/
 | Document | Purpose |
 | --- | --- |
 | [docs/dataverse-report-wizard.md](docs/dataverse-report-wizard.md) | Complete guide for reporting against an existing model-driven app, including simulation, preview, deployment approval, and validation |
+| [docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md](docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md) | Reviewed, gated implementation directive for the proposed FAST Solution Accelerator Discovery enhancement; does not indicate runtime implementation |
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
 | [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html) | Full visual walkthrough with direct links to skill entry points, scripts, and runbooks |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |

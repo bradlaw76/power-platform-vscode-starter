@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.9.0
+Version: 1.12.0
 
 ## Purpose
 
@@ -184,31 +184,62 @@ Required gate before execution:
 3. `15-dry-validate.ps1`
 4. `20-build-tables.ps1`
 5. `30-build-columns.ps1`
-6. `40-build-relationships.ps1`
-7. `50-add-to-solution.ps1`
-8. `55-build-business-process-flows.ps1`
-9. `60-build-forms-views.ps1`
-10. Optional `64-build-charts-dashboard.ps1` from `reporting-*.json`
-11. `62-build-app-module.ps1`, including declared chart/dashboard components
-12. Optional profile-driven web resources
-13. Optional `66-seed-synthetic-data.ps1` from `data-*.json`
-14. First `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
-15. `85-verify-idempotency.ps1 -Phase CaptureBaseline`
-16. Controlled second pass of forms/views, reporting, app/sitemap, and synthetic data
-17. Final membership gate and `85-verify-idempotency.ps1 -Phase Verify`
-18. `95-export-unmanaged-solution.ps1`
-19. `80-post-build-analysis.ps1`
+6. Optional `35-style-choice-options.ps1` when `choice-presentations-*.json`
+   exists. Preview is credential-free and hash-bound; Apply updates existing
+   local Choice option colors and inline label prefixes, then publishes and
+   verifies readback.
+7. `40-build-relationships.ps1`
+8. `50-add-to-solution.ps1`
+9. `55-build-business-process-flows.ps1`
+10. `60-build-forms-views.ps1`
+11. Optional `61-configure-power-apps-grid.ps1` when `grid-controls.json`
+    exists: credential-free maker handoff followed by an exported-solution
+    verification gate. A view alone does not guarantee OneGrid.
+12. Optional `64-build-charts-dashboard.ps1` from `reporting-*.json`
+13. `62-build-app-module.ps1`, including declared chart/dashboard components
+14. Optional `63-format-forms.ps1` after app assembly when `form-layouts.json` exists
+15. Optional profile-driven web resources
+16. Optional `66-seed-synthetic-data.ps1` from `data-*.json`
+17. First `50-add-to-solution.ps1 -InventoryOnly -EnforceExportGate`
+18. `85-verify-idempotency.ps1 -Phase CaptureBaseline`
+19. Controlled second pass of Choice presentation, forms/views, grid verification, reporting, app/sitemap, form formatting, and synthetic data
+20. Final membership gate and `85-verify-idempotency.ps1 -Phase Verify`
+21. `95-export-unmanaged-solution.ps1`
+22. `80-post-build-analysis.ps1`
 
 ### Optional Modules (profile-driven)
 
 - `65-build-web-resources.ps1`
 - `64-build-charts-dashboard.ps1`
 - `66-seed-synthetic-data.ps1`
+- `63-format-forms.ps1`
+- `61-configure-power-apps-grid.ps1`: table-level and applies to all views.
+  It runs after step 60 and before reporting/app assembly. Preview never claims
+  application; Verify requires exported metadata runtime name
+  `Microsoft.PowerApps.PowerAppsOneGrid` and declared property values. Editing
+  is explicit. Internal `customcontroldefaultconfigs` CRUD and editing
+  `CustomControlDefaultConfigs` import XML are unsupported and prohibited.
+  Form layout/subgrids are separate; subgrid support is deferred. See
+  [Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).
 - `06-demo-script-wizard.ps1`
 - `07-demo-dry-run.ps1`
 - future execution modules: AI summary and integration adapters
 
 Synthetic data is created only from a validated `data-*.json` payload. The stage requires a source tag and stable natural keys, resolves entity-set names from metadata, fails on duplicate or foreign same-key records, resolves lookups exactly once, and updates the same IDs on rerun.
+
+Form formatting Version 1 is an optional, post-app-assembly stage. Its
+scenario contract is `specs/<scenario-slug>/form-layouts.json`, validated by
+`schemas/payloads/form-layouts.schema.json`. It may target only active,
+customizable, wizard-owned custom Main forms and controls/fields already on the
+baseline form. Supported layout primitives are tabs, sections, and one-, two-,
+or three-column layouts, Boolean Toggle components, and Choice OptionSet Wrapper
+components. Components are type-checked and configured for web, tablet, and
+phone; OOB forms and other components are deferred.
+Preview emits review artifacts and a SHA-256 plan hash. Apply requires the
+exact hash through `-ApprovedPlanHash`; orchestrated Apply uses
+`-ApprovedFormFormattingPlanHash`. Credential-free orchestrator Preview lists
+the planned target. Anthropic's `frontend-design` skill is optional advice,
+not an installed dependency or a FormXML runtime.
 
 Native charts and dashboards are distinct from HTML web resources. `64-build-charts-dashboard.ps1` creates or updates only wizard-owned `savedqueryvisualization` and dashboard `systemform` identities declared in `reporting-*.json`, adds those exact components to the selected solution, and publishes only their scenario tables.
 

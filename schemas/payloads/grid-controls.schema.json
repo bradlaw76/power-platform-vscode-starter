@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/bradlaw76/power-platform-vscode-starter/schemas/payloads/grid-controls.schema.json",
+  "title": "Power Apps Grid Controls Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "tables"],
+  "properties": {
+    "version": {
+      "const": "1.0"
+    },
+    "tables": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "tableLogicalName",
+          "scope",
+          "enableEditing",
+          "filtering",
+          "sorting",
+          "grouping",
+          "aggregation",
+          "columnReordering",
+          "multiselect",
+          "rangeSelection",
+          "jumpBar",
+          "pagination",
+          "optionSetColors",
+          "statusIcons",
+          "typeIcons"
+        ],
+        "properties": {
+          "tableLogicalName": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "scope": {
+            "const": "all-views"
+          },
+          "enableEditing": { "type": "boolean" },
+          "filtering": { "type": "boolean" },
+          "sorting": { "type": "boolean" },
+          "grouping": { "type": "boolean" },
+          "aggregation": { "type": "boolean" },
+          "columnReordering": { "type": "boolean" },
+          "multiselect": { "type": "boolean" },
+          "rangeSelection": { "type": "boolean" },
+          "jumpBar": { "type": "boolean" },
+          "pagination": { "type": "boolean" },
+          "optionSetColors": { "type": "boolean" },
+          "statusIcons": { "type": "boolean" },
+          "typeIcons": { "type": "boolean" },
+          "rationale": {
+            "type": "string",
+            "minLength": 1
+          },
+          "persona": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  }
+}

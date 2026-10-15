@@ -321,6 +321,18 @@ Canonical contract sources:
 - `docs/wizard-contract-v1.md`
 - `wizard.profile.json`
 
+### Proposed FAST accelerator enhancement (instructions only)
+
+The reviewed
+[`FAST Solution Builder implementation instructions`](fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md)
+describe a future, optional accelerator-discovery capability after requirements
+discovery and before architecture finalization. That capability is not currently
+implemented or registered in the wizard runtime. Do not add FAST questions,
+catalog calls, dependencies, or deployment steps to a normal run. Any
+implementation effort must start with the directive's FAST-000 and FAST-001
+baseline and Spec Kit approval gates, while preserving the existing
+custom-only flow.
+
 Supported application profiles:
 
 - `standalone-model-driven`
@@ -456,12 +468,23 @@ Run each script in sequence. Each one tells you the next step on completion.
 pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
+# Optional when choice-presentations-*.json exists; Preview emits the approval hash
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
+# Apply only with the exact approved SHA-256 hash emitted by Preview
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -ApprovedPlanHash <sha256>
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# Optional contract: Preview handoff, maker configuration, then Verify gate
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Verify
 pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
+# Optional when specs/<scenario-slug>/form-layouts.json exists; always preview first
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+# Apply only with the exact approved SHA-256 hash emitted by Preview
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Apply -ApprovedPlanHash <sha256>
 # Optional if report web resources were enabled by profile + planning
 pwsh ./scripts/bootstrap/70-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
@@ -486,6 +509,8 @@ Payload rules for Step 10:
 - `table-*.json` must include only true custom entities.
 - Do not place standard entities (like `contact` or `incident`) in `table-*.json`.
 - `columns-*.json` and `relationships-*.json` can reference both standard and custom entities.
+- `choice-presentations-*.json` optionally assigns an allowlisted pastel color and inline icon prefix to existing options on wizard-owned unmanaged local Choice columns. Stage 35 runs after column creation, never inserts or deletes option values, previews the exact rendered labels, requires an approved SHA-256 hash, publishes only changed tables, and verifies metadata readback.
+- To display those configured pastel backgrounds in table views, also enable `optionSetColors` for the table in `grid-controls.json` and complete the stage 61 maker handoff/verification. The inline icon remains part of the Choice label everywhere that label is shown.
 - `50-add-to-solution.ps1` derives the expected table set from payload references and fails before adding components if the target solution already contains foreign tables.
 - `50-add-to-solution.ps1` also produces a contamination scan artifact that classifies expected, wizard-managed foreign, and manual or legacy solution contents before more components are added.
 - Override that guard only when reuse is intentional: `pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -FailIfSolutionHasForeignTables:$false`.
@@ -496,7 +521,21 @@ Payload rules for Step 10:
 - If BPF branch logic is ambiguous, resolve it in planning and the designer handoff before authoring the process.
 - `60-build-forms-views.ps1` builds Starter Main Form controls from `columns-*.json` for payload-defined custom entities.
 - `60-build-forms-views.ps1` applies form and view quality gates and writes population artifacts for both surfaces.
+- A created view does not automatically use the modern grid. When
+  `specs/<scenario-slug>/grid-controls.json` exists, stage 61 runs here—after
+  step 60 and before native reporting/app assembly. Preview writes an accessible
+  classic solution explorer maker handoff. Table-level setup applies to all
+  views, and **Enable editing** must be configured explicitly. Verify performs a
+  supported unmanaged export/unpack (or reads an override folder) and gates on
+  `Microsoft.PowerApps.PowerAppsOneGrid` plus requested property tokens. It
+  never writes `customcontroldefaultconfigs` or edits solution XML. Form
+  subgrids are separate and deferred. See [Power Apps grid control](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).
 - `62-build-app-module.ps1` creates or updates the scenario app shell, attaches intended components, and validates the resulting model-driven app configuration.
+- `63-format-forms.ps1` is the optional Version 1 second-pass formatter. It reads `specs/<scenario-slug>/form-layouts.json`, validates it against `schemas/payloads/form-layouts.schema.json`, and runs only after app assembly. It targets active, customizable, wizard-owned custom Main forms and existing baseline controls/fields; tabs, sections, one-, two-, or three-column layouts, Boolean Toggle components, and Choice OptionSet Wrapper components are supported. Components are type-checked and configured for web, tablet, and phone. OOB forms and other components are deferred.
+- Formatter Preview emits normalized-plan, semantic-diff, wireframe/report artifacts, and a SHA-256 plan hash without Dataverse mutation. Apply requires that exact hash through `-ApprovedPlanHash`.
+- `90-run-build.ps1` automatically enables this optional stage when `form-layouts.json` exists. Credential-free orchestrator Preview lists the planned target; orchestrated Apply requires `-ApprovedFormFormattingPlanHash <sha256>`.
+- `90-run-build.ps1` automatically enables stage 35 when `choice-presentations-*.json` exists. Orchestrated Apply requires `-ApprovedChoicePresentationPlanHash <sha256>`.
+- Anthropic's official `frontend-design` skill is optional advice only. This repository does not install it, and it must not generate or apply FormXML.
 - `64-build-charts-dashboard.ps1` reads `reporting-*.json`, safely upserts native charts and a dashboard, and adds them to the selected solution before app assembly.
 - `66-seed-synthetic-data.ps1` reads `data-*.json` and upserts only source-tagged records through stable natural keys and exact lookup resolution.
 - `85-verify-idempotency.ps1` compares first- and second-pass identity-to-ID evidence and fails on changed IDs, new identities, missing identities, or second-pass creates.
@@ -523,6 +562,7 @@ Validation checkpoint after each script:
 - Script exits without errors.
 - Summary counts are printed.
 - For script 60, verify: forms created, forms updated, forms skipped, views created, failures.
+- For optional script 63, verify: the preview target and artifacts, approved SHA-256 hash, eligible form boundary, readback result, and unchanged/updated/blocked/failed counts.
 - If failed count is greater than zero, stop and fix before proceeding.
 - If `50-add-to-solution.ps1` reports foreign tables, use the dry run first and follow [docs/solution-isolation-runbook.md](solution-isolation-runbook.md) before rerunning the build.
 

@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "tables": [
+    {
+      "tableLogicalName": "contoso_workitem",
+      "scope": "all-views",
+      "enableEditing": true,
+      "filtering": true,
+      "sorting": true,
+      "grouping": false,
+      "aggregation": false,
+      "columnReordering": false,
+      "multiselect": true,
+      "rangeSelection": true,
+      "jumpBar": false,
+      "pagination": false,
+      "optionSetColors": false,
+      "statusIcons": true,
+      "typeIcons": false,
+      "persona": "Operations coordinator",
+      "rationale": "High-frequency triage needs fast inline updates and visual status cues."
+    }
+  ]
+}

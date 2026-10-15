@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://power-platform-vscode-starter.local/schemas/payloads/choice-presentations.schema.json",
+  "title": "Dataverse local Choice presentation",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version", "TableLogicalName", "ColumnLogicalName", "Ownership", "Options"],
+  "properties": {
+    "version": { "const": "1.0" },
+    "TableLogicalName": { "$ref": "#/$defs/logicalName" },
+    "ColumnLogicalName": { "$ref": "#/$defs/logicalName" },
+    "Ownership": { "const": "wizard-owned-unmanaged-local-choice" },
+    "LanguageCode": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1033
+    },
+    "Options": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/option" }
+    }
+  },
+  "$defs": {
+    "logicalName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "option": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["Value", "Label", "ColorToken"],
+      "properties": {
+        "Value": { "type": "integer" },
+        "Label": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 96
+        },
+        "ColorToken": {
+          "enum": [
+            "pastel-apricot",
+            "pastel-blue",
+            "pastel-gray",
+            "pastel-lavender",
+            "pastel-mint",
+            "pastel-peach",
+            "pastel-rose",
+            "pastel-yellow"
+          ]
+        },
+        "Icon": {
+          "enum": [
+            "none",
+            "circle-filled",
+            "diamond-filled",
+            "diamond-outline",
+            "info",
+            "square-filled",
+            "triangle-filled",
+            "triangle-outline",
+            "warning"
+          ],
+          "default": "none"
+        }
+      }
+    }
+  }
+}

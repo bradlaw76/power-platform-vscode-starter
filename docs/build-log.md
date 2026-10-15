@@ -16,6 +16,7 @@ Record wizard version changes here so you can trace which behavior applied to ea
 | 2026-07-16 | v2.0.0 | Contract-driven wizard baseline: `wizard-contract-v1.md`, `wizard.profile.json`, optional module entrypoint `70-build-web-resources.ps1`, payload path standardization, and CI consistency checks. |
 | 2026-07-17 | v2.0.1 | Made `80-post-build-analysis.ps1` generic and parameterized (`SpecPath`, `PlanPath`, `TasksPath`, `PayloadFolder`, `ReadmePath`) with marker-safe README updates, preview mode, and branch-aware push confirmation. |
 | 2026-07-17 | v2.0.2 | Added disclosed local wizard telemetry (`.wizard-metrics/events.jsonl`) plus `81-build-progress-matrix.ps1` to summarize step completion/drop-off across runs. |
+| 2026-09-30 | Form formatter v1 | Added optional, hash-approved form-layout Preview/Apply for active, customizable, wizard-owned custom Main forms after app assembly. |
 
 ## Release Process
 
@@ -40,7 +41,7 @@ Date:
 Runner:
 Environment URL: https://<org>.crm.dynamics.com
 Build Type (Demo/Prod):
-Scripts Run (20,30,40,50,60):
+Scripts Run (15,20,30,optional 35,40,50,55,60,optional 61,64,62,optional 63,65,66,80,85,95):
 Tables (created/skipped/failed):
 Columns (created/skipped/failed):
 Relationships (created/skipped/failed):
@@ -57,6 +58,18 @@ Views (created/skipped/failed):
 Starter Main Form patched on rerun (yes/no):
 Non-starter Main forms preserved (yes/no):
 Business labels visible on starter form (yes/no):
+Form Formatting Contract (`specs/<slug>/form-layouts.json`) Present (yes/no):
+Form Field Components Applied (Toggle/OptionSet Wrapper/none):
+Choice Presentation Payloads (files/none):
+Choice Presentation Plan Hash:
+Choice Pastel Colors and Inline Label Icons Verified (yes/no):
+Form Formatting Schema Valid (yes/no/not applicable):
+Form Formatting Planned Target:
+Form Formatting Preview Artifacts Reviewed (yes/no/not applicable):
+Form Formatting Approved SHA-256:
+Form Formatting Apply (updated/unchanged/blocked/failed/not applied):
+Form Formatting Readback / Scoped Publish Verified (yes/no/not applicable):
+Form Formatting Boundary Verified (wizard-owned custom active customizable Main form; yes/no/not applicable):
 Solution Exported (yes/no):
 Native Reporting Stage (created/updated/skipped/failed):
 Synthetic Data Stage (created/updated/skipped/failed):
@@ -99,3 +112,13 @@ Complete this before implementation:
 - Known issues captured with owner/date: yes/no
 - README generated build summary reviewed/updated: yes/no
 - Post-build analysis preview run completed (`80-post-build-analysis.ps1 -PreviewOnly`): yes/no
+### Power Apps grid gate
+
+- Contract: `specs/<scenario-slug>/grid-controls.json` / not requested
+- Stage 61 Preview handoff reviewed:
+- Classic solution explorer all-views configuration published:
+- Inline editing configured explicitly:
+- Exported metadata verification: PASS / FAIL / N/A
+- Runtime control: `Microsoft.PowerApps.PowerAppsOneGrid`
+- Verification report:
+- Note: view creation alone does not guarantee OneGrid; subgrid support is deferred.

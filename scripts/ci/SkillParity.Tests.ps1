@@ -49,6 +49,81 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    Describe 'Copilot and Claude Dataverse form formatter skill parity' {
+        BeforeAll {
+            $formatterSkillPaths = [ordered]@{
+                Copilot = Join-Path $repoRoot '.github/skills/dataverse-form-formatter/SKILL.md'
+                Claude  = Join-Path $repoRoot '.claude/skills/dataverse-form-formatter/SKILL.md'
+            }
+            $formatterSkillContent = @{}
+            foreach ($entry in $formatterSkillPaths.GetEnumerator()) {
+                $formatterSkillContent[$entry.Key] = Get-Content -LiteralPath $entry.Value -Raw
+            }
+        }
+
+        It '<Skill> names formatter runtime and contract <Gate>' -ForEach @(
+            foreach ($skill in @('Copilot', 'Claude')) {
+                foreach ($gate in @(
+                    '63-format-forms.ps1',
+                    '90-run-build.ps1',
+                    'form-layouts.json',
+                    'form-layouts.schema.json',
+                    'ApprovedPlanHash',
+                    'ApprovedFormFormattingPlanHash',
+                    'SHA-256'
+                )) {
+                    @{ Skill = $skill; Gate = $gate }
+                }
+            }
+        ) {
+            $formatterSkillContent[$Skill] | Should -Match ([regex]::Escape($Gate))
+        }
+
+        It '<Skill> enforces ownership, eligibility, and supported layout gates' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $formatterSkillContent[$Skill] | Should -Match '(?i)wizard-owned'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)custom Main form'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)customizable'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)active'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)existing baseline fields|fields.*already on the baseline'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)tabs and sections'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)one-, two-, or three-column'
+        }
+
+        It '<Skill> documents supported field components and type gates' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $formatterSkillContent[$Skill] | Should -Match 'component: toggle'
+            $formatterSkillContent[$Skill] | Should -Match 'component: option-set-wrapper'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)Boolean'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)Picklist'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)web, tablet, and phone'
+        }
+
+        It '<Skill> routes Choice colors and inline label icons to stage 35' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $formatterSkillContent[$Skill] | Should -Match 'choice-presentations-\*\.json'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)stage 35'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)part of the Choice label'
+        }
+
+        It '<Skill> keeps Preview non-mutating and defers unsupported surfaces' -ForEach @(
+            @{ Skill = 'Copilot' }
+            @{ Skill = 'Claude' }
+        ) {
+            $formatterSkillContent[$Skill] | Should -Match '(?i)Preview must issue no PATCH, POST, DELETE, or publish'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)OOB'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)headers, subgrids, timelines, quick views'
+            $formatterSkillContent[$Skill] | Should -Match '(?i)frontend-design'
+            $formatterSkillContent[$Skill] | Should -Match "(?i)isn't installed|is not installed"
+        }
+    }
+
     It '<Skill> uses docs/onboarding.md as the authoritative sequence' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }
@@ -124,7 +199,18 @@ Describe 'Copilot and Claude wizard skill parity' {
         foreach ($artifact in @('spec.md', 'plan.md', 'tasks.md')) {
             $skillContent[$Skill] | Should -Match ([regex]::Escape($artifact))
         }
+
         $skillContent[$Skill] | Should -Match '(?is)(do not|never|must not).{0,120}(build|scripts? 20)'
+    }
+
+    It '<Skill> routes table-level Power Apps grid work through the supported stage 61 gate' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match '61-configure-power-apps-grid\.ps1'
+        $skillContent[$Skill] | Should -Match 'Microsoft\.PowerApps\.PowerAppsOneGrid'
+        $skillContent[$Skill] | Should -Match '(?i)all views'
+        $skillContent[$Skill] | Should -Match '(?i)subgrid.+deferred'
     }
 
     It '<Skill> names shared orchestration script <ScriptName>' -ForEach @(
@@ -133,6 +219,7 @@ Describe 'Copilot and Claude wizard skill parity' {
                 '00-prereq-check.ps1',
                 '05-start-wizard.ps1',
                 '10-auth-connect.ps1',
+                '35-style-choice-options.ps1',
                 '55-build-business-process-flows.ps1',
                 '64-build-charts-dashboard.ps1',
                 '62-build-app-module.ps1',

@@ -66,6 +66,11 @@ NON-NEGOTIABLES
       model-driven apps from VS Code using PAC CLI.
     - dataverse-report-wizard: report-only workflow for discovering,
       previewing, and deploying native Dataverse charts and dashboards.
+    - dataverse-form-formatter: optional hash-approved second-pass formatting
+      for eligible wizard-owned custom Main forms.
+
+    This installer does not install Anthropic's frontend-design skill. That
+    skill is optional advice only and is not part of the formatter runtime.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/01-install-skills.ps1
@@ -128,13 +133,18 @@ Write-Host "  Start a new Claude Code session and run the wizard skill:"
 Write-Host "  /power-platform-vscode-wizard"
 Write-Host "  Or run the Dataverse reporting skill:"
 Write-Host "  /dataverse-report-wizard"
+Write-Host "  Or preview approved-scope Dataverse form formatting:"
+Write-Host "  /dataverse-form-formatter"
 Write-Host ""
 Write-Host "VS Code Copilot Chat users:" -ForegroundColor Cyan
 Write-Host "  This repo also includes a shared skill at .github/skills/power-platform-wizard-init"
 Write-Host "  and a report-only skill at .github/skills/dataverse-report-wizard"
+Write-Host "  and a form-formatting skill at .github/skills/dataverse-form-formatter"
 Write-Host "  Invoke it in Copilot Chat with:"
 Write-Host "  /power-platform-wizard-init"
 Write-Host "  /dataverse-report-wizard"
+Write-Host "  /dataverse-form-formatter"
+Write-Host "  Anthropic frontend-design is optional advice and is not installed here."
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Skills installed."
 }

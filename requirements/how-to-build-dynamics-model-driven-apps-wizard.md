@@ -246,12 +246,28 @@ Build decisions:
 - Starter form source strategy: payload-driven fields from `columns-*.json` plus primary name field first.
 - Label strategy: payload `DisplayName.LocalizedLabels` first; friendly logical-name fallback if labels are missing.
 - Rerun behavior: patch Starter Main Form, preserve non-starter Main forms.
+- Optional Choice presentation: use `choice-presentations-*.json` and
+  `35-style-choice-options.ps1` after column creation to apply approved pastel
+  colors and optional inline Unicode label prefixes. Version 1 updates existing
+  options on wizard-owned unmanaged local Choices only.
+- Optional second-pass formatting: after app assembly, validate
+  `specs/<scenario-slug>/form-layouts.json` with
+  `schemas/payloads/form-layouts.schema.json`, Preview with
+  `63-format-forms.ps1`, review its artifacts and SHA-256 hash, then Apply only
+  with `-ApprovedPlanHash`.
+- Version 1 boundary: active, customizable, wizard-owned custom Main forms;
+  existing baseline controls/fields; tabs, sections, one- to three-column
+  layouts, Boolean Toggle components, and Choice OptionSet Wrapper components.
+  Components are type-checked and configured for web, tablet, and phone. Other
+  components and OOB forms are deferred.
 
 Exit criteria:
 - Sitemap draft approved.
 - Forms/views matrix complete.
 - Dashboard metric list signed off.
 - Form label behavior documented for create and rerun scenarios.
+- Optional form-formatting target and approval owner documented when
+  `form-layouts.json` is planned.
 
 Copilot prompt:
 "Draft a model-driven app sitemap and forms/views matrix aligned to task-centric workflows, including accessibility checkpoints."
@@ -602,3 +618,15 @@ Exit criteria:
 - Local repo has a valid `origin` remote.
 - Pull completes with `--ff-only` on target branch.
 - Any nested repo is updated independently when applicable.
+## Modern table grid handoff and gate
+
+A saved view does not automatically guarantee the modern Power Apps grid.
+Capture the table-level all-views decision and explicit inline-editing choice in
+`specs/<scenario-slug>/grid-controls.json`. Run stage 61 after
+`60-build-forms-views.ps1` and before reporting or app assembly. Preview creates
+the accessible classic solution explorer maker handoff; after the maker saves
+and publishes, Verify reads a supported unmanaged solution export and requires
+`Microsoft.PowerApps.PowerAppsOneGrid` plus declared property tokens. Never
+mutate internal `customcontroldefaultconfigs` or edit
+`CustomControlDefaultConfigs` solution XML. Form subgrids remain deferred. See
+[Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).

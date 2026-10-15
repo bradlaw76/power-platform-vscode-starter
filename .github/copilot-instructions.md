@@ -31,6 +31,11 @@ Use `framework-acceptance` only after explicit selection. Add authorized-environ
 
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
+Optional UI enhancement stages are
+`35-style-choice-options.ps1`, `61-configure-power-apps-grid.ps1`, and
+`63-format-forms.ps1`. Run them only when their scenario contracts enable them,
+with their documented approval or verification gates.
+
 When demo data is requested, never seed standard reused tables implicitly. If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, a bounded source-record count, ordering field, and tasks per selected record; do not create tasks for every record unless the user explicitly selects all.
 
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.
@@ -121,11 +126,11 @@ Write a run summary with created/updated/skipped/failed counts by category. Upda
 ## Human Run Sequence (Operator Checklist)
 1. Run wizard intake and answer all discovery questions (including architecture intent questions).
 2. Confirm planning artifacts.
-3. Execute schema build scripts (`20`, `30`, `40`).
-4. Execute form/view generation or OOB form update/create strategy (`60`).
-5. Execute app assembly and sitemap update (`62`).
+3. Execute schema build scripts (`20`, `30`, optional Choice presentation `35`, `40`).
+4. Execute form/view generation (`60`) and optional all-views grid handoff/verification (`61`).
+5. Execute app assembly (`62`) and optional second-pass form formatting (`63`).
 6. Run solution inventory and sync (`50`).
-7. Publish.
+7. Publish only scoped changed components.
 8. Run metadata and app usability validation (`80`).
 9. Export/unpack only after membership check passes.
 10. Record outcomes in `docs/build-log.md`.
@@ -137,7 +142,7 @@ Use this build sequence unless the user has a documented reason to change it:
 3. Run `00-prereq-check.ps1`
 4. Run `10-auth-connect.ps1`
 5. Complete Spec Kit planning (architecture intent confirmed)
-6. Run scripts `15`, `20`, `30`, `40`, `50`, `55`, `60`, `64`, `62`, `65`, and `66` when their scenario payloads enable them
+6. Run scripts `15`, `20`, `30`, optional `35`, `40`, `50`, `55`, `60`, optional `61`, `64`, `62`, optional `63`, `65`, and `66` when their scenario contracts enable them
 7. Run first solution membership, capture idempotency baseline, rerun experience/data stages, and run final membership plus script `85`
 8. Publish only scoped components and validate app usability
 9. Run script `95` for unmanaged export and local unpack/inspection; Framework Acceptance must never import that package
@@ -149,8 +154,11 @@ Use and reference these files when relevant:
 - `docs/build-log.md`
 - `requirements/how-to-build-dynamics-model-driven-apps-wizard.md`
 - `requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md`
+- `README.md` — enhancement registry and future-change maintenance checklist
 
 ## Editing Expectations
 Keep repo changes minimal and practical.
 Do not skip beginner explanations.
 Do not recommend running build scripts before planning is complete.
+For every runtime enhancement, update the README enhancement registry and all
+applicable surfaces in its required future-enhancement checklist.

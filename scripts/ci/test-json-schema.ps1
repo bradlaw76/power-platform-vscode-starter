@@ -48,6 +48,9 @@ $schemaByFamily = [ordered]@{
     'process'       = Join-Path $schemaRoot 'process.schema.json'
     'reporting'     = Join-Path $schemaRoot 'reporting.schema.json'
     'data'          = Join-Path $schemaRoot 'data.schema.json'
+    'form-layouts'  = Join-Path $schemaRoot 'form-layouts.schema.json'
+    'grid-controls' = Join-Path $schemaRoot 'grid-controls.schema.json'
+    'choice-presentations' = Join-Path $schemaRoot 'choice-presentations.schema.json'
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
@@ -74,11 +77,18 @@ foreach ($file in $jsonFiles) {
         continue
     }
 
-    if ($file.Name -notmatch '^(?<family>table|columns|relationships|process|reporting|data)-.+\.json$') {
+    $isScenarioFormLayout = $file.Name -ceq 'form-layouts.json' -and
+        $relativePath -match '^specs[\\/][^\\/]+[\\/]form-layouts\.json$'
+    if ($isScenarioFormLayout) {
+        $family = 'form-layouts'
+    } elseif ($file.Name -ceq 'grid-controls.json' -and
+        $relativePath -match '^specs[\\/][^\\/]+[\\/]grid-controls\.json$') {
+        $family = 'grid-controls'
+    } elseif ($file.Name -match '^(?<family>table|columns|relationships|process|reporting|data|choice-presentations)-.+\.json$') {
+        $family = $Matches['family']
+    } else {
         continue
     }
-
-    $family = $Matches['family']
     $schemaPath = $schemaByFamily[$family]
     if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
         continue

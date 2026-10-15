@@ -735,7 +735,7 @@ if ($Mode -eq 'demo-builder') {
     $answers = [ordered]@{}
     $answers["WizardMode"] = $Mode
 
-    Write-Host "Demo Builder asks seven questions, then generates the same planning artifacts used by the shared build pipeline." -ForegroundColor Cyan
+    Write-Host "Demo Builder asks six business questions plus one consolidated recommendation confirmation, then generates the shared planning artifacts." -ForegroundColor Cyan
     $scenarioName = Read-RequiredValue "1. Describe the app idea and business outcome"
     $scenarioSlug = ConvertTo-Slug $scenarioName
     $primaryUserTask = Read-RequiredValue "2. Who is the primary user, and what is their top task?"
@@ -755,12 +755,15 @@ if ($Mode -eq 'demo-builder') {
     $solutionName = [regex]::Replace((Get-Culture).TextInfo.ToTitleCase($scenarioSlug.Replace('-', ' ')), '[^A-Za-z0-9]', '')
     $needsDemoData = if ($successAndData -match '(?i)\b(no|without)\s+(sample|synthetic|demo)\s+data\b') { 'No' } else { 'Yes' }
     $solutionType = if ($environmentAndOutput -match '(?i)\bunmanaged\b') { 'Unmanaged' } elseif ($environmentAndOutput -match '(?i)\bmanaged\b') { 'Managed' } else { 'Unmanaged' }
+    $recommendModernGrid = "$primaryUserTask $experienceAndLifecycle" -match '(?i)\b(daily|frequent|high[- ]frequency|operations?|coordinator|triage|queue|bulk|list|grid|inline|active requests?|update records)\b'
+    $recommendGridEditing = $recommendModernGrid -and "$primaryUserTask $experienceAndLifecycle" -match '(?i)\b(edit|update|triage|assign|bulk|inline|maintain)\b'
 
     Write-Host ""
     Write-Host "Recommended technical design:" -ForegroundColor Cyan
     Write-Host "  Standalone model-driven app; custom tables; new forms"
     Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
+    Write-Host "  Power Apps grid for all $entryPointTable views: $recommendModernGrid; inline editing: $recommendGridEditing"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
     $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
     if ($recommendationConfirmation -ne 'yes') {
@@ -772,6 +775,8 @@ if ($Mode -eq 'demo-builder') {
     $answers["ApplicationProfile"] = 'standalone-model-driven'
     $answers["TableChoice"] = 'custom-only'
     $answers["FormStrategy"] = 'create-new-forms'
+    $answers["PowerAppsGridEnabled"] = if ($recommendModernGrid) { 'yes' } else { 'no' }
+    $answers["PowerAppsGridEditing"] = if ($recommendGridEditing) { 'yes' } else { 'no' }
     $answers["EntryPointTable"] = $entryPointTable
     $answers["EntryPointLandingView"] = "Active $entryPointPluralDisplayName"
     $answers["ReviewAppMode"] = 'create-or-update'
@@ -859,6 +864,12 @@ $answers["ReviewAppMode"] = 'create-or-update'
 Write-Host "A5. Review app behavior: create-or-update (required by the repository contract)"
 $answers["ReviewAppArtifacts"] = Read-RequiredValue "A6. Artifacts visible in the review app" "all run-created tables, forms, views, processes, and reports"
 $answers["NavigationGroup"] = Read-RequiredValue "A7. Primary app navigation group" "Operations"
+$answers["PowerAppsGridEnabled"] = Read-ChoiceValue -Prompt "A8. Use the modern Power Apps grid at table level for all views?" -AllowedValues @('yes', 'no') -Default 'no'
+$answers["PowerAppsGridEditing"] = if ($answers["PowerAppsGridEnabled"] -eq 'yes') {
+    Read-ChoiceValue -Prompt "A9. Enable inline editing in the Power Apps grid?" -AllowedValues @('yes', 'no') -Default 'no'
+} else {
+    'no'
+}
 
 if ($sourceControlModuleEnabled) {
     $gitPreflight = Get-SourceControlPreflight -RepositoryRoot $repoRoot
@@ -1153,6 +1164,7 @@ $tasksPath = Join-Path $scenarioFolder "tasks.md"
 $demoDataPlanPath = Join-Path $scenarioFolder "demo-data-plan.json"
 $reportMappingsPath = Join-Path $scenarioFolder "report-mappings.md"
 $viewsPath = Join-Path $scenarioFolder "views.json"
+$gridControlsPath = Join-Path $scenarioFolder "grid-controls.json"
 $scenarioPayloadFolder = Join-Path (Join-Path $repoRoot "payloads\scenarios") $scenarioSlug
 $bpfPayloadPath = Join-Path $scenarioPayloadFolder "process-$scenarioSlug.json"
 
@@ -1170,6 +1182,33 @@ $viewsContract = [ordered]@{
     )
 }
 $viewsJson = $viewsContract | ConvertTo-Json -Depth 8
+$gridControlsObject = if ($answers["PowerAppsGridEnabled"] -eq 'yes') {
+    [ordered]@{
+        version = '1.0'
+        tables = @(
+            [ordered]@{
+                tableLogicalName = $answers["EntryPointTable"]
+                scope = 'all-views'
+                enableEditing = ($answers["PowerAppsGridEditing"] -eq 'yes')
+                filtering = $true
+                sorting = $true
+                grouping = $false
+                aggregation = $false
+                columnReordering = $false
+                multiselect = $true
+                rangeSelection = $true
+                jumpBar = $false
+                pagination = $false
+                optionSetColors = $false
+                statusIcons = $true
+                typeIcons = $false
+                persona = $answers["Users"]
+                rationale = 'Modern table-level grid for the planned operational landing experience.'
+            }
+        )
+    }
+} else { $null }
+$gridControlsJson = if ($null -ne $gridControlsObject) { $gridControlsObject | ConvertTo-Json -Depth 8 } else { '' }
 
 $standardFieldsList = Format-BulletList -Input $answers["StandardFieldsReused"]
 $customFieldsList = Format-BulletList -Input $answers["CustomFieldsToAdd"]
@@ -1277,6 +1316,12 @@ $bpfPayloadJson
 }
 
 $targetFiles = @($answersPath, $specPath, $planPath, $tasksPath, $reportMappingsPath)
+$targetFiles += $viewsPath
+if ($null -ne $gridControlsObject) {
+    $targetFiles += $gridControlsPath
+} elseif (Test-Path -LiteralPath $gridControlsPath -PathType Leaf) {
+    $targetFiles += $gridControlsPath
+}
 if ($null -ne $demoDataPlanObject) {
     $targetFiles += $demoDataPlanPath
 }
@@ -1312,6 +1357,8 @@ $answersContent = @"
 - Landing View: $($answers["EntryPointLandingView"])
 - Entry Point Validation: $($answers["EntryPointValidationStatus"])
 - Landing View Plan: $($answers["EntryPointLandingViewPlan"])
+- Power Apps Grid (table-level, all views): $($answers["PowerAppsGridEnabled"])
+- Power Apps Grid Inline Editing: $($answers["PowerAppsGridEditing"])
 - Review App Mode: $($answers["ReviewAppMode"])
 - Required App Artifacts: $($answers["ReviewAppArtifacts"])
 
@@ -1438,6 +1485,8 @@ $($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["Platform
 - Landing-view action: $($answers["EntryPointLandingViewPlan"])
 - Review app: $($answers["ReviewAppMode"])
 - Required app artifacts: $($answers["ReviewAppArtifacts"])
+- Power Apps grid: enabled=$($answers["PowerAppsGridEnabled"]); scope=all-views; inline-editing=$($answers["PowerAppsGridEditing"])
+- Grid contract: generate and review `grid-controls.json` when enabled; stage 61 is a maker handoff plus exported-solution verification gate, not metadata mutation.
 
 ## Problem Statement
 $($answers["BusinessProblem"])
@@ -1570,6 +1619,8 @@ $planContent = @"
 - Entry-point validation: $($answers["EntryPointValidationStatus"])
 - Landing-view action: $($answers["EntryPointLandingViewPlan"])
 - Form strategy: $($answers["FormStrategy"])
+- Power Apps grid decision: enabled=$($answers["PowerAppsGridEnabled"]); table-level scope=all-views; inline-editing=$($answers["PowerAppsGridEditing"])
+- Grid implementation: generate `grid-controls.json`, complete the classic solution explorer handoff, then verify exported metadata at stage 61 before app assembly.
 - Required artifacts: $($answers["ReviewAppArtifacts"])
 $(if ($Retrofit) { @"
 
@@ -1732,6 +1783,7 @@ $tasksContent = @"
 - [ ] Add components to solution with '50-add-to-solution.ps1'
 - [ ] If BPF is enabled, run '55-build-business-process-flows.ps1' and review the generated BPF build report
 - [ ] Build starter forms/views with '60-build-forms-views.ps1'
+- [ ] If Power Apps grid is enabled, review `grid-controls.json`, run stage 61 Preview, complete the classic solution explorer all-views maker handoff, configure inline editing explicitly, and pass stage 61 Verify against exported metadata before app assembly
 - [ ] Create or update the review app with '62-build-app-module.ps1' and validate its entry table and landing view
 - [ ] If reports are enabled, run '70-build-web-resources.ps1'
 - [ ] At each approved checkpoint, inspect `git status` and `git diff`, run applicable validation, stage explicit files, and use a typed imperative commit message
@@ -1748,6 +1800,11 @@ Set-Content -Path $planPath -Value $planContent -Encoding UTF8
 Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
 Set-Content -Path $reportMappingsPath -Value $reportMappingsContent -Encoding UTF8
 Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
+if ($null -ne $gridControlsObject) {
+    Set-Content -Path $gridControlsPath -Value $gridControlsJson -Encoding UTF8
+} elseif (Test-Path -LiteralPath $gridControlsPath -PathType Leaf) {
+    Remove-Item -LiteralPath $gridControlsPath -Force
+}
 if ($null -ne $demoDataPlanObject) {
     Set-Content -Path $demoDataPlanPath -Value $demoDataPlanJson -Encoding UTF8
 }
@@ -1764,6 +1821,9 @@ Write-Host "  $planPath"
 Write-Host "  $tasksPath"
 Write-Host "  $reportMappingsPath"
 Write-Host "  $viewsPath"
+if ($null -ne $gridControlsObject) {
+    Write-Host "  $gridControlsPath"
+}
 if ($null -ne $demoDataPlanObject) {
     Write-Host "  $demoDataPlanPath"
 }

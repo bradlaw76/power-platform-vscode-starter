@@ -319,13 +319,27 @@ repo-root/
       10-auth-connect.ps1
       20-build-tables.ps1
       30-build-columns.ps1
+      35-style-choice-options.ps1
       40-build-relationships.ps1
       50-add-to-solution.ps1
       60-build-forms-views.ps1
+      61-configure-power-apps-grid.ps1
+      62-build-app-module.ps1
+      63-format-forms.ps1
+  schemas/
+    payloads/
+      choice-presentations.schema.json
+      grid-controls.schema.json
+      form-layouts.schema.json
   payloads/
     table-*.json
     columns-*.json
+    choice-presentations-*.json
     relationships-*.json
+  specs/
+    <scenario-slug>/
+      grid-controls.json
+      form-layouts.json
   docs/
     onboarding.md
     build-log.md
@@ -450,6 +464,10 @@ pwsh ./scripts/bootstrap/20-build-tables.ps1 -EnvironmentUrl $envUrl -AccessToke
 # 2) Create columns
 pwsh ./scripts/bootstrap/30-build-columns.ps1 -EnvironmentUrl $envUrl -AccessToken $token
 
+# Optional: preview pastel colors and inline Choice-label icons, then apply the approved hash
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
+# pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -ApprovedPlanHash <sha256>
+
 # 3) Create relationships
 pwsh ./scripts/bootstrap/40-build-relationships.ps1 -EnvironmentUrl $envUrl -AccessToken $token
 
@@ -458,6 +476,18 @@ pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -EnvironmentUrl $envUrl -AccessT
 
 # 5) Build forms and views
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1 -EnvironmentUrl $envUrl -AccessToken $token
+
+# Optional modern table grid contract: handoff first, verify after maker publish
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Verify
+
+# 6) Assemble or update the model-driven app
+pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
+
+# 7) After app assembly, optionally preview a scenario form layout
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+# Apply only after approving the emitted SHA-256 hash:
+# pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Apply -ApprovedPlanHash <sha256>
 ```
 
 Expected output per step:
@@ -477,6 +507,19 @@ Script 60 behavior baseline:
 - Do not overwrite non-starter Main forms.
 - Publish customizations after create/update.
 - Report script 60 counts as: forms created, forms updated, forms skipped, views created, failures.
+
+Optional form formatting Version 1 reads
+`specs/<scenario-slug>/form-layouts.json`, validates it against
+`schemas/payloads/form-layouts.schema.json`, and runs only after app assembly.
+It supports tabs, sections, one- to three-column layouts, and existing
+baseline controls/fields on active, customizable, wizard-owned custom Main
+forms. Preview emits artifacts and a SHA-256 plan hash; Apply requires that
+exact hash. `90-run-build.ps1` enables the stage when the contract exists,
+lists the target in credential-free Preview, and requires
+`-ApprovedFormFormattingPlanHash` for Apply. Boolean Toggle components and
+Choice OptionSet Wrapper components are type-checked and configured for web,
+tablet, and phone. Other components and OOB forms are deferred. Anthropic's official `frontend-design` skill is optional advice
+only and is not installed.
 
 If your repo already has differently named scripts:
 
@@ -782,9 +825,13 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - `10-auth-connect.ps1`
 - `20-build-tables.ps1`
 - `30-build-columns.ps1`
+- Optional `35-style-choice-options.ps1` when `choice-presentations-*.json` exists
 - `40-build-relationships.ps1`
 - `50-add-to-solution.ps1`
 - `60-build-forms-views.ps1`
+- Optional `61-configure-power-apps-grid.ps1` when `grid-controls.json` exists
+- `62-build-app-module.ps1`
+- Optional `63-format-forms.ps1` when `form-layouts.json` exists
 
 1. Validate in Maker experience
 
@@ -808,3 +855,11 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - Add results to `docs/build-log.md`.
 - Record blockers and remediation actions.
 - Create handoff note with environment, branch, and artifact list.
+The table-level Power Apps grid is a separate experience gate from form layout
+and subgrids. Views do not automatically guarantee OneGrid. Stage 61 runs after
+step 60 and before reporting/app assembly: Preview explains the supported
+classic solution explorer all-views setup (including explicit editing), and
+Verify checks exported metadata for
+`Microsoft.PowerApps.PowerAppsOneGrid` and declared properties. It never
+mutates internal metadata or import XML. Subgrid support is deferred. See
+[Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).

@@ -16,7 +16,7 @@ the shared planning-artifact contract used by the build pipeline.
 -----------------------------------------------------------------------------
 TEST CASES
 -----------------------------------------------------------------------------
-✔ Demo Builder is the default and uses seven prompts.
+✔ Demo Builder is the default and uses six business prompts plus confirmation.
 ✔ Default output excludes acceptance, retention, and cleanup prompts.
 ✔ Demo Builder consolidates inferred recommendations for confirmation.
 ✔ Advanced Builder exposes technical controls.
@@ -130,7 +130,7 @@ try {
     }
 
     $advancedControls = @($profile.discovery.modes.'advanced-builder'.controls)
-    foreach ($control in @('table-strategy', 'form-strategy', 'entry-point-table', 'named-landing-view', 'relationship-cardinality-requiredness-and-cascade', 'report-mappings')) {
+    foreach ($control in @('table-strategy', 'form-strategy', 'entry-point-table', 'named-landing-view', 'power-apps-grid-all-views-and-inline-editing', 'relationship-cardinality-requiredness-and-cascade', 'report-mappings')) {
         Assert-True -Condition ($advancedControls -contains $control) -Message "Advanced Builder is missing '$control'."
     }
 
@@ -166,6 +166,7 @@ try {
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
     Assert-True -Condition ($demoViews.Views[0].Disposition -eq 'adopt-generated-active') -Message 'Demo Builder must plan adoption for an exact generated Active-view collision on a new custom table.'
     Assert-Step60ConsumesViewsContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -ExpectedDisposition 'adopt-generated-active'
+    Assert-True -Condition (Test-Path -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/grid-controls.json")) -Message 'Demo Builder did not infer a grid contract for the high-frequency operational view.'
 
     $acceptanceWorkspace = New-WizardTestWorkspace -Name 'acceptance'
     $acceptanceOutput = Invoke-WizardFixture -Workspace $acceptanceWorkspace -Mode 'framework-acceptance' -Answers @(
@@ -177,6 +178,8 @@ try {
         'Active Requests',
         'all run-created tables, forms, views, processes, and reports',
         'Operations',
+        'yes',
+        'yes',
         'feature/framework-mode-acceptance',
         'specs/framework-mode-acceptance',
         'checkpoints',
@@ -226,7 +229,7 @@ try {
     $distinctWorkspace = New-WizardTestWorkspace -Name 'distinct-business-view'
     $distinctAnswers = @(
         'Distinct Business View', 'distinct-business-view', 'standalone-model-driven', 'custom-only', 'dbv_labasset', 'Available Lab Assets',
-        'all run-created tables, forms, views, processes, and reports', 'Operations', 'feature/distinct-business-view', 'specs/distinct-business-view',
+        'all run-created tables, forms, views, processes, and reports', 'Operations', 'yes', 'no', 'feature/distinct-business-view', 'specs/distinct-business-view',
         'checkpoints', 'applicable repo CI tests', 'no', 'squash', 'Model-driven asset app', 'Power Apps', 'Lab coordinators',
         'Track lab assets', 'Lab coordinators', 'Lab Asset', 'Asset form and availability view', 'Available assets are visible', 'Development',
         'No', 'Unmanaged', 'new', 'DistinctBusinessView', 'new', 'dbv', 'none', 'Lab Asset', 'none', 'LabAsset.dbv_name', 'none',
@@ -240,6 +243,14 @@ try {
     Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
     Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
+    $staleGridContract = Join-Path $distinctWorkspace 'specs/distinct-business-view/grid-controls.json'
+    '{"version":"1.0","tables":[]}' | Set-Content -LiteralPath $staleGridContract -Encoding UTF8
+    $gridDisabledAnswers = [Collections.Generic.List[string]]::new()
+    $gridDisabledAnswers.AddRange([string[]]$distinctAnswers)
+    $gridDisabledAnswers[8] = 'no'
+    $gridDisabledAnswers.RemoveAt(9)
+    $null = Invoke-WizardFixture -Workspace $distinctWorkspace -Mode 'advanced-builder' -Answers $gridDisabledAnswers.ToArray()
+    Assert-True -Condition (-not (Test-Path -LiteralPath $staleGridContract -PathType Leaf)) -Message 'Disabling the grid on a wizard rerun left the stale grid-controls.json contract active.'
 
     $acceptanceAnswers = Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/answers.md') -Raw -Encoding UTF8
     Assert-True -Condition ($acceptanceAnswers -match 'Environment authorized: yes') -Message 'Framework Acceptance did not persist environment authorization.'

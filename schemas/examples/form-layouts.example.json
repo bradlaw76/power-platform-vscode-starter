@@ -1,0 +1,57 @@
+{
+  "version": "1.0",
+  "forms": [
+    {
+      "tableLogicalName": "contoso_request",
+      "formName": "Request Main",
+      "ownership": "wizard-owned-only",
+      "intent": "Complete intake and route a request",
+      "primaryPersona": "Request coordinator",
+      "tabs": [
+        {
+          "key": "request",
+          "label": "Request",
+          "layout": "two-column",
+          "sections": [
+            {
+              "key": "request-details",
+              "label": "Request details",
+              "columns": 2,
+              "fields": [
+                {
+                  "logicalName": "contoso_name",
+                  "label": "Request"
+                },
+                "contoso_requester",
+                "contoso_needby",
+                {
+                  "logicalName": "contoso_isurgent",
+                  "label": "Urgent",
+                  "component": "toggle"
+                }
+              ]
+            },
+            {
+              "key": "routing",
+              "label": "Routing",
+              "columns": 1,
+              "fields": [
+                "contoso_owner",
+                {
+                  "logicalName": "contoso_priority",
+                  "component": "option-set-wrapper"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "preserve": {
+        "unlistedControls": true,
+        "eventHandlers": true,
+        "formLibraries": true,
+        "headersAndFooters": true
+      }
+    }
+  ]
+}

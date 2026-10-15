@@ -124,6 +124,19 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Prefer the orchestrated preview and apply entry point: `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>`.
 - A planned BPF uses `55-build-business-process-flows.ps1` to validate payloads and generate a designer handoff. Initial definition authoring occurs through Power Apps; apply mode validates, activates, adds, and links the existing category-4 process.
 - The required review app is assembled and validated by `62-build-app-module.ps1`.
+- When `choice-presentations-*.json` exists, optional `35-style-choice-options.ps1` runs after column creation. It applies allowlisted pastel colors and optional inline Unicode prefixes such as `▲`, `◆`, `⚠`, and `ℹ` to existing options on wizard-owned unmanaged local Choice columns. The icon is part of the Choice label, not separate icon metadata. Preview emits a SHA-256 hash; orchestrated Apply requires `-ApprovedChoicePresentationPlanHash <sha256>`.
+- When `specs/<scenario-slug>/form-layouts.json` exists, optional `63-format-forms.ps1` runs after app assembly. Its schema-validated Preview emits artifacts and a SHA-256 hash; Apply requires the approved hash. Version 1 targets only active, customizable, wizard-owned custom Main forms and existing baseline controls/fields, with tabs, sections, one- to three-column layouts, Boolean Toggle components, and Choice OptionSet Wrapper components. Components are type-checked and configured for web, tablet, and phone. OOB forms and other components are deferred.
+- Capture whether the modern Power Apps grid is desired at table level for all
+  all views and whether inline editing is enabled. Demo Builder infers this inside
+  its consolidated recommendation without adding a business question;
+  Advanced and Framework Acceptance ask explicitly. When enabled, generate
+  `grid-controls.json` and route it to
+  `61-configure-power-apps-grid.ps1` after forms/views and before
+  reporting/app assembly. Preview is a classic solution explorer maker handoff;
+  Apply verifies `Microsoft.PowerApps.PowerAppsOneGrid` in exported metadata.
+  This is separate from form layout and subgrids; subgrid support is deferred.
+- Credential-free orchestrator Preview lists the formatting target. Orchestrated Apply requires `-ApprovedFormFormattingPlanHash <sha256>`.
+- Anthropic's `frontend-design` skill is optional advice only and is not installed by this repository.
 - Native `reporting-*.json` charts/dashboard are built by `64-build-charts-dashboard.ps1` before app assembly.
 - Stable-key, source-tagged `data-*.json` records are built by `66-seed-synthetic-data.ps1`.
 - Framework Acceptance captures and verifies a controlled second pass with `85-verify-idempotency.ps1`.

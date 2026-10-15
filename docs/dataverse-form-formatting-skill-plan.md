@@ -1,6 +1,6 @@
 # Dataverse Form Formatting Skill Feasibility and Plan
 
-**Status:** Feasibility review only; no implementation authorized  
+**Status:** Version 1 implemented
 **Date:** 2026-09-30  
 **Target:** Model-driven Power Apps and Dynamics 365 forms built by this wizard
 
@@ -27,6 +27,34 @@ Recommended feasibility rating:
 | Fully autonomous visual styling | Low | Model-driven forms don't provide arbitrary CSS, font, palette, or component styling. |
 | Safe updates to wizard-owned forms | High | Existing scenario ownership markers provide a safe default boundary. |
 | Safe updates to existing OOB forms | Medium | Possible only with explicit selection, backup, preservation rules, and stronger validation. |
+
+## Version 1 implementation contract
+
+Version 1 is now implemented through
+`scripts/bootstrap/63-format-forms.ps1`. Scenario layouts live at
+`specs/<scenario-slug>/form-layouts.json` and validate against
+`schemas/payloads/form-layouts.schema.json`.
+
+- Scope is active, customizable, wizard-owned custom Main forms only.
+- Layouts use existing baseline controls/fields, tabs, sections, one-, two-, or
+  three-column structures, Boolean Toggle components, and Choice OptionSet
+  Wrapper components.
+- Preview emits normalized plan, semantic diff, wireframe/report artifacts,
+  and a SHA-256 plan hash.
+- Apply requires `-ApprovedPlanHash <sha256>`.
+- `90-run-build.ps1` enables the optional stage after app assembly when the
+  scenario contract exists. Credential-free orchestrator Preview lists the
+  target; orchestrated Apply requires
+  `-ApprovedFormFormattingPlanHash <sha256>`.
+- Components are type-checked and configured for web, tablet, and phone. Other
+  components and OOB forms remain deferred.
+- Choice pastel colors and inline icon prefixes are metadata presentation, not
+  FormXML. They are implemented separately through
+  `choice-presentations-*.json` and hash-gated stage
+  `35-style-choice-options.ps1`; the icon is written inline into the Choice
+  label, matching the Power Apps maker experience.
+- Anthropic's official `frontend-design` skill is optional advice only and is
+  not installed by this repository.
 
 ## What exists today
 
@@ -222,7 +250,7 @@ The production schema should also support, when verified:
 
 ### 3. Deterministic runtime
 
-Proposed future script:
+Implemented script:
 
 `scripts/bootstrap/63-format-forms.ps1`
 
@@ -475,32 +503,35 @@ Exit criteria:
 
 - Identical deterministic apply behavior with or without the optional advisor.
 
-## Open decisions before implementation
+## Decisions resolved for Version 1
 
-1. Should version 1 support only wizard-owned custom forms, as recommended, or
-   also permit selected OOB forms?
-2. Which native components belong in version 1: fields only, or fields plus
-   headers, subgrids, timeline, and quick views?
-3. Should `form-layouts.json` be fully user-authored, Claude-proposed and
-   approved, or a hybrid of defaults plus overrides?
-4. Should HTML preview be mandatory or optional?
-5. Should the formatter run automatically when a layout contract exists, or
-   only through an explicit skill invocation?
-6. Is importing or depending on Anthropic's `frontend-design` skill acceptable
-   after license review, or should this repository use only original,
-   model-driven-specific guidance?
+1. Version 1 supports only wizard-owned custom active customizable Main forms.
+2. Version 1 supports existing fields, tabs, sections, and one- to three-column
+   layouts; headers, subgrids, timelines, quick views, and other advanced
+   components are deferred.
+3. `form-layouts.json` is the reviewable scenario contract and must pass schema
+   validation.
+4. Preview artifacts and their SHA-256 plan hash are mandatory before Apply.
+5. The orchestrator enables the optional stage when the contract exists, after
+   app assembly.
+6. Anthropic's `frontend-design` skill is optional advice only, is not
+   installed, and is not a runtime dependency.
 
 ## Recommendation
 
-Proceed with a dedicated skill, but implement it in stages. Start with a
-preview-only contract and wizard-owned forms. Keep Claude in the design and
-review loop while keeping metadata resolution, XML transformation, publishing,
-and verification deterministic.
+Use the implemented Version 1 skill and deterministic runtime for
+wizard-owned custom forms. Keep Claude in the design and review loop while
+keeping metadata resolution, XML transformation, publishing, and verification
+deterministic.
 
 Do not fold this capability directly into the current baseline form builder.
 The baseline must remain predictable and rerunnable; formatting should remain an
 optional second pass that can be reviewed, rejected, rerun, or omitted without
 blocking a valid app build.
+
+Treat components beyond Boolean Toggle and Choice OptionSet Wrapper, plus
+controlled OOB/preexisting form updates, as separate follow-on work with their
+own fixtures, preservation rules, and acceptance evidence.
 
 ## References
 
@@ -512,3 +543,10 @@ blocking a valid app build.
   <https://learn.microsoft.com/power-apps/developer/model-driven-apps/customize-entity-forms>
 - Microsoft Learn, Create and customize a model-driven app form:
   <https://learn.microsoft.com/power-apps/maker/model-driven-apps/create-and-edit-a-model-driven-form>
+Table-level view grid configuration is intentionally outside this formatter.
+It uses `grid-controls.json` and stage 61 after forms/views and before app
+assembly. Preview is a classic solution explorer all-views maker handoff;
+Verify gates on exported metadata containing
+`Microsoft.PowerApps.PowerAppsOneGrid`. Editing must be explicit; no internal
+metadata or solution XML is mutated. Form subgrids remain deferred. See
+[Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).

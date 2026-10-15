@@ -50,6 +50,13 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 - `advanced-builder` requires explicit selection. Expose application profile, table strategy, form strategy, entry point, landing view, entity mapping, user tasks, relationships, reporting, demo data, solution identity, and source-control controls. Do not ask framework-acceptance or cleanup questions.
 - `framework-acceptance` requires explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an acceptance evidence plan.
 
+Demo Builder may infer a modern table-level Power Apps grid for high-frequency
+operational views inside its consolidated recommendation; do not add a seventh
+business question. Advanced Builder and Framework Acceptance explicitly capture
+whether the grid applies to all table views and whether inline editing is
+enabled. Preserve the decision in planning and generate `grid-controls.json`
+when enabled.
+
 All modes generate compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline.
 
 ## Advanced Discovery Questions
@@ -107,8 +114,8 @@ Follow this exact sequence — do not skip validation checkpoints:
 | 5 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1` | All tools show PASS |
 | 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |
 | 6.5 | **Validate solution + prefix** (`10-auth-connect.ps1` does this automatically) | Existing solution confirmed via `solutions?$filter=uniquename eq '<name>'`; existing prefix confirmed via `publishers?$filter=customizationprefix eq '<prefix>'`. Stop and fix if either is missing before running scripts 20–60. |
-| 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
-| 8 | Build in order (scripts 20–60, plus optional 65 if Q19=yes) | Each script exits with zero failed count |
+| 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, optional `choice-presentations-*.json`, and `relationships-*.json`) | Files present |
+| 8 | Build in authoritative `docs/onboarding.md` order, including optional stages 35, 61, and 63 when their contracts exist | Each executed stage exits successfully |
 | 9 | Verify in Maker portal | Tables, forms, views visible in target solution |
 | 10 | Export + unpack → validated final commit → approved push/PR handoff → pack → import | See Solution Lifecycle below |
 | 11 | Document in `docs/build-log.md` | Teammate can rerun the process |
@@ -118,13 +125,19 @@ Follow this exact sequence — do not skip validation checkpoints:
 ```powershell
 pwsh ./scripts/bootstrap/20-build-tables.ps1
 pwsh ./scripts/bootstrap/30-build-columns.ps1
+# Optional when choice-presentations-*.json exists; Preview emits the approval hash
+pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
+# When specs/<scenario-slug>/grid-controls.json exists: maker handoff, then exported-metadata verification
+pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
 # Run when reporting-*.json exists
 pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
+# Optional when specs/<scenario-slug>/form-layouts.json exists; Preview emits the approval hash
+pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
 # Run only if Q19 answer was yes
 pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
@@ -137,7 +150,32 @@ pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenari
 
 All scripts are idempotent — safe to rerun after fixing failures.
 
+When `choice-presentations-*.json` exists, stage 35 runs immediately after
+column creation. It applies allowlisted pastel colors and optional inline
+Unicode prefixes (`▲`, `◆`, `⚠`, `ℹ`, and related tokens) to existing options
+on wizard-owned unmanaged local Choice columns. The icon is part of the Choice
+label, not separate icon metadata. Preview is credential-free and emits an
+approval hash; orchestrated Apply requires
+`-ApprovedChoicePresentationPlanHash <sha256>`.
+
+Table-level view grids for all views are a separate experience contract from
+form layout and form subgrids. A `grid-controls.json` contract routes to stage 61 after forms
+and views and before reporting/app assembly. Preview creates the classic
+solution explorer maker handoff; Apply runs Verify and requires exported
+metadata to contain `Microsoft.PowerApps.PowerAppsOneGrid`. Never mutate
+`customcontroldefaultconfigs` or imported solution XML. Subgrid support remains deferred.
+
 Prefer `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>` for the complete ordered run. A planned BPF generates a designer handoff; author the initial definition through Power Apps. Script 55 validates, activates, adds, and links the existing category-4 process rather than fabricating workflow definition metadata. Do not export while the final solution membership gate fails.
+
+When `form-layouts.json` exists, the orchestrator runs optional stage 63 after
+app assembly. Credential-free Preview lists the target. Apply requires
+`-ApprovedFormFormattingPlanHash <sha256>`. Version 1 is limited to active,
+customizable, wizard-owned custom Main forms, existing baseline controls and
+fields, tabs/sections, one- to three-column layouts, Boolean Toggle components,
+and Choice OptionSet Wrapper components. Components are type-checked and
+configured for web, tablet, and phone. OOB forms and other components are
+deferred. Anthropic's `frontend-design` skill is optional advice
+only and is not installed by this repository.
 
 Native charts/dashboard and HTML web resources are separate capabilities. Framework Acceptance uses scenario-owned reporting/data payloads, a controlled second pass proving stable IDs and zero duplicates, and unmanaged export plus local unpack/inspection. Never import the Framework Acceptance export.
 
