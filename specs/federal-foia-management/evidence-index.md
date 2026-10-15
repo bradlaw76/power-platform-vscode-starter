@@ -20,15 +20,15 @@ push, or pull-request creation.
 | Evidence | Result | Runtime artifact |
 | --- | --- | --- |
 | Deployment manifest | Stages 20 through 66, final membership, stage 85, and stage 95 results recorded | `deployment-manifest.json` |
-| Strict solution membership | Export allowed; 232 already in solution; 0 failed; 0 missing; 0 unauthorized | `.wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json` |
+| Strict solution membership | Export allowed; 235 already in solution; 0 failed; 0 missing; 0 unauthorized | `.wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json` |
 | Strict membership summary | Human-readable companion to the JSON report | `.wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.md` |
-| Idempotency baseline | 673 identities captured before the controlled second pass | `.wizard-metrics/artifacts/idempotency/federal-foia-management/baseline.json` |
+| Idempotency baseline | 676 identities captured before the controlled second pass | `.wizard-metrics/artifacts/idempotency/federal-foia-management/baseline.json` |
 | Idempotency verification | Stable IDs true; duplicate count 0; failure count 0 | `.wizard-metrics/artifacts/idempotency/federal-foia-management/verification.json` |
 | Reporting second pass | 13 native reporting surfaces skipped with stable identities | `.wizard-metrics/artifacts/reporting/federal-foia-management.json` |
 | Synthetic-data second pass | 41 existing records updated; no duplicate candidates | `.wizard-metrics/artifacts/data/federal-foia-management.json` |
 | App-module validation | Published review-app identity, component linkage, and platform validation | `.wizard-metrics/artifacts/app-module/app-module-validation.json` |
 | Navigation validation | FOIA Request entry point, landing view, five dashboard links, and table navigation | `.wizard-metrics/artifacts/app-module/navigation-summary.json` |
-| Export inspection | 24 expected root components matched; 0 missing; 0 unrelated; import not permitted | `.wizard-metrics/artifacts/export/federal-foia-management.json` |
+| Export inspection | 27 expected root components matched, including 3 security roles; 0 missing; 0 unrelated; import not permitted | `.wizard-metrics/artifacts/export/federal-foia-management.json` |
 | Unmanaged package | Exported development package; not approved for import | `.wizard-metrics/exports/federal-foia-management/FederalFOIAManagement.zip` |
 | Unpacked package | 214 locally inspected files | `.wizard-metrics/exports/federal-foia-management/unpacked/` |
 

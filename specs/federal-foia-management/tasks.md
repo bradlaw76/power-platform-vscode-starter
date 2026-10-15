@@ -138,10 +138,10 @@
 
 - [x] Collect all required and optional artifact categories with logical names and IDs.
 - [x] Synchronize components into `FederalFOIAManagement` and report Added, Already in solution, Failed with reason, and Missing after sync.
-- [x] Capture the 673-identity idempotency baseline, rerun approved experience/data stages, refresh strict membership, and complete stage `85`.
+- [x] Capture the 676-identity idempotency baseline, rerun approved experience/data/security-role stages, refresh strict membership, and complete stage `85`.
 - [x] Prove stable IDs with zero failures and zero duplicate candidates; the second pass skipped all 13 reporting surfaces and updated the same 41 synthetic records.
-- [x] Verify final membership with strict isolation: 232 already in solution, zero failed, zero missing, zero unauthorized, and export allowed.
-- [x] Run stage `95` for the explicitly approved unmanaged export and local unpack/inspection; all 24 expected root components matched, with zero missing or unrelated components and no import permitted.
+- [x] Verify final membership with strict isolation: 235 already in solution, zero failed, zero missing, zero unauthorized, and export allowed.
+- [x] Run stage `95` for the explicitly approved unmanaged export and local unpack/inspection; all 27 expected root components, including three security roles, matched with zero missing or unrelated components and no import permitted.
 - [x] Update `docs/build-log.md`, requirement traceability, deployment manifest, rollback instructions, and evidence index with verified membership, export, and idempotency results.
 - [ ] Obtain approval before explicit staging, commit, push, or pull-request creation.
 - [ ] Produce a managed release artifact only through a separately approved release workflow.

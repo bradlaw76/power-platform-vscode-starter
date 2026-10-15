@@ -1,7 +1,7 @@
 {
   "manifestContractVersion": "1.0.0",
   "manifestId": "foia-fedciv-gcc-dev-bootstrap-20261008",
-  "status": "stage-85-idempotency-verified",
+  "status": "stage-95-export-verified",
   "scenario": {
     "slug": "federal-foia-management",
     "designVersion": "FOIA-DD-1.0",
@@ -51,14 +51,15 @@
     "appApplyAuthorized": false,
     "flowApplyAuthorized": false,
     "publishAuthorized": true,
-    "exportAuthorized": false,
+    "exportAuthorized": true,
     "managedPackageAuthorized": false,
     "releaseAuthorized": false,
     "commitAuthorized": false,
     "pushAuthorized": false,
     "authorizationReferences": [
       "interactive-approval-2026-10-07-publisher-and-solution-only",
-      "interactive-approval-2026-10-15-bounded-demo-security-roles"
+      "interactive-approval-2026-10-15-bounded-demo-security-roles",
+      "interactive-approval-2026-10-15-updated-unmanaged-export"
     ]
   },
   "finalMembershipGate": {
@@ -75,16 +76,16 @@
     "reportPath": ".wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json"
   },
   "unmanagedExportInspection": {
-    "verifiedAtUtc": "2026-10-13T19:00:52.3934893Z",
+    "verifiedAtUtc": "2026-10-15T21:07:02.2329330Z",
     "managed": false,
     "importPermitted": false,
-    "membershipItemCount": 232,
+    "membershipItemCount": 235,
     "inheritedMembershipItemCount": 198,
-    "rootComponentsExpected": 24,
-    "rootComponentsMatched": 24,
+    "rootComponentsExpected": 27,
+    "rootComponentsMatched": 27,
     "missingRootComponents": 0,
     "unrelatedRootComponents": 0,
-    "unpackedFileCount": 214,
+    "unpackedFileCount": 217,
     "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
   },
   "idempotencyVerification": {
