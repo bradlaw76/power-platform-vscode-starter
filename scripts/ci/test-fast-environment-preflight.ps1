@@ -29,12 +29,7 @@ if ($catalog.status -ne 'action-required' -or
 }
 
 $dependencyKeys = @($packages.declaredDependencies | ForEach-Object {
-    @(
-        "$($_.required.solution)",
-        "$($_.required.package)",
-        "$($_.required.schemaName)",
-        "$($_.required.displayName)"
-    ) -join '|'
+    Get-FastDependencyKey -Dependency $_
 })
 $readyEvidence = [pscustomobject]@{
     accessState = 'connected'

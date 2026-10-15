@@ -274,6 +274,19 @@ workflow, not an importer.
   tests.
 - [ ] Architectural review approval.
 
+## FAST-003A validation deliverables
+
+- [x] Discover GCC targets from existing PAC `UsGov` profiles.
+- [x] Require explicit confirmation before Dataverse Web API access.
+- [x] Validate the selected `crm9.dynamics.com` environment with a
+  resource-scoped token.
+- [x] Execute and measure forced-refresh and cache-hit paths.
+- [x] Correct live API discrepancies and add mocked regression coverage.
+- [x] Record a sanitized readiness report with no tenant, user, or token
+  identifiers.
+- [x] Keep the FAST build gate closed because Core is missing.
+- [ ] Architectural review approval.
+
 ## Stop condition
 
 Stop after FAST-003 review handoff. Do not begin FAST-004 matching, wizard

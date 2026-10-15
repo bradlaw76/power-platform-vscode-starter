@@ -182,7 +182,7 @@ function Set-FastCachedEnvironmentInspection {
 function Split-FastCollection {
     param(
         [object[]]$InputObject,
-        [ValidateRange(1, 100)] [int]$Size = 20
+        [ValidateRange(1, 10000)] [int]$Size = 20
     )
 
     $items = @($InputObject)
@@ -253,7 +253,7 @@ function Get-FastDependencyQueryDefinition {
                 Group = 'globaloptionsets'
                 EntitySet = 'GlobalOptionSetDefinitions'
                 Select = 'MetadataId,Name'
-                Filter = "Name eq '$(ConvertTo-WizardODataLiteral $schemaName)'"
+                Filter = ''
                 MatchProperty = 'Name'
                 MatchValue = $schemaName
             }
@@ -524,10 +524,18 @@ function Invoke-FastDataverseEnvironmentInspection {
     }
 
     foreach ($queryGroup in @($dependencyQueries | Group-Object { $_.Query.Group })) {
-        foreach ($queryChunk in @(Split-FastCollection -InputObject $queryGroup.Group -Size 20)) {
+        $chunkSize = if ($queryGroup.Name -eq 'globaloptionsets') {
+            [Math]::Max(1, $queryGroup.Count)
+        } else {
+            20
+        }
+        foreach ($queryChunk in @(Split-FastCollection -InputObject $queryGroup.Group -Size $chunkSize)) {
             $firstQuery = $queryChunk[0].Query
-            $filters = @($queryChunk.Query.Filter | Sort-Object -Unique)
-            $path = "$($firstQuery.EntitySet)?`$select=$($firstQuery.Select)&`$filter=$($filters -join ' or ')"
+            $filters = @($queryChunk.Query.Filter | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+            $path = "$($firstQuery.EntitySet)?`$select=$($firstQuery.Select)"
+            if ($filters.Count -gt 0) {
+                $path += "&`$filter=$($filters -join ' or ')"
+            }
             try {
                 $componentResponse = & $invokeGet $path "read-component-$($firstQuery.Group)"
                 $components = @(Get-FastObjectPropertyValue -InputObject $componentResponse -Name 'value' -DefaultValue @())
@@ -556,7 +564,12 @@ function Invoke-FastDataverseEnvironmentInspection {
                 }
             } catch {
                 $message = "$($_.Exception.Message)"
-                $inspectionErrors.Add([pscustomobject]@{ code = 'dependency.unverified'; message = $message }) | Out-Null
+                $missingParentTable = $firstQuery.Group -like 'attributes:*' -and
+                    $message -match 'HTTP 404' -and
+                    $message -match 'does not exist'
+                if (-not $missingParentTable) {
+                    $inspectionErrors.Add([pscustomobject]@{ code = 'dependency.unverified'; message = $message }) | Out-Null
+                }
                 foreach ($queryRecord in $queryChunk) {
                     $dependency = $queryRecord.Dependency
                     if ($message -match 'HTTP 403') {
@@ -567,8 +580,12 @@ function Invoke-FastDataverseEnvironmentInspection {
                         key = $queryRecord.Key
                         type = "$($dependency.required.type)"
                         displayName = "$($dependency.required.displayName)"
-                        status = 'unverified'
-                        evidence = $message
+                        status = if ($missingParentTable) { 'missing' } else { 'unverified' }
+                        evidence = if ($missingParentTable) {
+                            "The dependency parent table '$($firstQuery.Group.Substring('attributes:'.Length))' is not installed."
+                        } else {
+                            $message
+                        }
                     }) | Out-Null
                 }
             }

@@ -318,3 +318,25 @@ Acceptance requires:
 - no non-GET Dataverse request and no solution import.
 
 FAST-004 matching and wizard integration remain unauthorized.
+
+## FAST-003A live GCC acceptance
+
+The user-confirmed GCC environment validation met the authorized FAST-003A
+scope:
+
+- PAC identified the environment as `UsGov` with a GCC
+  `crm9.dynamics.com` Dataverse endpoint.
+- Resource-scoped authentication verified identity, organization version,
+  solution inventory, publishers, tables, and supported dependencies.
+- The corrected forced-refresh run completed with 22 GET requests and no
+  inspection errors.
+- Immediate cache reuse made no new Dataverse request and reproduced the
+  evidence fingerprint.
+- No FAST solution was installed. Core and all selected specialty modules were
+  absent.
+- The result was `action-required`; FAST-dependent generation remains blocked.
+- No Dataverse mutation, wizard-stage integration, merge, or FAST-004 work
+  occurred.
+
+The sanitized acceptance record is
+[`evidence/fast-003a-gcc-validation.md`](evidence/fast-003a-gcc-validation.md).

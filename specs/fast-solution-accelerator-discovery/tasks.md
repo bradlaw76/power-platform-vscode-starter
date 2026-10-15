@@ -94,6 +94,23 @@
 - [x] Preserve fully custom planning and the reusable readiness gate.
 - [ ] Obtain FAST-003 architectural review approval.
 
+## FAST-003A - Authorized GCC validation
+
+- [x] Discover authenticated GCC environments without assuming commercial,
+  GCC High, or DoD endpoints.
+- [x] Require explicit confirmation of a non-production target.
+- [x] Verify the PAC `UsGov` profile, GCC authority, and `crm9.dynamics.com`
+  environment URL.
+- [x] Run a resource-scoped, GET-only forced-refresh preflight.
+- [x] Verify environment identity, organization version, read permissions,
+  installed solutions, Core, specialty modules, and dependencies.
+- [x] Verify cache reuse and forced-refresh behavior.
+- [x] Correct unsupported global Choice filtering, missing-parent
+  classification, and duplicate dependency identities.
+- [x] Record sanitized GCC evidence without tenant, user, or token identifiers.
+- [x] Confirm Core is missing and the FAST build gate remains closed.
+- [ ] Obtain FAST-003A review approval before FAST-004.
+
 ## FAST-003 follow-up dependency intelligence (not authorized)
 
 - [ ] Discover and evaluate newer or alternate Core releases dynamically rather

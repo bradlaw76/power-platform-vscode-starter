@@ -23,6 +23,13 @@ $now = [datetime]'2026-10-15T12:00:00Z'
 
 $core = Get-Content -LiteralPath (Join-Path $evidenceRoot 'core.json') -Raw | ConvertFrom-Json
 $investigations = Get-Content -LiteralPath (Join-Path $evidenceRoot 'investigations.json') -Raw | ConvertFrom-Json
+$globalOptionSetNames = @(
+    @($core, $investigations).declaredDependencies |
+        Where-Object { "$($_.required.type)" -eq '9' } |
+        ForEach-Object { "$($_.required.schemaName)" } |
+        Where-Object { -not [string]::IsNullOrWhiteSpace($_) } |
+        Sort-Object -Unique
+)
 
 function New-FastTestHttpError {
     param(
@@ -49,6 +56,7 @@ function Reset-FastMockState {
         installSpecialty = $true
         specialtyVersion = $investigations.solution.version
         missingDependencyGroup = ''
+        missingAttributeParent = ''
         denySolutions = $false
         authenticationFailure = $false
         timeoutAll = $false
@@ -120,7 +128,7 @@ $mockInvoker = {
         }
         return [pscustomobject]@{ value = @($solutions.ToArray()) }
     }
-    if ($path -like 'EntityDefinitions?*') {
+    if ($path.StartsWith('EntityDefinitions?$select=', [StringComparison]::OrdinalIgnoreCase)) {
         $matches = [regex]::Matches($path, "LogicalName eq '([^']+)'")
         return [pscustomobject]@{
             value = @($matches | ForEach-Object {
@@ -129,6 +137,10 @@ $mockInvoker = {
         }
     }
     if ($path -like "EntityDefinitions(LogicalName='*')/Attributes?*") {
+        $tableMatch = [regex]::Match($path, "EntityDefinitions\(LogicalName='([^']+)'\)")
+        if ($tableMatch.Success -and $tableMatch.Groups[1].Value -eq $script:fastMockState.missingAttributeParent) {
+            throw (New-FastTestHttpError -StatusCode 404 -Message "HTTP 404: Entity With Id = LogicalName='$($tableMatch.Groups[1].Value)' does not exist.")
+        }
         $matches = [regex]::Matches($path, "LogicalName eq '([^']+)'")
         return [pscustomobject]@{
             value = @($matches | ForEach-Object {
@@ -137,10 +149,9 @@ $mockInvoker = {
         }
     }
     if ($path -like 'GlobalOptionSetDefinitions?*') {
-        $matches = [regex]::Matches($path, "Name eq '([^']+)'")
         return [pscustomobject]@{
-            value = @($matches | ForEach-Object {
-                [pscustomobject]@{ MetadataId = [guid]::NewGuid(); Name = $_.Groups[1].Value }
+            value = @($globalOptionSetNames | ForEach-Object {
+                [pscustomobject]@{ MetadataId = [guid]::NewGuid(); Name = $_ }
             })
         }
     }
@@ -219,7 +230,6 @@ try {
     if (@($script:fastMockState.requests | Where-Object TimeoutSec -ne 5).Count -ne 0) {
         throw 'Live preflight did not apply the configured bounded request timeout.'
     }
-
     Reset-FastMockState
     $script:fastMockState.installCore = $false
     $missingCore = Invoke-FastTestPreflight -ForceRefresh
@@ -243,6 +253,19 @@ try {
     }
 
     Reset-FastMockState
+    $script:fastMockState.missingAttributeParent = 'appbase_complianceframework'
+    $missingParentTable = Invoke-FastTestPreflight -Packages @($core, $investigations) -ForceRefresh
+    $missingParentEvidence = @(
+        $missingParentTable.Evidence.dependencyAssessments |
+            Where-Object { $_.status -eq 'missing' -and $_.evidence -match 'parent table' }
+    )
+    if ($missingParentTable.Report.status -ne 'action-required' -or
+        $missingParentEvidence.Count -eq 0 -or
+        @($missingParentTable.Evidence.inspectionErrors | Where-Object message -match 'appbase_complianceframework').Count -ne 0) {
+        throw 'A missing dependency parent table was not classified as explicit missing evidence.'
+    }
+
+    Reset-FastMockState
     $script:fastMockState.installSpecialty = $false
     if ((Invoke-FastTestPreflight -Packages @($core, $investigations) -ForceRefresh).Report.status -ne 'action-required') {
         throw 'Missing specialty module did not return action-required.'
@@ -251,6 +274,10 @@ try {
     Reset-FastMockState
     if ((Invoke-FastTestPreflight -Packages @($core, $investigations) -ForceRefresh).Report.status -ne 'ready') {
         throw 'Compatible installed specialty module did not return ready.'
+    }
+    $globalOptionSetRequests = @($script:fastMockState.requests | Where-Object Path -like 'GlobalOptionSetDefinitions?*')
+    if ($globalOptionSetRequests.Count -ne 1 -or $globalOptionSetRequests[0].Path -match '\$filter=') {
+        throw 'Global Choice metadata was not retrieved through one supported unfiltered request.'
     }
 
     Reset-FastMockState

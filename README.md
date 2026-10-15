@@ -232,6 +232,8 @@ and live environment preflight commands require explicit `-EnableFast`.
 Preflight reuses an existing authenticated environment connection, performs
 only bounded Dataverse metadata reads, and caches no credentials. FAST-003 does
 not change the current build sequence, profile, modes, or deployment behavior.
+FAST-003A validated the GET-only path against an explicitly confirmed GCC
+environment and does not claim FAST product support or importability in GCC.
 FAST-004 and wizard runtime integration require separate authorization.
 
 ```powershell

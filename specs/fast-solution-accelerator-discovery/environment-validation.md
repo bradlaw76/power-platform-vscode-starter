@@ -159,3 +159,14 @@ for requirements analysis only.
   stale-evidence, offline, and user-declined fixtures.
 
 The three modes and existing build stages remain unchanged in FAST-003.
+
+## FAST-003A GCC evidence
+
+The first authorized live Level 2 run is recorded in
+[`evidence/fast-003a-gcc-validation.md`](evidence/fast-003a-gcc-validation.md).
+It validated a user-confirmed GCC `UsGov` environment through its
+`crm9.dynamics.com` endpoint using a resource-scoped token. The run issued only
+GET requests and found no installed FAST modules. Core was missing, so the
+result was `action-required` and the FAST-dependent build gate remained closed.
+
+This evidence does not assert FAST product support or importability in GCC.

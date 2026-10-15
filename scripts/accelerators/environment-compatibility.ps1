@@ -76,9 +76,13 @@ function Get-FastDependencyKey {
     param([Parameter(Mandatory)] [object]$Dependency)
 
     return @(
+        "$($Dependency.required.type)",
+        "$($Dependency.required.id)",
         "$($Dependency.required.solution)",
         "$($Dependency.required.package)",
         "$($Dependency.required.schemaName)",
+        "$($Dependency.required.uniqueName)",
+        "$($Dependency.required.parentDisplayName)",
         "$($Dependency.required.displayName)"
     ) -join '|'
 }
@@ -384,16 +388,22 @@ function Test-FastEnvironmentPreflight {
     }
 
     $dependencyAssessments = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'dependencyAssessments' -DefaultValue @())
-    $dependencyByKey = @{}
+    $dependencyByPackageKey = @{}
     foreach ($assessment in $dependencyAssessments) {
-        $dependencyByKey["$($assessment.key)"] = $assessment
+        $assessmentKey = "$($assessment.packageId)|$($assessment.key)".ToLowerInvariant()
+        $dependencyByPackageKey[$assessmentKey] = $assessment
     }
     $satisfiedDependencyKeys = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'satisfiedDependencyKeys' -DefaultValue @() | ForEach-Object { "$_".ToLowerInvariant() })
     foreach ($package in @($SelectedPackages)) {
         foreach ($dependency in @($package.declaredDependencies)) {
             $key = Get-FastDependencyKey -Dependency $dependency
             $normalizedKey = $key.ToLowerInvariant()
-            $assessment = if ($dependencyByKey.ContainsKey($key)) { $dependencyByKey[$key] } else { $null }
+            $packageDependencyKey = "$($package.packageId)|$key".ToLowerInvariant()
+            $assessment = if ($dependencyByPackageKey.ContainsKey($packageDependencyKey)) {
+                $dependencyByPackageKey[$packageDependencyKey]
+            } else {
+                $null
+            }
             $dependencyStatus = if ($null -ne $assessment) {
                 "$($assessment.status)"
             } elseif ($satisfiedDependencyKeys -contains $normalizedKey) {
