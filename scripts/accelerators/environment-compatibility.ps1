@@ -72,6 +72,34 @@ function Resolve-AcceleratorValidationStatus {
     return 'ready'
 }
 
+function Get-FastDependencyKey {
+    param([Parameter(Mandatory)] [object]$Dependency)
+
+    return @(
+        "$($Dependency.required.solution)",
+        "$($Dependency.required.package)",
+        "$($Dependency.required.schemaName)",
+        "$($Dependency.required.displayName)"
+    ) -join '|'
+}
+
+function Get-FastValidationPropertyValue {
+    param(
+        [AllowNull()] [object]$InputObject,
+        [Parameter(Mandatory)] [string]$Name,
+        [AllowNull()] [object]$DefaultValue = $null
+    )
+
+    if ($null -eq $InputObject) {
+        return $DefaultValue
+    }
+    $property = $InputObject.PSObject.Properties[$Name]
+    if ($null -eq $property -or $null -eq $property.Value) {
+        return $DefaultValue
+    }
+    return $property.Value
+}
+
 function New-AcceleratorEnvironmentValidationResult {
     param(
         [Parameter(Mandatory)] [string]$ScenarioSlug,
@@ -80,34 +108,57 @@ function New-AcceleratorEnvironmentValidationResult {
         [Parameter(Mandatory)] [object[]]$SelectedPackages,
         [Parameter(Mandatory)] [object[]]$Checks,
         [object]$Environment = $null,
+        [object[]]$InstalledModules = @(),
+        [object[]]$DependencyAssessment = @(),
+        [object[]]$MissingComponents = @(),
+        [object[]]$IncompatibleComponents = @(),
+        [object]$Evidence = $null,
         [string[]]$Limitations = @(),
         [object]$Authorization = $null,
+        [string]$RecommendedNextAction = '',
         [datetime]$ValidatedAtUtc = [DateTime]::UtcNow,
         [timespan]$TimeToLive = ([TimeSpan]::FromHours(24))
     )
 
     $status = Resolve-AcceleratorValidationStatus -Checks $Checks
+    if ([string]::IsNullOrWhiteSpace($RecommendedNextAction)) {
+        $RecommendedNextAction = switch ($status) {
+            'ready' { 'Proceed only through the separately authorized FAST-dependent build gate.' }
+            'action-required' { 'Resolve the reported missing modules or dependencies, then run a fresh read-only preflight.' }
+            'incompatible' { 'Resolve version, publisher, or component conflicts before selecting FAST-dependent generation.' }
+            default { 'Obtain fresh, sufficient read-only environment evidence before FAST-dependent generation.' }
+        }
+    }
+    $requiredModules = @($SelectedPackages | ForEach-Object {
+        [pscustomobject]@{
+            packageId = "$($_.packageId)"
+            moduleId = "$($_.moduleId)"
+            solutionUniqueName = "$($_.solution.uniqueName)"
+            version = "$($_.solution.version)"
+            sha256 = "$($_.sha256)"
+        }
+    })
     return [pscustomobject][ordered]@{
-        schemaVersion = '1.0'
+        schemaVersion = '1.1'
         providerId = 'microsoft-fast'
         scenarioSlug = $ScenarioSlug
         level = $Level
         status = $status
+        readinessStatus = $status
         validatedAtUtc = $ValidatedAtUtc.ToUniversalTime().ToString('o')
         expiresAtUtc = $ValidatedAtUtc.ToUniversalTime().Add($TimeToLive).ToString('o')
         catalogSnapshotId = $CatalogSnapshotId
         environment = $Environment
-        selectedPackages = @($SelectedPackages | ForEach-Object {
-            [pscustomobject]@{
-                packageId = "$($_.packageId)"
-                moduleId = "$($_.moduleId)"
-                solutionUniqueName = "$($_.solution.uniqueName)"
-                version = "$($_.solution.version)"
-                sha256 = "$($_.sha256)"
-            }
-        })
+        requiredModules = $requiredModules
+        selectedPackages = $requiredModules
+        installedModules = @($InstalledModules)
+        dependencyAssessment = @($DependencyAssessment)
+        missingComponents = @($MissingComponents)
+        incompatibleComponents = @($IncompatibleComponents)
         checks = @($Checks)
+        evidence = $Evidence
         limitations = @($Limitations)
+        recommendedNextAction = $RecommendedNextAction
         authorization = $Authorization
     }
 }
@@ -190,11 +241,20 @@ function Test-FastEnvironmentPreflight {
     $checks = [Collections.Generic.List[object]]::new()
     $accessStateProperty = $EnvironmentEvidence.PSObject.Properties['accessState']
     $accessState = if ($null -eq $accessStateProperty) { 'connected' } else { "$($accessStateProperty.Value)" }
-    if ($accessState -in @('offline', 'user-declined')) {
-        $message = if ($accessState -eq 'offline') {
-            'Read-only environment validation could not run because the environment was offline.'
-        } else {
-            'The user declined read-only environment validation.'
+    $environmentId = "$(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'environmentId' -DefaultValue '')"
+    $environmentUrl = "$(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'environmentUrl' -DefaultValue '')"
+    $tenantId = "$(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'tenantId' -DefaultValue '')"
+    $organizationVersion = "$(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'organizationVersion' -DefaultValue '')"
+    $metadataFingerprint = "$(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'metadataFingerprint' -DefaultValue '')"
+    $inspectionErrors = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'inspectionErrors' -DefaultValue @())
+    $cacheEvidence = Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'cache'
+    if ($accessState -ne 'connected') {
+        $message = switch ($accessState) {
+            'offline' { 'Read-only environment validation could not run because the environment was offline.' }
+            'user-declined' { 'The user declined read-only environment validation.' }
+            'authentication-failed' { 'Dataverse authentication failed; no environment compatibility claim can be made.' }
+            'insufficient-permissions' { 'The caller lacks sufficient read permissions for environment compatibility verification.' }
+            default { 'The selected Dataverse environment could not be inspected.' }
         }
         $checks.Add((New-AcceleratorValidationCheck -Code "environment.$accessState" -Status 'unverified' -Message $message)) | Out-Null
         return New-AcceleratorEnvironmentValidationResult `
@@ -203,7 +263,18 @@ function Test-FastEnvironmentPreflight {
             -CatalogSnapshotId $CatalogSnapshotId `
             -SelectedPackages $SelectedPackages `
             -Checks $checks.ToArray() `
-            -Environment $null `
+            -Environment ([pscustomobject]@{
+                environmentId = $environmentId
+                environmentUrl = $environmentUrl
+                tenantId = $tenantId
+                organizationVersion = $organizationVersion
+            }) `
+            -Evidence ([pscustomobject]@{
+                accessState = $accessState
+                metadataFingerprint = $metadataFingerprint
+                inspectionErrors = $inspectionErrors
+                cache = $cacheEvidence
+            }) `
             -Limitations @(
                 'No environment compatibility claim can be made without current read-only evidence.',
                 'Requirements analysis may continue, but FAST-dependent build execution remains blocked.'
@@ -228,25 +299,51 @@ function Test-FastEnvironmentPreflight {
         })) | Out-Null
     }
 
-    $collectedAt = [DateTime]::MinValue
-    if (-not [DateTime]::TryParse("$($EnvironmentEvidence.collectedAtUtc)", [ref]$collectedAt)) {
+    try {
+        $collectedAt = [DateTimeOffset]::Parse(
+            "$($EnvironmentEvidence.collectedAtUtc)",
+            [Globalization.CultureInfo]::InvariantCulture,
+            [Globalization.DateTimeStyles]::RoundtripKind
+        )
+    } catch {
+        $collectedAt = $null
+    }
+    if ($null -eq $collectedAt) {
         $checks.Add((New-AcceleratorValidationCheck -Code 'evidence.timestamp' -Status 'unverified' -Message 'Environment evidence has no valid collection timestamp.')) | Out-Null
-    } elseif ($collectedAt.ToUniversalTime().Add($EvidenceTimeToLive) -lt $NowUtc.ToUniversalTime()) {
+    } elseif ($collectedAt.UtcDateTime.Add($EvidenceTimeToLive) -lt $NowUtc.ToUniversalTime()) {
         $checks.Add((New-AcceleratorValidationCheck -Code 'evidence.stale' -Status 'unverified' -Message 'Environment validation evidence is stale.' -Evidence $EnvironmentEvidence.collectedAtUtc)) | Out-Null
     } else {
         $checks.Add((New-AcceleratorValidationCheck -Code 'evidence.fresh' -Status 'ready' -Message 'Environment validation evidence is within its validity window.' -Evidence $EnvironmentEvidence.collectedAtUtc)) | Out-Null
     }
 
-    $installedSolutions = @($EnvironmentEvidence.installedSolutions)
+    $installedSolutions = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'installedSolutions' -DefaultValue @())
+    $permissions = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'permissions' -DefaultValue @() | ForEach-Object { "$_".ToLowerInvariant() })
+    $canReadSolutions = $permissions -contains 'read-solutions'
+    $installedByName = @{}
+    foreach ($solution in $installedSolutions) {
+        $installedByName["$($solution.uniqueName)"] = $solution
+    }
+    $missingComponents = [Collections.Generic.List[object]]::new()
+    $incompatibleComponents = [Collections.Generic.List[object]]::new()
     foreach ($package in @($SelectedPackages)) {
         $expectedName = "$($package.solution.uniqueName)"
         $installed = @($installedSolutions | Where-Object {
             [string]::Equals("$($_.uniqueName)", $expectedName, [StringComparison]::OrdinalIgnoreCase)
         })
+        if (-not $canReadSolutions) {
+            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.unverified' -Status 'unverified' -Message "Installed solution '$expectedName' could not be verified because solution-read evidence is unavailable.")) | Out-Null
+            continue
+        }
         if ($installed.Count -eq 0) {
             $checks.Add((New-AcceleratorValidationCheck -Code 'solution.missing' -Status 'action-required' -Message "Required solution '$expectedName' is not installed." -Evidence @{
                 expectedVersion = "$($package.solution.version)"
             })) | Out-Null
+            $missingComponents.Add([pscustomobject]@{
+                kind = 'solution'
+                identity = $expectedName
+                expectedVersion = "$($package.solution.version)"
+                moduleId = "$($package.moduleId)"
+            }) | Out-Null
             continue
         }
         if ($installed.Count -gt 1) {
@@ -256,37 +353,141 @@ function Test-FastEnvironmentPreflight {
 
         $installedVersion = [version]"$($installed[0].version)"
         $requiredVersion = [version]"$($package.solution.version)"
-        if ($installedVersion -lt $requiredVersion) {
-            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.version.incompatible' -Status 'incompatible' -Message "Installed '$expectedName' version '$installedVersion' is older than selected package '$requiredVersion'.")) | Out-Null
+        if ($installedVersion -ne $requiredVersion) {
+            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.version.incompatible' -Status 'incompatible' -Message "Installed '$expectedName' version '$installedVersion' does not exactly match selected package '$requiredVersion'.")) | Out-Null
+            $incompatibleComponents.Add([pscustomobject]@{
+                kind = 'solution-version'
+                identity = $expectedName
+                expectedVersion = "$requiredVersion"
+                installedVersion = "$installedVersion"
+                moduleId = "$($package.moduleId)"
+            }) | Out-Null
         } else {
-            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.version.ready' -Status 'ready' -Message "Installed '$expectedName' version '$installedVersion' satisfies selected package '$requiredVersion'.")) | Out-Null
+            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.version.ready' -Status 'ready' -Message "Installed '$expectedName' version '$installedVersion' exactly matches the selected package.")) | Out-Null
+        }
+
+        $publisherUniqueName = "$(Get-FastValidationPropertyValue -InputObject $installed[0] -Name 'publisherUniqueName' -DefaultValue '')"
+        $publisherPrefix = "$(Get-FastValidationPropertyValue -InputObject $installed[0] -Name 'publisherPrefix' -DefaultValue '')"
+        if ([string]::IsNullOrWhiteSpace($publisherUniqueName) -or [string]::IsNullOrWhiteSpace($publisherPrefix)) {
+            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.publisher.unverified' -Status 'unverified' -Message "Publisher evidence for '$expectedName' is incomplete.")) | Out-Null
+        } elseif (-not [string]::Equals($publisherUniqueName, "$($package.publisher.uniqueName)", [StringComparison]::OrdinalIgnoreCase) -or
+            -not [string]::Equals($publisherPrefix, "$($package.publisher.customizationPrefix)", [StringComparison]::OrdinalIgnoreCase)) {
+            $checks.Add((New-AcceleratorValidationCheck -Code 'solution.publisher.incompatible' -Status 'incompatible' -Message "Installed '$expectedName' publisher identity does not match the selected package.")) | Out-Null
+            $incompatibleComponents.Add([pscustomobject]@{
+                kind = 'publisher'
+                identity = $expectedName
+                expected = "$($package.publisher.uniqueName)|$($package.publisher.customizationPrefix)"
+                installed = "$publisherUniqueName|$publisherPrefix"
+                moduleId = "$($package.moduleId)"
+            }) | Out-Null
         }
     }
 
-    $satisfiedDependencyKeys = @($EnvironmentEvidence.satisfiedDependencyKeys | ForEach-Object {
-        "$_".ToLowerInvariant()
-    })
+    $dependencyAssessments = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'dependencyAssessments' -DefaultValue @())
+    $dependencyByKey = @{}
+    foreach ($assessment in $dependencyAssessments) {
+        $dependencyByKey["$($assessment.key)"] = $assessment
+    }
+    $satisfiedDependencyKeys = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'satisfiedDependencyKeys' -DefaultValue @() | ForEach-Object { "$_".ToLowerInvariant() })
     foreach ($package in @($SelectedPackages)) {
         foreach ($dependency in @($package.declaredDependencies)) {
-            $key = @(
-                "$($dependency.required.solution)",
-                "$($dependency.required.package)",
-                "$($dependency.required.schemaName)",
-                "$($dependency.required.displayName)"
-            ) -join '|'
+            $key = Get-FastDependencyKey -Dependency $dependency
             $normalizedKey = $key.ToLowerInvariant()
-            if ($satisfiedDependencyKeys -contains $normalizedKey) {
+            $assessment = if ($dependencyByKey.ContainsKey($key)) { $dependencyByKey[$key] } else { $null }
+            $dependencyStatus = if ($null -ne $assessment) {
+                "$($assessment.status)"
+            } elseif ($satisfiedDependencyKeys -contains $normalizedKey) {
+                'satisfied'
+            } else {
+                'missing'
+            }
+            if ($dependencyStatus -eq 'satisfied') {
                 $checks.Add((New-AcceleratorValidationCheck -Code 'dependency.satisfied' -Status 'ready' -Message "Dependency '$($dependency.required.displayName)' is satisfied." -Evidence $key)) | Out-Null
+            } elseif ($dependencyStatus -eq 'incompatible') {
+                $checks.Add((New-AcceleratorValidationCheck -Code 'dependency.incompatible' -Status 'incompatible' -Message "Dependency '$($dependency.required.displayName)' resolved ambiguously or incompatibly." -Evidence $key)) | Out-Null
+                $incompatibleComponents.Add([pscustomobject]@{
+                    kind = 'dependency'
+                    identity = $key
+                    moduleId = "$($package.moduleId)"
+                }) | Out-Null
+            } elseif ($dependencyStatus -eq 'unverified') {
+                $checks.Add((New-AcceleratorValidationCheck -Code 'dependency.unverified' -Status 'unverified' -Message "Dependency '$($dependency.required.displayName)' could not be verified with current permissions or supported metadata." -Evidence $key)) | Out-Null
             } else {
                 $checks.Add((New-AcceleratorValidationCheck -Code 'dependency.missing' -Status 'action-required' -Message "Dependency '$($dependency.required.displayName)' is not verified in the environment." -Evidence $key)) | Out-Null
+                $missingComponents.Add([pscustomobject]@{
+                    kind = 'dependency'
+                    identity = $key
+                    moduleId = "$($package.moduleId)"
+                }) | Out-Null
             }
         }
     }
 
-    $permissions = @($EnvironmentEvidence.permissions | ForEach-Object { "$_".ToLowerInvariant() })
     foreach ($requiredPermission in @('read-solutions', 'read-metadata')) {
         if ($permissions -notcontains $requiredPermission) {
             $checks.Add((New-AcceleratorValidationCheck -Code 'permission.missing' -Status 'unverified' -Message "Permission evidence '$requiredPermission' is missing.")) | Out-Null
+        }
+    }
+
+    foreach ($package in @($SelectedPackages)) {
+        if (-not $installedByName.ContainsKey("$($package.solution.uniqueName)")) {
+            continue
+        }
+        $packageTables = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'requiredTables' -DefaultValue @() | Where-Object {
+            "$($_.moduleId)" -eq "$($package.moduleId)"
+        })
+        foreach ($table in $packageTables) {
+            if ("$($table.verificationState)" -ne 'verified') {
+                $checks.Add((New-AcceleratorValidationCheck -Code 'table.unverified' -Status 'unverified' -Message "Required table '$($table.logicalName)' could not be verified.")) | Out-Null
+            } elseif (-not [bool]$table.found) {
+                $checks.Add((New-AcceleratorValidationCheck -Code 'table.missing' -Status 'incompatible' -Message "Installed solution '$($package.solution.uniqueName)' is missing required table '$($table.logicalName)'.")) | Out-Null
+                $incompatibleComponents.Add([pscustomobject]@{
+                    kind = 'table'
+                    identity = "$($table.logicalName)"
+                    moduleId = "$($package.moduleId)"
+                }) | Out-Null
+            }
+        }
+    }
+
+    foreach ($limitation in @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'permissionLimitations' -DefaultValue @())) {
+        $checks.Add((New-AcceleratorValidationCheck -Code 'permission.limitation' -Status 'unverified' -Message "$limitation")) | Out-Null
+    }
+
+    $corePackage = @($SelectedPackages | Where-Object moduleId -eq 'microsoft-fast:module:core' | Select-Object -First 1)
+    $coreAssessment = 'not-selected'
+    if ($corePackage.Count -gt 0) {
+        $core = $corePackage[0]
+        $coreName = "$($core.solution.uniqueName)"
+        $coreInstalled = $installedByName.ContainsKey($coreName)
+        $coreDependencyEvidence = @($dependencyAssessments | Where-Object packageId -eq "$($core.packageId)")
+        $coreTableEvidence = @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'requiredTables' -DefaultValue @() | Where-Object {
+            "$($_.moduleId)" -eq "$($core.moduleId)"
+        })
+        $coreBlockingEvidence = @($coreDependencyEvidence | Where-Object status -ne 'satisfied')
+        $coreBlockingEvidence += @($coreTableEvidence | Where-Object {
+            "$($_.verificationState)" -ne 'verified' -or -not [bool]$_.found
+        })
+        if ($coreInstalled) {
+            $installedCore = $installedByName[$coreName]
+            if ("$($installedCore.version)" -ne "$($core.solution.version)" -or
+                -not [string]::Equals("$($installedCore.publisherUniqueName)", "$($core.publisher.uniqueName)", [StringComparison]::OrdinalIgnoreCase) -or
+                -not [string]::Equals("$($installedCore.publisherPrefix)", "$($core.publisher.customizationPrefix)", [StringComparison]::OrdinalIgnoreCase)) {
+                $coreBlockingEvidence += $installedCore
+            }
+        }
+        if (-not $canReadSolutions) {
+            $coreAssessment = 'inaccessible-or-insufficiently-verified'
+        } elseif ($coreInstalled -and $coreBlockingEvidence.Count -eq 0) {
+            $coreAssessment = 'installed-and-verified'
+        } elseif ($coreInstalled) {
+            $coreAssessment = 'installed-incompatible-or-incomplete'
+        } elseif (@($coreDependencyEvidence | Where-Object status -in @('missing', 'incompatible')).Count -gt 0) {
+            $coreAssessment = 'missing-with-known-blockers'
+        } elseif (@($coreDependencyEvidence | Where-Object status -eq 'unverified').Count -gt 0) {
+            $coreAssessment = 'inaccessible-or-insufficiently-verified'
+        } else {
+            $coreAssessment = 'missing-prerequisites-potentially-available'
         }
     }
 
@@ -297,9 +498,24 @@ function Test-FastEnvironmentPreflight {
         -SelectedPackages $SelectedPackages `
         -Checks $checks.ToArray() `
         -Environment ([pscustomobject]@{
-            environmentId = "$($EnvironmentEvidence.environmentId)"
-            environmentUrl = "$($EnvironmentEvidence.environmentUrl)"
-            tenantId = "$($EnvironmentEvidence.tenantId)"
+            environmentId = $environmentId
+            environmentUrl = $environmentUrl
+            tenantId = $tenantId
+            organizationVersion = $organizationVersion
+        }) `
+        -InstalledModules @(Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'installedFastModules' -DefaultValue @()) `
+        -DependencyAssessment $dependencyAssessments `
+        -MissingComponents $missingComponents.ToArray() `
+        -IncompatibleComponents $incompatibleComponents.ToArray() `
+        -Evidence ([pscustomobject]@{
+            evidenceType = 'environment-verified'
+            accessState = $accessState
+            coreAssessment = $coreAssessment
+            metadataFingerprint = $metadataFingerprint
+            requestCount = Get-FastValidationPropertyValue -InputObject $EnvironmentEvidence -Name 'requestCount' -DefaultValue 0
+            permissions = $permissions
+            inspectionErrors = $inspectionErrors
+            cache = $cacheEvidence
         }) `
         -Limitations @(
             'Preflight is read-only and does not prove that a future import will succeed.',
@@ -387,7 +603,16 @@ function Test-FastDependentBuildGate {
             Reason = 'Selected environment changed; revalidation is required.'
         }
     }
-    if ([DateTime]::Parse("$($ValidationEvidence.expiresAtUtc)").ToUniversalTime() -lt $NowUtc.ToUniversalTime()) {
+    try {
+        $expiresAt = [DateTimeOffset]::Parse(
+            "$($ValidationEvidence.expiresAtUtc)",
+            [Globalization.CultureInfo]::InvariantCulture,
+            [Globalization.DateTimeStyles]::RoundtripKind
+        )
+    } catch {
+        $expiresAt = $null
+    }
+    if ($null -eq $expiresAt -or $expiresAt.UtcDateTime -lt $NowUtc.ToUniversalTime()) {
         return [pscustomobject]@{
             Allowed = $false
             Reason = 'Environment validation evidence is stale.'

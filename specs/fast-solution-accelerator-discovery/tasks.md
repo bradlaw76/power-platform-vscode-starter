@@ -41,7 +41,7 @@
 - [x] Define feature-disable, outage, retirement, and rollback behavior.
 - [x] Define mode-preserving integration and acceptance criteria.
 - [x] Create architecture decision records.
-- [ ] Obtain architectural review approval.
+- [x] Obtain architectural review approval.
 
 ## FAST-002 - Catalog foundation
 
@@ -72,22 +72,38 @@
 - [x] Test ready, missing-dependency, incompatible, stale, offline, and
   user-declined environment outcomes.
 - [x] Prove no wizard UI, build-stage, or Dataverse change in FAST-002.
-- [ ] Obtain FAST-002 architectural review approval.
+- [x] Obtain FAST-002 architectural review approval.
 
-## FAST-003 - Core and package intelligence (not authorized)
+## FAST-003 - Read-only environment preflight
 
-- [ ] Implement live read-only environment transport before enabling any
+- [x] Implement live read-only environment transport before enabling any
   FAST-dependent generation in the wizard.
-- [ ] Prove the selected environment identity, permissions, installed Core,
+- [x] Prove the selected environment identity, permissions, installed Core,
   specialty versions, required components, and dependency evidence.
+- [x] Reuse existing authenticated environment and token refresh conventions.
+- [x] Inspect organization version, exact solution versions, and publishers.
+- [x] Validate all four Core declared dependencies using live metadata.
+- [x] Inspect required package tables and specialty component dependencies.
+- [x] Classify Core installed, incomplete, missing, blocked, and inaccessible.
+- [x] Produce a schema-valid version `1.1` preflight report.
+- [x] Cache non-secret evidence by environment, snapshot, package, and
+  dependency identity with bounded TTL.
+- [x] Test authentication, permissions, throttling, timeout, stale cache,
+  catalog/package/dependency changes, environment switching, disabled mode,
+  and nonmutation.
+- [x] Preserve fully custom planning and the reusable readiness gate.
+- [ ] Obtain FAST-003 architectural review approval.
+
+## FAST-003 follow-up dependency intelligence (not authorized)
+
 - [ ] Discover and evaluate newer or alternate Core releases dynamically rather
   than pinning `1.2.1.0`.
 - [ ] Build the evidence-carrying dependency DAG.
 - [ ] Add cycle, missing dependency, and version conflict validation.
-- [ ] Implement safe offline package metadata inspection.
+- [x] Implement safe offline package metadata inspection.
 - [ ] Define package hash/signature verification policy.
-- [ ] Build a Core component manifest from verified evidence.
-- [ ] Keep environment verification behind separate authorization.
+- [x] Build a Core component manifest from verified evidence.
+- [x] Keep environment verification behind explicit standalone invocation.
 
 ## FAST-004 - Matching and delta analysis (not authorized)
 

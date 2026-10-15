@@ -1,7 +1,7 @@
 # FAST Catalog and Decision Contracts
 
 **Status:** FAST-001 conceptual contract  
-**Implementation:** Deferred to FAST-002 and later
+**Implementation:** FAST-002 catalog contracts and FAST-003 preflight report
 
 ## Design rules
 
@@ -251,6 +251,43 @@ approvedAtUtc
 
 The decision is planning evidence only. It contains no deployment credential
 and grants no mutation authorization.
+
+## Environment preflight report
+
+```text
+schemaVersion: 1.1
+providerId
+scenarioSlug
+level: environment-preflight
+status | readinessStatus
+validatedAtUtc
+expiresAtUtc
+catalogSnapshotId
+environment:
+  environmentId
+  environmentUrl
+  tenantId
+  organizationVersion
+requiredModules[]
+installedModules[]
+dependencyAssessment[]
+missingComponents[]
+incompatibleComponents[]
+checks[]
+evidence:
+  evidenceType
+  coreAssessment
+  metadataFingerprint
+  permissions[]
+  inspectionErrors[]
+  cache
+limitations[]
+recommendedNextAction
+```
+
+The report contains no token. A fresh report is bound to the environment,
+catalog snapshot, package identities/hashes/versions, dependency versions, and
+evidence validity window. It never guarantees future import success.
 
 ## Snapshot promotion invariants
 

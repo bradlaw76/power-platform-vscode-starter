@@ -1,7 +1,7 @@
 # FAST Integration — Implementation Instructions for the Existing Solution Builder / Wizard
 
 > [!IMPORTANT]
-> **Repository status:** FAST-000 through FAST-002 were completed on 2026-10-15 and await architectural review. See the [baseline evidence](../baseline.md), [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), and [environment compatibility contract](../../../specs/fast-solution-accelerator-discovery/environment-validation.md). FAST-002 adds default-off, standalone catalog synchronization, offline package indexing, immutable snapshots, and mockable environment compatibility contracts. It is not wired into the wizard runtime and cannot connect to, import into, or modify Dataverse. Matching, wizard integration, and deployment behavior remain unimplemented. The current wizard contract and authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
+> **Repository status:** FAST-000 through FAST-003 were completed on 2026-10-15; FAST-002 is accepted and FAST-003 awaits architectural review. See the [baseline evidence](../baseline.md), [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), and [environment compatibility contract](../../../specs/fast-solution-accelerator-discovery/environment-validation.md). FAST-003 adds an explicitly enabled, standalone, authenticated read-only Dataverse preflight with versioned reports and non-secret evidence caching. It is not wired into wizard stages and cannot import solutions or modify Dataverse. Matching, wizard integration, and deployment behavior remain unimplemented. The current wizard contract and authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
 
 **Instruction ID:** FAST-IMPLEMENTATION-001  
 **Intended executor:** GitHub Copilot Agent in Visual Studio Code, working in the existing wizard repository  
@@ -282,7 +282,7 @@ Produce narrowly scoped PRs with explicit stop/go reviews:
 | FAST-000 | Git baseline/backup/rollback | Remote tag/branch SHA, original tests and restore rehearsal |
 | FAST-001 | Assessment/Spec Kit/ADR | Reviewed architecture and incremental task list |
 | FAST-002 | Crawling/catalog schema/snapshots | Current catalog inventory, source coverage, sync tests |
-| FAST-003 | Core/package metadata/dependencies | Verified Core manifest, dependency tests |
+| FAST-003 | Live read-only environment preflight | Versioned readiness report, mocked transport/cache/failure tests, no mutation |
 | FAST-004 | Requirements matching/delta planner | Golden requirement scenarios, traceability/evidence |
 | FAST-005 | Mode UX and generator wiring | Feature-flagged behavior, no added mandatory questions |
 | FAST-006 | Failure/rollback/regression/ALM | Disabled/offline tests, nonproduction restore verification |

@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-002 implemented; architectural review required
-**Phase boundary:** Stop after FAST-002
+**Status:** FAST-003 implemented; architectural review required
+**Phase boundary:** Stop after FAST-003
 
 ## Problem statement
 
@@ -50,7 +50,9 @@ repository-level specification or active wizard contract.
 - Implementing the crawler, catalog store, matching engine, UI, or generator in
   FAST-001.
 - Installing FAST Core or any specialty module.
-- Connecting to or modifying a Dataverse environment.
+- Modifying a Dataverse environment or installing solutions.
+- Connecting to Dataverse during requirements discovery or custom-only
+  planning.
 - Treating reference implementations as supported production products.
 - Inferring exact Dataverse schema from prose, screenshots, or ERDs.
 - Adding a fourth wizard mode.
@@ -293,4 +295,26 @@ FAST-002 provides an explicit, default-off catalog synchronization command,
 offline package inspection, immutable snapshots, and transport-neutral
 environment compatibility evaluation. It is not wired into wizard discovery,
 planning, or build stages and has no Dataverse transport or import capability.
-FAST-003 and runtime integration require separate authorization.
+FAST-003 later supplied the separately authorized read-only transport. Wizard
+runtime integration still requires separate authorization.
+
+## FAST-003 implementation boundary
+
+FAST-003 adds an explicitly enabled, authenticated, read-only Dataverse
+inspector and versioned Level 2 preflight report. It reuses repository token
+refresh, retry, timeout, and redaction conventions; caches only non-secret
+evidence; and remains disconnected from existing wizard stages.
+
+Acceptance requires:
+
+- exact Core and specialty solution-version checks;
+- all four Core dependency checks;
+- required table, component, and publisher verification;
+- explicit missing, incompatible, inaccessible, and insufficient-permission
+  outcomes;
+- cache invalidation for environment, catalog, package, dependency, and
+  freshness changes;
+- a reusable build-gate decision with fully custom bypass;
+- no non-GET Dataverse request and no solution import.
+
+FAST-004 matching and wizard integration remain unauthorized.

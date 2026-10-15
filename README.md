@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog tooling only; no wizard runtime stage is registered | Explicit catalog enable flag; immutable snapshots; offline package inspection; read-only compatibility contract; no Dataverse connection, import, or modification |
+| **FAST Solution Accelerator Discovery** *(standalone foundation; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Standalone catalog and live read-only preflight tooling; no wizard runtime stage is registered | Explicit enable flag; immutable snapshots; offline package inspection; authenticated GET-only Dataverse metadata preflight; no import or modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -225,14 +225,22 @@ views.
 The FAST entry remains unavailable to the active wizard. FAST-000 baseline
 evidence is recorded in
 [`docs/fast-integration/baseline.md`](docs/fast-integration/baseline.md), and
-the FAST architecture and FAST-002 contracts are under
+the FAST architecture and FAST-003 contracts are under
 [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/).
-The provider registry remains disabled by default. The standalone
-`scripts/accelerators/sync-fast-catalog.ps1` command requires explicit
-`-EnableFast`, writes only to an explicit snapshot folder, and never connects
-to Dataverse. FAST-002 does not change the current build sequence, profile,
-contract version, modes, or deployment behavior. FAST-003 and wizard runtime
-integration require separate authorization.
+The provider registry remains disabled by default. The standalone catalog sync
+and live environment preflight commands require explicit `-EnableFast`.
+Preflight reuses an existing authenticated environment connection, performs
+only bounded Dataverse metadata reads, and caches no credentials. FAST-003 does
+not change the current build sequence, profile, modes, or deployment behavior.
+FAST-004 and wizard runtime integration require separate authorization.
+
+```powershell
+# Explicit read-only inspection; no wizard stage invokes this command.
+pwsh ./scripts/accelerators/invoke-fast-environment-preflight.ps1 `
+  -EnableFast `
+  -CatalogSnapshotPath <snapshot-path> `
+  -PackageIndexPaths <package-index-paths>
+```
 
 ### Required checklist for future enhancements
 
@@ -916,12 +924,15 @@ power-platform-vscode-starter/
       accelerator-catalog.ps1 -- Provider-neutral immutable catalog snapshots
       fast-provider.ps1       -- Dynamic FAST source/release and offline package adapter
       environment-compatibility.ps1 -- Three-level compatibility and build gate
+      dataverse-environment-inspector.ps1 -- Authenticated read-only Level 2 evidence
+      invoke-fast-environment-preflight.ps1 -- Explicit standalone live preflight
       sync-fast-catalog.ps1   -- Explicit standalone catalog synchronization
     ci/
       test-docs-consistency.ps1  -- Guardrail: docs/prompt question-contract consistency
       test-fast-catalog.ps1      -- FAST discovery, snapshots, diff, and offline fallback
       test-fast-package-indexing.ps1 -- Offline managed solution metadata indexing
       test-fast-environment-preflight.ps1 -- Mocked compatibility and build-gate cases
+      test-fast-live-environment-preflight.ps1 -- Mocked live Dataverse/cache failures
       test-fast-disabled-compatibility.ps1 -- Default-off wizard isolation
       test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
       test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
@@ -981,7 +992,7 @@ power-platform-vscode-starter/
 | Document | Purpose |
 | --- | --- |
 | [docs/dataverse-report-wizard.md](docs/dataverse-report-wizard.md) | Complete guide for reporting against an existing model-driven app, including simulation, preview, deployment approval, and validation |
-| [docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md](docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md) | Reviewed, gated implementation directive for the proposed FAST Solution Accelerator Discovery enhancement; does not indicate runtime implementation |
+| [docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md](docs/fast-integration/instructions/FAST_Solution_Builder_Implementation_Instructions.md) | Reviewed, gated implementation directive for the standalone FAST catalog and read-only environment preflight; wizard-stage integration remains deferred |
 | [docs/onboarding.md](docs/onboarding.md) | Complete step-by-step setup guide with validation checkpoints and common issues |
 | [docs/wizard-walkthrough.html](docs/wizard-walkthrough.html) | Full visual walkthrough with direct links to skill entry points, scripts, and runbooks |
 | [docs/build-log.md](docs/build-log.md) | Template for recording each build run for traceability |

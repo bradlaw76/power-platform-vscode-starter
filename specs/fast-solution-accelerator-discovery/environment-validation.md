@@ -1,6 +1,6 @@
 # FAST Environment Compatibility Contract
 
-**Status:** FAST-002 implemented; runtime integration not authorized
+**Status:** FAST-003 live read-only preflight implemented; wizard integration not authorized
 **Applies to:** Any future FAST-dependent Dataverse build
 **Does not apply to:** Fully custom architecture
 
@@ -32,9 +32,12 @@ succeed.
 
 ## Level 2 - Read-only environment preflight
 
-Level 2 accepts evidence from an injected read-only environment inspector. The
-FAST-002 implementation is transport-neutral and uses fixtures; it is not
-wired to authentication or the wizard runtime.
+Level 2 uses the standalone authenticated read-only inspector in
+`scripts/accelerators/dataverse-environment-inspector.ps1`. The operator entry
+point is `scripts/accelerators/invoke-fast-environment-preflight.ps1`. It
+requires explicit `-EnableFast`, reuses the existing authenticated environment
+file when credentials are not supplied directly, and remains disconnected from
+wizard stages.
 
 The future inspector must verify, where permissions permit:
 
@@ -58,6 +61,57 @@ The result is:
 Read-only preflight does not prove a future import will succeed. Transient
 service health, capacity, policy, plugin, and undisclosed dependency conditions
 may still block an approved installation.
+
+### Read-only request plan
+
+The inspector minimizes requests by using:
+
+1. one `WhoAmI` identity request;
+2. one organization-version request;
+3. one filtered solution query with publisher expansion;
+4. table metadata filters in bounded chunks;
+5. dependency checks grouped by component kind and parent table.
+
+Supported package dependency identities include forms, web resources, custom
+controls, setting definitions, table attributes, and global Choice metadata.
+Unknown dependency types remain `unverified`.
+
+Requests have bounded timeout and retry limits. The shared Dataverse runtime
+refreshes once after `401`, honors `Retry-After` for `429`, applies exponential
+backoff to transient failures, and redacts token values from terminal errors.
+No token is written to a report or cache.
+
+### Versioned preflight report
+
+Schema version `1.1` records:
+
+- environment ID, URL, tenant evidence, and organization version;
+- inspection and expiration timestamps;
+- catalog snapshot ID;
+- required package IDs, versions, and hashes;
+- installed FAST modules and exact versions;
+- dependency assessments;
+- missing and incompatible components;
+- readiness status, checks, evidence, limitations, and next action;
+- metadata fingerprint, permissions, request count, and cache provenance.
+
+Selected package versions must match installed versions exactly until a
+separately reviewed compatibility policy exists.
+
+### Evidence cache
+
+Read-only evidence may be cached locally under `.wizard-metrics`. The cache key
+binds:
+
+- normalized environment URL;
+- catalog snapshot ID;
+- package IDs, selected versions, and hashes;
+- dependency identities and declared dependency versions.
+
+Entries expire after a bounded TTL and contain no access token. Environment
+switches and catalog/package/dependency changes produce a different key.
+Fresh inspection results carry a metadata fingerprint and replace cached
+evidence when environment metadata changes. `-ForceRefresh` bypasses the cache.
 
 ## Level 3 - Approved installation verification
 
@@ -104,4 +158,4 @@ for requirements analysis only.
 - Framework Acceptance: ready, missing-dependency, incompatible,
   stale-evidence, offline, and user-declined fixtures.
 
-The three modes and existing build stages remain unchanged in FAST-002.
+The three modes and existing build stages remain unchanged in FAST-003.

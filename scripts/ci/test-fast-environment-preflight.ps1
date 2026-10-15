@@ -44,7 +44,12 @@ $readyEvidence = [pscustomobject]@{
     tenantId = 'tenant-1'
     collectedAtUtc = $now.ToString('o')
     installedSolutions = @($packages | ForEach-Object {
-        [pscustomobject]@{ uniqueName = $_.solution.uniqueName; version = $_.solution.version }
+        [pscustomobject]@{
+            uniqueName = $_.solution.uniqueName
+            version = $_.solution.version
+            publisherUniqueName = $_.publisher.uniqueName
+            publisherPrefix = $_.publisher.customizationPrefix
+        }
     })
     satisfiedDependencyKeys = $dependencyKeys
     permissions = @('read-solutions', 'read-metadata')

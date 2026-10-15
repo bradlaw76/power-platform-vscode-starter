@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** FAST-002 implemented; architectural review required
+**Status:** FAST-003 implemented; architectural review required
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -140,11 +140,13 @@ Exact schemas are defined in
 
 ### FAST-003 - Dependency intelligence and approved integration preparation
 
-- Complete Core and specialty dependency graph.
-- Broader version/package inventory and reconciliation.
-- Evidence-tier promotion.
-- Compatibility matrix contract.
-- No automatic import.
+- Authenticated read-only Dataverse inspector.
+- Exact installed Core and specialty version/publisher checks.
+- Batched table and grouped component dependency inspection.
+- Versioned compatibility report and metadata fingerprint.
+- Environment/snapshot/package/dependency-bound evidence cache.
+- Reusable readiness gate without wizard-stage registration.
+- No automatic import or Dataverse mutation.
 
 ### FAST-004 - Matching and delta planning
 
@@ -201,10 +203,12 @@ Exact schemas are defined in
 
 ### Environment verification
 
-FAST-002 implements the transport-neutral three-level contract in
+FAST-003 implements live Level 2 inspection under the three-level contract in
 [`environment-validation.md`](environment-validation.md). Level 2 uses
-mocked/injected read-only evidence; no live Dataverse connection is present.
-Level 3 remains a separately authorized future workflow, not an importer.
+the shared authenticated Dataverse request conventions and an injectable
+transport for credential-free tests. Real-environment execution is optional,
+explicit, and read-only. Level 3 remains a separately authorized future
+workflow, not an importer.
 
 ## Compatibility
 
@@ -254,10 +258,24 @@ Level 3 remains a separately authorized future workflow, not an importer.
 - [x] Level 3 installation-verification plan with execution disabled.
 - [x] Mandatory FAST-dependent build gate.
 - [x] FAST-disabled runtime isolation regression test.
+- [x] Architectural review approval.
+
+## FAST-003 deliverables
+
+- [x] Explicit, default-off live preflight entry point.
+- [x] Reuse authenticated environment/token refresh conventions.
+- [x] Identity, organization version, solution, publisher, and table evidence.
+- [x] Core and specialty dependency-component verification.
+- [x] Core installed/missing/incompatible/inaccessible classifications.
+- [x] Versioned schema-valid report with recommended next action.
+- [x] Bounded timeouts, retry/backoff, grouped reads, and local evidence cache.
+- [x] Cache invalidation for environment, catalog, package, dependency, and TTL.
+- [x] Mocked authentication, permission, throttling, timeout, and nonmutation
+  tests.
 - [ ] Architectural review approval.
 
 ## Stop condition
 
-Stop after FAST-002 review handoff. Do not begin FAST-003, matching, wizard
-prompts, runtime-stage integration, live Dataverse inspection, or package
-installation without further authorization.
+Stop after FAST-003 review handoff. Do not begin FAST-004 matching, wizard
+prompts, runtime-stage integration, package installation, or Dataverse
+mutation without further authorization.
