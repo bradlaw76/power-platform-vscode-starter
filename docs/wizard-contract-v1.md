@@ -212,7 +212,7 @@ Required gate before execution:
 
 Synthetic data is created only from a validated `data-*.json` payload. The stage requires a source tag and stable natural keys, resolves entity-set names from metadata, fails on duplicate or foreign same-key records, resolves lookups exactly once, and updates the same IDs on rerun.
 
-Bounded demo security roles are created only from a validated `security-roles-*.json` payload. `68-build-security-roles.ps1` defaults to preview, requires explicit `-Mode Apply`, replaces only the exact privilege set of scenario-owned roles, verifies component-type 20 solution membership, and never creates identities, assigns roles, creates field-security profiles, or provisions SharePoint.
+Bounded demo security roles are created only from a validated `security-roles-*.json` payload. `68-build-security-roles.ps1` defaults to preview, requires explicit `-Mode Apply`, replaces only the exact payload-defined privilege set of scenario-owned roles, verifies component-type 20 solution membership, and never creates identities, assigns roles, creates field-security profiles, or provisions SharePoint. Verification separately permits only Dataverse's four Global, platform-managed SharePoint integration privileges (`Create/Read/Write SharePointData` and `Read SharePointDocument`) that are automatically attached to new roles; these do not provision SharePoint or replace SharePoint document permissions.
 
 Native charts and dashboards are distinct from HTML web resources. `64-build-charts-dashboard.ps1` creates or updates only wizard-owned `savedqueryvisualization` and dashboard `systemform` identities declared in `reporting-*.json`, adds those exact components to the selected solution, and publishes only their scenario tables.
 

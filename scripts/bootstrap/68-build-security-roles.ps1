@@ -59,9 +59,9 @@ function Get-WizardSecurityRolesPayload {
 function Get-WizardPrivilegeDepthValue {
     param([Parameter(Mandatory)] [string]$Depth)
 
-    $values = @{ Basic = 0; Local = 1; Deep = 2; Global = 3 }
-    if (-not $values.ContainsKey($Depth)) { throw "Unsupported privilege depth '$Depth'." }
-    return [int]$values[$Depth]
+    $values = @('Basic', 'Local', 'Deep', 'Global')
+    if ($Depth -notin $values) { throw "Unsupported privilege depth '$Depth'." }
+    return $Depth
 }
 
 function Get-WizardRolePrivilegePlan {
@@ -107,6 +107,20 @@ function ConvertTo-WizardRolePrivilegeKey {
         default { [int]$Privilege.Depth }
     }
     return "$id|$depthValue"
+}
+
+function Test-WizardPlatformManagedRolePrivilege {
+    param([Parameter(Mandatory)] [object]$Privilege)
+
+    $nameProperty = $Privilege.PSObject.Properties['PrivilegeName']
+    if ($null -eq $nameProperty) { return $false }
+    $names = @(
+        'prvCreateSharePointData',
+        'prvReadSharePointData',
+        'prvReadSharePointDocument',
+        'prvWriteSharePointData'
+    )
+    return "$($nameProperty.Value)" -in $names -and "$($Privilege.Depth)" -eq 'Global'
 }
 
 function Invoke-WizardSecurityRoleStage {
@@ -176,28 +190,15 @@ function Invoke-WizardSecurityRoleStage {
         }
         $businessUnitId = "$($businessUnits[0].businessunitid)"
 
+        $applyPlans = [System.Collections.Generic.List[object]]::new()
         foreach ($plan in $plans) {
             $safeRoleName = ConvertTo-WizardODataLiteral $plan.Name
             $rolePath = "roles?`$select=roleid,name,description,_businessunitid_value&`$filter=name eq '$safeRoleName' and _businessunitid_value eq $businessUnitId"
             $matches = @((& $invoke Get $rolePath).value)
             if ($matches.Count -gt 1) { throw "Security role '$($plan.Name)' resolved more than once in the root business unit." }
-
-            $created = $false
-            if ($matches.Count -eq 0) {
-                & $invoke Post 'roles' @{
-                    name = $plan.Name
-                    description = "$($plan.Description) $marker"
-                    'businessunitid@odata.bind' = "/businessunits($businessUnitId)"
-                } | Out-Null
-                $matches = @((& $invoke Get $rolePath).value)
-                if ($matches.Count -ne 1) { throw "Security role '$($plan.Name)' did not resolve exactly once after create." }
-                $created = $true
-            } elseif ("$($matches[0].description)" -notlike "*$marker*") {
+            if ($matches.Count -eq 1 -and "$($matches[0].description)" -notlike "*$marker*") {
                 throw "Security role '$($plan.Name)' exists but is not owned by scenario '$ScenarioSlug'."
             }
-
-            $roleId = "$($matches[0].roleid)"
-            if ([string]::IsNullOrWhiteSpace($roleId)) { throw "Security role '$($plan.Name)' has no stable ID." }
 
             $resolvedPrivileges = [System.Collections.Generic.List[object]]::new()
             foreach ($privilegePlan in @($plan.Privileges)) {
@@ -211,9 +212,36 @@ function Invoke-WizardSecurityRoleStage {
                 }
                 [void]$resolvedPrivileges.Add([pscustomobject]@{
                     PrivilegeId = "$($privilegeMatches[0].privilegeid)"
-                    Depth = [int]$privilegePlan.DepthValue
+                    Depth = "$($privilegePlan.DepthValue)"
                 })
             }
+
+            [void]$applyPlans.Add([pscustomobject]@{
+                Plan = $plan
+                RolePath = $rolePath
+                Matches = @($matches)
+                ResolvedPrivileges = @($resolvedPrivileges)
+            })
+        }
+
+        foreach ($applyPlan in @($applyPlans)) {
+            $plan = $applyPlan.Plan
+            $matches = @($applyPlan.Matches)
+            $resolvedPrivileges = @($applyPlan.ResolvedPrivileges)
+            $created = $false
+            if ($matches.Count -eq 0) {
+                & $invoke Post 'roles' @{
+                    name = $plan.Name
+                    description = "$($plan.Description) $marker"
+                    'businessunitid@odata.bind' = "/businessunits($businessUnitId)"
+                } | Out-Null
+                $matches = @((& $invoke Get $applyPlan.RolePath).value)
+                if ($matches.Count -ne 1) { throw "Security role '$($plan.Name)' did not resolve exactly once after create." }
+                $created = $true
+            }
+
+            $roleId = "$($matches[0].roleid)"
+            if ([string]::IsNullOrWhiteSpace($roleId)) { throw "Security role '$($plan.Name)' has no stable ID." }
 
             $currentResponse = & $invoke Get "RetrieveRolePrivilegesRole(RoleId=$roleId)"
             $currentPrivileges = if ($null -ne $currentResponse.PSObject.Properties['RolePrivileges']) {
@@ -222,19 +250,30 @@ function Invoke-WizardSecurityRoleStage {
                 @()
             }
             $desiredKeys = @($resolvedPrivileges | ForEach-Object { ConvertTo-WizardRolePrivilegeKey -Privilege $_ } | Sort-Object)
-            $currentKeys = @($currentPrivileges | ForEach-Object { ConvertTo-WizardRolePrivilegeKey -Privilege $_ } | Sort-Object)
+            $currentManagedPrivileges = @($currentPrivileges | Where-Object {
+                Test-WizardPlatformManagedRolePrivilege -Privilege $_
+            })
+            $currentKeys = @($currentPrivileges | Where-Object {
+                -not (Test-WizardPlatformManagedRolePrivilege -Privilege $_)
+            } | ForEach-Object { ConvertTo-WizardRolePrivilegeKey -Privilege $_ } | Sort-Object)
             $privilegesChanged = ($desiredKeys -join ',') -cne ($currentKeys -join ',')
             if ($privilegesChanged) {
                 & $invoke Post "roles($roleId)/Microsoft.Dynamics.CRM.ReplacePrivilegesRole" @{
                     Privileges = @($resolvedPrivileges)
                 } | Out-Null
                 $verifiedResponse = & $invoke Get "RetrieveRolePrivilegesRole(RoleId=$roleId)"
-                $verifiedKeys = @($verifiedResponse.RolePrivileges | ForEach-Object {
+                $verifiedManagedPrivileges = @($verifiedResponse.RolePrivileges | Where-Object {
+                    Test-WizardPlatformManagedRolePrivilege -Privilege $_
+                })
+                $verifiedKeys = @($verifiedResponse.RolePrivileges | Where-Object {
+                    -not (Test-WizardPlatformManagedRolePrivilege -Privilege $_)
+                } | ForEach-Object {
                     ConvertTo-WizardRolePrivilegeKey -Privilege $_
                 } | Sort-Object)
                 if (($desiredKeys -join ',') -cne ($verifiedKeys -join ',')) {
                     throw "Security role '$($plan.Name)' did not retain the exact planned privilege set."
                 }
+                $currentManagedPrivileges = $verifiedManagedPrivileges
             }
 
             $membershipPath = "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq $solutionId and objectid eq $roleId and componenttype eq 20"
@@ -259,6 +298,7 @@ function Invoke-WizardSecurityRoleStage {
                 action = $action
                 privilegeDepth = "$($payload.BusinessUnitScope)"
                 privilegeCount = $desiredKeys.Count
+                platformManagedPrivilegeCount = $currentManagedPrivileges.Count
                 solutionMembership = 'explicit'
             })
         }

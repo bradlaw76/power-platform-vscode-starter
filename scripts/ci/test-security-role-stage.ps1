@@ -65,6 +65,19 @@ $rolesByName = @{}
 $privilegesByRole = @{}
 $memberships = [System.Collections.Generic.HashSet[string]]::new([System.StringComparer]::OrdinalIgnoreCase)
 $calls = [System.Collections.Generic.List[object]]::new()
+$testState = [pscustomobject]@{ MissingPrivilegeName = $null }
+$platformManagedPrivileges = @(
+    'prvCreateSharePointData',
+    'prvReadSharePointData',
+    'prvReadSharePointDocument',
+    'prvWriteSharePointData'
+) | ForEach-Object {
+    [pscustomobject]@{
+        PrivilegeId = New-TestStableGuid "platform|$_"
+        PrivilegeName = $_
+        Depth = 'Global'
+    }
+}
 $requestInvoker = {
     param($request)
     $path = [Uri]::UnescapeDataString(($request.Uri -split '/api/data/v9.2/')[1])
@@ -95,12 +108,15 @@ $requestInvoker = {
             description = "$($body.description)"
             _businessunitid_value = $businessUnitId
         }
-        $privilegesByRole[$roleId] = @()
+        $privilegesByRole[$roleId] = @($platformManagedPrivileges)
         return [pscustomobject]@{}
     }
     if ($request.Method -eq 'Get' -and $path -like 'privileges?*') {
         if ($path -notmatch "name eq '(?<name>(?:''|[^'])*)'") { throw "Privilege query did not contain a name: $path" }
         $name = $Matches.name.Replace("''", "'")
+        if ($name -eq $testState.MissingPrivilegeName) {
+            return [pscustomobject]@{ value = @() }
+        }
         return [pscustomobject]@{ value = @([pscustomobject]@{
             privilegeid = New-TestStableGuid "privilege|$name"
             name = $name
@@ -111,7 +127,7 @@ $requestInvoker = {
         return [pscustomobject]@{ RolePrivileges = @($privilegesByRole[$Matches.id]) }
     }
     if ($request.Method -eq 'Post' -and $path -match '^roles\((?<id>[^)]+)\)/Microsoft\.Dynamics\.CRM\.ReplacePrivilegesRole$') {
-        $privilegesByRole[$Matches.id] = @($body.Privileges)
+        $privilegesByRole[$Matches.id] = @($body.Privileges) + @($platformManagedPrivileges)
         return [pscustomobject]@{}
     }
     if ($request.Method -eq 'Get' -and $path -like 'solutioncomponents?*') {
@@ -136,8 +152,19 @@ $firstPass = @(Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug 
 if ($firstPass.Count -ne 3 -or @($firstPass | Where-Object action -ne 'created').Count -gt 0) {
     throw 'First apply must create exactly three roles.'
 }
-if (@($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -like '*ReplacePrivilegesRole' }).Count -ne 3) {
+if (@($firstPass | Where-Object platformManagedPrivilegeCount -ne 4).Count -gt 0) {
+    throw 'Apply must report the exact Dataverse-managed SharePoint integration baseline.'
+}
+$replaceCalls = @($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -like '*ReplacePrivilegesRole' })
+if ($replaceCalls.Count -ne 3) {
     throw 'First apply must replace each role with its exact privilege set.'
+}
+foreach ($replaceCall in $replaceCalls) {
+    if (@($replaceCall.Body.Privileges | Where-Object {
+        $_.Depth -isnot [string] -or $_.Depth -ne 'Local'
+    }).Count -gt 0) {
+        throw 'ReplacePrivilegesRole must serialize privilege depth as the Local enum string.'
+    }
 }
 
 $firstPassCallCount = $calls.Count
@@ -164,6 +191,23 @@ try {
     throw 'Expected ownership collision failure.'
 } catch {
     if ($_.Exception.Message -notmatch 'not owned by scenario') { throw }
+}
+
+$rolesByName.Clear()
+$privilegesByRole.Clear()
+$memberships.Clear()
+$calls.Clear()
+$testState.MissingPrivilegeName = 'prvReadfoia_aiassistancerecord'
+try {
+    Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+        -PayloadsFolder $payloadFolder -Mode Apply -EnvironmentUrl 'https://unit.test' `
+        -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -RequestInvoker $requestInvoker | Out-Null
+    throw 'Expected unresolved privilege preflight failure.'
+} catch {
+    if ($_.Exception.Message -notmatch 'must resolve exactly once') { throw }
+}
+if (@($calls | Where-Object Method -eq 'Post').Count -ne 0) {
+    throw 'Privilege preflight failure must occur before any Dataverse mutation.'
 }
 
 Remove-Item Env:WIZARD_SECURITY_ROLES_SKIP_MAIN -ErrorAction SilentlyContinue
