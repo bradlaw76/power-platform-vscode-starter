@@ -1,7 +1,7 @@
 # FAST Integration — Implementation Instructions for the Existing Solution Builder / Wizard
 
 > [!IMPORTANT]
-> **Repository status:** Reviewed and added on 2026-10-15 as planning and implementation instructions only. The FAST discovery engine, provider, catalog synchronization, matching, and deployment behavior described below are not yet implemented. Until those capabilities pass their stated approval gates, the current wizard contract and the authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
+> **Repository status:** FAST-000 and FAST-001 were completed on 2026-10-15. See the [baseline evidence](../baseline.md) and [review-ready Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/). FAST-002 runtime development has not started. The FAST discovery engine, provider, catalog synchronization, matching, and deployment behavior described below are not yet implemented. Until those capabilities pass their stated approval gates, the current wizard contract and the authoritative sequence in [`docs/onboarding.md`](../../onboarding.md) remain unchanged.
 
 **Instruction ID:** FAST-IMPLEMENTATION-001  
 **Intended executor:** GitHub Copilot Agent in Visual Studio Code, working in the existing wizard repository  

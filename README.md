@@ -223,10 +223,14 @@ matching grid contract when the pastel backgrounds must also appear in table
 views.
 
 The FAST entry registers a reviewed implementation directive, not a completed
-wizard capability. It does not change the current build sequence, profile,
-contract version, scripts, or deployment behavior. Future FAST implementation
-work must begin with FAST-000 and FAST-001 in the directive and satisfy the
-checklist below before any runtime capability is described as available.
+wizard capability. FAST-000 baseline evidence is recorded in
+[`docs/fast-integration/baseline.md`](docs/fast-integration/baseline.md), and
+the FAST-001 architecture is under
+[`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/).
+It does not change the current build sequence, profile, contract version,
+scripts, or deployment behavior. FAST-002 requires architectural approval and
+must satisfy the checklist below before any runtime capability is described as
+available.
 
 ### Required checklist for future enhancements
 
