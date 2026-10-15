@@ -1,0 +1,3649 @@
+{
+  "manifestContractVersion": "1.0.0",
+  "manifestId": "foia-fedciv-gcc-dev-bootstrap-20261008",
+  "status": "stage-85-idempotency-verified",
+  "scenario": {
+    "slug": "federal-foia-management",
+    "designVersion": "FOIA-DD-1.0",
+    "requirementsCatalogVersion": "1.0",
+    "requirementsBaselineVersion": "1.0",
+    "solutionUniqueName": "FederalFOIAManagement",
+    "solutionDisplayName": "Federal FOIA Management",
+    "publisherUniqueName": "FederalFOIA",
+    "publisherDisplayName": "Federal FOIA",
+    "publisherPrefix": "foia",
+    "applicationProfile": "dynamics-customer-service-extension"
+  },
+  "authorizationBoundary": {
+    "liveAccessAuthorized": true,
+    "authenticationAuthorized": true,
+    "previewAuthorized": true,
+    "applyAuthorized": true,
+    "authorizedApplyScope": [
+      "create-publisher:FederalFOIA",
+      "create-unmanaged-solution:FederalFOIAManagement",
+      "20-build-tables:create-11-planned-custom-tables",
+      "30-build-columns:create-134-planned-columns-and-11-alternate-keys",
+      "40-build-relationships:create-20-one-to-many-and-1-many-to-many-relationships",
+      "50-add-to-solution:sync-approved-schema-components-and-publish-13-scoped-entities",
+      "55-build-business-process-flows:validate-two-process-payloads-and-integrate-only-existing-designer-authored-bpfs",
+      "60-build-forms-views:create-13-wizard-owned-main-forms-and-implement-13-explicit-public-views",
+      "64-build-charts-dashboard:create-8-native-charts-and-5-native-dashboards"
+    ],
+    "schemaApplyAuthorized": true,
+    "authorizedSchemaStages": [
+      "20-build-tables",
+      "30-build-columns",
+      "40-build-relationships",
+      "50-add-to-solution",
+      "55-build-business-process-flows",
+      "60-build-forms-views",
+      "64-build-charts-dashboard"
+    ],
+    "columnApplyAuthorized": true,
+    "relationshipApplyAuthorized": true,
+    "dataApplyAuthorized": false,
+    "appApplyAuthorized": false,
+    "flowApplyAuthorized": false,
+    "publishAuthorized": true,
+    "exportAuthorized": false,
+    "managedPackageAuthorized": false,
+    "releaseAuthorized": false,
+    "commitAuthorized": false,
+    "pushAuthorized": false,
+    "authorizationReferences": [
+      "interactive-approval-2026-10-07-publisher-and-solution-only"
+    ]
+  },
+  "finalMembershipGate": {
+    "verifiedAtUtc": "2026-10-13T17:42:27.0854572Z",
+    "strictIsolation": true,
+    "exportAllowed": true,
+    "counts": {
+      "added": 0,
+      "alreadyInSolution": 232,
+      "failed": 0,
+      "missing": 0,
+      "unauthorized": 0
+    },
+    "reportPath": ".wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json"
+  },
+  "unmanagedExportInspection": {
+    "verifiedAtUtc": "2026-10-13T19:00:52.3934893Z",
+    "managed": false,
+    "importPermitted": false,
+    "membershipItemCount": 232,
+    "inheritedMembershipItemCount": 198,
+    "rootComponentsExpected": 24,
+    "rootComponentsMatched": 24,
+    "missingRootComponents": 0,
+    "unrelatedRootComponents": 0,
+    "unpackedFileCount": 214,
+    "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
+  },
+  "idempotencyVerification": {
+    "baselineCapturedAtUtc": "2026-10-14T14:55:23.9027802Z",
+    "verifiedAtUtc": "2026-10-14T15:34:18.2383652Z",
+    "identityCount": 673,
+    "stableIds": true,
+    "duplicateCount": 0,
+    "failureCount": 0,
+    "secondPassActions": {
+      "reportingSkipped": 13,
+      "syntheticDataUpdated": 41
+    },
+    "evidencePath": ".wizard-metrics/artifacts/idempotency/federal-foia-management/verification.json"
+  },
+  "target": {
+    "environmentClassification": "FEDCIV_GCC",
+    "deploymentRing": "DEV",
+    "environmentReference": "fedciv-gcc-dev",
+    "tenantReference": "protected-external",
+    "environmentIdRecorded": false,
+    "environmentUrlRecorded": false,
+    "portabilityTarget": "DOD_IL5",
+    "authorizedOperations": [
+      "authenticate",
+      "read-metadata",
+      "preview",
+      "create-approved-publisher",
+      "create-approved-empty-unmanaged-solution",
+      "create-approved-custom-tables",
+      "create-approved-columns",
+      "create-approved-alternate-keys",
+      "create-approved-relationships",
+      "integrate-approved-existing-business-process-flows",
+      "create-approved-forms-and-views",
+      "create-approved-native-charts-and-dashboards"
+    ]
+  },
+  "source": {
+    "repositoryReference": "bradlaw76/power-platform-vscode-starter",
+    "branch": "feature/federal-foia-management",
+    "commit": "uncommitted",
+    "workingTreeReviewed": true,
+    "containsSecrets": false,
+    "containsOperationalData": false,
+    "syntheticDataOnly": true
+  },
+  "requirements": {
+    "catalog": "Federal-FOIA-Solution-Requirements.md",
+    "catalogIds": "FOIA-REQ-001..FOIA-REQ-300",
+    "implementationProfile": "requirements-baseline.md",
+    "traceabilityArtifact": "requirement-traceability.md",
+    "traceabilityValidationStatus": "passed",
+    "missingIds": [],
+    "duplicateIds": []
+  },
+  "capabilityValidation": {
+    "dataverseMetadata": {
+      "status": "passed",
+      "availableTables": [
+        "sharepointsite",
+        "sharepointdocumentlocation",
+        "workflow",
+        "connectionreference",
+        "environmentvariabledefinition",
+        "environmentvariablevalue"
+      ]
+    },
+    "sharePointConnection": {
+      "status": "passed",
+      "validationMethod": "operator-confirmed",
+      "note": "SharePoint Online is licensed and usable. Automated connector inventory could not complete because the Power Platform API tool generated an invalid environment endpoint."
+    },
+    "powerAutomateConnection": {
+      "status": "passed",
+      "validationMethod": "operator-confirmed",
+      "note": "Power Automate and Office 365 connectors are licensed and usable. Automated connector inventory could not complete because the Power Platform API tool generated an invalid environment endpoint."
+    },
+    "licensing": {
+      "status": "passed",
+      "validationMethod": "operator-confirmed",
+      "confirmedAtUtc": "2026-10-08T13:05:42Z"
+    }
+  },
+  "configuration": {
+    "contractVersion": "FOIA-CONFIG-1.0",
+    "featureFlags": {
+      "foia_AzFunctionsEnabled": false,
+      "foia_AzOpenAIEnabled": false,
+      "foia_AzAISearchEnabled": false,
+      "foia_AzDocumentIntelligenceEnabled": false,
+      "foia_AzStorageEnabled": false
+    },
+    "secretValuesPresent": false,
+    "hardCodedEndpointsPresent": false
+  },
+  "bootstrapInventory": {
+    "publisher": {
+      "uniqueName": "FederalFOIA",
+      "prefix": "foia",
+      "liveId": null,
+      "result": "created",
+      "verification": "passed"
+    },
+    "solution": {
+      "uniqueName": "FederalFOIAManagement",
+      "type": "unmanaged",
+      "liveId": null,
+      "result": "created",
+      "publisherBinding": "verified"
+    }
+  },
+  "componentInventory": {
+    "tables": [
+      {
+        "logicalName": "foia_aiassistancerecord",
+        "displayName": "AI Assistance Record",
+        "liveId": "de735f0c-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-AI-001..006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_aiassistancerecord.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_appeal",
+        "displayName": "Appeal",
+        "liveId": "ada15b36-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_appeal.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_auditevent",
+        "displayName": "Audit Event",
+        "liveId": "07097950-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-SEC-006..007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_auditevent.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_clockevent",
+        "displayName": "Clock Event",
+        "liveId": "79b28d64-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-CLK-003..006",
+          "FOIA-SEC-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_clockevent.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_exemptiondecision",
+        "displayName": "Exemption Decision",
+        "liveId": "51f9df76-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-REV-003",
+          "FOIA-CAS-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_exemptiondecision.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_foiarequest",
+        "displayName": "FOIA Request",
+        "liveId": "fca5fd89-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-INT-001..006",
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_foiarequest.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_redactiondecision",
+        "displayName": "Redaction Decision",
+        "liveId": "8d83f29c-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-REV-004",
+          "FOIA-CAS-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_redactiondecision.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_releasepackage",
+        "displayName": "Release Package",
+        "liveId": "c0eef0a8-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-REV-005..007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_releasepackage.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_responsiverecord",
+        "displayName": "Responsive Record",
+        "liveId": "fd3404bc-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-COL-004..007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_responsiverecord.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_reviewtask",
+        "displayName": "Review Task",
+        "liveId": "080107c9-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-REV-001..002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_reviewtask.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "logicalName": "foia_searchtask",
+        "displayName": "Search Task",
+        "liveId": "257706d6-4cc3-f111-aaae-001dd80bb94c",
+        "ownershipType": "UserOwned",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/table-foia_searchtask.json",
+        "result": "created",
+        "published": true,
+        "membership": "verified"
+      }
+    ],
+    "columns": [
+      {
+        "tableLogicalName": "contact",
+        "logicalName": "foia_requesterclassification",
+        "liveId": "4a23ca56-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-002",
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-contact.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "contact",
+        "logicalName": "foia_identityverified",
+        "liveId": "7797bbd1-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "Boolean",
+        "requirementReferences": [
+          "FOIA-INT-002",
+          "FOIA-SEC-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-contact.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "contact",
+        "logicalName": "foia_syntheticrecordkey",
+        "liveId": "f9720f6a-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-contact.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "contact",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "50bf4772-53c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-contact.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_assistanceidentifier",
+        "liveId": "f5c9df83-53c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_operationalstatus",
+        "liveId": "2c083596-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_provider",
+        "liveId": "7cb62f9c-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-003",
+          "FOIA-ARC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_serviceversion",
+        "liveId": "dab62f9c-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_operationclassification",
+        "liveId": "98e85ba8-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_sourcereferences",
+        "liveId": "5de764ae-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_output",
+        "liveId": "bf4a5bb4-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_confidence",
+        "liveId": "76bd5aba-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "Decimal",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_reviewerdisposition",
+        "liveId": "4a5053c0-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_createddatetime",
+        "liveId": "912755c6-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_revieweddatetime",
+        "liveId": "51d54fcc-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-AI-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "86d54fcc-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_appealnumber",
+        "liveId": "2c8fdbd9-53c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_challengeddetermination",
+        "liveId": "9243e7de-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_receiveddate",
+        "liveId": "4404f5e4-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-001",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_duedate",
+        "liveId": "b3db3aeb-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-001",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_closeddate",
+        "liveId": "03727ff1-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_stage",
+        "liveId": "3e727ff1-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_decision",
+        "liveId": "1a827cf7-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_outcome",
+        "liveId": "a98ed6fd-53c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "9227e903-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_eventidentifier",
+        "liveId": "29928607-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_eventtype",
+        "liveId": "c38cd410-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_eventdatetime",
+        "liveId": "b5bf6014-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_actorreference",
+        "liveId": "bd7d761d-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_purpose",
+        "liveId": "5d8c0724-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_scope",
+        "liveId": "1d73342a-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_correlationidentifier",
+        "liveId": "c3cf9530-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INTG-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "e90da132-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_eventidentifier",
+        "liveId": "ae74de38-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CLK-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_clocktype",
+        "liveId": "00a1573f-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-002",
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_eventtype",
+        "liveId": "7d6d4b46-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_effectivedatetime",
+        "liveId": "39880950-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_reason",
+        "liveId": "c9f92756-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_actorreference",
+        "liveId": "25a6225c-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_priorduedate",
+        "liveId": "df1a4d62-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_resultingduedate",
+        "liveId": "25507168-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_provenance",
+        "liveId": "eb3aba6b-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "70ecdf73-54c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_decisionnumber",
+        "liveId": "19ba2379-54c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_authority",
+        "liveId": "b49e0a7b-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_rationale",
+        "liveId": "675d1181-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_scope",
+        "liveId": "ca1a5b88-54c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_approvalstate",
+        "liveId": "f31a5b88-54c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-005",
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_proposeridentity",
+        "liveId": "73522c93-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_approveridentity",
+        "liveId": "a7c42b99-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_proposeddate",
+        "liveId": "d9063c9f-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_decisiondate",
+        "liveId": "9b5134a5-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "ffc2bea7-54c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_trackingnumber",
+        "liveId": "a51080ab-54c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-INT-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_intakechannel",
+        "liveId": "e14bc854-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INT-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_validationstate",
+        "liveId": "29e6185b-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_lifecyclestage",
+        "liveId": "80994361-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_receiveddate",
+        "liveId": "c1bf7469-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_perfecteddate",
+        "liveId": "4aee036e-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_currentduedate",
+        "liveId": "e4a04076-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_clarificationduedate",
+        "liveId": "5eca297d-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CAS-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_closeddate",
+        "liveId": "c57d0b81-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_acknowledgmentsent",
+        "liveId": "25758d83-55c3-f111-aaae-001dd80816e7",
+        "attributeType": "Boolean",
+        "requirementReferences": [
+          "FOIA-INT-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_duplicatesuspected",
+        "liveId": "bd525e8d-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "Boolean",
+        "requirementReferences": [
+          "FOIA-INT-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_expeditedrequested",
+        "liveId": "f2525e8d-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "Boolean",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_expediteddecision",
+        "liveId": "d843e396-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_requestscope",
+        "liveId": "3a093b9d-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_disposition",
+        "liveId": "946938a0-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-RPT-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_feecategory",
+        "liveId": "8ebde3a3-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_feeassessed",
+        "liveId": "a5b2efa9-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "Money",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_feewaived",
+        "liveId": "873e01bc-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "Money",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_feecollected",
+        "liveId": "03f36bc2-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "Money",
+        "requirementReferences": [
+          "FOIA-RPT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_acknowledgmentreference",
+        "liveId": "de9a66c8-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INT-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_fiscalperiod",
+        "liveId": "45dae4cb-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-RPT-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "e35e16d2-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_redactionnumber",
+        "liveId": "fa8316d8-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_recordlocation",
+        "liveId": "b6b4f2e1-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_proposedbasis",
+        "liveId": "0a1e11e8-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_finalstate",
+        "liveId": "2cb117ee-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_proposeridentity",
+        "liveId": "9fcfa7f6-55c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_approveridentity",
+        "liveId": "40610ffa-55c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_proposeddate",
+        "liveId": "da2b1900-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_approveddate",
+        "liveId": "0fc5270b-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "2b112011-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_packagenumber",
+        "liveId": "a7f35e12-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_packageversion",
+        "liveId": "68a0c61d-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "Integer",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_approvalstate",
+        "liveId": "51c31324-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-005",
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_packagehash",
+        "liveId": "32e7d924-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_responsecorrespondence",
+        "liveId": "e62e2c31-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_plannedreleasedate",
+        "liveId": "242f2c31-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_releasedate",
+        "liveId": "af854437-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_releasemethod",
+        "liveId": "feb3213e-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_recipientreference",
+        "liveId": "6ddc8e46-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_approveridentity",
+        "liveId": "c4a1ba4c-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "e0778451-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_recordidentifier",
+        "liveId": "617f0359-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_originalfilename",
+        "liveId": "0c0a4558-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_mediatype",
+        "liveId": "0a2b745e-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_repository",
+        "liveId": "99da2865-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_siteidentifier",
+        "liveId": "637a836b-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_libraryidentifier",
+        "liveId": "b7a94172-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_itemidentifier",
+        "liveId": "9d77d778-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_itemversion",
+        "liveId": "3d1f4e7f-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-004",
+          "FOIA-REV-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_contenthash",
+        "liveId": "ff3fe784-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-007",
+          "FOIA-REV-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_sizebytes",
+        "liveId": "43aedf8a-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "Integer",
+        "requirementReferences": [
+          "FOIA-INT-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_classification",
+        "liveId": "8a92518c-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_accessstate",
+        "liveId": "39c2f092-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-INT-003",
+          "FOIA-SEC-009"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_reviewstate",
+        "liveId": "f3492299-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "b595a3a3-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_reviewtasknumber",
+        "liveId": "09989ca5-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_reviewtype",
+        "liveId": "ab54dbaa-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_status",
+        "liveId": "aee343b3-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_disposition",
+        "liveId": "1c6420be-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_assigneddate",
+        "liveId": "b9daa9bf-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_duedate",
+        "liveId": "6c44cdca-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_completeddate",
+        "liveId": "18ab16d1-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_reviewernotes",
+        "liveId": "958612d7-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "66b5f0dd-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_searchtasknumber",
+        "liveId": "f5499ee4-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_collectionsourcesystem",
+        "liveId": "98898eeb-56c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_custodianorsource",
+        "liveId": "289e7ff1-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_searchscope",
+        "liveId": "ec02e7f9-56c3-f111-aaae-001dd80816e7",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_searchterms",
+        "liveId": "0950b9fe-56c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_status",
+        "liveId": "4a98c204-57c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_assigneddate",
+        "liveId": "b3bd450a-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_duedate",
+        "liveId": "0f45c212-57c3-f111-aaae-001dd80753e2",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_completeddate",
+        "liveId": "a7165a16-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_resultcount",
+        "liveId": "85c61b1f-57c3-f111-aaae-001dd80753e2",
+        "attributeType": "Integer",
+        "requirementReferences": [
+          "FOIA-COL-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_evidencereference",
+        "liveId": "c61dbd22-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-INTG-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "9be5c128-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "incident",
+        "logicalName": "foia_caseworktype",
+        "liveId": "47af0e2b-57c3-f111-aaae-001dd80753e2",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-CAS-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-incident.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "incident",
+        "logicalName": "foia_statutoryduedate",
+        "liveId": "29a1f734-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "DateTime",
+        "requirementReferences": [
+          "FOIA-CLK-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-incident.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "incident",
+        "logicalName": "foia_syntheticrecordkey",
+        "liveId": "89fe023b-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-incident.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "tableLogicalName": "incident",
+        "logicalName": "foia_syntheticsourcetag",
+        "liveId": "75d30441-57c3-f111-aaae-001dd80bb94c",
+        "attributeType": "String",
+        "requirementReferences": [
+          "FOIA-SEC-008",
+          "FOIA-TST-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/columns-incident.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      }
+    ],
+    "relationships": [
+      {
+        "schemaName": "foia_contact_foiarequest",
+        "liveId": "156722fc-85c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "contact",
+        "referencedAttribute": "contactid",
+        "referencingEntity": "foia_foiarequest",
+        "referencingAttribute": "foia_requesterid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "Cascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-002",
+          "FOIA-DAT-007",
+          "FOIA-INT-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_incident",
+        "liveId": "3d32350b-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "incident",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-CAS-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_searchtask",
+        "liveId": "4d1e051d-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_searchtask",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_incident_searchtask",
+        "liveId": "c514352a-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "incident",
+        "referencedAttribute": "incidentid",
+        "referencingEntity": "foia_searchtask",
+        "referencingAttribute": "foia_incidentid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "None",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_searchtask_responsiverecord",
+        "liveId": "25315536-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_searchtask",
+        "referencedAttribute": "foia_searchtaskid",
+        "referencingEntity": "foia_responsiverecord",
+        "referencingAttribute": "foia_searchtaskid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_responsiverecord",
+        "liveId": "e40a2540-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_responsiverecord",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-COL-004",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_responsiverecord_reviewtask",
+        "liveId": "3a4c894d-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_responsiverecord",
+        "referencedAttribute": "foia_responsiverecordid",
+        "referencingEntity": "foia_reviewtask",
+        "referencingAttribute": "foia_responsiverecordid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-001"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_reviewtask",
+        "liveId": "410daa58-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_reviewtask",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_reviewtask_exemptiondecision",
+        "liveId": "9faef062-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_reviewtask",
+        "referencedAttribute": "foia_reviewtaskid",
+        "referencingEntity": "foia_exemptiondecision",
+        "referencingAttribute": "foia_reviewtaskid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_responsiverecord_exemptiondecision",
+        "liveId": "e4100268-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_responsiverecord",
+        "referencedAttribute": "foia_responsiverecordid",
+        "referencingEntity": "foia_exemptiondecision",
+        "referencingAttribute": "foia_responsiverecordid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_responsiverecord_redactiondecision",
+        "liveId": "a88d4a78-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_responsiverecord",
+        "referencedAttribute": "foia_responsiverecordid",
+        "referencingEntity": "foia_redactiondecision",
+        "referencingAttribute": "foia_responsiverecordid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_exemptiondecision_redactiondecision",
+        "liveId": "43dec284-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_exemptiondecision",
+        "referencedAttribute": "foia_exemptiondecisionid",
+        "referencingEntity": "foia_redactiondecision",
+        "referencingAttribute": "foia_exemptiondecisionid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "None",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_releasepackage",
+        "liveId": "a8f9978c-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_releasepackage",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_appeal",
+        "liveId": "8ee80095-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_appeal",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_releasepackage_appeal",
+        "liveId": "6e076fa6-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_releasepackage",
+        "referencedAttribute": "foia_releasepackageid",
+        "referencingEntity": "foia_appeal",
+        "referencingAttribute": "foia_releasepackageid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "None",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_clockevent",
+        "liveId": "fb9789ae-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_clockevent",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-CLK-001",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_incident_clockevent",
+        "liveId": "2e7987bb-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "incident",
+        "referencedAttribute": "incidentid",
+        "referencingEntity": "foia_clockevent",
+        "referencingAttribute": "foia_incidentid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "None",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-CLK-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_auditevent",
+        "liveId": "91407dc6-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_auditevent",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-DAT-007",
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_foiarequest_aiassistancerecord",
+        "liveId": "718d01d6-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_foiarequest",
+        "referencedAttribute": "foia_foiarequestid",
+        "referencingEntity": "foia_aiassistancerecord",
+        "referencingAttribute": "foia_foiarequestid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "ApplicationRequired",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-AI-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_responsiverecord_aiassistancerecord",
+        "liveId": "4d5a0ee3-86c5-f111-aaae-001dd80753e2",
+        "relationshipType": "OneToMany",
+        "referencedEntity": "foia_responsiverecord",
+        "referencedAttribute": "foia_responsiverecordid",
+        "referencingEntity": "foia_aiassistancerecord",
+        "referencingAttribute": "foia_responsiverecordid",
+        "entity1LogicalName": null,
+        "entity2LogicalName": null,
+        "intersectEntityName": null,
+        "requiredLevel": "None",
+        "cascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Archive": "RemoveLink",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade",
+          "RollupView": "NoCascade"
+        },
+        "requirementReferences": [
+          "FOIA-AI-003",
+          "FOIA-DAT-007"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      },
+      {
+        "schemaName": "foia_releasepackage_responsiverecord",
+        "liveId": "e9cbb2ec-86c5-f111-aaae-001dd80bb94c",
+        "relationshipType": "ManyToMany",
+        "referencedEntity": null,
+        "referencedAttribute": null,
+        "referencingEntity": null,
+        "referencingAttribute": null,
+        "entity1LogicalName": "foia_releasepackage",
+        "entity2LogicalName": "foia_responsiverecord",
+        "intersectEntityName": "foia_releasepackage_responsiverecord",
+        "requiredLevel": null,
+        "cascadeConfiguration": null,
+        "requirementReferences": [],
+        "payloadPath": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+        "result": "verified-existing",
+        "published": true,
+        "membership": "verified"
+      }
+    ],
+    "choices": [],
+    "alternateKeys": [
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "schemaName": "foia_AK_AiAssistance_Identifier",
+        "displayName": "AI Assistance Identifier",
+        "liveId": "9bc4d5c0-58c3-f111-aaae-001dd80bb94c",
+        "keyAttributes": [
+          "foia_assistanceidentifier"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-AI-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_aiassistancerecord.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "schemaName": "foia_AK_Appeal_Number",
+        "displayName": "Appeal Number",
+        "liveId": "1db75bd4-58c3-f111-aaae-001dd80bb94c",
+        "keyAttributes": [
+          "foia_appealnumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_appeal.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "schemaName": "foia_AK_AuditEvent_Identifier",
+        "displayName": "Audit Event Identifier",
+        "liveId": "495f3758-5ac3-f111-aaae-001dd80bb94c",
+        "keyAttributes": [
+          "foia_eventidentifier"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-SEC-006"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_auditevent.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "schemaName": "foia_AK_ClockEvent_Identifier",
+        "displayName": "Clock Event Identifier",
+        "liveId": "95cdc76c-5ac3-f111-aaae-001dd80bb94c",
+        "keyAttributes": [
+          "foia_eventidentifier"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-CLK-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_clockevent.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "schemaName": "foia_AK_ExemptionDecision_Number",
+        "displayName": "Exemption Decision Number",
+        "liveId": "632cc783-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_decisionnumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-003"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_exemptiondecision.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "schemaName": "foia_AK_FoiaRequest_TrackingNumber",
+        "displayName": "FOIA Request Tracking Number",
+        "liveId": "cce74f9f-5ac3-f111-aaae-001dd80bb94c",
+        "keyAttributes": [
+          "foia_trackingnumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-INT-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_foiarequest.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "schemaName": "foia_AK_RedactionDecision_Number",
+        "displayName": "Redaction Decision Number",
+        "liveId": "93c018af-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_redactionnumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-004"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_redactiondecision.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "schemaName": "foia_AK_ReleasePackage_NumberVersion",
+        "displayName": "Release Package Number and Version",
+        "liveId": "edfa38bb-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_packagenumber",
+          "foia_packageversion"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-005"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_releasepackage.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "schemaName": "foia_AK_ResponsiveRecord_Identifier",
+        "displayName": "Responsive Record Identifier",
+        "liveId": "518a2ace-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_recordidentifier"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-COL-004",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_responsiverecord.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "schemaName": "foia_AK_ReviewTask_Number",
+        "displayName": "Review Task Number",
+        "liveId": "e5908ae0-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_reviewtasknumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-DAT-008",
+          "FOIA-REV-002"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_reviewtask.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "schemaName": "foia_AK_SearchTask_Number",
+        "displayName": "Search Task Number",
+        "liveId": "e879b1f2-5ac3-f111-aaae-001dd80753e2",
+        "keyAttributes": [
+          "foia_searchtasknumber"
+        ],
+        "indexStatus": "Active",
+        "requirementReferences": [
+          "FOIA-COL-003",
+          "FOIA-DAT-008"
+        ],
+        "payloadPath": "payloads/scenarios/federal-foia-management/keys-foia_searchtask.json",
+        "result": "verified-existing",
+        "membership": "verified",
+        "published": true
+      }
+    ],
+    "forms": [
+      {"tableLogicalName": "contact", "name": "Starter Main Form", "liveId": "40657ef3-62c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_aiassistancerecord", "name": "Starter Main Form", "liveId": "2a2ffa01-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_appeal", "name": "FOIA Appeal Main", "liveId": "18ec340b-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_auditevent", "name": "Starter Main Form", "liveId": "d95dc51a-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_clockevent", "name": "Starter Main Form", "liveId": "c2ea372e-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_exemptiondecision", "name": "Starter Main Form", "liveId": "2366d437-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_foiarequest", "name": "FOIA Request Main", "liveId": "7f4a2b4a-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_redactiondecision", "name": "Starter Main Form", "liveId": "26c0f760-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_releasepackage", "name": "Starter Main Form", "liveId": "e5897874-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_responsiverecord", "name": "Starter Main Form", "liveId": "76546381-63c6-f111-aaae-001dd80816e7", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_reviewtask", "name": "Starter Main Form", "liveId": "09e6828f-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_searchtask", "name": "Starter Main Form", "liveId": "edbdd59e-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "incident", "name": "Starter Main Form", "liveId": "af4ab8af-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true}
+    ],
+    "views": [
+      {"tableLogicalName": "contact", "name": "FOIA Requesters", "liveId": "a1d4e0dd-61c6-f111-aaae-001dd80bb94c", "disposition": "create-custom", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_aiassistancerecord", "name": "Active AI Assistance Records", "liveId": "3f6d7a12-fd09-403d-9a27-28487a2afdb7", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_appeal", "name": "Active Appeals", "liveId": "6f678b18-2400-49d0-b437-5baa5fd4d8d2", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_auditevent", "name": "Active Audit Events", "liveId": "662a7644-4168-4c2d-b7f4-6dc9f8c9170f", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_clockevent", "name": "Active Clock Events", "liveId": "4facefe8-84dd-4597-897f-e5c4a104ddbb", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_exemptiondecision", "name": "Active Exemption Decisions", "liveId": "a982275c-26aa-46d3-b394-6cef51b4b61a", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_foiarequest", "name": "Active FOIA Requests", "liveId": "3e922e74-957e-43c3-8595-683ce84d643d", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_redactiondecision", "name": "Active Redaction Decisions", "liveId": "d4c06148-5167-4f97-b6ea-d943cff420ce", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_releasepackage", "name": "Active Release Packages", "liveId": "b6347d45-740b-4764-9ccc-fed6e6ec014a", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_responsiverecord", "name": "Active Responsive Records", "liveId": "016cd4f6-9aa7-4b36-b526-feef5b71a896", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_reviewtask", "name": "Active Review Tasks", "liveId": "0d7864b2-cc6c-4c8a-9aa1-09a57a11b6b2", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "foia_searchtask", "name": "Active Search Tasks", "liveId": "c9803fe4-54e9-4a31-822e-a024b9983f1b", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
+      {"tableLogicalName": "incident", "name": "Active FOIA Case Work", "liveId": "fc5e5e9a-62c6-f111-aaae-001dd80753e2", "disposition": "create-custom", "result": "verified-existing", "published": true}
+    ],
+    "charts": [
+      {"name": "Active Requests by Lifecycle Stage", "tableLogicalName": "foia_foiarequest", "liveId": "fd5bd876-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
+      {"name": "Expedited Requests by Decision", "tableLogicalName": "foia_foiarequest", "liveId": "e220bb81-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
+      {"name": "Fees Assessed by Fiscal Period", "tableLogicalName": "foia_foiarequest", "liveId": "c2cc678d-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
+      {"name": "Appeals by Outcome", "tableLogicalName": "foia_appeal", "liveId": "a1c61a95-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
+      {"name": "Approved Exemptions by Authority", "tableLogicalName": "foia_exemptiondecision", "liveId": "422dca9d-6ec6-f111-aaae-001dd80816e7", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
+      {"name": "Clock Events by Type", "tableLogicalName": "foia_clockevent", "liveId": "ebdcc7ab-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
+      {"name": "Open Reviews by Type", "tableLogicalName": "foia_reviewtask", "liveId": "178499b5-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
+      {"name": "Release Packages by Approval State", "tableLogicalName": "foia_releasepackage", "liveId": "97a1e1bd-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true}
+    ],
+    "dashboards": [
+      {"name": "Federal FOIA Operations", "liveId": "3706cafb-7fc6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 3, "result": "verified-existing", "published": true},
+      {"name": "Federal FOIA Statutory Reporting", "liveId": "afea9509-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 2, "result": "verified-existing", "published": true},
+      {"name": "Federal FOIA Appeals", "liveId": "f7fb8513-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 1, "result": "verified-existing", "published": true},
+      {"name": "Federal FOIA Review Workload", "liveId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 2, "result": "verified-existing", "published": true},
+      {"name": "Federal FOIA Release Readiness", "liveId": "d15b4436-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 3, "result": "verified-existing", "published": true}
+    ],
+    "businessProcessFlows": [
+      {
+        "name": "Federal FOIA Request Lifecycle",
+        "uniqueName": "foia_federal_foia_request_lifecycle",
+        "targetTable": "foia_foiarequest",
+        "workflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
+        "category": 4,
+        "state": "Active",
+        "stateCode": 1,
+        "statusCode": 2,
+        "componentType": 29,
+        "solutionMembership": "verified",
+        "metadataMutation": "none",
+        "stages": 8,
+        "conditions": 16,
+        "steps": 13,
+        "formIntegration": "verified",
+        "targetFormName": "FOIA Request Main",
+        "appLinkage": "verified"
+      },
+      {
+        "name": "Federal FOIA Appeal Lifecycle",
+        "uniqueName": "foia_federal_foia_appeal_lifecycle",
+        "targetTable": "foia_appeal",
+        "workflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
+        "category": 4,
+        "state": "Active",
+        "stateCode": 1,
+        "statusCode": 2,
+        "componentType": 29,
+        "solutionMembership": "verified",
+        "metadataMutation": "none",
+        "stages": 6,
+        "conditions": 12,
+        "steps": 10,
+        "formIntegration": "verified",
+        "targetFormName": "FOIA Appeal Main",
+        "appLinkage": "verified"
+      }
+    ],
+    "flows": [],
+    "securityRoles": [],
+    "apps": [
+      {
+        "name": "Federal FOIA Management",
+        "uniqueName": "foia_federal_foia_management",
+        "liveId": "7ab66f1e-0ec7-f111-aaae-001dd80753e2",
+        "componentType": 80,
+        "solutionMembership": "explicit",
+        "entryPointTable": "foia_foiarequest",
+        "landingView": "Active FOIA Requests",
+        "attachedComponentCount": 45,
+        "platformValidation": "passed",
+        "published": true
+      }
+    ],
+    "sitemapEntries": [
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "componentType": 62, "solutionMembership": "explicit", "group": "FOIA Operations", "tableLogicalName": "foia_foiarequest", "isEntryPoint": true, "landingView": "Active FOIA Requests"},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "contact", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "incident", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_aiassistancerecord", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_appeal", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_auditevent", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_clockevent", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_exemptiondecision", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_redactiondecision", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_releasepackage", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_responsiverecord", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_reviewtask", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_searchtask", "isEntryPoint": false},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Appeals", "dashboardId": "f7fb8513-80c6-f111-aaae-001dd80753e2"},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Operations", "dashboardId": "3706cafb-7fc6-f111-aaae-001dd80753e2"},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Release Readiness", "dashboardId": "d15b4436-80c6-f111-aaae-001dd80753e2"},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Review Workload", "dashboardId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c"},
+      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Statutory Reporting", "dashboardId": "afea9509-80c6-f111-aaae-001dd80753e2"}
+    ],
+    "reports": [],
+    "syntheticDataSets": [
+      {
+        "sourceTag": "federal-foia-synthetic-v1",
+        "tables": 13,
+        "records": 41,
+        "contacts": 7,
+        "cases": 7,
+        "requests": 7,
+        "stableIdsOnRerun": 41,
+        "duplicatesOnRerun": 0,
+        "evidenceReport": ".wizard-metrics/artifacts/data/federal-foia-management.json",
+        "result": "verified"
+      }
+    ]
+  },
+  "solutionMembership": {
+    "requiredComponentCount": 202,
+    "added": [
+      "column:contact.foia_requesterclassification",
+      "column:contact.foia_identityverified",
+      "column:contact.foia_syntheticrecordkey",
+      "column:contact.foia_syntheticsourcetag",
+      "column:foia_aiassistancerecord.foia_assistanceidentifier",
+      "column:foia_aiassistancerecord.foia_operationalstatus",
+      "column:foia_aiassistancerecord.foia_provider",
+      "column:foia_aiassistancerecord.foia_serviceversion",
+      "column:foia_aiassistancerecord.foia_operationclassification",
+      "column:foia_aiassistancerecord.foia_sourcereferences",
+      "column:foia_aiassistancerecord.foia_output",
+      "column:foia_aiassistancerecord.foia_confidence",
+      "column:foia_aiassistancerecord.foia_reviewerdisposition",
+      "column:foia_aiassistancerecord.foia_createddatetime",
+      "column:foia_aiassistancerecord.foia_revieweddatetime",
+      "column:foia_aiassistancerecord.foia_syntheticsourcetag",
+      "column:foia_appeal.foia_appealnumber",
+      "column:foia_appeal.foia_challengeddetermination",
+      "column:foia_appeal.foia_receiveddate",
+      "column:foia_appeal.foia_duedate",
+      "column:foia_appeal.foia_closeddate",
+      "column:foia_appeal.foia_stage",
+      "column:foia_appeal.foia_decision",
+      "column:foia_appeal.foia_outcome",
+      "column:foia_appeal.foia_syntheticsourcetag",
+      "column:foia_auditevent.foia_eventidentifier",
+      "column:foia_auditevent.foia_eventtype",
+      "column:foia_auditevent.foia_eventdatetime",
+      "column:foia_auditevent.foia_actorreference",
+      "column:foia_auditevent.foia_purpose",
+      "column:foia_auditevent.foia_scope",
+      "column:foia_auditevent.foia_correlationidentifier",
+      "column:foia_auditevent.foia_syntheticsourcetag",
+      "column:foia_clockevent.foia_eventidentifier",
+      "column:foia_clockevent.foia_clocktype",
+      "column:foia_clockevent.foia_eventtype",
+      "column:foia_clockevent.foia_effectivedatetime",
+      "column:foia_clockevent.foia_reason",
+      "column:foia_clockevent.foia_actorreference",
+      "column:foia_clockevent.foia_priorduedate",
+      "column:foia_clockevent.foia_resultingduedate",
+      "column:foia_clockevent.foia_provenance",
+      "column:foia_clockevent.foia_syntheticsourcetag",
+      "column:foia_exemptiondecision.foia_decisionnumber",
+      "column:foia_exemptiondecision.foia_authority",
+      "column:foia_exemptiondecision.foia_rationale",
+      "column:foia_exemptiondecision.foia_scope",
+      "column:foia_exemptiondecision.foia_approvalstate",
+      "column:foia_exemptiondecision.foia_proposeridentity",
+      "column:foia_exemptiondecision.foia_approveridentity",
+      "column:foia_exemptiondecision.foia_proposeddate",
+      "column:foia_exemptiondecision.foia_decisiondate",
+      "column:foia_exemptiondecision.foia_syntheticsourcetag",
+      "column:foia_foiarequest.foia_trackingnumber",
+      "column:foia_foiarequest.foia_intakechannel",
+      "column:foia_foiarequest.foia_validationstate",
+      "column:foia_foiarequest.foia_lifecyclestage",
+      "column:foia_foiarequest.foia_receiveddate",
+      "column:foia_foiarequest.foia_perfecteddate",
+      "column:foia_foiarequest.foia_currentduedate",
+      "column:foia_foiarequest.foia_clarificationduedate",
+      "column:foia_foiarequest.foia_closeddate",
+      "column:foia_foiarequest.foia_acknowledgmentsent",
+      "column:foia_foiarequest.foia_duplicatesuspected",
+      "column:foia_foiarequest.foia_expeditedrequested",
+      "column:foia_foiarequest.foia_expediteddecision",
+      "column:foia_foiarequest.foia_requestscope",
+      "column:foia_foiarequest.foia_disposition",
+      "column:foia_foiarequest.foia_feecategory",
+      "column:foia_foiarequest.foia_feeassessed",
+      "column:foia_foiarequest.foia_feewaived",
+      "column:foia_foiarequest.foia_feecollected",
+      "column:foia_foiarequest.foia_acknowledgmentreference",
+      "column:foia_foiarequest.foia_fiscalperiod",
+      "column:foia_foiarequest.foia_syntheticsourcetag",
+      "column:foia_redactiondecision.foia_redactionnumber",
+      "column:foia_redactiondecision.foia_recordlocation",
+      "column:foia_redactiondecision.foia_proposedbasis",
+      "column:foia_redactiondecision.foia_finalstate",
+      "column:foia_redactiondecision.foia_proposeridentity",
+      "column:foia_redactiondecision.foia_approveridentity",
+      "column:foia_redactiondecision.foia_proposeddate",
+      "column:foia_redactiondecision.foia_approveddate",
+      "column:foia_redactiondecision.foia_syntheticsourcetag",
+      "column:foia_releasepackage.foia_packagenumber",
+      "column:foia_releasepackage.foia_packageversion",
+      "column:foia_releasepackage.foia_approvalstate",
+      "column:foia_releasepackage.foia_packagehash",
+      "column:foia_releasepackage.foia_responsecorrespondence",
+      "column:foia_releasepackage.foia_plannedreleasedate",
+      "column:foia_releasepackage.foia_releasedate",
+      "column:foia_releasepackage.foia_releasemethod",
+      "column:foia_releasepackage.foia_recipientreference",
+      "column:foia_releasepackage.foia_approveridentity",
+      "column:foia_releasepackage.foia_syntheticsourcetag",
+      "column:foia_responsiverecord.foia_recordidentifier",
+      "column:foia_responsiverecord.foia_originalfilename",
+      "column:foia_responsiverecord.foia_mediatype",
+      "column:foia_responsiverecord.foia_repository",
+      "column:foia_responsiverecord.foia_siteidentifier",
+      "column:foia_responsiverecord.foia_libraryidentifier",
+      "column:foia_responsiverecord.foia_itemidentifier",
+      "column:foia_responsiverecord.foia_itemversion",
+      "column:foia_responsiverecord.foia_contenthash",
+      "column:foia_responsiverecord.foia_sizebytes",
+      "column:foia_responsiverecord.foia_classification",
+      "column:foia_responsiverecord.foia_accessstate",
+      "column:foia_responsiverecord.foia_reviewstate",
+      "column:foia_responsiverecord.foia_syntheticsourcetag",
+      "column:foia_reviewtask.foia_reviewtasknumber",
+      "column:foia_reviewtask.foia_reviewtype",
+      "column:foia_reviewtask.foia_status",
+      "column:foia_reviewtask.foia_disposition",
+      "column:foia_reviewtask.foia_assigneddate",
+      "column:foia_reviewtask.foia_duedate",
+      "column:foia_reviewtask.foia_completeddate",
+      "column:foia_reviewtask.foia_reviewernotes",
+      "column:foia_reviewtask.foia_syntheticsourcetag",
+      "column:foia_searchtask.foia_searchtasknumber",
+      "column:foia_searchtask.foia_collectionsourcesystem",
+      "column:foia_searchtask.foia_custodianorsource",
+      "column:foia_searchtask.foia_searchscope",
+      "column:foia_searchtask.foia_searchterms",
+      "column:foia_searchtask.foia_status",
+      "column:foia_searchtask.foia_assigneddate",
+      "column:foia_searchtask.foia_duedate",
+      "column:foia_searchtask.foia_completeddate",
+      "column:foia_searchtask.foia_resultcount",
+      "column:foia_searchtask.foia_evidencereference",
+      "column:foia_searchtask.foia_syntheticsourcetag",
+      "column:incident.foia_caseworktype",
+      "column:incident.foia_statutoryduedate",
+      "column:incident.foia_syntheticrecordkey",
+      "column:incident.foia_syntheticsourcetag",
+      "relationship:foia_contact_foiarequest",
+      "relationship:foia_foiarequest_incident",
+      "relationship:foia_foiarequest_searchtask",
+      "relationship:foia_incident_searchtask",
+      "relationship:foia_searchtask_responsiverecord",
+      "relationship:foia_foiarequest_responsiverecord",
+      "relationship:foia_responsiverecord_reviewtask",
+      "relationship:foia_foiarequest_reviewtask",
+      "relationship:foia_reviewtask_exemptiondecision",
+      "relationship:foia_responsiverecord_exemptiondecision",
+      "relationship:foia_responsiverecord_redactiondecision",
+      "relationship:foia_exemptiondecision_redactiondecision",
+      "relationship:foia_foiarequest_releasepackage",
+      "relationship:foia_foiarequest_appeal",
+      "relationship:foia_releasepackage_appeal",
+      "relationship:foia_foiarequest_clockevent",
+      "relationship:foia_incident_clockevent",
+      "relationship:foia_foiarequest_auditevent",
+      "relationship:foia_foiarequest_aiassistancerecord",
+      "relationship:foia_responsiverecord_aiassistancerecord",
+      "relationship:foia_releasepackage_responsiverecord"
+    ],
+    "alreadyInSolution": [
+      "table:foia_aiassistancerecord",
+      "table:foia_appeal",
+      "table:foia_auditevent",
+      "table:foia_clockevent",
+      "table:foia_exemptiondecision",
+      "table:foia_foiarequest",
+      "table:foia_redactiondecision",
+      "table:foia_releasepackage",
+      "table:foia_responsiverecord",
+      "table:foia_reviewtask",
+      "table:foia_searchtask",
+      "alternateKey:foia_aiassistancerecord.foia_AK_AiAssistance_Identifier",
+      "alternateKey:foia_appeal.foia_AK_Appeal_Number",
+      "alternateKey:foia_auditevent.foia_AK_AuditEvent_Identifier",
+      "alternateKey:foia_clockevent.foia_AK_ClockEvent_Identifier",
+      "alternateKey:foia_exemptiondecision.foia_AK_ExemptionDecision_Number",
+      "alternateKey:foia_foiarequest.foia_AK_FoiaRequest_TrackingNumber",
+      "alternateKey:foia_redactiondecision.foia_AK_RedactionDecision_Number",
+      "alternateKey:foia_releasepackage.foia_AK_ReleasePackage_NumberVersion",
+      "alternateKey:foia_responsiverecord.foia_AK_ResponsiveRecord_Identifier",
+      "alternateKey:foia_reviewtask.foia_AK_ReviewTask_Number",
+      "alternateKey:foia_searchtask.foia_AK_SearchTask_Number"
+    ],
+    "failed": [],
+    "missingAfterSync": [],
+    "passed": true,
+    "exportAllowed": false,
+    "automaticallyIncludedDependencies": [
+      "columns:foia_aiassistancerecord.foia_foiarequestid",
+      "columns:foia_aiassistancerecord.foia_responsiverecordid",
+      "columns:foia_appeal.foia_foiarequestid",
+      "columns:foia_appeal.foia_releasepackageid",
+      "columns:foia_auditevent.foia_foiarequestid",
+      "columns:foia_clockevent.foia_foiarequestid",
+      "columns:foia_clockevent.foia_incidentid",
+      "columns:foia_exemptiondecision.foia_responsiverecordid",
+      "columns:foia_exemptiondecision.foia_reviewtaskid",
+      "columns:foia_foiarequest.foia_feeassessed_base",
+      "columns:foia_foiarequest.foia_feecollected_base",
+      "columns:foia_foiarequest.foia_feewaived_base",
+      "columns:foia_foiarequest.foia_requesterid",
+      "columns:foia_redactiondecision.foia_exemptiondecisionid",
+      "columns:foia_redactiondecision.foia_responsiverecordid",
+      "columns:foia_releasepackage.foia_foiarequestid",
+      "columns:foia_responsiverecord.foia_foiarequestid",
+      "columns:foia_responsiverecord.foia_searchtaskid",
+      "columns:foia_reviewtask.foia_foiarequestid",
+      "columns:foia_reviewtask.foia_responsiverecordid",
+      "columns:foia_searchtask.foia_foiarequestid",
+      "columns:foia_searchtask.foia_incidentid",
+      "columns:incident.foia_foiarequestid",
+      "tables:contact",
+      "tables:incident"
+    ]
+  },
+  "approvals": {
+    "apply": [
+      {
+        "approvalId": "publisher-solution-only-20261007",
+        "decision": "approved",
+        "scope": "Create the foia publisher and empty unmanaged FederalFOIAManagement solution only",
+        "decidedAtUtc": "2026-10-08T00:24:04Z"
+      },
+      {
+        "approvalId": "stage-20-tables-only-20261008",
+        "decision": "approved",
+        "scope": "Create the 11 planned custom Dataverse tables through stage 20 only",
+        "decidedAtUtc": "2026-10-08T19:09:12Z"
+      },
+      {
+        "approvalId": "stage-30-columns-keys-only-20261008",
+        "decision": "approved",
+        "scope": "Create the 134 reviewed columns and 11 alternate keys through stage 30 only",
+        "decidedAtUtc": "2026-10-08T19:51:05Z"
+      },
+      {
+        "approvalId": "stage-40-relationships-only-20261011",
+        "decision": "approved",
+        "scope": "Create the reviewed 20 one-to-many and one many-to-many relationships through stage 40 only",
+        "decidedAtUtc": "2026-10-11T15:09:24Z"
+      },
+      {
+        "approvalId": "stage-50-membership-and-scoped-publish-20261011",
+        "decision": "approved",
+        "scope": "Synchronize the approved tables, columns, relationships, and alternate keys into FederalFOIAManagement and publish only the 13 payload-referenced entities",
+        "decidedAtUtc": "2026-10-11T15:29:22Z"
+      },
+      {
+        "approvalId": "stage-55-existing-bpf-integration-20261012",
+        "decision": "approved",
+        "scope": "Validate both planned BPFs and activate, synchronize, and link only matching designer-authored category-4 processes; do not fabricate workflow metadata",
+        "decidedAtUtc": "2026-10-12T15:31:21Z"
+      },
+      {
+        "approvalId": "stage-60-forms-views-20261012",
+        "decision": "approved",
+        "scope": "Create separate wizard-owned main forms and implement the 13 explicit view contracts without modifying existing OOB forms",
+        "decidedAtUtc": "2026-10-12T17:11:14Z"
+      },
+      {
+        "approvalId": "stage-64-native-reporting-20261012",
+        "decision": "approved",
+        "scope": "Create eight approved native charts and five native dashboards, synchronize them into FederalFOIAManagement, and publish only their six source tables",
+        "decidedAtUtc": "2026-10-12T18:53:26Z"
+      },
+      {
+        "approvalId": "stage-62-review-app-20261013",
+        "decision": "approved",
+        "scope": "Create or update and publish the Federal FOIA Management review app and sitemap with all approved tables, forms, views, BPFs, charts, and dashboards",
+        "decidedAtUtc": "2026-10-13T13:34:00Z"
+      }
+    ],
+    "schema": [],
+    "publish": [
+      {
+        "approvalId": "stage-50-membership-and-scoped-publish-20261011",
+        "decision": "approved",
+        "scope": "Publish only the 13 payload-referenced entities after successful schema membership synchronization",
+        "decidedAtUtc": "2026-10-11T15:29:22Z"
+      },
+      {
+        "approvalId": "stage-64-native-reporting-20261012",
+        "decision": "approved",
+        "scope": "Publish only foia_foiarequest, foia_appeal, foia_exemptiondecision, foia_clockevent, foia_reviewtask, and foia_releasepackage after reporting synchronization",
+        "decidedAtUtc": "2026-10-12T18:53:26Z"
+      },
+      {
+        "approvalId": "stage-62-review-app-20261013",
+        "decision": "approved",
+        "scope": "Publish only the scoped Federal FOIA Management app module after successful platform validation",
+        "decidedAtUtc": "2026-10-13T13:34:00Z"
+      }
+    ],
+    "export": [],
+    "commit": [],
+    "push": []
+  },
+  "runSummary": {
+    "startedAtUtc": "2026-10-08T00:24:04Z",
+    "completedAtUtc": "2026-10-13T14:38:02.4263644Z",
+    "result": "stage-66-passed-native-reporting-visually-verified",
+    "created": 208,
+    "updated": 168,
+    "skipped": 184,
+    "failed": 0,
+    "blockedReasons": [
+      "Broader end-to-end, security, accessibility, and performance validation is pending.",
+      "Data, export, commit, and push are not authorized."
+    ]
+  },
+  "stageResults": {
+    "stage20": {
+      "status": "passed",
+      "tablesExpected": 11,
+      "tablesVerified": 11,
+      "failed": 0
+    },
+    "stage30": {
+      "status": "passed",
+      "columnsExpected": 134,
+      "columnsVerified": 134,
+      "alternateKeysExpected": 11,
+      "alternateKeysVerified": 11,
+      "activeKeyIndexes": 11,
+      "keySolutionMembershipVerified": 11,
+      "missing": 0,
+      "failed": 0,
+      "verifiedAtUtc": "2026-10-08T21:00:49.2817099Z",
+      "recoveryNotes": [
+        "Added explicit Boolean option metadata after Dataverse rejected an incomplete Boolean payload.",
+        "Added localized alternate-key display names after Dataverse rejected incomplete EntityKeyMetadata.",
+        "Added bounded key metadata propagation retries before solution membership synchronization."
+      ]
+    },
+    "stage40": {
+      "status": "passed",
+      "relationshipsExpected": 21,
+      "relationshipsVerified": 21,
+      "oneToManyVerified": 20,
+      "manyToManyVerified": 1,
+      "missing": 0,
+      "failed": 0,
+      "verifiedAtUtc": "2026-10-11T15:25:37.8808053Z",
+      "idempotencyRerun": {
+        "created": 0,
+        "skippedExactMatches": 21,
+        "failed": 0
+      },
+      "platformNormalization": "Contact is merge-enabled, so Dataverse requires Merge= Cascade for foia_contact_foiarequest; all other configured cascade actions match the restrictive contract.",
+      "recoveryNotes": [
+        "Loaded solution and publisher provenance identities independently of pre-populated credential parameters before apply.",
+        "Aligned the Contact-parent merge behavior with the Dataverse-required Cascade setting."
+      ]
+    },
+    "stage50": {
+      "status": "passed",
+      "contaminationVerdict": "clean",
+      "declaredTablesVerified": 11,
+      "dependencyTablesVerified": 2,
+      "declaredColumnsVerified": 134,
+      "generatedDependencyColumnsVerified": 23,
+      "relationshipsVerified": 21,
+      "alternateKeysVerified": 11,
+      "addedDuringApply": 155,
+      "alreadyPresentDuringApply": 11,
+      "failed": 0,
+      "scopedEntitiesPublished": 13,
+      "schemaMembershipPassed": true,
+      "overallExportAllowed": false,
+      "exportBlockedByFutureStages": true,
+      "membershipReport": ".wizard-metrics/artifacts/solution/solution-membership-report.json",
+      "verifiedAtUtc": "2026-10-11T16:57:56.566682Z"
+    },
+    "stage55": {
+      "status": "passed",
+      "previewStatus": "passed",
+      "processPayloads": 2,
+      "requestLifecycle": {
+        "stages": 8,
+        "conditions": 16,
+        "steps": 13,
+        "expectedUniqueName": "foia_federal_foia_request_lifecycle",
+        "workflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
+        "liveMatches": 1,
+        "state": "Active",
+        "solutionMembership": "verified"
+      },
+      "appealLifecycle": {
+        "stages": 6,
+        "conditions": 12,
+        "steps": 10,
+        "expectedUniqueName": "foia_federal_foia_appeal_lifecycle",
+        "workflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
+        "liveMatches": 1,
+        "state": "Active",
+        "solutionMembership": "verified"
+      },
+      "failed": 0,
+      "metadataMutation": "none",
+      "componentType": 29,
+      "formIntegration": "verified",
+      "appLinkage": "pending-stage-62",
+      "stageFieldDesign": "BPF chevrons are authoritative for interactive stage position; lifecycle and appeal-stage columns remain reporting/status projections and are not repeated as BPF steps.",
+      "handoffs": [
+        "specs/federal-foia-management/reports/business-process-flow-01-foia-request-designer-handoff.md",
+        "specs/federal-foia-management/reports/business-process-flow-02-appeal-designer-handoff.md"
+      ],
+      "blockedReason": null,
+      "verifiedAtUtc": "2026-10-12T16:27:07.7184872Z"
+    },
+    "stage60": {
+      "status": "passed",
+      "tablesProcessed": 13,
+      "formsExpected": 13,
+      "formsVerified": 13,
+      "viewsExpected": 13,
+      "viewsVerified": 13,
+      "underpopulatedForms": 0,
+      "underpopulatedViews": 0,
+      "scopedEntitiesPublished": 13,
+      "failed": 0,
+      "idempotencyRerun": {
+        "formsCreated": 0,
+        "formsUpdated": 0,
+        "formsSkipped": 13,
+        "viewsCreated": 0,
+        "viewsUpdated": 0,
+        "viewsSkipped": 13,
+        "failed": 0
+      },
+      "formStrategy": "create-new-forms",
+      "targetFormName": "Starter Main Form except FOIA Request Main and FOIA Appeal Main",
+      "bpfFormNameAlignment": "verified",
+      "formPopulationReport": ".wizard-metrics/artifacts/forms/form-population-report.json",
+      "viewPopulationReport": ".wizard-metrics/artifacts/views/view-population-report.json",
+      "recoveryNotes": [
+        "Routed metadata requests through the shared resilient Dataverse runtime and stopped treating non-404 transport failures as missing tables.",
+        "Added valid form tab label GUID metadata after Dataverse rejected empty labelid values.",
+        "Added semantic view comparison so Dataverse XML normalization does not cause repeated updates.",
+        "Expanded the Contact and Case view contracts to meet the four-business-column quality gate."
+      ],
+      "verifiedAtUtc": "2026-10-12T18:15:24.8936912Z"
+    },
+    "stage62": {
+      "status": "passed",
+      "appName": "Federal FOIA Management",
+      "appUniqueName": "foia_federal_foia_management",
+      "appModuleId": "7ab66f1e-0ec7-f111-aaae-001dd80753e2",
+      "appComponentType": 80,
+      "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+      "siteMapComponentType": 62,
+      "solutionMembership": "verified",
+      "tablesInNavigation": 13,
+      "entryPointTable": "foia_foiarequest",
+      "landingView": "Active FOIA Requests",
+      "chartsAttached": 8,
+      "dashboardsAttached": 5,
+      "businessProcessFlowsAttached": 2,
+      "platformValidation": "passed",
+      "idempotencyRerun": {
+        "stableAppId": true,
+        "stableSiteMapId": true,
+        "validationPassed": true
+      },
+      "evidenceReports": [
+        ".wizard-metrics/artifacts/app-module/app-module-summary.json",
+        ".wizard-metrics/artifacts/app-module/navigation-summary.json",
+        ".wizard-metrics/artifacts/app-module/app-module-validation.json"
+      ],
+      "recoveryNotes": [
+        "Resolved the scenario payload folder from ScenarioSlug before contract validation.",
+        "Routed live requests through the shared resilient Dataverse runtime.",
+        "Recovered the exact wizard-owned unpublished app draft after a 204 create response.",
+        "Used crmbaseentity-compatible entity references for AddAppComponents.",
+        "Created and attached the app-aware sitemap before platform validation and publication.",
+        "Used component-type fallbacks 80 for App Module and 62 for Site Map when GCC option metadata omitted App Module.",
+        "Included all five dashboards and both reused standard tables in the app scope."
+      ],
+      "verifiedAtUtc": "2026-10-13T14:38:02.4263644Z"
+    },
+    "stage64": {
+      "status": "passed",
+      "chartsExpected": 8,
+      "chartsVerified": 8,
+      "chartsVisuallyRendered": 8,
+      "dashboardsExpected": 5,
+      "dashboardsVerified": 5,
+      "explicitChartMembership": 4,
+      "inheritedChartMembership": 4,
+      "explicitDashboardMembership": 5,
+      "scopedEntitiesPublished": 6,
+      "sourceTablesWithRows": 6,
+      "failed": 0,
+      "idempotencyRerun": {
+        "chartsCreated": 0,
+        "chartsUpdated": 0,
+        "chartsSkipped": 8,
+        "dashboardsCreated": 0,
+        "dashboardsUpdated": 0,
+        "dashboardsSkipped": 5,
+        "stableIds": true,
+        "failed": 0
+      },
+      "evidenceReport": ".wizard-metrics/artifacts/reporting/federal-foia-management.json",
+      "recoveryNotes": [
+        "Loaded authenticated environment and solution provenance when stage 64 is invoked directly.",
+        "Extended bounded transport retries for Windows forcibly-closed connection errors.",
+        "Compared chart and dashboard definitions semantically so Dataverse XML normalization does not trigger repeated updates.",
+        "Recognized charts inherited through include-all table roots as valid solution membership alongside explicit component-59 rows."
+        ,"Replaced incomplete dashboard cells after visual inspection showed that VisualizationId alone does not render a native chart control."
+        ,"Validated each live dashboard control for VisualizationId, ViewId, TargetEntityType, and ChartGridMode=Chart."
+        ,"Updated chart definitions to exact working native templates for column, bar, pie, and doughnut charts, retained FetchXML aliases, removed the invalid category alias, and verified all eight aggregates return grouped data."
+        ,"The operator confirmed that all charts render in the published app after stage 66 populated the six chart-source tables."
+      ],
+      "verifiedAtUtc": "2026-10-13T16:39:20.1737579Z"
+    },
+    "stage66": {
+      "status": "passed",
+      "sourceTag": "federal-foia-synthetic-v1",
+      "tablesExpected": 13,
+      "tablesVerified": 13,
+      "recordsExpected": 41,
+      "recordsVerified": 41,
+      "contacts": 7,
+      "cases": 7,
+      "requests": 7,
+      "standardTaskActivitiesCreated": 0,
+      "idempotencyRerun": {
+        "recordsUpdated": 41,
+        "stableIds": 41,
+        "duplicatesCreated": 0
+      },
+      "evidenceReport": ".wizard-metrics/artifacts/data/federal-foia-management.json",
+      "recoveryNotes": [
+        "Loaded authenticated environment context when stage 66 is invoked directly.",
+        "Added the required Customer Service Case-to-Contact customer binding for each explicitly approved synthetic Case.",
+        "Verified exact source-tagged counts for all 13 tables.",
+        "Reran the stage and preserved all 41 table/key/ID tuples."
+      ],
+      "verifiedAtUtc": "2026-10-13T16:39:20.1737579Z"
+    }
+  }
+}

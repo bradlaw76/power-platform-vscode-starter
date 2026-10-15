@@ -1,0 +1,159 @@
+{
+  "DataverseResult": {
+    "RuntimeNotes": [],
+    "Metrics": {
+      "StageCount": 6,
+      "ConditionCount": 12,
+      "StepCount": 10
+    },
+    "Action": "validated-existing",
+    "WorkflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
+    "Provisioning": "designer-authored-existing-process",
+    "Activation": {
+      "Activated": true,
+      "StateCode": 1,
+      "StatusCode": 2,
+      "Action": "already-active"
+    },
+    "UniqueName": "foia_federal_foia_appeal_lifecycle",
+    "SolutionAddStatus": "added",
+    "SolutionMembership": {
+      "InSolution": true,
+      "SolutionUniqueName": "FederalFOIAManagement",
+      "ComponentType": 29
+    },
+    "Thresholds": {
+      "MinimumStageCount": 2,
+      "MinimumConditionCount": 2,
+      "MinimumStepCount": 2
+    },
+    "BranchPredicateSummary": [
+      {
+        "StageOrder": 1,
+        "StageName": "Appeal Intake",
+        "EntryCriteria": "Appeal received and linked; FOIA-REV-006.",
+        "ExitCriteria": "Identity, receipt, and challenged determination recorded; FOIA-REV-006."
+      },
+      {
+        "StageOrder": 2,
+        "StageName": "Validation",
+        "EntryCriteria": "Appeal intake is recorded.",
+        "ExitCriteria": "Timeliness, scope, and appeal due date validated; FOIA-CLK-001..006."
+      },
+      {
+        "StageOrder": 3,
+        "StageName": "Reconsideration and Legal Review",
+        "EntryCriteria": "Appeal validation passes.",
+        "ExitCriteria": "Decision evidence is reconsidered; FOIA-REV-001..006."
+      },
+      {
+        "StageOrder": 4,
+        "StageName": "Appeal Decision",
+        "EntryCriteria": "Legal review is complete.",
+        "ExitCriteria": "Authorized decision and outcome recorded; FOIA-REV-006."
+      },
+      {
+        "StageOrder": 5,
+        "StageName": "Response",
+        "EntryCriteria": "Appeal decision has final approval.",
+        "ExitCriteria": "Approved response issuance recorded; FOIA-CAS-005."
+      },
+      {
+        "StageOrder": 6,
+        "StageName": "Closure",
+        "EntryCriteria": "Response issued or controlled final outcome applies.",
+        "ExitCriteria": "Closure reconciles to Appeal Clock Events; FOIA-RPT-003."
+      }
+    ],
+    "MetadataMutation": "none"
+  },
+  "TargetEntity": "foia_appeal",
+  "StagesCreated": [
+    {
+      "Order": 1,
+      "StageName": "Appeal Intake",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_appealnumber",
+        "foia_receiveddate",
+        "foia_challengeddetermination"
+      ],
+      "EntryCriteria": "Appeal received and linked; FOIA-REV-006.",
+      "ExitCriteria": "Identity, receipt, and challenged determination recorded; FOIA-REV-006.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 2,
+      "StageName": "Validation",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_duedate"
+      ],
+      "EntryCriteria": "Appeal intake is recorded.",
+      "ExitCriteria": "Timeliness, scope, and appeal due date validated; FOIA-CLK-001..006.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 3,
+      "StageName": "Reconsideration and Legal Review",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_challengeddetermination"
+      ],
+      "EntryCriteria": "Appeal validation passes.",
+      "ExitCriteria": "Decision evidence is reconsidered; FOIA-REV-001..006.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 4,
+      "StageName": "Appeal Decision",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_decision",
+        "foia_outcome"
+      ],
+      "EntryCriteria": "Legal review is complete.",
+      "ExitCriteria": "Authorized decision and outcome recorded; FOIA-REV-006.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 5,
+      "StageName": "Response",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_outcome"
+      ],
+      "EntryCriteria": "Appeal decision has final approval.",
+      "ExitCriteria": "Approved response issuance recorded; FOIA-CAS-005.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 6,
+      "StageName": "Closure",
+      "EntityLogicalName": "foia_appeal",
+      "RequiredFields": [
+        "foia_outcome",
+        "foia_closeddate"
+      ],
+      "EntryCriteria": "Response issued or controlled final outcome applies.",
+      "ExitCriteria": "Closure reconciles to Appeal Clock Events; FOIA-RPT-003.",
+      "RelationshipLogicalName": ""
+    }
+  ],
+  "Status": "validated-existing",
+  "Timestamp": "2026-10-12T14:09:18.6676920-04:00",
+  "ProcessName": "Federal FOIA Appeal Lifecycle",
+  "Validation": {
+    "Passed": [
+      "Process name supplied: Federal FOIA Appeal Lifecycle",
+      "Primary entity resolved: foia_appeal",
+      "Target Main form declared: FOIA Appeal Main",
+      "Stage threshold passed: 6 >= 2.",
+      "Condition threshold passed: 12 >= 2.",
+      "Step threshold passed: 10 >= 2."
+    ],
+    "Failed": [],
+    "Warnings": []
+  },
+  "InputsUsed": null
+}

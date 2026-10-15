@@ -1,0 +1,205 @@
+{
+  "TableLogicalName": "foia_auditevent",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_eventidentifier",
+      "LogicalName": "foia_eventidentifier",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Event Identifier",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Immutable audit identifier. [required] FOIA-SEC-006..007; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 80
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_eventtype",
+      "LogicalName": "foia_eventtype",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Event Type",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Access, export, approval, package, release, or integration event. [required] FOIA-SEC-006..007.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 80
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_eventdatetime",
+      "LogicalName": "foia_eventdatetime",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Event Date and Time",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Immutable audit timestamp. [required] FOIA-SEC-006..007.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_actorreference",
+      "LogicalName": "foia_actorreference",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Actor Reference",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Actor provenance. [required] FOIA-SEC-006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_purpose",
+      "LogicalName": "foia_purpose",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Purpose",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authorized purpose. [required] FOIA-SEC-006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 500
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_scope",
+      "LogicalName": "foia_scope",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Scope",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Affected request, package, records, or export scope. [required] FOIA-SEC-006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 1000
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_correlationidentifier",
+      "LogicalName": "foia_correlationidentifier",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Correlation Identifier",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Safe retry and diagnostic correlation identifier. FOIA-INTG-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

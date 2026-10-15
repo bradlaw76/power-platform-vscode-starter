@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_foiarequest",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_FoiaRequest_TrackingNumber",
+      "DisplayName": "FOIA Request Tracking Number",
+      "KeyAttributes": ["foia_trackingnumber"]
+    }
+  ]
+}

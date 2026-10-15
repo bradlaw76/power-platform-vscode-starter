@@ -1,0 +1,105 @@
+{
+  "TableLogicalName": "incident",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_caseworktype",
+      "LogicalName": "foia_caseworktype",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Case Work Type",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA routing/work classification. FOIA-CAS-003..004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_statutoryduedate",
+      "LogicalName": "foia_statutoryduedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Statutory Due Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Clock-derived case due date. FOIA-CLK-003..006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticrecordkey",
+      "LogicalName": "foia_syntheticrecordkey",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Synthetic Record Key",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Explicit bounded test natural key. FOIA-TST-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "FOIA Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Explicit non-production ownership marker. FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

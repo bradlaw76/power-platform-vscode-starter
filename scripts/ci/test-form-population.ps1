@@ -326,11 +326,18 @@ try {
   try { Get-TargetMainForm -ExistingForms @([pscustomobject]@{ name = 'Starter Main Form' }, [pscustomobject]@{ name = 'Starter Main Form' }) -PreferredFormName 'Starter Main Form' -FormStrategy 'create-new-forms' | Out-Null } catch { $duplicateFormStopped = $true }
   Assert-Condition -Condition $duplicateFormStopped -Message 'Duplicate same-name Main forms must cause a hard stop.'
   Assert-Condition -Condition ($script:MockContext.Views[0].name -eq 'Active Cases') -Message 'Expected the entry table to use its configured landing-view name.'
+  $formattedFetchXml = $script:MockContext.Views[0].fetchxml -replace '><', ">`r`n<"
+  $formattedLayoutXml = $script:MockContext.Views[0].layoutxml -replace '><', ">`r`n<"
+  Assert-Condition -Condition (Test-ViewDefinitionMatches -CurrentFetchXml $formattedFetchXml -DesiredFetchXml $script:MockContext.Views[0].fetchxml -CurrentLayoutXml $formattedLayoutXml -DesiredLayoutXml $script:MockContext.Views[0].layoutxml) -Message 'View comparison must ignore non-semantic XML formatting differences.'
 
   $createdFields = @(Get-FormFieldNames -FormXml $script:MockContext.Forms[0].formxml)
   foreach ($expectedField in @('tst_name', 'tst_description', 'tst_priority', 'tst_category', 'tst_region', 'ownerid')) {
     Assert-Condition -Condition ($createdFields -contains $expectedField) -Message "Expected field $expectedField to be placed on the form."
   }
+  [xml]$createdFormDocument = $script:MockContext.Forms[0].formxml
+  $tabLabelId = $createdFormDocument.SelectSingleNode('/form/tabs/tab').GetAttribute('labelid').Trim('{}')
+  $parsedTabLabelId = [guid]::Empty
+  Assert-Condition -Condition ([guid]::TryParse($tabLabelId, [ref]$parsedTabLabelId)) -Message 'Generated form tab labelid must be a valid GUID.'
 
   $viewLayoutFields = @(Get-ViewFieldNamesFromLayoutXml -LayoutXml $script:MockContext.Views[0].layoutxml)
   $viewFetchFields = @(Get-ViewFieldNamesFromFetchXml -FetchXml $script:MockContext.Views[0].fetchxml)
@@ -411,6 +418,13 @@ try {
     [pscustomobject]@{ LogicalName = 'tst_segment'; DisplayName = [pscustomobject]@{ LocalizedLabels = @([pscustomobject]@{ LanguageCode = 1033; Label = 'Segment' }) } }
   )
   Write-TestScenario -RepoPath $mixedRepo -ScenarioSlug 'mixed-scenario' -SpecContent '# mixed standard-table extension'
+  @{
+    Views = @(@{
+      TableLogicalName = 'account'; Name = 'Scenario Accounts'; Disposition = 'create-custom'
+      Columns = @('name', 'tst_segment')
+      Sort = @{ Attribute = 'name'; Descending = $false }
+    })
+  } | ConvertTo-Json -Depth 8 | Set-Content -Path (Join-Path $mixedRepo 'payloads/views-mixed-scenario.json') -Encoding UTF8
 
   $script:MockContext = New-MockContext -TableLogical 'account' -PrimaryField 'name' -PrimaryIdField 'accountid' -Attributes @(
     (New-Attribute -LogicalName 'accountid' -Label 'Account' -AttributeType 'Uniqueidentifier' -IsPrimaryId $true),
@@ -431,6 +445,9 @@ try {
   Assert-Condition -Condition ($script:MockContext.Forms.Count -eq 2) -Message 'Expected a new wizard form alongside the existing Information form.'
   Assert-Condition -Condition ($script:MockContext.Forms[0].formxml -eq $existingFormXml) -Message 'Expected the existing Information form to remain unchanged.'
   Assert-Condition -Condition (@($script:MockContext.Forms | Where-Object { $_.name -eq 'Starter Main Form' }).Count -eq 1) -Message 'Expected one Starter Main Form for the standard table.'
+  Remove-Item -LiteralPath (Join-Path $mixedRepo 'payloads/views-mixed-scenario.json') -Force
+  $missingStandardContractExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $mixedRepo 'payloads') -ScenarioSlug 'mixed-scenario' -MinBusinessFieldsPerForm 1 -MinBusinessColumnsPerView 1 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true -PreviewOnly $true
+  Assert-Condition -Condition ($missingStandardContractExitCode -eq 1) -Message 'A standard table without an explicit reusable view contract must fail closed.'
 
   $adoptionRepo = New-TestRepo
   Write-TestPayloads -RepoPath $adoptionRepo -TableLogical 'tst_request' -Columns @(
@@ -447,7 +464,7 @@ try {
       Filter = @{ Attribute = 'statecode'; Operator = 'eq'; Value = '0' }
       Sort = @{ Attribute = 'tst_number'; Descending = $false }
     })
-  } | ConvertTo-Json -Depth 8 | Set-Content -Path (Join-Path $adoptionRepo 'specs/adoption-scenario/views.json') -Encoding UTF8
+  } | ConvertTo-Json -Depth 8 | Set-Content -Path (Join-Path $adoptionRepo 'payloads/views-adoption-scenario.json') -Encoding UTF8
 
   $script:MockContext = New-MockContext -TableLogical 'tst_request' -PrimaryField 'tst_name' -PrimaryIdField 'tst_requestid' -Attributes @(
     (New-Attribute -LogicalName 'tst_requestid' -Label 'Request' -AttributeType 'Uniqueidentifier' -IsPrimaryId $true),

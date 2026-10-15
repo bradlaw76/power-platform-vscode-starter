@@ -1,0 +1,196 @@
+{
+  "DataverseResult": {
+    "MetadataMutation": "existing-components-only",
+    "Processes": [
+      {
+        "RuntimeNotes": [],
+        "Metrics": {
+          "StageCount": 8,
+          "ConditionCount": 16,
+          "StepCount": 13
+        },
+        "Action": "validated-existing",
+        "WorkflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
+        "Provisioning": "designer-authored-existing-process",
+        "Activation": {
+          "Activated": true,
+          "StateCode": 1,
+          "StatusCode": 2,
+          "Action": "already-active"
+        },
+        "UniqueName": "foia_federal_foia_request_lifecycle",
+        "SolutionAddStatus": "added",
+        "SolutionMembership": {
+          "InSolution": true,
+          "SolutionUniqueName": "FederalFOIAManagement",
+          "ComponentType": 29
+        },
+        "Thresholds": {
+          "MinimumStageCount": 2,
+          "MinimumConditionCount": 2,
+          "MinimumStepCount": 2
+        },
+        "BranchPredicateSummary": [
+          {
+            "StageOrder": 1,
+            "StageName": "Intake",
+            "EntryCriteria": "Submission received through an approved channel; FOIA-INT-001.",
+            "ExitCriteria": "Validation, tracking, and acknowledgment complete; FOIA-INT-002..005."
+          },
+          {
+            "StageOrder": 2,
+            "StageName": "Clarification",
+            "EntryCriteria": "Scope requires human-managed correction; FOIA-INT-002.",
+            "ExitCriteria": "Scope is clarified and perfected or controlled disposition recorded; FOIA-CAS-001."
+          },
+          {
+            "StageOrder": 3,
+            "StageName": "Search",
+            "EntryCriteria": "Perfected request has approved search scope; FOIA-COL-003.",
+            "ExitCriteria": "Every approved search has evidence and results; FOIA-COL-003."
+          },
+          {
+            "StageOrder": 4,
+            "StageName": "Review",
+            "EntryCriteria": "Collected record metadata is available; FOIA-REV-001.",
+            "ExitCriteria": "Required review dispositions are documented; FOIA-REV-001..003."
+          },
+          {
+            "StageOrder": 5,
+            "StageName": "Redaction",
+            "EntryCriteria": "Review identifies controlled redaction work; FOIA-REV-004.",
+            "ExitCriteria": "Every proposed redaction has independent approval state; FOIA-CAS-005."
+          },
+          {
+            "StageOrder": 6,
+            "StageName": "Approval",
+            "EntryCriteria": "Controlled decisions are ready for approval; FOIA-CAS-005.",
+            "ExitCriteria": "Independent human approvals are recorded; FOIA-CAS-005; FOIA-SEC-002."
+          },
+          {
+            "StageOrder": 7,
+            "StageName": "Release",
+            "EntryCriteria": "Approved fixed package is ready; FOIA-REV-005..007.",
+            "ExitCriteria": "Method, recipient, hash, and timestamp are recorded; FOIA-REV-005."
+          },
+          {
+            "StageOrder": 8,
+            "StageName": "Closure",
+            "EntryCriteria": "A controlled final disposition is complete; FOIA-CAS-001.",
+            "ExitCriteria": "Closure reconciles to clock and audit history; FOIA-RPT-003."
+          }
+        ],
+        "MetadataMutation": "none"
+      },
+      {
+        "RuntimeNotes": [],
+        "Metrics": {
+          "StageCount": 6,
+          "ConditionCount": 12,
+          "StepCount": 10
+        },
+        "Action": "validated-existing",
+        "WorkflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
+        "Provisioning": "designer-authored-existing-process",
+        "Activation": {
+          "Activated": true,
+          "StateCode": 1,
+          "StatusCode": 2,
+          "Action": "already-active"
+        },
+        "UniqueName": "foia_federal_foia_appeal_lifecycle",
+        "SolutionAddStatus": "added",
+        "SolutionMembership": {
+          "InSolution": true,
+          "SolutionUniqueName": "FederalFOIAManagement",
+          "ComponentType": 29
+        },
+        "Thresholds": {
+          "MinimumStageCount": 2,
+          "MinimumConditionCount": 2,
+          "MinimumStepCount": 2
+        },
+        "BranchPredicateSummary": [
+          {
+            "StageOrder": 1,
+            "StageName": "Appeal Intake",
+            "EntryCriteria": "Appeal received and linked; FOIA-REV-006.",
+            "ExitCriteria": "Identity, receipt, and challenged determination recorded; FOIA-REV-006."
+          },
+          {
+            "StageOrder": 2,
+            "StageName": "Validation",
+            "EntryCriteria": "Appeal intake is recorded.",
+            "ExitCriteria": "Timeliness, scope, and appeal due date validated; FOIA-CLK-001..006."
+          },
+          {
+            "StageOrder": 3,
+            "StageName": "Reconsideration and Legal Review",
+            "EntryCriteria": "Appeal validation passes.",
+            "ExitCriteria": "Decision evidence is reconsidered; FOIA-REV-001..006."
+          },
+          {
+            "StageOrder": 4,
+            "StageName": "Appeal Decision",
+            "EntryCriteria": "Legal review is complete.",
+            "ExitCriteria": "Authorized decision and outcome recorded; FOIA-REV-006."
+          },
+          {
+            "StageOrder": 5,
+            "StageName": "Response",
+            "EntryCriteria": "Appeal decision has final approval.",
+            "ExitCriteria": "Approved response issuance recorded; FOIA-CAS-005."
+          },
+          {
+            "StageOrder": 6,
+            "StageName": "Closure",
+            "EntryCriteria": "Response issued or controlled final outcome applies.",
+            "ExitCriteria": "Closure reconciles to Appeal Clock Events; FOIA-RPT-003."
+          }
+        ],
+        "MetadataMutation": "none"
+      }
+    ]
+  },
+  "FailedCount": 0,
+  "Processes": [
+    {
+      "Key": "01-foia-request",
+      "ProcessName": "Federal FOIA Request Lifecycle",
+      "TargetEntity": "foia_foiarequest",
+      "Status": "validated-existing",
+      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-report.json",
+      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-designer-handoff.md"
+    },
+    {
+      "Key": "02-appeal",
+      "ProcessName": "Federal FOIA Appeal Lifecycle",
+      "TargetEntity": "foia_appeal",
+      "Status": "validated-existing",
+      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-report.json",
+      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-designer-handoff.md"
+    }
+  ],
+  "ProcessCount": 2,
+  "Status": "completed",
+  "Timestamp": "2026-10-12T14:09:18.9598158-04:00",
+  "SucceededCount": 2,
+  "Validation": {
+    "Passed": [
+      "Process name supplied: Federal FOIA Request Lifecycle",
+      "Primary entity resolved: foia_foiarequest",
+      "Target Main form declared: FOIA Request Main",
+      "Stage threshold passed: 8 >= 2.",
+      "Condition threshold passed: 16 >= 2.",
+      "Step threshold passed: 13 >= 2.",
+      "Process name supplied: Federal FOIA Appeal Lifecycle",
+      "Primary entity resolved: foia_appeal",
+      "Target Main form declared: FOIA Appeal Main",
+      "Stage threshold passed: 6 >= 2.",
+      "Condition threshold passed: 12 >= 2.",
+      "Step threshold passed: 10 >= 2."
+    ],
+    "Failed": [],
+    "Warnings": []
+  }
+}

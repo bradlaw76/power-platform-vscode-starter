@@ -1,0 +1,230 @@
+{
+  "TableLogicalName": "foia_redactiondecision",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_redactionnumber",
+      "LogicalName": "foia_redactionnumber",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Redaction Number",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Controlled redaction identifier. [required] FOIA-REV-004; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_recordlocation",
+      "LogicalName": "foia_recordlocation",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Record Location",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Affected page, range, or location. [required] FOIA-REV-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 500
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_proposedbasis",
+      "LogicalName": "foia_proposedbasis",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposed Basis",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposed exemption or basis. [required] FOIA-REV-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 500
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_finalstate",
+      "LogicalName": "foia_finalstate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Final State",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposed, Approved, Rejected, or Applied. [required] FOIA-REV-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_proposeridentity",
+      "LogicalName": "foia_proposeridentity",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposer Identity",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Human proposer reference. [required] FOIA-SEC-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_approveridentity",
+      "LogicalName": "foia_approveridentity",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approver Identity",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Independent human approver reference. FOIA-SEC-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_proposeddate",
+      "LogicalName": "foia_proposeddate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposed Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Proposal timestamp. [required] FOIA-REV-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_approveddate",
+      "LogicalName": "foia_approveddate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approved Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approval timestamp. FOIA-REV-004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

@@ -245,7 +245,36 @@ function New-WizardAggregateFetchXml {
         $filterXml = "<filter type='and'>$($conditions -join '')</filter>"
     }
 
-    return "<fetch mapping='logical' aggregate='true'><entity name='$table'><attribute name='$aggregateField' aggregate='$aggregate' alias='aggregatevalue'/><attribute name='$category' groupby='true' alias='categoryvalue'/>$filterXml</entity></fetch>"
+    return "<fetch mapping='logical' aggregate='true'><entity name='$table'><attribute name='$aggregateField' aggregate='$aggregate' alias='aggregate_column'/><attribute name='$category' groupby='true' alias='groupby_column'/>$filterXml</entity></fetch>"
+}
+
+function New-WizardNativeChartDataDescription {
+    param([Parameter(Mandatory)] [object]$Chart)
+
+    $fetchXml = New-WizardAggregateFetchXml -Chart $Chart
+    return "<datadefinition><fetchcollection>$fetchXml</fetchcollection><categorycollection><category><measurecollection><measure alias='aggregate_column'/></measurecollection></category></categorycollection></datadefinition>"
+}
+
+function New-WizardNativeChartPresentationDescription {
+    param([Parameter(Mandatory)] [object]$Chart)
+
+    $requestedChartType = if ($Chart.PSObject.Properties.Name -contains 'ChartType') { "$($Chart.ChartType)" } else { 'column' }
+    $axisXml = "<ChartAreas><ChartArea BorderColor='White' BorderDashStyle='Solid'><AxisY LabelAutoFitMinFontSize='8' TitleForeColor='59, 59, 59' TitleFont='{0}, 10.5px' LineColor='165, 172, 181'><MajorGrid LineColor='239, 242, 246'/><MajorTickMark LineColor='165, 172, 181'/><LabelStyle Font='{0}, 10.5px' ForeColor='59, 59, 59'/></AxisY><AxisX LabelAutoFitMinFontSize='8' TitleForeColor='59, 59, 59' TitleFont='{0}, 10.5px' LineColor='165, 172, 181'><MajorGrid Enabled='False'/><MajorTickMark Enabled='False'/><LabelStyle Font='{0}, 10.5px' ForeColor='59, 59, 59'/></AxisX></ChartArea></ChartAreas>"
+    $titleXml = "<Titles><Title Alignment='TopLeft' DockingOffset='-3' Font='{0}, 13px' ForeColor='59, 59, 59'/></Titles>"
+    switch ($requestedChartType) {
+        'pie' {
+            return "<Chart Palette='None' PaletteCustomColors='91,151,213; 237,125,49; 160,116,166; 255,192,0; 68,114,196; 112,173,71; 37,94,145; 158,72,14; 117,55,125; 153,115,0; 38,68,120; 67,104,43; 124,175,221; 241,151,90; 186,144,192; 255,205,51; 105,142,208; 140,193,104; 50,125,194; 210,96,18; 150,83,159; 204,154,0; 51,90,161; 90,138,57;'><Series><Series ShadowOffset='0' IsValueShownAsLabel='true' Font='{0}, 9.5px' LabelForeColor='59, 59, 59' CustomProperties='PieLabelStyle=Inside, PieDrawingStyle=Default' ChartType='pie'><SmartLabelStyle Enabled='True'/></Series></Series><ChartAreas><ChartArea><Area3DStyle Enable3D='false'/></ChartArea></ChartAreas><Legends><Legend Alignment='Center' LegendStyle='Table' Docking='right' Font='{0}, 11px' ShadowColor='0, 0, 0, 0' ForeColor='59, 59, 59'/></Legends><Titles><Title Alignment='TopLeft' Name='Title1' DockingOffset='-3' Font='{0}, 13px' ForeColor='0, 0, 0'/></Titles></Chart>"
+        }
+        'doughnut' {
+            return "<Chart><Series><Series IsValueShownAsLabel='True' Color='91, 151, 213' BackSecondaryColor='41, 88, 145' Font='{0}, 9.5px' LabelForeColor='59, 59, 59' ChartType='Doughnut' CustomProperties='PointWidth=0.75, MaxPixelPointWidth=40'><SmartLabelStyle Enabled='True'/><Points/></Series></Series>$axisXml$titleXml</Chart>"
+        }
+        'bar' {
+            return "<Chart><Series><Series ChartType='Bar' IsValueShownAsLabel='True' Color='91, 151, 213' BackSecondaryColor='112, 142, 50' Font='{0}, 9.5px' LabelForeColor='59, 59, 59' CustomProperties='PointWidth=0.75, MaxPixelPointWidth=40'><SmartLabelStyle Enabled='True'/></Series></Series>$axisXml$titleXml</Chart>"
+        }
+        default {
+            return "<Chart><Series><Series IsValueShownAsLabel='True' Color='91, 151, 213' BackSecondaryColor='41, 88, 145' Font='{0}, 9.5px' LabelForeColor='59, 59, 59' CustomProperties='PointWidth=0.75, MaxPixelPointWidth=40'><SmartLabelStyle Enabled='True'/></Series></Series>$axisXml$titleXml</Chart>"
+        }
+    }
 }
 
 function Select-WizardReportItem {

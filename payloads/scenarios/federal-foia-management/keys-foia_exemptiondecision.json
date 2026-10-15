@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_exemptiondecision",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_ExemptionDecision_Number",
+      "DisplayName": "Exemption Decision Number",
+      "KeyAttributes": ["foia_decisionnumber"]
+    }
+  ]
+}

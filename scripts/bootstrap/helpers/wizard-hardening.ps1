@@ -86,7 +86,24 @@ function Get-WizardScenarioContext {
         [string]$PayloadsFolder
     )
 
-    $specsRoot = Join-Path $RepoRoot 'specs'
+    $repoRootPath = [IO.Path]::GetFullPath($RepoRoot)
+    $specsRoot = Join-Path $repoRootPath 'specs'
+    $resolvedPayloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
+        Join-Path $repoRootPath 'payloads'
+    } elseif ([IO.Path]::IsPathRooted($PayloadsFolder)) {
+        [IO.Path]::GetFullPath($PayloadsFolder)
+    } else {
+        [IO.Path]::GetFullPath((Join-Path $repoRootPath $PayloadsFolder))
+    }
+
+    $scenarioPayloadsRoot = [IO.Path]::GetFullPath((Join-Path $repoRootPath 'payloads\scenarios')).TrimEnd('\', '/')
+    $resolvedPayloadPath = $resolvedPayloadsFolder.TrimEnd('\', '/')
+    $scenarioPathPrefix = "$scenarioPayloadsRoot$([IO.Path]::DirectorySeparatorChar)"
+    if ([string]::IsNullOrWhiteSpace($ScenarioSlug) -and $resolvedPayloadPath.StartsWith($scenarioPathPrefix, [StringComparison]::OrdinalIgnoreCase)) {
+        $relativeScenarioPath = $resolvedPayloadPath.Substring($scenarioPathPrefix.Length)
+        $ScenarioSlug = ($relativeScenarioPath -split '[\\/]')[0]
+    }
+
     if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
         $scenarioDirs = @(Get-ChildItem -Path $specsRoot -Directory -ErrorAction SilentlyContinue)
         if ($scenarioDirs.Count -eq 1) {
@@ -95,11 +112,17 @@ function Get-WizardScenarioContext {
     }
 
     $scenarioFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) { '' } else { Join-Path $specsRoot $ScenarioSlug }
-    $resolvedPayloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) { Join-Path $RepoRoot 'payloads' } else { $PayloadsFolder }
-    $scenarioPayloadFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) { $resolvedPayloadsFolder } else { Join-Path $resolvedPayloadsFolder (Join-Path 'scenarios' $ScenarioSlug) }
+    $expectedScenarioPayloadFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) { '' } else { Join-Path $scenarioPayloadsRoot $ScenarioSlug }
+    $scenarioPayloadFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
+        $resolvedPayloadsFolder
+    } elseif ($resolvedPayloadPath.Equals($expectedScenarioPayloadFolder, [StringComparison]::OrdinalIgnoreCase)) {
+        $resolvedPayloadsFolder
+    } else {
+        Join-Path $resolvedPayloadsFolder (Join-Path 'scenarios' $ScenarioSlug)
+    }
 
     return [pscustomobject]@{
-        RepoRoot              = $RepoRoot
+        RepoRoot              = $repoRootPath
         ScenarioSlug          = $ScenarioSlug
         SpecsRoot             = $specsRoot
         ScenarioFolder        = $scenarioFolder
@@ -226,6 +249,19 @@ function Get-WizardJsonFiles {
     return @(Get-ChildItem -Path $Folder -Filter $Filter -File -ErrorAction SilentlyContinue | Sort-Object Name)
 }
 
+function ConvertTo-WizardWorkflowUniqueName {
+    param(
+        [string]$Value,
+        [string]$PublisherPrefix
+    )
+
+    $slug = [regex]::Replace(($Value ?? '').Trim().ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_')
+    $prefix = [regex]::Replace(($PublisherPrefix ?? '').Trim().ToLowerInvariant(), '[^a-z0-9]+', '')
+    if ([string]::IsNullOrWhiteSpace($prefix)) { $prefix = 'wizard' }
+    if ([string]::IsNullOrWhiteSpace($slug)) { return "${prefix}_bpf" }
+    return "${prefix}_$slug"
+}
+
 function Get-WizardPayloadSummary {
     param([string]$PayloadsFolder)
 
@@ -271,7 +307,13 @@ function Get-WizardPayloadSummary {
                 if (-not [string]::IsNullOrWhiteSpace($logicalName)) {
                     [void]$summary.Columns.Add($logicalName.Trim().ToLowerInvariant())
                     if (-not [string]::IsNullOrWhiteSpace($table)) {
-                        [void]$summary.ColumnReferences.Add("$($table.Trim().ToLowerInvariant()).$($logicalName.Trim().ToLowerInvariant())")
+                        $normalizedTable = $table.Trim().ToLowerInvariant()
+                        $normalizedColumn = $logicalName.Trim().ToLowerInvariant()
+                        [void]$summary.ColumnReferences.Add("$normalizedTable.$normalizedColumn")
+                        $odataType = "$(Get-WizardOptionalPropertyValue -InputObject $column -PropertyName '@odata.type')"
+                        if ($odataType.EndsWith('MoneyAttributeMetadata', [StringComparison]::OrdinalIgnoreCase)) {
+                            [void]$summary.ColumnReferences.Add("$normalizedTable.$($normalizedColumn)_base")
+                        }
                     }
                 }
             }
@@ -298,6 +340,14 @@ function Get-WizardPayloadSummary {
                     if (-not [string]::IsNullOrWhiteSpace($candidate)) {
                         [void]$summary.RelationshipEntities.Add($candidate.Trim().ToLowerInvariant())
                     }
+                }
+                $referencingEntity = (Get-WizardOptionalPropertyValue -InputObject $relationship -PropertyName 'ReferencingEntity') ??
+                    (Get-WizardOptionalPropertyValue -InputObject $definition -PropertyName 'ReferencingEntity')
+                $referencingAttribute = (Get-WizardOptionalPropertyValue -InputObject $relationship -PropertyName 'ReferencingAttribute') ??
+                    (Get-WizardOptionalPropertyValue -InputObject $definition -PropertyName 'ReferencingAttribute')
+                if (-not [string]::IsNullOrWhiteSpace($referencingEntity) -and
+                    -not [string]::IsNullOrWhiteSpace($referencingAttribute)) {
+                    [void]$summary.ColumnReferences.Add("$($referencingEntity.Trim().ToLowerInvariant()).$($referencingAttribute.Trim().ToLowerInvariant())")
                 }
             }
         } catch {
@@ -407,6 +457,8 @@ function Get-WizardSolutionIdentity {
     }
     $solutionName = ($solutionName -replace '\s*\((new|existing)\)\s*$', '').Trim()
     $publisherPrefix = ($publisherPrefix -replace '\s*\((new|existing)\)\s*$', '').Trim()
+    $solutionName = $solutionName.Trim([char]96)
+    $publisherPrefix = $publisherPrefix.Trim([char]96)
 
     return [pscustomobject]@{
         SolutionName = $solutionName
@@ -721,7 +773,7 @@ function New-WizardExpectedArtifacts {
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
 
     $reportWebResources = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
-    foreach ($reportName in @($featureConfig.SelectedReports)) {
+    foreach ($reportName in @($featureConfig.SelectedReports | Where-Object { $_ -and $_.Trim().ToLowerInvariant() -notin @('none', 'no', 'n/a') })) {
         $slug = ConvertTo-WizardSafeSlug -Value $reportName
         if (-not [string]::IsNullOrWhiteSpace($prefix) -and -not [string]::IsNullOrWhiteSpace($slug)) {
             [void]$reportWebResources.Add("$prefix`_reports/$slug.html")
@@ -741,15 +793,31 @@ function New-WizardExpectedArtifacts {
         $reporting = Get-Content -LiteralPath $reportingPayloads[0].FullName -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($reporting.Enabled) {
             $nativeCharts = @($reporting.Charts | ForEach-Object { "$($_.TableLogicalName)|$($_.Name)" })
-            $nativeDashboards = @($reporting.Dashboard.Name)
+            $dashboardDefinitions = if ($reporting.PSObject.Properties.Name -contains 'Dashboards' -and @($reporting.Dashboards).Count -gt 0) {
+                @($reporting.Dashboards)
+            } else {
+                @($reporting.Dashboard)
+            }
+            $nativeDashboards = @($dashboardDefinitions | ForEach-Object { $_.Name } | Sort-Object -Unique)
         }
     }
 
     return [pscustomobject]@{
         Tables = @($payloadSummary.Tables)
+        DependencyTables = @(
+            @($payloadSummary.ColumnTables) +
+            @($payloadSummary.RelationshipEntities) |
+            Where-Object { $_ -notin @($payloadSummary.Tables) } |
+            Sort-Object -Unique
+        )
         Columns = @($payloadSummary.ColumnReferences)
         Relationships = @($payloadSummary.Relationships)
-        Bpfs = @($payloadSummary.ProcessNames)
+        Bpfs = @($payloadSummary.ProcessNames | ForEach-Object {
+            ConvertTo-WizardWorkflowUniqueName -Value $_ -PublisherPrefix $PublisherPrefix
+        })
+        BpfTables = @($payloadSummary.ProcessNames | ForEach-Object {
+            ConvertTo-WizardWorkflowUniqueName -Value $_ -PublisherPrefix $PublisherPrefix
+        })
         WebResources = @($reportWebResources | Sort-Object)
         Forms = @($payloadSummary.Tables | ForEach-Object { "$($_)|main" })
         Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })
@@ -784,7 +852,7 @@ function New-WizardContaminationVerdict {
         bpf = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     }
 
-    foreach ($name in @($ExpectedArtifacts.Tables)) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @(@($ExpectedArtifacts.Tables) + @($ExpectedArtifacts.DependencyTables))) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Columns)) { [void]$expected.column.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Relationships)) { [void]$expected.relationship.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.WebResources)) { [void]$expected.webresource.Add(($name ?? '').Trim().ToLowerInvariant()) }
@@ -1111,7 +1179,7 @@ function Get-WizardAppModuleConfig {
         ScenarioSlug = $context.ScenarioSlug
         SolutionName = $identity.SolutionName
         PublisherPrefix = $identity.PublisherPrefix
-        Tables = @($expected.Tables)
+        Tables = @(@($expected.Tables) + @($expected.DependencyTables) | Sort-Object -Unique)
         Forms = @($expected.Forms)
         Views = @($expected.Views)
         Dashboards = @($expected.Dashboards)

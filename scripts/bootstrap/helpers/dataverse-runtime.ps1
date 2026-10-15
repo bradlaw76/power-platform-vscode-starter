@@ -211,7 +211,7 @@ function Invoke-WizardDataverseRequest {
             $retryable = $false
             if ($statusCode -eq 429 -or ($statusCode -ge 500 -and $statusCode -le 599)) {
                 $retryable = $true
-            } elseif ($statusCode -eq 0 -and $_.Exception.Message -match '(?i)timeout|temporar|connection reset') {
+            } elseif ($statusCode -eq 0 -and $_.Exception.Message -match '(?i)timeout|temporar|connection reset|forcibly closed') {
                 $retryable = $true
             }
             if ($retryable -and $attempt -lt $MaxAttempts) {

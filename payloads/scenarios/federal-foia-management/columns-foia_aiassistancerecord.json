@@ -1,0 +1,307 @@
+{
+  "TableLogicalName": "foia_aiassistancerecord",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_assistanceidentifier",
+      "LogicalName": "foia_assistanceidentifier",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Assistance Identifier",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Controlled assistance identifier. [required] FOIA-AI-003; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 80
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_operationalstatus",
+      "LogicalName": "foia_operationalstatus",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Operational Status",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Disabled, Unavailable, Failed, or Completed. [required] FOIA-AI-005..006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_provider",
+      "LogicalName": "foia_provider",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Provider",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Adapter identifier without secrets or endpoints. [required] FOIA-AI-003; FOIA-ARC-006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_serviceversion",
+      "LogicalName": "foia_serviceversion",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Model or Service Version",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Adapter service version. FOIA-AI-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_operationclassification",
+      "LogicalName": "foia_operationclassification",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Operation Classification",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Assistive operation classification. [required] FOIA-AI-001..003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_sourcereferences",
+      "LogicalName": "foia_sourcereferences",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Source References",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authorized references used. FOIA-AI-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 2000
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_output",
+      "LogicalName": "foia_output",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Recommendation Output",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Assistive output only. FOIA-AI-002..004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 4000
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DecimalAttributeMetadata",
+      "SchemaName": "foia_confidence",
+      "LogicalName": "foia_confidence",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Confidence",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Optional confidence from zero to one. FOIA-AI-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MinValue": 0,
+      "Precision": 4,
+      "MaxValue": 1
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_reviewerdisposition",
+      "LogicalName": "foia_reviewerdisposition",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Reviewer Disposition",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Pending, Accepted, Rejected, or Superseded. [required] FOIA-AI-003..004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_createddatetime",
+      "LogicalName": "foia_createddatetime",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Created Date and Time",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Recommendation creation timestamp. [required] FOIA-AI-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_revieweddatetime",
+      "LogicalName": "foia_revieweddatetime",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Reviewed Date and Time",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Human disposition timestamp. FOIA-AI-003..004.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

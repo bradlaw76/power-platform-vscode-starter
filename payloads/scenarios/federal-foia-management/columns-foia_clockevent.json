@@ -1,0 +1,255 @@
+{
+  "TableLogicalName": "foia_clockevent",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_eventidentifier",
+      "LogicalName": "foia_eventidentifier",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Event Identifier",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Immutable event identifier. [required] FOIA-CLK-003; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 80
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_clocktype",
+      "LogicalName": "foia_clocktype",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Clock Type",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Request or Appeal clock. [required] FOIA-CAS-002; FOIA-CLK-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 30
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_eventtype",
+      "LogicalName": "foia_eventtype",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Event Type",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Receipt, perfection, tolling, extension, appeal, correction, or closure. [required] FOIA-CLK-001..003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_effectivedatetime",
+      "LogicalName": "foia_effectivedatetime",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Effective Date and Time",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Immutable effective timestamp. [required] FOIA-CLK-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_reason",
+      "LogicalName": "foia_reason",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Reason",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authorized event reason. [required] FOIA-CLK-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 1000
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_actorreference",
+      "LogicalName": "foia_actorreference",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Actor Reference",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Human or service actor provenance. [required] FOIA-CLK-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_priorduedate",
+      "LogicalName": "foia_priorduedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Prior Due Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Due date before the event. FOIA-CLK-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_resultingduedate",
+      "LogicalName": "foia_resultingduedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Resulting Due Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministically resulting due date. FOIA-CLK-003..006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_provenance",
+      "LogicalName": "foia_provenance",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Provenance",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Command, correlation, and calculator version. [required] FOIA-CLK-003..006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 500
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

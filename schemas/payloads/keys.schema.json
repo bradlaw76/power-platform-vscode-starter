@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://power-platform-vscode-starter.local/schemas/payloads/keys.schema.json",
+  "title": "Dataverse alternate-key payload",
+  "description": "Credential-free declarations for Dataverse EntityKeyMetadata.",
+  "type": "object",
+  "required": [
+    "TableLogicalName",
+    "Keys"
+  ],
+  "properties": {
+    "TableLogicalName": {
+      "$ref": "#/definitions/logicalName"
+    },
+    "Keys": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "required": [
+          "SchemaName",
+          "KeyAttributes"
+        ],
+        "properties": {
+          "SchemaName": {
+            "type": "string",
+            "pattern": "^[A-Za-z][A-Za-z0-9_]{0,99}$"
+          },
+          "DisplayName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "KeyAttributes": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 16,
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/definitions/logicalName"
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "logicalName": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    }
+  }
+}

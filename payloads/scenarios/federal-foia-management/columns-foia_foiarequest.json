@@ -1,0 +1,627 @@
+{
+  "TableLogicalName": "foia_foiarequest",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_trackingnumber",
+      "LogicalName": "foia_trackingnumber",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Tracking Number",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Unique reproducible accepted-request identifier. [required] FOIA-INT-004; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_intakechannel",
+      "LogicalName": "foia_intakechannel",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Intake Channel",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approved intake channel. [required] FOIA-INT-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_validationstate",
+      "LogicalName": "foia_validationstate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Validation State",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Validation outcome and correction-routing state. [required] FOIA-INT-002..003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_lifecyclestage",
+      "LogicalName": "foia_lifecyclestage",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Lifecycle Stage",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Current primary process stage. [required] FOIA-CAS-001..002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_receiveddate",
+      "LogicalName": "foia_receiveddate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Received Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authoritative receipt timestamp. [required] FOIA-CLK-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_perfecteddate",
+      "LogicalName": "foia_perfecteddate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Perfected Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Date statutory processing began. FOIA-CLK-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_currentduedate",
+      "LogicalName": "foia_currentduedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Current Due Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authoritative derived due date. FOIA-CLK-003..006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_clarificationduedate",
+      "LogicalName": "foia_clarificationduedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Clarification Due Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Clarification response due date. FOIA-CAS-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_closeddate",
+      "LogicalName": "foia_closeddate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Closed Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Controlled request closure date. FOIA-CLK-001.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.BooleanAttributeMetadata",
+      "SchemaName": "foia_acknowledgmentsent",
+      "LogicalName": "foia_acknowledgmentsent",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Acknowledgment Sent",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Whether acceptance acknowledgment was recorded. [required] FOIA-INT-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "DefaultValue": false,
+      "OptionSet": {
+        "TrueOption": {
+          "Value": 1,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "Yes",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        },
+        "FalseOption": {
+          "Value": 0,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "No",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.BooleanAttributeMetadata",
+      "SchemaName": "foia_duplicatesuspected",
+      "LogicalName": "foia_duplicatesuspected",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Duplicate Suspected",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Human-review suggestion without automatic merge. [required] FOIA-INT-006.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "DefaultValue": false,
+      "OptionSet": {
+        "TrueOption": {
+          "Value": 1,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "Yes",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        },
+        "FalseOption": {
+          "Value": 0,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "No",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.BooleanAttributeMetadata",
+      "SchemaName": "foia_expeditedrequested",
+      "LogicalName": "foia_expeditedrequested",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Expedited Processing Requested",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Whether expedited handling was requested. [required] FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "DefaultValue": false,
+      "OptionSet": {
+        "TrueOption": {
+          "Value": 1,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "Yes",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        },
+        "FalseOption": {
+          "Value": 0,
+          "Label": {
+            "LocalizedLabels": [
+              {
+                "Label": "No",
+                "LanguageCode": 1033
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_expediteddecision",
+      "LogicalName": "foia_expediteddecision",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Expedited Decision",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Pending, Granted, or Denied decision. FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 30
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_requestscope",
+      "LogicalName": "foia_requestscope",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Request Scope",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Validated description of requested records. [required] FOIA-INT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 2000
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_disposition",
+      "LogicalName": "foia_disposition",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Disposition",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Final or current reporting disposition. FOIA-RPT-003.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 100
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_feecategory",
+      "LogicalName": "foia_feecategory",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fee Category",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Requester fee category. FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MoneyAttributeMetadata",
+      "SchemaName": "foia_feeassessed",
+      "LogicalName": "foia_feeassessed",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fee Assessed",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Total fees assessed. FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Precision": 2
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MoneyAttributeMetadata",
+      "SchemaName": "foia_feewaived",
+      "LogicalName": "foia_feewaived",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fee Waived",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Total fees waived. FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Precision": 2
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.MoneyAttributeMetadata",
+      "SchemaName": "foia_feecollected",
+      "LogicalName": "foia_feecollected",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fee Collected",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Total fees collected. FOIA-RPT-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Precision": 2
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_acknowledgmentreference",
+      "LogicalName": "foia_acknowledgmentreference",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Acknowledgment Reference",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Non-secret correspondence reference. FOIA-INT-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_fiscalperiod",
+      "LogicalName": "foia_fiscalperiod",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fiscal Period",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Version-controlled reporting period label. FOIA-RPT-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 20
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

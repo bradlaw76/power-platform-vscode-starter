@@ -113,12 +113,17 @@ if (Test-Path $hardeningHelper) {
 }
 
 . (Join-Path $PSScriptRoot 'helpers\bpf-validation.ps1')
+. (Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1')
 
 $envFile = Join-Path $repoRoot '.env.ps1'
-if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+if (Test-Path $envFile) {
     . $envFile
-    $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
-    $AccessToken = $global:DV_TOKEN
+    if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+        $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    }
+    if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+        $AccessToken = $global:DV_TOKEN
+    }
     if ([string]::IsNullOrWhiteSpace($SolutionUniqueName) -and -not [string]::IsNullOrWhiteSpace($global:DV_SOLUTION_NAME)) {
         $SolutionUniqueName = $global:DV_SOLUTION_NAME
     }
@@ -143,7 +148,7 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
 }
 
 if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
-    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX | Out-Null
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
 }
 
 $artifactPaths = Get-ScenarioArtifactPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
@@ -151,8 +156,7 @@ $artifactText = Get-PlanningArtifactContent -Paths @($artifactPaths.AnswersPath,
 $scenarioPayloadFolder = Get-ScenarioPayloadFolder -RepoRoot $repoRoot -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug
 $processDefinitions = @(Get-BpfDefinitions -PayloadFolder $scenarioPayloadFolder)
 $reportFolder = Join-Path $artifactPaths.ScenarioFolder 'reports'
-$reportPath = Join-Path $reportFolder 'business-process-flow-report.json'
-$handoffPath = Join-Path $reportFolder 'business-process-flow-designer-handoff.md'
+$aggregateReportPath = Join-Path $reportFolder 'business-process-flow-report.json'
 $runtimeNotes = New-Object System.Collections.Generic.List[string]
 
 function Get-RetryDelaySeconds {
@@ -254,16 +258,20 @@ function Get-BranchPredicateSummary {
 }
 
 function Write-BpfReportFile {
-    param([hashtable]$Report)
+    param(
+        [hashtable]$Report,
+        [string]$Path
+    )
 
     New-Item -ItemType Directory -Path $reportFolder -Force | Out-Null
-    Set-Content -Path $reportPath -Value ($Report | ConvertTo-Json -Depth 12) -Encoding UTF8
+    Set-Content -LiteralPath $Path -Value ($Report | ConvertTo-Json -Depth 12) -Encoding UTF8
 }
 
 function Write-BpfDesignerHandoff {
     param(
         [object]$Definition,
-        [object]$Validation
+        [object]$Validation,
+        [string]$Path
     )
 
     New-Item -ItemType Directory -Path $reportFolder -Force | Out-Null
@@ -296,7 +304,7 @@ function Write-BpfDesignerHandoff {
     $lines.Add('1. Activate the process in the designer.') | Out-Null
     $lines.Add('2. Confirm the process is present in the target unmanaged solution.') | Out-Null
     $lines.Add('3. Rerun step 55 in apply mode; it validates and links the existing process.') | Out-Null
-    Set-Content -Path $handoffPath -Value ($lines -join "`r`n") -Encoding UTF8
+    Set-Content -LiteralPath $Path -Value ($lines -join "`r`n") -Encoding UTF8
 }
 
 function Invoke-Dv {
@@ -314,12 +322,9 @@ function Invoke-Dv {
         Accept             = 'application/json'
     }
 
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ([string]::IsNullOrWhiteSpace($Body)) {
-        return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers
-    }
-
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $Body
+    $requestBody = if ([string]::IsNullOrWhiteSpace($Body)) { $null } else { $Body }
+    return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl `
+        -AccessToken $AccessToken -Body $requestBody
 }
 
 function Invoke-DvWithRetry {
@@ -385,17 +390,24 @@ function Get-Solution {
 }
 
 function Get-ComponentTypeValue {
-    param([string]$Label)
+    param(
+        [string[]]$Labels,
+        [int]$Fallback = -1
+    )
 
     $meta = Invoke-Dv -Method 'Get' -Path "EntityDefinitions(LogicalName='solutioncomponent')/Attributes(LogicalName='componenttype')/Microsoft.Dynamics.CRM.PicklistAttributeMetadata?`$select=LogicalName&`$expand=OptionSet"
     foreach ($opt in @($meta.OptionSet.Options)) {
         $optionLabel = $opt.Label.UserLocalizedLabel.Label
-        if ($optionLabel -eq $Label) {
+        if ($optionLabel -in $Labels) {
             return [int]$opt.Value
         }
     }
 
-    throw "Unable to resolve solution component type '$Label'."
+    if ($Fallback -ge 0) {
+        return $Fallback
+    }
+
+    throw "Unable to resolve solution component type '$($Labels -join "', '")'."
 }
 
 function Get-MainFormStatus {
@@ -419,14 +431,15 @@ function Upsert-BpfWorkflow {
     param(
         [object]$Definition,
         [string]$SolutionName,
-        [bool]$PreferUpdate
+        [bool]$PreferUpdate,
+        [string]$HandoffPath
     )
 
     $processName = ($Definition.BusinessProcessFlowName ?? '').Trim()
     $uniqueName = ConvertTo-WorkflowUniqueName -Value $processName -PublisherPrefix $PublisherPrefix
     $existing = @(Get-ExistingWorkflow -UniqueName $uniqueName)
     if ($existing.Count -eq 0) {
-        throw "Supported BPF prerequisite is missing. Create '$processName' in the Power Apps designer with unique name '$uniqueName', add it to solution '$SolutionName', publish it, and rerun. Handoff: $handoffPath"
+        throw "Supported BPF prerequisite is missing. Create '$processName' in the Power Apps designer with unique name '$uniqueName', add it to solution '$SolutionName', publish it, and rerun. Handoff: $HandoffPath"
     }
 
     $existingProcess = $existing[0]
@@ -436,12 +449,196 @@ function Upsert-BpfWorkflow {
 
     $workflowId = $existingProcess.workflowid
 
-    $componentType = Get-ComponentTypeValue -Label 'Process'
+    $componentType = Get-ComponentTypeValue -Labels @('Process', 'Workflow') -Fallback 29
     $addBody = [ordered]@{ ComponentId = $workflowId; ComponentType = $componentType; SolutionUniqueName = $SolutionName; AddRequiredComponents = $true } | ConvertTo-Json -Compress
     Invoke-DvWithRetry -Method 'Post' -Path 'AddSolutionComponent' -Body $addBody | Out-Null
 
     return [ordered]@{ Action = 'validated-existing'; WorkflowId = $workflowId; SolutionAddStatus = 'added'; UniqueName = $uniqueName; MetadataMutation = 'none' }
 }
+
+function Get-WorkflowDetails {
+    param([string]$WorkflowId)
+    return Invoke-DvWithRetry -Method 'Get' -Path "workflows($WorkflowId)?`$select=workflowid,name,uniquename,category,statecode,statuscode,clientdata,uidata"
+}
+
+function Ensure-WorkflowActivated {
+    param([string]$WorkflowId)
+    $before = Get-WorkflowDetails -WorkflowId $WorkflowId
+    if (($before.statecode ?? -1) -eq 1) {
+        return [pscustomobject]@{ Activated = $true; StateCode = $before.statecode; StatusCode = $before.statuscode; Action = 'already-active' }
+    }
+    $body = @{ EntityId = $WorkflowId } | ConvertTo-Json -Compress
+    Invoke-DvWithRetry -Method 'Post' -Path 'Microsoft.Dynamics.CRM.ActivateWorkflow' -Body $body | Out-Null
+    $after = Get-WorkflowDetails -WorkflowId $WorkflowId
+    return [pscustomobject]@{ Activated = (($after.statecode ?? -1) -eq 1); StateCode = $after.statecode; StatusCode = $after.statuscode; Action = 'activate-attempted' }
+}
+
+function Test-WorkflowInSolution {
+    param([string]$WorkflowId, [string]$SolutionId, [int]$ProcessComponentType)
+    $resp = Invoke-DvWithRetry -Method 'Get' -Path "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq $SolutionId and objectid eq $WorkflowId and componenttype eq $ProcessComponentType"
+    return @($resp.value).Count -gt 0
+}
+
+function Invoke-BpfProcess {
+    param(
+        [object]$Definition,
+        [string]$ReportPath,
+        [string]$HandoffPath,
+        [object]$Solution
+    )
+
+    $validation = Test-BpfDefinition -Definition $Definition -ArtifactText $artifactText -PayloadFolder $scenarioPayloadFolder
+    $inputsUsed = @{
+        ScenarioSlug = $ScenarioSlug
+        PayloadFolder = $scenarioPayloadFolder
+        ProcessPayload = $Definition.__SourceFile
+        PlanningArtifacts = @($artifactPaths.AnswersPath, $artifactPaths.SpecPath, $artifactPaths.PlanPath, $artifactPaths.TasksPath)
+        Parameters = @{ EnableBusinessProcessFlow = $EnableBusinessProcessFlow; BusinessProcessFlowName = $BusinessProcessFlowName; PrimaryProcessEntity = $PrimaryProcessEntity; FailIfBpfDefinitionIncomplete = $FailIfBpfDefinitionIncomplete; PreferUpdateExistingBpf = $PreferUpdateExistingBpf; MinimumStageCount = $MinimumStageCount; MinimumConditionCount = $MinimumConditionCount; MinimumStepCount = $MinimumStepCount }
+    }
+
+    $thresholdValidation = Test-BpfRuntimeThresholds -StageSummaries $validation.StageSummaries -MinStage $MinimumStageCount -MinCondition $MinimumConditionCount -MinStep $MinimumStepCount
+    $allFailures = @($validation.Failed) + @($thresholdValidation.Failed)
+    $effectiveValidation = [pscustomobject]@{
+        Passed = @($validation.Passed) + @($thresholdValidation.Passed)
+        Failed = $allFailures
+        Warnings = @($validation.Warnings)
+    }
+    $status = $validation.Status
+    $dataverseResult = [ordered]@{ Thresholds = $thresholdValidation.Thresholds; Metrics = $thresholdValidation.Metrics }
+
+    if ($validation.Status -eq 'passed' -and $thresholdValidation.Failed.Count -eq 0) {
+        Write-BpfDesignerHandoff -Definition $Definition -Validation $validation -Path $HandoffPath
+        $expectedUniqueName = ConvertTo-WorkflowUniqueName -Value $Definition.BusinessProcessFlowName -PublisherPrefix $PublisherPrefix
+        if ($PreviewOnly) {
+            $status = 'preview'
+            $dataverseResult = [ordered]@{
+                Provisioning = 'designer-handoff-required'
+                MetadataMutation = 'none'
+                HandoffPath = $HandoffPath
+                ExpectedUniqueName = $expectedUniqueName
+                Thresholds = $thresholdValidation.Thresholds
+                Metrics = $thresholdValidation.Metrics
+            }
+        } else {
+            try {
+                $result = Upsert-BpfWorkflow -Definition $Definition -SolutionName $SolutionUniqueName -PreferUpdate:$PreferUpdateExistingBpf -HandoffPath $HandoffPath
+                $activation = Ensure-WorkflowActivated -WorkflowId $result.WorkflowId
+                $componentType = Get-ComponentTypeValue -Labels @('Process', 'Workflow') -Fallback 29
+                $inSolution = Test-WorkflowInSolution -WorkflowId $result.WorkflowId -SolutionId $Solution.solutionid -ProcessComponentType $componentType
+                $gateFailures = @()
+                if (-not $activation.Activated) { $gateFailures += "Workflow '$($Definition.BusinessProcessFlowName)' is not active." }
+                if (-not $inSolution) { $gateFailures += "Workflow '$($Definition.BusinessProcessFlowName)' is not present in solution '$SolutionUniqueName'." }
+                $effectiveValidation.Failed = @($effectiveValidation.Failed) + $gateFailures
+                $status = if ($gateFailures.Count -gt 0) { 'failed' } else { $result.Action }
+                $dataverseResult = [ordered]@{
+                    Action = $result.Action
+                    WorkflowId = $result.WorkflowId
+                    UniqueName = $result.UniqueName
+                    SolutionAddStatus = $result.SolutionAddStatus
+                    Activation = $activation
+                    SolutionMembership = [ordered]@{ InSolution = $inSolution; SolutionUniqueName = $SolutionUniqueName; ComponentType = 29 }
+                    Thresholds = $thresholdValidation.Thresholds
+                    Metrics = $thresholdValidation.Metrics
+                    BranchPredicateSummary = Get-BranchPredicateSummary -StageSummaries $validation.StageSummaries
+                    RuntimeNotes = @($runtimeNotes)
+                    Provisioning = 'designer-authored-existing-process'
+                    MetadataMutation = $result.MetadataMutation
+                }
+            } catch {
+                $status = 'failed'
+                $effectiveValidation.Failed = @($effectiveValidation.Failed) + @($_.Exception.Message)
+            }
+        }
+    } elseif ($validation.Status -ne 'skipped') {
+        $status = 'failed'
+    }
+
+    $report = New-BpfReport -Status $status -ProcessName $Definition.BusinessProcessFlowName -TargetEntity $Definition.PrimaryProcessEntity -StageSummaries $validation.StageSummaries -Validation $effectiveValidation -InputsUsed $inputsUsed -DataverseResult $dataverseResult
+    Write-BpfReportFile -Report $report -Path $ReportPath
+    if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name $Definition.BusinessProcessFlowName -Status $status -Step '55-build-business-process-flows.ps1' -Details @{ processPayload = $Definition.__SourceFile; reportPath = $ReportPath; handoffPath = $HandoffPath; uniqueName = (ConvertTo-WorkflowUniqueName -Value $Definition.BusinessProcessFlowName -PublisherPrefix $PublisherPrefix) } | Out-Null
+    }
+    return [pscustomobject]@{ Key = Get-BpfArtifactKey -SourceFile $Definition.__SourceFile; ReportPath = $ReportPath; HandoffPath = $HandoffPath; Report = $report }
+}
+
+Write-Host ''
+Write-Host '=== Build Business Process Flows ===' -ForegroundColor Cyan
+Write-Host "  Scenario: $ScenarioSlug"
+Write-Host "  Payloads: $scenarioPayloadFolder"
+
+if (-not $EnableBusinessProcessFlow -or -not (Test-Path -LiteralPath $scenarioPayloadFolder) -or $processDefinitions.Count -eq 0) {
+    $reason = if (-not $EnableBusinessProcessFlow) { 'EnableBusinessProcessFlow=false' } elseif (-not (Test-Path -LiteralPath $scenarioPayloadFolder)) { "Payload folder not found: $scenarioPayloadFolder" } else { 'No process-*.json definition exists for this scenario.' }
+    $report = New-BpfReport -Status 'skipped' -ProcessName $BusinessProcessFlowName -TargetEntity $PrimaryProcessEntity -StageSummaries @() -Validation ([pscustomobject]@{ Passed = @(); Failed = @(); Warnings = @($reason) }) -InputsUsed @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $scenarioPayloadFolder } -DataverseResult @{}
+    Write-BpfReportFile -Report $report -Path $aggregateReportPath
+    Write-Host "$reason Skipping." -ForegroundColor Yellow
+    exit 0
+}
+
+if ($processDefinitions.Count -gt 1 -and (-not [string]::IsNullOrWhiteSpace($BusinessProcessFlowName) -or -not [string]::IsNullOrWhiteSpace($PrimaryProcessEntity))) {
+    throw 'BusinessProcessFlowName and PrimaryProcessEntity overrides are only supported for a single process payload.'
+}
+if ($processDefinitions.Count -eq 1) {
+    if (-not [string]::IsNullOrWhiteSpace($BusinessProcessFlowName)) { $processDefinitions[0].BusinessProcessFlowName = $BusinessProcessFlowName }
+    if (-not [string]::IsNullOrWhiteSpace($PrimaryProcessEntity)) { $processDefinitions[0].PrimaryProcessEntity = $PrimaryProcessEntity }
+}
+
+$uniqueNames = @{}
+foreach ($definition in $processDefinitions) {
+    if ($null -ne $definition.PSObject.Properties['__LoadError']) { continue }
+    $uniqueName = ConvertTo-WorkflowUniqueName -Value $definition.BusinessProcessFlowName -PublisherPrefix $PublisherPrefix
+    if ($uniqueNames.ContainsKey($uniqueName)) {
+        $definition | Add-Member -NotePropertyName '__LoadError' -NotePropertyValue "Derived workflow unique name '$uniqueName' duplicates '$($uniqueNames[$uniqueName])'." -Force
+    } else {
+        $uniqueNames[$uniqueName] = $definition.__SourceFile
+    }
+}
+
+$solution = $null
+if (-not $PreviewOnly) {
+    foreach ($required in @($EnvironmentUrl, $AccessToken, $SolutionUniqueName)) {
+        if ([string]::IsNullOrWhiteSpace($required)) { throw 'Run 10-auth-connect.ps1 first so EnvironmentUrl, AccessToken, and SolutionUniqueName are available.' }
+    }
+    $solutions = @(Get-Solution -UniqueName $SolutionUniqueName)
+    if ($solutions.Count -eq 0) { throw "Solution '$SolutionUniqueName' not found." }
+    $solution = $solutions[0]
+}
+
+$results = New-Object System.Collections.Generic.List[object]
+foreach ($definition in $processDefinitions) {
+    $definition.Enabled = $EnableBusinessProcessFlow
+    $key = Get-BpfArtifactKey -SourceFile $definition.__SourceFile
+    $reportPath = if ($processDefinitions.Count -eq 1) { $aggregateReportPath } else { Join-Path $reportFolder "business-process-flow-$key-report.json" }
+    $handoffPath = if ($processDefinitions.Count -eq 1) { Join-Path $reportFolder 'business-process-flow-designer-handoff.md' } else { Join-Path $reportFolder "business-process-flow-$key-designer-handoff.md" }
+    $results.Add((Invoke-BpfProcess -Definition $definition -ReportPath $reportPath -HandoffPath $handoffPath -Solution $solution)) | Out-Null
+}
+
+if ($processDefinitions.Count -gt 1) {
+    $failed = @($results | Where-Object { $_.Report.Status -eq 'failed' })
+    $aggregate = [ordered]@{
+        Timestamp = (Get-Date).ToString('o')
+        Status = if ($failed.Count -gt 0) { 'failed' } elseif (@($results | Where-Object { $_.Report.Status -eq 'preview' }).Count -eq $results.Count) { 'preview' } else { 'completed' }
+        ProcessCount = $results.Count
+        SucceededCount = @($results | Where-Object { $_.Report.Status -ne 'failed' }).Count
+        FailedCount = $failed.Count
+        Processes = @($results | ForEach-Object { [ordered]@{ Key = $_.Key; ProcessName = $_.Report.ProcessName; TargetEntity = $_.Report.TargetEntity; Status = $_.Report.Status; ReportPath = $_.ReportPath; HandoffPath = $_.HandoffPath } })
+        Validation = [ordered]@{ Passed = @($results | ForEach-Object { $_.Report.Validation.Passed }); Failed = @($results | ForEach-Object { $_.Report.Validation.Failed }); Warnings = @($results | ForEach-Object { $_.Report.Validation.Warnings }) }
+        DataverseResult = [ordered]@{ MetadataMutation = if ($PreviewOnly) { 'none' } else { 'existing-components-only' }; Processes = @($results | ForEach-Object { $_.Report.DataverseResult }) }
+    }
+    Write-BpfReportFile -Report $aggregate -Path $aggregateReportPath
+}
+
+$failureCount = @($results | Where-Object { $_.Report.Status -eq 'failed' }).Count
+Write-Host "Processed $($results.Count) Business Process Flow payload(s); failures: $failureCount. Aggregate: $aggregateReportPath" -ForegroundColor $(if ($failureCount -gt 0) { 'Red' } else { 'Green' })
+if ($failureCount -gt 0) {
+    if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) { Register-WizardStepFailure -Message "$failureCount Business Process Flow payload(s) failed." }
+    exit 1
+}
+if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) { Complete-WizardStepTelemetry -Message "$($results.Count) Business Process Flow payload(s) completed." }
+exit 0
+
+<#
+Legacy single-process execution retained temporarily as migration reference.
+The reusable multi-process runner above always exits before this block.
 
 Write-Host ''
 Write-Host '=== Build Business Process Flows ===' -ForegroundColor Cyan
@@ -454,7 +651,7 @@ if (-not $EnableBusinessProcessFlow) {
     $report = New-BpfReport -Status 'skipped' -ProcessName $BusinessProcessFlowName -TargetEntity $PrimaryProcessEntity -StageSummaries @() -Validation ([pscustomobject]@{ Passed = @(); Failed = @(); Warnings = @('EnableBusinessProcessFlow=false') }) -InputsUsed @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $scenarioPayloadFolder } -DataverseResult @{}
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'disabled' } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'disabled' } | Out-Null
     }
     Write-Host 'Business Process Flow generation disabled by parameter. Skipping.' -ForegroundColor Yellow
     exit 0
@@ -464,7 +661,7 @@ if (-not (Test-Path $scenarioPayloadFolder)) {
     $report = New-BpfReport -Status 'skipped' -ProcessName $BusinessProcessFlowName -TargetEntity $PrimaryProcessEntity -StageSummaries @() -Validation ([pscustomobject]@{ Passed = @(); Failed = @(); Warnings = @("Payload folder not found: $scenarioPayloadFolder") }) -InputsUsed @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $scenarioPayloadFolder } -DataverseResult @{}
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'missing scenario payload folder' } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'missing scenario payload folder' } | Out-Null
     }
     Write-Host 'No scenario payload folder found for BPF. Skipping.' -ForegroundColor Yellow
     exit 0
@@ -474,7 +671,7 @@ if ($processDefinitions.Count -eq 0) {
     $report = New-BpfReport -Status 'skipped' -ProcessName $BusinessProcessFlowName -TargetEntity $PrimaryProcessEntity -StageSummaries @() -Validation ([pscustomobject]@{ Passed = @(); Failed = @(); Warnings = @('No process-*.json definition exists for this scenario. CRUD-only scenarios should skip BPF generation.') }) -InputsUsed @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $scenarioPayloadFolder } -DataverseResult @{}
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'no process payload' } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name ($BusinessProcessFlowName ?? 'business-process-flow') -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'no process payload' } | Out-Null
     }
     Write-Host 'No process-*.json payload found. Skipping BPF generation.' -ForegroundColor Yellow
     exit 0
@@ -504,7 +701,7 @@ if ($validation.Status -eq 'skipped') {
     $report = New-BpfReport -Status 'skipped' -ProcessName $definition.BusinessProcessFlowName -TargetEntity $definition.PrimaryProcessEntity -StageSummaries $validation.StageSummaries -Validation $validation -InputsUsed $inputsUsed -DataverseResult @{}
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'scenario does not justify bpf' } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'skipped' -Step '55-build-business-process-flows.ps1' -Details @{ reason = 'scenario does not justify bpf' } | Out-Null
     }
     Write-Host 'Scenario does not justify a Business Process Flow. Skipping.' -ForegroundColor Yellow
     exit 0
@@ -517,7 +714,7 @@ if ($validation.Status -eq 'failed') {
         Write-Host "  VALIDATION FAILED: $message" -ForegroundColor Red
     }
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'failed' -Step '55-build-business-process-flows.ps1' -Details @{ validationFailures = @($validation.Failed) } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'failed' -Step '55-build-business-process-flows.ps1' -Details @{ validationFailures = @($validation.Failed) } | Out-Null
     }
     if ($FailIfBpfDefinitionIncomplete) {
         if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
@@ -596,13 +793,13 @@ if (-not $formStatus.Exists) {
 try {
     $dataverseResult = Upsert-BpfWorkflow -Definition $definition -SolutionName $SolutionUniqueName -PreferUpdate:$PreferUpdateExistingBpf
     $activation = Ensure-WorkflowActivated -WorkflowId $dataverseResult.WorkflowId
-    $processComponentType = Get-ComponentTypeValue -Label 'Process'
+    $processComponentType = Get-ComponentTypeValue -Labels @('Process', 'Workflow') -Fallback 29
     $isInSolution = Test-WorkflowInSolution -WorkflowId $dataverseResult.WorkflowId -SolutionId $solution[0].solutionid -ProcessComponentType $processComponentType
 
     $appLinkage = [ordered]@{ Status = 'not-configured'; AppUniqueName = ''; AppModuleId = ''; Added = $false; ValidationSuccess = $null; Notes = @() }
     if (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue) {
         try {
-            $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $scenarioPayloadFolder -PublisherPrefix $env:DV_PUBLISHER_PREFIX
+            $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $scenarioPayloadFolder -PublisherPrefix $PublisherPrefix
             if ($appConfig.Enabled -and -not [string]::IsNullOrWhiteSpace(($appConfig.UniqueName ?? ''))) {
                 $appLinkage.Status = 'pending-app-module'
                 $appLinkage.AppUniqueName = $appConfig.UniqueName
@@ -660,7 +857,7 @@ try {
     $report = New-BpfReport -Status $status -ProcessName $definition.BusinessProcessFlowName -TargetEntity $definition.PrimaryProcessEntity -StageSummaries $validation.StageSummaries -Validation $effectiveValidation -InputsUsed $inputsUsed -DataverseResult $dataverseResult
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status $status -Step '55-build-business-process-flows.ps1' -Details @{ workflowId = $dataverseResult.WorkflowId; solutionAddStatus = $dataverseResult.SolutionAddStatus; activated = $activation.Activated; inSolution = $isInSolution } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status $status -Step '55-build-business-process-flows.ps1' -Details @{ workflowId = $dataverseResult.WorkflowId; solutionAddStatus = $dataverseResult.SolutionAddStatus; activated = $activation.Activated; inSolution = $isInSolution } | Out-Null
     }
 
     Write-Host ''
@@ -697,7 +894,7 @@ try {
     $report = New-BpfReport -Status 'failed' -ProcessName $definition.BusinessProcessFlowName -TargetEntity $definition.PrimaryProcessEntity -StageSummaries $validation.StageSummaries -Validation ([pscustomobject]@{ Passed = $validation.Passed; Failed = @($message); Warnings = $validation.Warnings }) -InputsUsed $inputsUsed -DataverseResult @{}
     Write-BpfReportFile -Report $report
     if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $env:DV_PUBLISHER_PREFIX -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'failed' -Step '55-build-business-process-flows.ps1' -Details @{ error = $message } | Out-Null
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'bpf' -Name $definition.BusinessProcessFlowName -Status 'failed' -Step '55-build-business-process-flows.ps1' -Details @{ error = $message } | Out-Null
     }
     if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
         Register-WizardStepFailure -Message "Business Process Flow build failed: $message"
@@ -733,7 +930,7 @@ function Test-WorkflowInSolution {
         [int]$ProcessComponentType
     )
 
-    $resp = Invoke-DvWithRetry -Method 'Get' -Path "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq guid'$SolutionId' and objectid eq guid'$WorkflowId' and componenttype eq $ProcessComponentType"
+    $resp = Invoke-DvWithRetry -Method 'Get' -Path "solutioncomponents?`$select=solutioncomponentid&`$filter=_solutionid_value eq $SolutionId and objectid eq $WorkflowId and componenttype eq $ProcessComponentType"
     return @($resp.value).Count -gt 0
 }
 
@@ -759,3 +956,4 @@ function Add-WorkflowToAppModule {
     $body = @{ AppId = $AppModuleId; Components = @($component) } | ConvertTo-Json -Depth 10 -Compress
     Invoke-DvWithRetry -Method 'Post' -Path 'AddAppComponents' -Body $body | Out-Null
 }
+#>

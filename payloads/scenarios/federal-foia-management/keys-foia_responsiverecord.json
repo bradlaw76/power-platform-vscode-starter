@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_responsiverecord",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_ResponsiveRecord_Identifier",
+      "DisplayName": "Responsive Record Identifier",
+      "KeyAttributes": ["foia_recordidentifier"]
+    }
+  ]
+}

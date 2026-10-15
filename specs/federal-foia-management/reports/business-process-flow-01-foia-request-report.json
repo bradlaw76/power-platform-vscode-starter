@@ -1,0 +1,194 @@
+{
+  "DataverseResult": {
+    "RuntimeNotes": [],
+    "Metrics": {
+      "StageCount": 8,
+      "ConditionCount": 16,
+      "StepCount": 13
+    },
+    "Action": "validated-existing",
+    "WorkflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
+    "Provisioning": "designer-authored-existing-process",
+    "Activation": {
+      "Activated": true,
+      "StateCode": 1,
+      "StatusCode": 2,
+      "Action": "already-active"
+    },
+    "UniqueName": "foia_federal_foia_request_lifecycle",
+    "SolutionAddStatus": "added",
+    "SolutionMembership": {
+      "InSolution": true,
+      "SolutionUniqueName": "FederalFOIAManagement",
+      "ComponentType": 29
+    },
+    "Thresholds": {
+      "MinimumStageCount": 2,
+      "MinimumConditionCount": 2,
+      "MinimumStepCount": 2
+    },
+    "BranchPredicateSummary": [
+      {
+        "StageOrder": 1,
+        "StageName": "Intake",
+        "EntryCriteria": "Submission received through an approved channel; FOIA-INT-001.",
+        "ExitCriteria": "Validation, tracking, and acknowledgment complete; FOIA-INT-002..005."
+      },
+      {
+        "StageOrder": 2,
+        "StageName": "Clarification",
+        "EntryCriteria": "Scope requires human-managed correction; FOIA-INT-002.",
+        "ExitCriteria": "Scope is clarified and perfected or controlled disposition recorded; FOIA-CAS-001."
+      },
+      {
+        "StageOrder": 3,
+        "StageName": "Search",
+        "EntryCriteria": "Perfected request has approved search scope; FOIA-COL-003.",
+        "ExitCriteria": "Every approved search has evidence and results; FOIA-COL-003."
+      },
+      {
+        "StageOrder": 4,
+        "StageName": "Review",
+        "EntryCriteria": "Collected record metadata is available; FOIA-REV-001.",
+        "ExitCriteria": "Required review dispositions are documented; FOIA-REV-001..003."
+      },
+      {
+        "StageOrder": 5,
+        "StageName": "Redaction",
+        "EntryCriteria": "Review identifies controlled redaction work; FOIA-REV-004.",
+        "ExitCriteria": "Every proposed redaction has independent approval state; FOIA-CAS-005."
+      },
+      {
+        "StageOrder": 6,
+        "StageName": "Approval",
+        "EntryCriteria": "Controlled decisions are ready for approval; FOIA-CAS-005.",
+        "ExitCriteria": "Independent human approvals are recorded; FOIA-CAS-005; FOIA-SEC-002."
+      },
+      {
+        "StageOrder": 7,
+        "StageName": "Release",
+        "EntryCriteria": "Approved fixed package is ready; FOIA-REV-005..007.",
+        "ExitCriteria": "Method, recipient, hash, and timestamp are recorded; FOIA-REV-005."
+      },
+      {
+        "StageOrder": 8,
+        "StageName": "Closure",
+        "EntryCriteria": "A controlled final disposition is complete; FOIA-CAS-001.",
+        "ExitCriteria": "Closure reconciles to clock and audit history; FOIA-RPT-003."
+      }
+    ],
+    "MetadataMutation": "none"
+  },
+  "TargetEntity": "foia_foiarequest",
+  "StagesCreated": [
+    {
+      "Order": 1,
+      "StageName": "Intake",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_trackingnumber",
+        "foia_intakechannel",
+        "foia_receiveddate",
+        "foia_validationstate"
+      ],
+      "EntryCriteria": "Submission received through an approved channel; FOIA-INT-001.",
+      "ExitCriteria": "Validation, tracking, and acknowledgment complete; FOIA-INT-002..005.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 2,
+      "StageName": "Clarification",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_validationstate",
+        "foia_clarificationduedate"
+      ],
+      "EntryCriteria": "Scope requires human-managed correction; FOIA-INT-002.",
+      "ExitCriteria": "Scope is clarified and perfected or controlled disposition recorded; FOIA-CAS-001.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 3,
+      "StageName": "Search",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_currentduedate"
+      ],
+      "EntryCriteria": "Perfected request has approved search scope; FOIA-COL-003.",
+      "ExitCriteria": "Every approved search has evidence and results; FOIA-COL-003.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 4,
+      "StageName": "Review",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_currentduedate"
+      ],
+      "EntryCriteria": "Collected record metadata is available; FOIA-REV-001.",
+      "ExitCriteria": "Required review dispositions are documented; FOIA-REV-001..003.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 5,
+      "StageName": "Redaction",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_currentduedate"
+      ],
+      "EntryCriteria": "Review identifies controlled redaction work; FOIA-REV-004.",
+      "ExitCriteria": "Every proposed redaction has independent approval state; FOIA-CAS-005.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 6,
+      "StageName": "Approval",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_disposition"
+      ],
+      "EntryCriteria": "Controlled decisions are ready for approval; FOIA-CAS-005.",
+      "ExitCriteria": "Independent human approvals are recorded; FOIA-CAS-005; FOIA-SEC-002.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 7,
+      "StageName": "Release",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_disposition"
+      ],
+      "EntryCriteria": "Approved fixed package is ready; FOIA-REV-005..007.",
+      "ExitCriteria": "Method, recipient, hash, and timestamp are recorded; FOIA-REV-005.",
+      "RelationshipLogicalName": ""
+    },
+    {
+      "Order": 8,
+      "StageName": "Closure",
+      "EntityLogicalName": "foia_foiarequest",
+      "RequiredFields": [
+        "foia_disposition",
+        "foia_closeddate"
+      ],
+      "EntryCriteria": "A controlled final disposition is complete; FOIA-CAS-001.",
+      "ExitCriteria": "Closure reconciles to clock and audit history; FOIA-RPT-003.",
+      "RelationshipLogicalName": ""
+    }
+  ],
+  "Status": "validated-existing",
+  "Timestamp": "2026-10-12T14:08:33.8814727-04:00",
+  "ProcessName": "Federal FOIA Request Lifecycle",
+  "Validation": {
+    "Passed": [
+      "Process name supplied: Federal FOIA Request Lifecycle",
+      "Primary entity resolved: foia_foiarequest",
+      "Target Main form declared: FOIA Request Main",
+      "Stage threshold passed: 8 >= 2.",
+      "Condition threshold passed: 16 >= 2.",
+      "Step threshold passed: 13 >= 2."
+    ],
+    "Failed": [],
+    "Warnings": []
+  },
+  "InputsUsed": null
+}

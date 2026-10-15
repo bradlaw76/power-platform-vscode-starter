@@ -2,7 +2,11 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "type": "object",
   "additionalProperties": false,
-  "required": ["Enabled", "Charts", "Dashboard"],
+  "required": ["Enabled", "Charts"],
+  "anyOf": [
+    { "required": ["Dashboard"] },
+    { "required": ["Dashboards"] }
+  ],
   "properties": {
     "Enabled": { "type": "boolean" },
     "ReportRequest": {
@@ -52,6 +56,18 @@
       }
     },
     "Dashboard": {
+      "$ref": "#/$defs/dashboard"
+    },
+    "Dashboards": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/dashboard"
+      }
+    }
+  },
+  "$defs": {
+    "dashboard": {
       "type": "object",
       "additionalProperties": false,
       "required": ["Name", "ChartNames"],

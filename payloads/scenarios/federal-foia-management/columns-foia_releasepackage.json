@@ -1,0 +1,281 @@
+{
+  "TableLogicalName": "foia_releasepackage",
+  "Columns": [
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_packagenumber",
+      "LogicalName": "foia_packagenumber",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Package Number",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Controlled package identifier. [required] FOIA-REV-005; FOIA-DAT-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.IntegerAttributeMetadata",
+      "SchemaName": "foia_packageversion",
+      "LogicalName": "foia_packageversion",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Package Version",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Immutable controlled version. [required] FOIA-REV-005..007.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxValue": 2147483647,
+      "MinValue": 1
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_approvalstate",
+      "LogicalName": "foia_approvalstate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approval State",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Draft, Pending Approval, Approved, or Released. [required] FOIA-CAS-005; FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_packagehash",
+      "LogicalName": "foia_packagehash",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Package Hash",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Fixed manifest integrity hash. FOIA-REV-005..007.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 128
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_responsecorrespondence",
+      "LogicalName": "foia_responsecorrespondence",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Response Correspondence Reference",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Secure correspondence reference. FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 500
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_plannedreleasedate",
+      "LogicalName": "foia_plannedreleasedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Planned Release Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Planned issuance date. FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateOnly"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.DateTimeAttributeMetadata",
+      "SchemaName": "foia_releasedate",
+      "LogicalName": "foia_releasedate",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Release Date",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Actual release timestamp. FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "Format": "DateAndTime"
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_releasemethod",
+      "LogicalName": "foia_releasemethod",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Release Method",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Authorized release channel. FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 50
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_recipientreference",
+      "LogicalName": "foia_recipientreference",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Recipient Reference",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Non-secret recipient reference. FOIA-REV-005.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_approveridentity",
+      "LogicalName": "foia_approveridentity",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Approver Identity",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Independent release approver. FOIA-SEC-002.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "None"
+      },
+      "MaxLength": 200
+    },
+    {
+      "@odata.type": "Microsoft.Dynamics.CRM.StringAttributeMetadata",
+      "SchemaName": "foia_syntheticsourcetag",
+      "LogicalName": "foia_syntheticsourcetag",
+      "DisplayName": {
+        "LocalizedLabels": [
+          {
+            "Label": "Synthetic Source Tag",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "Description": {
+        "LocalizedLabels": [
+          {
+            "Label": "Deterministic non-production ownership marker. [required] FOIA-TST-003; FOIA-SEC-008.",
+            "LanguageCode": 1033
+          }
+        ]
+      },
+      "RequiredLevel": {
+        "Value": "ApplicationRequired"
+      },
+      "MaxLength": 100
+    }
+  ]
+}

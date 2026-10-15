@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_clockevent",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Clock Event",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Clock Events",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Append-only statutory event and reproducible due-date derivation. FOIA-DAT-003; FOIA-CLK-003..006; FOIA-SEC-007.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

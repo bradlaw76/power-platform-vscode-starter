@@ -34,7 +34,7 @@ $requestInvoker = {
     if ($request.Path -like 'savedqueries?*') { return [pscustomobject]@{ value=@([pscustomobject]@{ savedqueryid='view-id'; name='Requested View' }) } }
     if ($request.Path -like 'savedqueryvisualizations?*') { return [pscustomobject]@{ value=@([pscustomobject]@{ savedqueryvisualizationid='chart-id'; name='Chart' }) } }
     if ($request.Path -like 'workflows?*') { return [pscustomobject]@{ value=@([pscustomobject]@{ workflowid='bpf-id'; name='BPF' }) } }
-    if ($request.Path -like 'sitemaps?*') { return [pscustomobject]@{ value=@($siteMapState) } }
+    if ($request.Path -like 'sitemaps?*' -or $request.Path -like 'sitemaps/Microsoft.Dynamics.CRM.RetrieveUnpublishedMultiple()*') { return [pscustomobject]@{ value=@($siteMapState) } }
     if ($request.Method -eq 'Post' -and $request.Path -eq 'sitemaps') {
         $siteMap = [pscustomobject]@{ sitemapid='22222222-2222-2222-2222-222222222222'; sitemapname=$body.sitemapname; sitemapnameunique=$body.sitemapnameunique; sitemapxml=$body.sitemapxml }
         $siteMapState.Add($siteMap); return [pscustomobject]@{}

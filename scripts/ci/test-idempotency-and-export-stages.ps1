@@ -24,11 +24,17 @@ $manifestPath = Join-Path $testPaths[0] 'generated-artifact-manifest.json'
 $reportingPath = Join-Path $testPaths[1] "$scenario.json"
 $dataPath = Join-Path $testPaths[2] "$scenario.json"
 $membershipPath = Join-Path $testPaths[3] 'solution-membership-report.json'
-$manifest = @{ items=@(@{ kind='appmodule'; name='sample_app'; status='updated'; details=@{ id='app-1' } }) }
+$manifest = @{ items=@(
+    @{ kind='appmodule'; name='sample_app'; status='updated'; details=@{ id='app-1' } },
+    @{ kind='publish'; name='scoped_components'; status='completed'; details=@{} }
+) }
 $reporting = @{ items=@(@{ kind='chart'; name='Sample Chart'; id='chart-1'; action='created' }) }
 $data = @{ records=@(@{ table='sample'; key='KEY-1'; id='record-1'; action='created' }) }
 $appId = '11111111-1111-1111-1111-111111111111'
-$membership = @{ ExportAllowed=$true; Items=@(@{ Category='model-driven-apps'; Name='sample_app'; ObjectId=$appId; ComponentType=80; State='Already in solution' }) }
+$membership = @{ ExportAllowed=$true; Items=@(
+    @{ Category='model-driven-apps'; Name='sample_app'; ObjectId=$appId; ComponentType=80; State='Already in solution' },
+    @{ Category='columns'; Name='sample.sample_priority'; ObjectId=''; SolutionComponentId='sample-table-component'; ComponentType=$null; State='Already in solution'; Reason="Inherited from include-all table root 'sample'." }
+) }
 $manifest | ConvertTo-Json -Depth 10 | Set-Content $manifestPath
 $reporting | ConvertTo-Json -Depth 10 | Set-Content $reportingPath
 $data | ConvertTo-Json -Depth 10 | Set-Content $dataPath
@@ -58,8 +64,8 @@ try {
         } elseif ($Arguments[1] -eq 'unpack') {
             $folder = $Arguments[[Array]::IndexOf($Arguments,'--folder') + 1]
             New-Item -ItemType Directory -Path $folder -Force | Out-Null
-            $expected = if ($omitExpectedComponent) { '' } else { '<RootComponent type="80" id="{0}" schemaName="sample_app" />' -f $appId }
-            $extra = if ($includeUnrelatedComponent) { '<RootComponent type="1" id="22222222-2222-2222-2222-222222222222" schemaName="foreign_table" />' } else { '' }
+            $expected = if ($omitExpectedComponent) { '' } else { '<RootComponent type="80" schemaName="sample_app" />' }
+            $extra = if ($includeUnrelatedComponent) { '<RootComponent type="1" schemaName="foreign_table" />' } else { '' }
             ('<ImportExportXml><SolutionManifest><UniqueName>UnitSolution</UniqueName><RootComponents>{0}{1}</RootComponents></SolutionManifest></ImportExportXml>' -f $expected,$extra) | Set-Content -LiteralPath (Join-Path $folder 'Solution.xml')
         }
     }
@@ -67,7 +73,7 @@ try {
     if ($pacCalls.Count -ne 2 -or $pacCalls[0] -notmatch '--managed false' -or $pacCalls[1] -notmatch '--packagetype Unmanaged') { throw 'Export stage did not issue exact unmanaged export/unpack commands.' }
     if (@($pacCalls | Where-Object { $_ -match '(?i)\bimport\b' }).Count -ne 0) { throw 'Export stage attempted import.' }
     $exportEvidence = Get-Content -LiteralPath (Join-Path $artifactRoot "export/$scenario.json") -Raw | ConvertFrom-Json
-    if ($exportEvidence.inspection.expected -ne 1 -or $exportEvidence.inspection.matched -ne 1) { throw 'Export stage did not record exact package inspection evidence.' }
+    if ($exportEvidence.inspection.expected -ne 1 -or $exportEvidence.inspection.matched -ne 1 -or $exportEvidence.inheritedMembershipItemCount -ne 1) { throw 'Export stage did not record exact explicit and inherited package inspection evidence.' }
     $omitExpectedComponent = $true
     try { & (Join-Path $repoRoot 'scripts/bootstrap/95-export-unmanaged-solution.ps1') -ScenarioSlug $scenario -SolutionUniqueName UnitSolution -OutputFolder $outputFolder -PacInvoker $pacInvoker; throw 'Expected missing-component failure.' } catch { if ($_.Exception.Message -notmatch 'missing required component') { throw } }
     $omitExpectedComponent = $false

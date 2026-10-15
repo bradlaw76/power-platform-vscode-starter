@@ -44,9 +44,11 @@ $schemaRoot = Join-Path $repoRoot 'schemas/payloads'
 $schemaByFamily = [ordered]@{
     'table'         = Join-Path $schemaRoot 'table.schema.json'
     'columns'       = Join-Path $schemaRoot 'columns.schema.json'
+    'keys'          = Join-Path $schemaRoot 'keys.schema.json'
     'relationships' = Join-Path $schemaRoot 'relationships.schema.json'
     'process'       = Join-Path $schemaRoot 'process.schema.json'
     'reporting'     = Join-Path $schemaRoot 'reporting.schema.json'
+    'views'         = Join-Path $schemaRoot 'views.schema.json'
     'data'          = Join-Path $schemaRoot 'data.schema.json'
 }
 $failures = [System.Collections.Generic.List[string]]::new()
@@ -74,7 +76,7 @@ foreach ($file in $jsonFiles) {
         continue
     }
 
-    if ($file.Name -notmatch '^(?<family>table|columns|relationships|process|reporting|data)-.+\.json$') {
+    if ($file.Name -notmatch '^(?<family>table|columns|keys|relationships|process|reporting|views|data)-.+\.json$') {
         continue
     }
 

@@ -1,0 +1,147 @@
+{
+  "Enabled": true,
+  "ReportRequest": "FOIA-RPT-001..005 native operational and statutory source charts organized into five runtime dashboards.",
+  "TargetAppUniqueName": "foia_federal_foia_management",
+  "OutputTargets": [
+    "fetchxml-preview",
+    "native-chart-dashboard"
+  ],
+  "Charts": [
+    {
+      "Filters": [
+        {
+          "Field": "foia_closeddate",
+          "Operator": "null"
+        }
+      ],
+      "Name": "Active Requests by Lifecycle Stage",
+      "CategoryField": "foia_lifecyclestage",
+      "TableLogicalName": "foia_foiarequest",
+      "ChartType": "column",
+      "AggregateField": "foia_trackingnumber",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Filters": [
+        {
+          "Operator": "eq",
+          "Field": "foia_expeditedrequested",
+          "Value": true
+        }
+      ],
+      "Name": "Expedited Requests by Decision",
+      "CategoryField": "foia_expediteddecision",
+      "TableLogicalName": "foia_foiarequest",
+      "ChartType": "doughnut",
+      "AggregateField": "foia_trackingnumber",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Name": "Fees Assessed by Fiscal Period",
+      "CategoryField": "foia_fiscalperiod",
+      "TableLogicalName": "foia_foiarequest",
+      "ChartType": "column",
+      "AggregateField": "foia_feeassessed",
+      "Aggregate": "sum"
+    },
+    {
+      "Name": "Appeals by Outcome",
+      "CategoryField": "foia_outcome",
+      "TableLogicalName": "foia_appeal",
+      "ChartType": "pie",
+      "AggregateField": "foia_appealnumber",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Filters": [
+        {
+          "Operator": "eq",
+          "Field": "foia_approvalstate",
+          "Value": "Approved"
+        }
+      ],
+      "Name": "Approved Exemptions by Authority",
+      "CategoryField": "foia_authority",
+      "TableLogicalName": "foia_exemptiondecision",
+      "ChartType": "bar",
+      "AggregateField": "foia_decisionnumber",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Name": "Clock Events by Type",
+      "CategoryField": "foia_eventtype",
+      "TableLogicalName": "foia_clockevent",
+      "ChartType": "column",
+      "AggregateField": "foia_eventidentifier",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Filters": [
+        {
+          "Field": "foia_completeddate",
+          "Operator": "null"
+        }
+      ],
+      "Name": "Open Reviews by Type",
+      "CategoryField": "foia_reviewtype",
+      "TableLogicalName": "foia_reviewtask",
+      "ChartType": "bar",
+      "AggregateField": "foia_reviewtasknumber",
+      "Aggregate": "countcolumn"
+    },
+    {
+      "Name": "Release Packages by Approval State",
+      "CategoryField": "foia_approvalstate",
+      "TableLogicalName": "foia_releasepackage",
+      "ChartType": "doughnut",
+      "AggregateField": "foia_packagenumber",
+      "Aggregate": "countcolumn"
+    }
+  ],
+  "Dashboard": {
+    "Name": "Federal FOIA Operations",
+    "ChartNames": [
+      "Active Requests by Lifecycle Stage",
+      "Expedited Requests by Decision",
+      "Clock Events by Type"
+    ]
+  },
+  "Dashboards": [
+    {
+      "Name": "Federal FOIA Operations",
+      "ChartNames": [
+      "Active Requests by Lifecycle Stage",
+      "Expedited Requests by Decision",
+      "Clock Events by Type"
+      ]
+    },
+    {
+      "Name": "Federal FOIA Statutory Reporting",
+      "ChartNames": [
+      "Fees Assessed by Fiscal Period",
+      "Approved Exemptions by Authority"
+      ]
+    },
+    {
+      "Name": "Federal FOIA Appeals",
+      "ChartNames": [
+      "Appeals by Outcome"
+      ]
+    },
+    {
+      "Name": "Federal FOIA Review Workload",
+      "ChartNames": [
+      "Open Reviews by Type",
+      "Approved Exemptions by Authority"
+      ]
+    },
+    {
+      "Name": "Federal FOIA Release Readiness",
+      "ChartNames": [
+      "Release Packages by Approval State",
+      "Approved Exemptions by Authority",
+      "Open Reviews by Type"
+      ]
+    }
+  ]
+}

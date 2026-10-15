@@ -174,4 +174,42 @@ if ($blockedUnauthorized.ExportAllowed -or @($blockedUnauthorized.BlockingItems 
     throw 'Strict inventory must block export when unauthorized components remain.'
 }
 
+$inheritedExpected = @{
+    tables = @('cct_case', 'contact')
+    columns = @('cct_case.cct_priority', 'contact.cct_reference')
+    relationships = @('cct_case_contact')
+    forms = @('cct_case|main')
+    views = @('cct_case|active')
+    charts = @('cct_case|Cases by Priority')
+}
+$inheritedInventory = @(
+    [pscustomobject]@{
+        Kind = 'table'; Category = 'tables'; Name = 'cct_case'; ObjectId = 'table-id'
+        SolutionComponentId = 'sc-table'; ComponentType = 1; RootComponentBehavior = 0
+    },
+    [pscustomobject]@{
+        Kind = 'column'; Category = 'columns'; Name = 'contact.cct_reference'; ObjectId = 'contact-column-id'
+        SolutionComponentId = 'sc-contact-column'; ComponentType = 2
+    }
+)
+$expandedInventory = @(Expand-SolutionInheritedInventory `
+    -ExpectedByCategory $inheritedExpected `
+    -CurrentInventory $inheritedInventory `
+    -RelationshipTables @{ cct_case_contact = @('cct_case', 'contact') })
+
+foreach ($expectedInheritedName in @(
+    'cct_case.cct_priority',
+    'cct_case_contact',
+    'cct_case|main',
+    'cct_case|active',
+    'cct_case|Cases by Priority'
+)) {
+    if (@($expandedInventory | Where-Object Name -eq $expectedInheritedName).Count -ne 1) {
+        throw "Include-all table roots should satisfy inherited membership for '$expectedInheritedName'."
+    }
+}
+if (@($expandedInventory | Where-Object { $_.Category -eq 'tables' -and $_.Name -eq 'contact' }).Count -ne 1) {
+    throw 'An expected dependency table should be represented by its explicit solution subcomponents.'
+}
+
 Write-Host 'Solution isolation checks passed.' -ForegroundColor Green

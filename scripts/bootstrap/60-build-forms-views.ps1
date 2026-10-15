@@ -180,12 +180,9 @@ function Invoke-Dv {
     Accept             = 'application/json'
   }
 
-  $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-  if ([string]::IsNullOrWhiteSpace($Body)) {
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers
-  }
-
-  return Invoke-RestMethod -Method $Method -Uri $uri -Headers $headers -Body $Body
+  $requestBody = if ([string]::IsNullOrWhiteSpace($Body)) { $null } else { $Body }
+  return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl `
+    -AccessToken $AccessToken -Body $requestBody
 }
 
 function ConvertTo-Boolean {
@@ -1044,7 +1041,7 @@ function Initialize-FormScaffold {
     $tabNode = New-XmlElement -Document $Document -Name 'tab' -Attributes @{
       name      = 'general'
       id        = '{00000000-0000-0000-0000-000000000001}'
-      labelid   = ''
+      labelid   = '{00000000-0000-0000-0000-000000000002}'
       showlabel = 'true'
       expanded  = 'true'
     }
@@ -1250,9 +1247,16 @@ function New-StarterViewFetchXml {
 
   $filterBlock = ''
   if ($null -ne $FilterDefinition) {
+    $filterAttribute = [Security.SecurityElement]::Escape("$(Get-PropertyValue -Object $FilterDefinition -Name 'Attribute')")
+    $filterOperator = "$(Get-PropertyValue -Object $FilterDefinition -Name 'Operator')"
+    $valueAttribute = ''
+    if ($filterOperator -notin @('null', 'not-null')) {
+      $filterValue = [Security.SecurityElement]::Escape("$(Get-PropertyValue -Object $FilterDefinition -Name 'Value')")
+      $valueAttribute = " value=`"$filterValue`""
+    }
     $filterBlock = @"
     <filter type="and">
-      <condition attribute="$(Get-PropertyValue -Object $FilterDefinition -Name 'Attribute')" operator="$(Get-PropertyValue -Object $FilterDefinition -Name 'Operator')" value="$(Get-PropertyValue -Object $FilterDefinition -Name 'Value')" />
+      <condition attribute="$filterAttribute" operator="$filterOperator"$valueAttribute />
     </filter>
 "@
   } elseif ($FilterToActiveRecords) {
@@ -1405,6 +1409,44 @@ function Get-ViewPopulationAnalysis {
   }
 }
 
+function Test-ViewDefinitionMatches {
+  param(
+    [string]$CurrentFetchXml,
+    [string]$DesiredFetchXml,
+    [string]$CurrentLayoutXml,
+    [string]$DesiredLayoutXml
+  )
+
+  try {
+    [xml]$currentFetch = $CurrentFetchXml
+    [xml]$desiredFetch = $DesiredFetchXml
+  } catch {
+    return $false
+  }
+
+  $getFetchSignature = {
+    param([xml]$Document)
+    $entity = $Document.SelectSingleNode('//entity')
+    if ($null -eq $entity) { return '' }
+    $attributes = @($entity.SelectNodes('attribute') | ForEach-Object { $_.GetAttribute('name').ToLowerInvariant() })
+    $conditions = @($entity.SelectNodes('.//condition') | ForEach-Object {
+        "$($_.GetAttribute('attribute').ToLowerInvariant())|$($_.GetAttribute('operator').ToLowerInvariant())|$($_.GetAttribute('value'))"
+      })
+    $orders = @($entity.SelectNodes('order') | ForEach-Object {
+        "$($_.GetAttribute('attribute').ToLowerInvariant())|$($_.GetAttribute('descending').ToLowerInvariant())"
+      })
+    return "$($entity.GetAttribute('name').ToLowerInvariant())::$(($attributes -join ','))::$(($conditions -join ','))::$(($orders -join ','))"
+  }
+
+  $currentFetchSignature = & $getFetchSignature $currentFetch
+  $desiredFetchSignature = & $getFetchSignature $desiredFetch
+  $currentLayoutFields = @(Get-FieldNamesFromViewLayoutXml -LayoutXml $CurrentLayoutXml)
+  $desiredLayoutFields = @(Get-FieldNamesFromViewLayoutXml -LayoutXml $DesiredLayoutXml)
+
+  return $currentFetchSignature -eq $desiredFetchSignature -and
+    (($currentLayoutFields -join ',') -eq ($desiredLayoutFields -join ','))
+}
+
 function Test-IsWizardManagedView {
   param(
     $View,
@@ -1521,10 +1563,14 @@ function Invoke-WizardFormsViewsBuild {
     [bool]$PreviewOnly = $false
   )
 
-  if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+  if (Test-Path $envFile) {
     . $envFile
-    $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
-    $AccessToken = $global:DV_TOKEN
+    if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+      $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    }
+    if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+      $AccessToken = $global:DV_TOKEN
+    }
     if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
       $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
     }
@@ -1558,7 +1604,7 @@ function Invoke-WizardFormsViewsBuild {
   }
 
   $scenarioContext = Get-ScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
-  $surfaceContract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext
+  $surfaceContract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext -PayloadsFolder $PayloadsFolder
   $appConfig = $null
   if ($null -ne $scenarioContext -and (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue)) {
     try {
@@ -1608,7 +1654,11 @@ function Invoke-WizardFormsViewsBuild {
       $entity = Invoke-Dv -Method 'Get' -Path "EntityDefinitions(LogicalName='$logicalName')?`$select=LogicalName,PrimaryNameAttribute,PrimaryIdAttribute,MetadataId,IsCustomEntity"
       $tables += $entity
     } catch {
-      Write-Host "  $logicalName (not found — skipped)" -ForegroundColor Yellow
+      if ($_.Exception.Message -match 'HTTP 404') {
+        Write-Host "  $logicalName (not found — skipped)" -ForegroundColor Yellow
+        continue
+      }
+      throw
     }
   }
 
@@ -1759,6 +1809,9 @@ function Invoke-WizardFormsViewsBuild {
       $viewSelection = Get-DesiredViewFields -TableLogical $logical -PrimaryField $primary -PrimaryLabel $primaryLabel -PrimaryIdField $primaryId -PayloadFields $payloadFields -Attributes $attributes -MinimumBusinessFields $MinBusinessColumnsPerView -IncludeOwner $IncludeOwnerInViews -IncludeStatus $IncludeStatusInViews -ScenarioContext $scenarioContext
       $desiredViewFields = @($viewSelection.Fields)
       $viewDefinition = Get-TableSurfaceDefinition -Definitions $surfaceContract.Views -TableLogical $logical
+      if ($null -eq $viewDefinition -and -not (ConvertTo-Boolean -Value (Get-PropertyValue -Object $table -Name 'IsCustomEntity'))) {
+        throw "Standard table '$logical' requires an explicit view contract; refusing to guess a view or disposition."
+      }
       $contractColumns = @(if ($null -ne $viewDefinition) { Get-PropertyValue -Object $viewDefinition -Name 'Columns' -Default @() })
       if ($contractColumns.Count -gt 0) {
         $desiredViewFields = @($contractColumns | ForEach-Object {
@@ -1787,6 +1840,14 @@ function Invoke-WizardFormsViewsBuild {
       }
       $filterDefinition = if ($null -eq $viewDefinition) { $null } else { Get-PropertyValue -Object $viewDefinition -Name 'Filter' }
       $sortDefinition = if ($null -eq $viewDefinition) { $null } else { Get-PropertyValue -Object $viewDefinition -Name 'Sort' }
+      foreach ($contractAttribute in @(
+          $(if ($null -ne $filterDefinition) { "$(Get-PropertyValue -Object $filterDefinition -Name 'Attribute')" }),
+          $(if ($null -ne $sortDefinition) { "$(Get-PropertyValue -Object $sortDefinition -Name 'Attribute')" })
+        ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) {
+        if (-not $attributeMap.ContainsKey($contractAttribute.ToLowerInvariant())) {
+          throw "View '$viewName' references missing filter/sort field '$contractAttribute'."
+        }
+      }
       $desiredFetchXml = New-StarterViewFetchXml -TableLogical $logical -PrimaryField $primary -Fields $desiredViewFields -FilterToActiveRecords ($attributeMap.ContainsKey('statecode')) -FilterDefinition $filterDefinition -SortDefinition $sortDefinition
       $desiredLayoutXml = New-StarterViewLayoutXml -Fields $desiredViewFields -PrimaryField $primary -PrimaryIdField $primaryId
       $viewAction = 'created'
@@ -1811,7 +1872,8 @@ function Invoke-WizardFormsViewsBuild {
         $currentLayoutXml = Get-PropertyValue -Object $targetView -Name 'layoutxml' -Default ''
         if ($disposition -eq 'adopt-generated-active' -or (Test-IsWizardManagedView -View $targetView -PrimaryField $primary)) {
           $viewAction = 'validated'
-          if (($currentFetchXml -ne $desiredFetchXml) -or ($currentLayoutXml -ne $desiredLayoutXml) -or ((Get-PropertyValue -Object $targetView -Name 'description' -Default '') -notlike "*$script:WizardManagedViewMarker*")) {
+          $viewDefinitionMatches = Test-ViewDefinitionMatches -CurrentFetchXml $currentFetchXml -DesiredFetchXml $desiredFetchXml -CurrentLayoutXml $currentLayoutXml -DesiredLayoutXml $desiredLayoutXml
+          if ((-not $viewDefinitionMatches) -or ((Get-PropertyValue -Object $targetView -Name 'description' -Default '') -notlike "*$script:WizardManagedViewMarker*")) {
             $patchBody = @{
               description = (Get-WizardViewOwnershipMarker -ScenarioSlug $scenarioContext.ScenarioSlug -Disposition $disposition)
               fetchxml    = $desiredFetchXml
@@ -1950,17 +2012,36 @@ function Invoke-WizardFormsViewsBuild {
 }
 
 function Get-ScenarioSurfaceContract {
-  param($ScenarioContext)
+  param(
+    $ScenarioContext,
+    [string]$PayloadsFolder
+  )
 
   $result = [pscustomobject]@{ Forms = @(); Views = @() }
   if ($null -eq $ScenarioContext) { return $result }
 
-  foreach ($contractName in @('forms.json', 'views.json')) {
+  foreach ($contractName in @('forms.json')) {
     $contractPath = Join-Path $ScenarioContext.ScenarioFolder $contractName
     if (-not (Test-Path $contractPath)) { continue }
     $document = Get-Content -Path $contractPath -Raw -Encoding UTF8 | ConvertFrom-Json
     if ($contractName -eq 'forms.json') { $result.Forms = @(Get-PropertyValue -Object $document -Name 'Forms' -Default @()) }
-    if ($contractName -eq 'views.json') { $result.Views = @(Get-PropertyValue -Object $document -Name 'Views' -Default @()) }
+  }
+
+  $legacyViewPath = Join-Path $ScenarioContext.ScenarioFolder 'views.json'
+  $payloadViewPaths = @()
+  if (-not [string]::IsNullOrWhiteSpace($PayloadsFolder) -and (Test-Path -LiteralPath $PayloadsFolder)) {
+    $payloadViewPaths = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'views-*.json' -File -ErrorAction SilentlyContinue)
+  }
+  if ($payloadViewPaths.Count -gt 1) {
+    throw "Expected at most one reusable views payload in '$PayloadsFolder'; found $($payloadViewPaths.Count)."
+  }
+  if ((Test-Path -LiteralPath $legacyViewPath) -and $payloadViewPaths.Count -eq 1) {
+    throw "View contract is ambiguous: both legacy '$legacyViewPath' and reusable '$($payloadViewPaths[0].FullName)' exist."
+  }
+  $viewContractPath = if ($payloadViewPaths.Count -eq 1) { $payloadViewPaths[0].FullName } elseif (Test-Path -LiteralPath $legacyViewPath) { $legacyViewPath } else { $null }
+  if ($null -ne $viewContractPath) {
+    $viewDocument = Get-Content -LiteralPath $viewContractPath -Raw -Encoding UTF8 | ConvertFrom-Json
+    $result.Views = @(Get-PropertyValue -Object $viewDocument -Name 'Views' -Default @())
   }
 
   foreach ($view in @($result.Views)) {

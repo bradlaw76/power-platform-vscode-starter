@@ -2,248 +2,271 @@
 =============================================================================
 COMPONENT:    Build Relationships
 FILE:         scripts/bootstrap/40-build-relationships.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-10-06
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API
 
------------------------------------------------------------------------------
-OVERVIEW
------------------------------------------------------------------------------
-Creates the approved Dataverse relationships between standard and custom tables
-using payload-driven metadata operations.
-
------------------------------------------------------------------------------
-ARCHITECTURE
------------------------------------------------------------------------------
-- Role:            bootstrap step
-- Inputs:          relationship payloads and approved entity mapping
-- Outputs:         created relationships and build artifacts
-- Dependencies:    Dataverse Web API, planning files, repo helpers
-- Side Effects:    mutates Dataverse relationship metadata and telemetry data
-
------------------------------------------------------------------------------
-PREREQUISITES
------------------------------------------------------------------------------
-1. Referenced tables must already exist or be reusable.
-2. Relationship payloads must match the approved scenario mapping.
-
------------------------------------------------------------------------------
-TEST CASES
------------------------------------------------------------------------------
-✔ Approved relationships are created successfully.
-✔ Existence checks prevent false positives and duplicate creation.
-
------------------------------------------------------------------------------
-CHANGELOG
------------------------------------------------------------------------------
-v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
-
------------------------------------------------------------------------------
-NON-NEGOTIABLES
------------------------------------------------------------------------------
-- Preserve accurate existence checks before creating relationships.
-- Keep standard/custom mapping aligned with planning artifacts.
-- Update this header when the step contract materially changes.
+Creates payload-driven Dataverse 1:N and N:N relationship metadata. Preview is
+credential-free; apply uses the shared resilient Dataverse runtime.
 =============================================================================
-#>
-
-<#
-.SYNOPSIS
-    Creates lookup relationships between Dataverse tables from a relationships-*.json
-    payload file. Safe to rerun — skips relationships that already exist.
-
-.PARAMETER EnvironmentUrl  Defaults to $env:DV_ENVIRONMENT_URL.
-.PARAMETER AccessToken     Defaults to $env:DV_TOKEN.
-.PARAMETER PayloadsFolder  Defaults to ../../payloads.
-
-.EXAMPLE
-    pwsh ./scripts/bootstrap/40-build-relationships.ps1
 #>
 
 param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
-    [string]$AccessToken    = $env:DV_TOKEN,
-    [string]$PayloadsFolder = ""
+    [string]$AccessToken = $env:DV_TOKEN,
+    [string]$PayloadsFolder = '',
+    [switch]$PreviewOnly,
+    [scriptblock]$RequestInvoker
 )
 
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
-if (Test-Path $telemetryHelper) {
+$runtimeHelper = Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1'
+if (-not (Test-Path -LiteralPath $runtimeHelper -PathType Leaf)) {
+    throw "Dataverse runtime helper not found: $runtimeHelper"
+}
+. $runtimeHelper
+
+$telemetryHelper = Join-Path $PSScriptRoot 'helpers\wizard-telemetry.ps1'
+if (Test-Path -LiteralPath $telemetryHelper) {
     . $telemetryHelper
-    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "40-build-relationships.ps1"
+    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName '40-build-relationships.ps1'
+}
+$hardeningHelper = Join-Path $PSScriptRoot 'helpers\wizard-hardening.ps1'
+if (Test-Path -LiteralPath $hardeningHelper) { . $hardeningHelper }
+
+$envFile = Join-Path $repoRoot '.env.ps1'
+if (-not $PreviewOnly -and (Test-Path -LiteralPath $envFile)) {
+    . $envFile
+    if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
+        $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
+    }
+    if ([string]::IsNullOrWhiteSpace($AccessToken)) {
+        $AccessToken = $global:DV_TOKEN
+    }
+}
+if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) { $PayloadsFolder = Join-Path $repoRoot 'payloads' }
+if (-not (Test-Path -LiteralPath $PayloadsFolder -PathType Container)) {
+    throw "Payload folder not found: $PayloadsFolder"
+}
+if (-not $PreviewOnly -and ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpace($AccessToken))) {
+    throw 'Environment URL and access token are required in apply mode. Run 10-auth-connect.ps1 first.'
 }
 
-$hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
-if (Test-Path $hardeningHelper) {
-    . $hardeningHelper
-}
-
-$envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) ".env.ps1"
-if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
-    . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
-}
 $scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
     Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
 } else { $null }
-$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
-$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
-if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue) {
-    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
-}
-if ([string]::IsNullOrWhiteSpace($EnvironmentUrl) -or [string]::IsNullOrWhiteSpace($AccessToken)) {
-    Write-Host "Run 10-auth-connect.ps1 first." -ForegroundColor Red; exit 1
-}
-if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
-    $PayloadsFolder = Join-Path $repoRoot "payloads"
+$scenarioSlug = if ($null -ne $scenarioContext) { "$($scenarioContext.ScenarioSlug)" } else { '' }
+$solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { "$global:DV_SOLUTION_NAME" } elseif ($env:DV_SOLUTION_NAME) { "$env:DV_SOLUTION_NAME" } else { '' }
+$publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { "$global:DV_PUBLISHER_PREFIX" } elseif ($env:DV_PUBLISHER_PREFIX) { "$env:DV_PUBLISHER_PREFIX" } else { '' }
+if (-not $PreviewOnly -and -not [string]::IsNullOrWhiteSpace($scenarioSlug) -and
+    (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
 
-if (-not (Test-Path $PayloadsFolder)) {
-    Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
-    Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
-    exit 1
+function Get-RelationshipDefinition {
+    param([Parameter(Mandatory)] [object]$Relationship)
+    return $Relationship.RelationshipDefinition ?? $Relationship
 }
 
-function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
-    $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
-            "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
+function Get-RelationshipKind {
+    param([Parameter(Mandatory)] [object]$Definition)
+
+    $odataType = "$($Definition.'@odata.type')"
+    if ($odataType -eq 'Microsoft.Dynamics.CRM.ManyToManyRelationshipMetadata') { return 'ManyToMany' }
+    if ([string]::IsNullOrWhiteSpace($odataType) -or $odataType -eq 'Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata') {
+        return 'OneToMany'
+    }
+    throw "Unsupported relationship metadata type '$odataType'."
 }
 
-function Test-RelationshipExists([string]$SchemaName) {
-    try {
-        $resp = Invoke-Dv "Get" "RelationshipDefinitions?`$filter=SchemaName eq '$SchemaName'&`$select=SchemaName"
-        $matches = @($resp.value | Where-Object {
-            -not [string]::IsNullOrWhiteSpace($_.SchemaName) -and $_.SchemaName.Equals($SchemaName, [System.StringComparison]::OrdinalIgnoreCase)
-        })
-        return $matches.Count -gt 0
-    } catch { return $false }
-}
+function Assert-RelationshipPayload {
+    param([Parameter(Mandatory)] [object]$Relationship, [Parameter(Mandatory)] [string]$PayloadName)
 
-function Normalize-RelationshipEntityNames($RelationshipObject) {
-    if ($null -eq $RelationshipObject) { return }
-
-    foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
-        $prop = $RelationshipObject.PSObject.Properties[$propName]
-        if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
-            $prop.Value = $prop.Value.Trim()
-        }
+    $definition = Get-RelationshipDefinition -Relationship $Relationship
+    $schema = "$($definition.SchemaName)".Trim()
+    $wrapperSchema = "$($Relationship.SchemaName)".Trim()
+    if ([string]::IsNullOrWhiteSpace($schema)) { throw "$PayloadName contains a relationship without RelationshipDefinition.SchemaName." }
+    if ($schema -cnotmatch '^[A-Za-z][A-Za-z0-9_]*$') { throw "$PayloadName contains invalid relationship SchemaName '$schema'." }
+    if (-not [string]::IsNullOrWhiteSpace($wrapperSchema) -and
+        -not $wrapperSchema.Equals($schema, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "$PayloadName wrapper SchemaName '$wrapperSchema' does not match definition SchemaName '$schema'."
     }
 
-    $definition = $RelationshipObject.PSObject.Properties["RelationshipDefinition"]
-    if ($null -ne $definition -and $null -ne $definition.Value) {
-        foreach ($propName in @("ReferencedEntity", "ReferencingEntity", "Entity1LogicalName", "Entity2LogicalName")) {
-            $prop = $definition.Value.PSObject.Properties[$propName]
-            if ($null -ne $prop -and $prop.Value -is [string] -and -not [string]::IsNullOrWhiteSpace($prop.Value)) {
-                $prop.Value = $prop.Value.Trim()
+    $kind = Get-RelationshipKind -Definition $definition
+    $required = if ($kind -eq 'ManyToMany') {
+        @('Entity1LogicalName', 'Entity2LogicalName', 'IntersectEntityName')
+    } else {
+        @('ReferencedEntity', 'ReferencedAttribute', 'ReferencingEntity', 'ReferencingAttribute')
+    }
+    foreach ($name in $required) {
+        if ([string]::IsNullOrWhiteSpace("$($definition.$name)")) {
+            throw "$PayloadName relationship '$schema' is missing required $kind property '$name'."
+        }
+    }
+    if ($kind -eq 'ManyToMany') {
+        foreach ($forbidden in @('CascadeConfiguration', 'Lookup', 'ReferencedAttribute', 'ReferencingAttribute')) {
+            if ($null -ne $definition.PSObject.Properties[$forbidden]) {
+                throw "$PayloadName N:N relationship '$schema' must not specify '$forbidden'. N:N metadata has no cascade contract."
             }
         }
     }
+    return [pscustomobject]@{ SchemaName = $schema; Kind = $kind; Definition = $definition }
 }
 
 function ConvertTo-DataverseRelationshipMetadata {
     param([Parameter(Mandatory)] [object]$Relationship)
 
-    $definition = $Relationship.RelationshipDefinition ?? $Relationship
+    $definition = Get-RelationshipDefinition -Relationship $Relationship
+    $kind = Get-RelationshipKind -Definition $definition
     $metadata = [ordered]@{}
     foreach ($property in $definition.PSObject.Properties) {
-        if ($property.Name -ne 'ReferencingAttribute') {
+        if ($kind -eq 'ManyToMany' -or $property.Name -ne 'ReferencingAttribute') {
             $metadata[$property.Name] = $property.Value
         }
     }
-
-    $lookupProperty = $definition.PSObject.Properties['Lookup']
-    if ($null -eq $lookupProperty -and -not [string]::IsNullOrWhiteSpace($definition.ReferencingAttribute)) {
-        $referencedName = ([string]$definition.ReferencedEntity).Split('_')[-1]
-        $displayName = (Get-Culture).TextInfo.ToTitleCase($referencedName)
-        $metadata.Lookup = [ordered]@{
-            '@odata.type' = 'Microsoft.Dynamics.CRM.LookupAttributeMetadata'
-            SchemaName = [string]$definition.ReferencingAttribute
-            DisplayName = @{ LocalizedLabels = @(@{ Label = $displayName; LanguageCode = 1033 }) }
-            Description = @{ LocalizedLabels = @(@{ Label = "Related $displayName"; LanguageCode = 1033 }) }
-            RequiredLevel = @{ Value = 'None'; CanBeChanged = $true; ManagedPropertyLogicalName = 'canmodifyrequirementlevelsettings' }
+    if ($kind -eq 'OneToMany') {
+        if (-not $metadata.Contains('@odata.type')) {
+            $metadata['@odata.type'] = 'Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata'
+        }
+        $lookupProperty = $definition.PSObject.Properties['Lookup']
+        if ($null -eq $lookupProperty) {
+            $referencedName = "$($definition.ReferencedEntity)".Split('_')[-1]
+            $displayName = (Get-Culture).TextInfo.ToTitleCase($referencedName)
+            $metadata.Lookup = [ordered]@{
+                '@odata.type' = 'Microsoft.Dynamics.CRM.LookupAttributeMetadata'
+                SchemaName = "$($definition.ReferencingAttribute)"
+                DisplayName = @{ LocalizedLabels = @(@{ Label = $displayName; LanguageCode = 1033 }) }
+                Description = @{ LocalizedLabels = @(@{ Label = "Related $displayName"; LanguageCode = 1033 }) }
+                RequiredLevel = @{ Value = 'None'; CanBeChanged = $true; ManagedPropertyLogicalName = 'canmodifyrequirementlevelsettings' }
+            }
         }
     }
-
     return $metadata
 }
 
-Write-Host ""
-Write-Host "=== Build Relationships ===" -ForegroundColor Cyan
-Write-Host "  Environment: $EnvironmentUrl"
-Write-Host ""
+function Invoke-Dv {
+    param([string]$Method, [string]$Path, [object]$Body = $null)
+    return Invoke-WizardDataverseRequest -Method $Method -Path $Path -EnvironmentUrl $EnvironmentUrl `
+        -AccessToken $AccessToken -Body $Body -RequestInvoker $RequestInvoker
+}
 
-$payloads = @(Get-ChildItem -Path $PayloadsFolder -Filter "relationships-*.json" -ErrorAction SilentlyContinue)
+function Assert-ExistingRelationshipIdentity {
+    param([Parameter(Mandatory)] [object]$Expected, [Parameter(Mandatory)] [object]$Actual)
+
+    $schema = $Expected.SchemaName
+    $actualType = "$($Actual.'@odata.type')"
+    $expectedType = if ($Expected.Kind -eq 'ManyToMany') { 'ManyToManyRelationshipMetadata' } else { 'OneToManyRelationshipMetadata' }
+    if (-not $actualType.EndsWith($expectedType, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Relationship '$schema' exists but is not $expectedType (actual '$actualType')."
+    }
+    $identityProperties = if ($Expected.Kind -eq 'ManyToMany') {
+        @('Entity1LogicalName', 'Entity2LogicalName', 'IntersectEntityName')
+    } else {
+        @('ReferencedEntity', 'ReferencedAttribute', 'ReferencingEntity', 'ReferencingAttribute')
+    }
+    foreach ($name in $identityProperties) {
+        $expectedValue = "$($Expected.Definition.$name)"
+        $actualValue = "$($Actual.$name)"
+        if ([string]::IsNullOrWhiteSpace($actualValue) -or
+            -not $actualValue.Equals($expectedValue, [StringComparison]::OrdinalIgnoreCase)) {
+            throw "Relationship '$schema' exists with conflicting $name '$actualValue' (expected '$expectedValue')."
+        }
+    }
+}
+
+function Find-ExistingRelationship {
+    param([Parameter(Mandatory)] [object]$Expected)
+
+    $SchemaName = $Expected.SchemaName
+    $literal = ConvertTo-WizardODataLiteral -Value $SchemaName
+    $response = Invoke-Dv -Method Get -Path "RelationshipDefinitions?`$filter=SchemaName eq '$literal'"
+    $matches = @($response.value | Where-Object {
+        -not [string]::IsNullOrWhiteSpace("$($_.SchemaName)") -and
+        $_.SchemaName.Equals($SchemaName, [StringComparison]::OrdinalIgnoreCase)
+    })
+    if ($matches.Count -gt 1) { throw "Dataverse returned multiple relationships named '$($Expected.SchemaName)'." }
+    if ($matches.Count -eq 0) { return $null }
+    Assert-ExistingRelationshipIdentity -Expected $Expected -Actual $matches[0]
+    return $matches[0]
+}
+
+function Add-RelationshipManifestItem {
+    param([string]$Name, [string]$Status, [string]$Payload, [hashtable]$Extra = @{})
+    if ($PreviewOnly -or [string]::IsNullOrWhiteSpace($scenarioSlug) -or
+        -not (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue)) { return }
+    $details = @{ payload = $Payload; relationshipType = $Extra.relationshipType }
+    foreach ($key in $Extra.Keys) { $details[$key] = $Extra[$key] }
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioSlug -SolutionName $solutionName `
+        -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $Name -Status $Status `
+        -Step '40-build-relationships.ps1' -Details $details | Out-Null
+}
+
+Write-Host "`n=== Build Relationships ===" -ForegroundColor Cyan
+Write-Host "  Mode: $(if ($PreviewOnly) { 'Preview' } else { 'Apply' })"
+$payloads = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'relationships-*.json' -File -ErrorAction SilentlyContinue)
 if ($payloads.Count -eq 0) {
     Write-Host "No relationships-*.json found in: $PayloadsFolder" -ForegroundColor Yellow
-    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
-        Complete-WizardStepTelemetry -Message "No relationship payloads found."
-    }
-    exit 0
+    return
 }
 
-$created = 0; $skipped = 0; $failed = 0
-
+$created = 0
+$skipped = 0
+$previewed = 0
+$failures = [Collections.Generic.List[string]]::new()
 foreach ($file in $payloads) {
-    $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-    $rels = @($doc.Relationships ?? $doc)
-
-    foreach ($rel in $rels) {
-        Normalize-RelationshipEntityNames $rel
-        $schema = $rel.SchemaName ?? $rel.RelationshipDefinition.SchemaName
-        if ([string]::IsNullOrWhiteSpace($schema)) {
-            Write-Host "  SKIP $($file.Name) — missing relationship SchemaName" -ForegroundColor Yellow
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $file.Name -Status 'skipped' -Step '40-build-relationships.ps1' -Details @{ reason = 'missing schema name'; payload = $file.Name } | Out-Null
+    try {
+        $document = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $relationships = @($document.Relationships ?? $document)
+        foreach ($relationship in $relationships) {
+            try {
+                $expected = Assert-RelationshipPayload -Relationship $relationship -PayloadName $file.Name
+                $schema = $expected.SchemaName
+                if ($PreviewOnly) {
+                    $null = ConvertTo-DataverseRelationshipMetadata -Relationship $relationship
+                    Write-Host "  $schema (would create $($expected.Kind))" -ForegroundColor Cyan
+                    $previewed++
+                    continue
+                }
+                $existing = Find-ExistingRelationship -Expected $expected
+                if ($null -ne $existing) {
+                    Write-Host "  $schema (exact identity exists - skipped)" -ForegroundColor DarkGray
+                    Add-RelationshipManifestItem -Name $schema -Status 'skipped' -Payload $file.Name -Extra @{ reason = 'exact identity already exists'; relationshipType = $expected.Kind }
+                    $skipped++
+                    continue
+                }
+                $body = ConvertTo-DataverseRelationshipMetadata -Relationship $relationship
+                Invoke-Dv -Method Post -Path 'RelationshipDefinitions' -Body $body | Out-Null
+                Write-Host "  $schema (created $($expected.Kind))" -ForegroundColor Green
+                Add-RelationshipManifestItem -Name $schema -Status 'created' -Payload $file.Name -Extra @{ relationshipType = $expected.Kind }
+                $created++
+            } catch {
+                $name = try {
+                    $failedDefinition = Get-RelationshipDefinition -Relationship $relationship
+                    "$($failedDefinition.SchemaName)"
+                } catch { '<unknown>' }
+                $message = "$($file.Name): $name - $($_.Exception.Message)"
+                Write-Host "  FAILED: $message" -ForegroundColor Red
+                Add-RelationshipManifestItem -Name $name -Status 'failed' -Payload $file.Name -Extra @{ error = $_.Exception.Message; relationshipType = 'unknown' }
+                $failures.Add($message) | Out-Null
             }
-            $skipped++
-            continue
         }
-        Write-Host "  $schema " -NoNewline
-
-        if (Test-RelationshipExists $schema) {
-            Write-Host "(exists — skipped)" -ForegroundColor DarkGray
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'skipped' -Step '40-build-relationships.ps1' -Details @{ reason = 'already exists'; payload = $file.Name } | Out-Null
-            }
-            $skipped++; continue
-        }
-
-        try {
-            $relationshipDefinition = ConvertTo-DataverseRelationshipMetadata -Relationship $rel
-            $body = ($relationshipDefinition | ConvertTo-Json -Depth 20 -Compress)
-            Invoke-Dv "Post" "RelationshipDefinitions" $body | Out-Null
-            Write-Host "(created)" -ForegroundColor Green
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'created' -Step '40-build-relationships.ps1' -Details @{ payload = $file.Name } | Out-Null
-            }
-            $created++
-        } catch {
-            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'relationship' -Name $schema -Status 'failed' -Step '40-build-relationships.ps1' -Details @{ payload = $file.Name; error = $_.Exception.Message } | Out-Null
-            }
-            $failed++
-        }
+    } catch {
+        $failures.Add("$($file.Name): $($_.Exception.Message)") | Out-Null
     }
 }
 
-Write-Host ""
-Write-Host "Relationships — created: $created  skipped: $skipped  failed: $failed"
-if ($failed -gt 0) {
+Write-Host "`nRelationships - created: $created  skipped: $skipped  previewed: $previewed  failed: $($failures.Count)"
+if ($failures.Count -gt 0) {
     if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
-        Register-WizardStepFailure -Message "Relationship build failed for one or more payloads."
+        Register-WizardStepFailure -Message 'Relationship build failed for one or more payloads.'
     }
-    exit 1
+    throw "Relationship build failed:`n - $($failures -join "`n - ")"
 }
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
-    Complete-WizardStepTelemetry -Message "Relationship build completed."
+    Complete-WizardStepTelemetry -Message "Relationship build completed (created=$created; skipped=$skipped; previewed=$previewed)."
 }
-Write-Host ""
-Write-Host "Next step: pwsh ./scripts/bootstrap/50-add-to-solution.ps1"
-
+if (-not $PreviewOnly) { Write-Host "`nNext step: pwsh ./scripts/bootstrap/50-add-to-solution.ps1" }

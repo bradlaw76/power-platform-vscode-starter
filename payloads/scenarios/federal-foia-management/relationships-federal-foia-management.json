@@ -1,0 +1,854 @@
+{
+  "Relationships": [
+    {
+      "SchemaName": "foia_contact_foiarequest",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_contact_foiarequest",
+        "ReferencedEntity": "contact",
+        "ReferencedAttribute": "contactid",
+        "ReferencingEntity": "foia_foiarequest",
+        "ReferencingAttribute": "foia_requesterid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_requesterid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Requester",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Requester relationship. FOIA-DAT-002; FOIA-INT-002. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "Cascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_incident",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_incident",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "incident",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-CAS-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_searchtask",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_searchtask",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_searchtask",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-COL-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_incident_searchtask",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_incident_searchtask",
+        "ReferencedEntity": "incident",
+        "ReferencedAttribute": "incidentid",
+        "ReferencingEntity": "foia_searchtask",
+        "ReferencingAttribute": "foia_incidentid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_incidentid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Case",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Case relationship. FOIA-COL-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "None"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_searchtask_responsiverecord",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_searchtask_responsiverecord",
+        "ReferencedEntity": "foia_searchtask",
+        "ReferencedAttribute": "foia_searchtaskid",
+        "ReferencingEntity": "foia_responsiverecord",
+        "ReferencingAttribute": "foia_searchtaskid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_searchtaskid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Search Task",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Search Task relationship. FOIA-COL-003..004. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_responsiverecord",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_responsiverecord",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_responsiverecord",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-COL-004. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_responsiverecord_reviewtask",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_responsiverecord_reviewtask",
+        "ReferencedEntity": "foia_responsiverecord",
+        "ReferencedAttribute": "foia_responsiverecordid",
+        "ReferencingEntity": "foia_reviewtask",
+        "ReferencingAttribute": "foia_responsiverecordid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_responsiverecordid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record relationship. FOIA-REV-001..002. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_reviewtask",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_reviewtask",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_reviewtask",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-REV-002. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_reviewtask_exemptiondecision",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_reviewtask_exemptiondecision",
+        "ReferencedEntity": "foia_reviewtask",
+        "ReferencedAttribute": "foia_reviewtaskid",
+        "ReferencingEntity": "foia_exemptiondecision",
+        "ReferencingAttribute": "foia_reviewtaskid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_reviewtaskid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Review Task",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Review Task relationship. FOIA-REV-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_responsiverecord_exemptiondecision",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_responsiverecord_exemptiondecision",
+        "ReferencedEntity": "foia_responsiverecord",
+        "ReferencedAttribute": "foia_responsiverecordid",
+        "ReferencingEntity": "foia_exemptiondecision",
+        "ReferencingAttribute": "foia_responsiverecordid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_responsiverecordid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record relationship. FOIA-REV-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_responsiverecord_redactiondecision",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_responsiverecord_redactiondecision",
+        "ReferencedEntity": "foia_responsiverecord",
+        "ReferencedAttribute": "foia_responsiverecordid",
+        "ReferencingEntity": "foia_redactiondecision",
+        "ReferencingAttribute": "foia_responsiverecordid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_responsiverecordid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record relationship. FOIA-REV-004. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_exemptiondecision_redactiondecision",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_exemptiondecision_redactiondecision",
+        "ReferencedEntity": "foia_exemptiondecision",
+        "ReferencedAttribute": "foia_exemptiondecisionid",
+        "ReferencingEntity": "foia_redactiondecision",
+        "ReferencingAttribute": "foia_exemptiondecisionid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_exemptiondecisionid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Exemption Decision",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Exemption Decision relationship. FOIA-REV-004. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "None"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_releasepackage",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_releasepackage",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_releasepackage",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-REV-005..007. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_appeal",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_appeal",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_appeal",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-REV-006. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_releasepackage_appeal",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_releasepackage_appeal",
+        "ReferencedEntity": "foia_releasepackage",
+        "ReferencedAttribute": "foia_releasepackageid",
+        "ReferencingEntity": "foia_appeal",
+        "ReferencingAttribute": "foia_releasepackageid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_releasepackageid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Challenged Release Package",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Challenged Release Package relationship. FOIA-REV-006. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "None"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_clockevent",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_clockevent",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_clockevent",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-CLK-001..006. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_incident_clockevent",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_incident_clockevent",
+        "ReferencedEntity": "incident",
+        "ReferencedAttribute": "incidentid",
+        "ReferencingEntity": "foia_clockevent",
+        "ReferencingAttribute": "foia_incidentid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_incidentid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Case",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Case relationship. FOIA-CLK-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "None"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_auditevent",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_auditevent",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_auditevent",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-SEC-006..007. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_foiarequest_aiassistancerecord",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_foiarequest_aiassistancerecord",
+        "ReferencedEntity": "foia_foiarequest",
+        "ReferencedAttribute": "foia_foiarequestid",
+        "ReferencingEntity": "foia_aiassistancerecord",
+        "ReferencingAttribute": "foia_foiarequestid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_foiarequestid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "FOIA Request relationship. FOIA-AI-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "ApplicationRequired"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_responsiverecord_aiassistancerecord",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.OneToManyRelationshipMetadata",
+        "SchemaName": "foia_responsiverecord_aiassistancerecord",
+        "ReferencedEntity": "foia_responsiverecord",
+        "ReferencedAttribute": "foia_responsiverecordid",
+        "ReferencingEntity": "foia_aiassistancerecord",
+        "ReferencingAttribute": "foia_responsiverecordid",
+        "Lookup": {
+          "@odata.type": "Microsoft.Dynamics.CRM.LookupAttributeMetadata",
+          "SchemaName": "foia_responsiverecordid",
+          "DisplayName": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "Description": {
+            "LocalizedLabels": [
+              {
+                "Label": "Responsive Record relationship. FOIA-AI-003. Restrictive cascade per FOIA-DAT-007.",
+                "LanguageCode": 1033
+              }
+            ]
+          },
+          "RequiredLevel": {
+            "Value": "None"
+          }
+        },
+        "CascadeConfiguration": {
+          "Assign": "NoCascade",
+          "Delete": "Restrict",
+          "Merge": "NoCascade",
+          "Reparent": "NoCascade",
+          "Share": "NoCascade",
+          "Unshare": "NoCascade"
+        }
+      }
+    },
+    {
+      "SchemaName": "foia_releasepackage_responsiverecord",
+      "RelationshipDefinition": {
+        "@odata.type": "Microsoft.Dynamics.CRM.ManyToManyRelationshipMetadata",
+        "SchemaName": "foia_releasepackage_responsiverecord",
+        "Entity1LogicalName": "foia_releasepackage",
+        "Entity2LogicalName": "foia_responsiverecord",
+        "IntersectEntityName": "foia_releasepackage_responsiverecord"
+      }
+    }
+  ]
+}

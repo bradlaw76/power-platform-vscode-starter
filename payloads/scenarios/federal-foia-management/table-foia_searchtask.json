@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_searchtask",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Search Task",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Search Tasks",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Collection scope, assignment, evidence, and results. FOIA-DAT-003; FOIA-COL-003.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}

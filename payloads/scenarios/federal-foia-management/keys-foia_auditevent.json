@@ -1,0 +1,10 @@
+{
+  "TableLogicalName": "foia_auditevent",
+  "Keys": [
+    {
+      "SchemaName": "foia_AK_AuditEvent_Identifier",
+      "DisplayName": "Audit Event Identifier",
+      "KeyAttributes": ["foia_eventidentifier"]
+    }
+  ]
+}

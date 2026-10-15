@@ -1,0 +1,31 @@
+{
+  "EntityDefinition": {
+    "SchemaName": "foia_responsiverecord",
+    "DisplayName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Responsive Record",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "DisplayCollectionName": {
+      "LocalizedLabels": [
+        {
+          "Label": "Responsive Records",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "Description": {
+      "LocalizedLabels": [
+        {
+          "Label": "Authoritative metadata and secure repository reference for collected artifacts. FOIA-DAT-003; FOIA-COL-004..007.",
+          "LanguageCode": 1033
+        }
+      ]
+    },
+    "OwnershipType": "UserOwned",
+    "IsActivity": false
+  }
+}
