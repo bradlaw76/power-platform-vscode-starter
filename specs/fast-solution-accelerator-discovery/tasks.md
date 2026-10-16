@@ -182,7 +182,7 @@
   reproducibility, and safety regression tests.
 - [x] Repeat and preserve all three corrected acceptance demonstrations.
 - [x] Run complete FAST and wizard regression validation.
-- [ ] Commit, push, and verify the remote feature branch and recovery refs.
+- [x] Commit, push, and verify the remote feature branch and recovery refs.
 - [ ] Obtain FAST-005B architectural review approval before FAST-006.
 
 ## FAST-006 - Failure, rollback, and rollout (not authorized)
