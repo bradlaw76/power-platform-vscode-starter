@@ -1,0 +1,141 @@
+[
+  {
+    "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+    "acceptanceCriteria": [
+      "A complete synthetic fraud case proves traceable custody",
+      "and accurate reporting",
+      "fraud-score audit reference",
+      "interview history",
+      "supervisor approval"
+    ],
+    "dispositions": [
+      "BUILD"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-EVIDENCE",
+      "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-DESIGN",
+      "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+    "acceptanceCriteria": [
+      "A complete synthetic fraud case proves traceable custody"
+    ],
+    "dispositions": [
+      "EXTEND"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-EVIDENCE",
+      "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-DESIGN",
+      "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+    "acceptanceCriteria": [
+      "A complete synthetic fraud case proves traceable custody",
+      "fraud-score audit reference"
+    ],
+    "dispositions": [
+      "VERIFY"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:programs-and-services",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/programs-and-services.md",
+        "contentHash": "ba7cbe327044da37b530e1e55f77f406e6ddea690a91f9ec8859866f864066ff",
+        "claim": "Define what your organization offers, configure eligibility, track participation, and document service delivery outcomes with structured program and service management.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-EVIDENCE",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-DESIGN",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INTAKE-001",
+    "acceptanceCriteria": [
+      "A complete synthetic fraud case proves traceable custody",
+      "and accurate reporting",
+      "fraud-score audit reference",
+      "interview history",
+      "supervisor approval"
+    ],
+    "dispositions": [
+      "BUILD"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-INTAKE-001-EVIDENCE",
+      "FAST004-REQ-INTAKE-001-DESIGN",
+      "FAST004-REQ-INTAKE-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "acceptanceCriteria": [
+      "interview history"
+    ],
+    "dispositions": [
+      "EXTEND"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+      "FAST004-REQ-INTERVIEW-001-DESIGN",
+      "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "acceptanceCriteria": [
+      "accurate reporting"
+    ],
+    "dispositions": [
+      "BUILD"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+    "acceptanceCriteria": [
+      "A complete synthetic fraud case proves traceable custody",
+      "supervisor approval"
+    ],
+    "dispositions": [
+      "BUILD"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-EVIDENCE",
+      "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-DESIGN",
+      "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-ACCEPTANCE"
+    ]
+  }
+]

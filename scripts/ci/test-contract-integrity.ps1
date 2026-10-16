@@ -86,10 +86,18 @@ if ($wizardProfile.acceleratorRecommendations.integrationPoint -ne 'post-discove
     [bool]$wizardProfile.acceleratorRecommendations.dataverseGenerationConnected) {
     Add-ContractFailure 'Accelerator recommendation integration contract is incomplete or unsafe.'
 }
+if ([bool]$wizardProfile.acceleratorRecommendations.preferenceSelector.enabledByDefault -or
+    -not [bool]$wizardProfile.acceleratorRecommendations.preferenceSelector.offeredWhenExplicitlyEnabled -or
+    $wizardProfile.acceleratorRecommendations.preferenceSelector.parameter -ne 'AcceleratorPreference' -or
+    @($wizardProfile.acceleratorRecommendations.preferenceSelector.choices).Count -ne 3) {
+    Add-ContractFailure 'Accelerator startup preference contract is incomplete or unsafe.'
+}
 foreach ($acceleratorPath in @(
     "$($wizardProfile.acceleratorRecommendations.service)",
     "$($wizardProfile.acceleratorRecommendations.analysisSchema)",
-    "$($wizardProfile.acceleratorRecommendations.decisionSchema)"
+    "$($wizardProfile.acceleratorRecommendations.decisionSchema)",
+    "$($wizardProfile.acceleratorRecommendations.preferenceSchema)",
+    "$($wizardProfile.acceleratorRecommendations.packageManifestSchema)"
 )) {
     Test-RequiredPath -RelativePath $acceleratorPath -Description 'Accelerator recommendation runtime'
 }
@@ -102,6 +110,8 @@ if ($wizardScriptText -notmatch "\[string\]\`$Mode\s*=\s*'demo-builder'" -or
 }
 foreach ($acceleratorToken in @(
     'EnableAcceleratorRecommendations',
+    'AcceleratorPreference',
+    'AcceleratorPackageManifestPath',
     'ConvertTo-WizardAcceleratorRequirements',
     'Invoke-WizardAcceleratorEvaluation',
     'New-WizardAcceleratorDecision',

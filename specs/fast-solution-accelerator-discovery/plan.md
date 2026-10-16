@@ -332,8 +332,29 @@ workflow, not an importer.
 - [x] No Dataverse transport, import, build-stage registration, or fourth mode.
 - [ ] Architectural review approval before FAST-006.
 
+## FAST-005B implementation plan
+
+1. Add a schema-valid preliminary preference record and expose it after mode
+   selection only for explicitly enabled controlled runs.
+2. Split explicitly listed workflow needs into stable requirement records
+   without inferring requirements absent from discovery.
+3. Correct the PowerShell renderer collision with the automatic `$input`
+   variable and validate schema values across all generated planning files.
+4. Replace ambiguous nested command-line package arrays with a validated
+   package manifest while retaining direct arrays for in-process callers.
+5. Sanitize generated Markdown at the source before writing.
+6. Repeat Demo Builder, Advanced Builder, and Framework Acceptance fraud
+   scenarios; prove stable artifacts, decision-change approval, missing-Core
+   blocking, and no Dataverse transport.
+7. Update the profile, contract, Spec Kit, canonical docs, distributed skills,
+   and regression suites before committing and pushing.
+
+The preference artifact remains separate from the analysis manifest because it
+records user intent before analysis rather than evidence produced by analysis.
+The final decision continues to pin the analysis and package identities.
+
 ## Stop condition
 
-Stop after FAST-005 review handoff. Do not begin FAST-006 build integration,
+Stop after FAST-005B review handoff. Do not begin FAST-006 build integration,
 package installation, Dataverse mutation, or rollout without further
 authorization.

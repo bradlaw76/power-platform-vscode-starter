@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "1.0",
+  "analysisId": "sha256:dd261832bb9f2a9ab2192fb99c1195cedcfd9f7dc3436daa8eb3902eb5e159f6",
+  "providerId": "microsoft-fast",
+  "snapshotId": "sha256:777873ba1d2beedcb9fb5de2fe85d17c0f5bb20c6fafe5ce674d0de654be8348",
+  "requirementsHash": "bfc4961782897b035190f1f35ab39a098a9d881cc78c4ddd938bc51204d66135",
+  "artifacts": [
+    {
+      "file": "accelerator-evaluation.json",
+      "sha256": "970c0420882ee61584e2afee250d9f9f4d170b0ba96cbc1b60d41d05fb223c27"
+    },
+    {
+      "file": "acceptance-traceability.json",
+      "sha256": "871321ec441559245c214efdedf885c624b375501f1c7762e2e117848802fbf7"
+    },
+    {
+      "file": "ADR-accelerator-selection.md",
+      "sha256": "a8bd9c6abcb71313516183728e4e93ef30080f74acd9294212c2fe8e2b68bc6f"
+    },
+    {
+      "file": "architecture-recommendation.json",
+      "sha256": "23018c4d58797e77e8dba5cc67072b8d86684df95d65270c1ba3d4ad88627ecb"
+    },
+    {
+      "file": "component-delta-analysis.json",
+      "sha256": "c653d20dca6e30929b298cebe9d4377e209a128151ff37be1412b3aaa21dc2ab"
+    },
+    {
+      "file": "dependency-manifest.json",
+      "sha256": "d51a7481f50c4330fdf80378f4bcef421cef7cd591f8a28766a3b4b4594eae73"
+    },
+    {
+      "file": "environment-readiness-reference.json",
+      "sha256": "a37b3c07f20935d2cd501299bef1f3a1f9d922943573b14effdb9854844d4420"
+    },
+    {
+      "file": "requirements-coverage-matrix.json",
+      "sha256": "0433be959a1c9c682ec781f629e128e76bf6c5f94d109b95eedf962600cba304"
+    },
+    {
+      "file": "requirements-to-accelerator-matrix.md",
+      "sha256": "53381f005f6907bc72a9ff42dfa4b5676e8d318d922bc70fafc28825b5f7cca9"
+    },
+    {
+      "file": "schema-reuse-extension-plan.json",
+      "sha256": "af909c45d8100db80bb7b1e2eac50e1d15561db413bdc93ca90cc2538d9fa2a0"
+    }
+  ]
+}

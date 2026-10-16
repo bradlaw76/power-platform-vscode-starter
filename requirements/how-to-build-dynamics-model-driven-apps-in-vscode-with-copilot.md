@@ -53,9 +53,12 @@ Validation checkpoints:
 Use `demo-builder` by default: ask six business questions plus one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
 
 Accelerator recommendations remain disabled by default. With explicit
-`FAST_ENABLED=true` or `-EnableAcceleratorRecommendations`, reuse the
+`FAST_ENABLED=true` or `-EnableAcceleratorRecommendations`, offer a preliminary
+Evaluate accelerators, Fully Custom, or Prefer FAST reuse preference after mode
+selection. It is separate from final approval and does not authorize
+deployment. Fully Custom bypasses matching; otherwise reuse the
 provider-neutral matcher after normal discovery and before architecture
-finalization. Do not ask an upfront FAST question. Present FAST-based, Hybrid,
+finalization. Do not ask a FAST-specific business question. Present FAST-based, Hybrid,
 and Fully Custom options, require an explicit selection, and record the pinned
 snapshot, package hashes, coverage, deltas, readiness, and rationale under
 `specs/<slug>/accelerator/`. Do not connect this planning decision to

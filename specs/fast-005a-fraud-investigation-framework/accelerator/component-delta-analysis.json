@@ -1,0 +1,701 @@
+[
+  {
+    "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "existingComponents": [
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accessdatetime",
+        "name": "Evidence Access Log appbase_accessdatetime",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accessedby",
+        "name": "Evidence Access Log appbase_accessedby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accesspurpose",
+        "name": "Evidence Access Log appbase_accesspurpose",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accesstype",
+        "name": "Evidence Access Log appbase_accesstype",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "name": "Evidence Access Log appbase_documentdownloaded",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_downloadcount",
+        "name": "Evidence Access Log appbase_downloadcount",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "name": "Evidence Access Log appbase_evidenceaccesslogid",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_evidenceitem",
+        "name": "Evidence Access Log appbase_evidenceitem",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_ipaddress",
+        "name": "Evidence Access Log appbase_ipaddress",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_name",
+        "name": "Evidence Access Log appbase_name",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_notes",
+        "name": "Evidence Access Log appbase_notes",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_systemuser",
+        "name": "Evidence Access Log appbase_systemuser",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdby",
+        "name": "Evidence Access Log createdby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdon",
+        "name": "Evidence Access Log createdon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdonbehalfby",
+        "name": "Evidence Access Log createdonbehalfby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.importsequencenumber",
+        "name": "Evidence Access Log importsequencenumber",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedby",
+        "name": "Evidence Access Log modifiedby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedon",
+        "name": "Evidence Access Log modifiedon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedonbehalfby",
+        "name": "Evidence Access Log modifiedonbehalfby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.overriddencreatedon",
+        "name": "Evidence Access Log overriddencreatedon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+        "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+        "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+        "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+        "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+        "Reuse appbase_evidenceaccesslog.appbase_name",
+        "Reuse appbase_evidenceaccesslog.appbase_notes",
+        "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+        "Reuse appbase_evidenceaccesslog.createdby",
+        "Reuse appbase_evidenceaccesslog.createdon",
+        "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+        "Reuse appbase_evidenceaccesslog.importsequencenumber",
+        "Reuse appbase_evidenceaccesslog.modifiedby",
+        "Reuse appbase_evidenceaccesslog.modifiedon",
+        "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+        "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Fraud Score'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "dispositions": [
+      "INTEGRATE",
+      "VERIFY"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Connector, security, error handling, and external API lifecycle effort is required.",
+      "Estimation remains provisional until evidence gaps are resolved."
+    ],
+    "risks": [
+      "Requirement has insufficient distinctive business detail."
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "existingComponents": [
+      {
+        "kind": "application",
+        "identity": "appbase_Investigations",
+        "name": "appbase_Investigations model-driven-app",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceitem.appbase_investigation",
+        "name": "Evidence Item appbase_investigation",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidencelink.appbase_investigation",
+        "name": "Evidence Link appbase_investigation",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidencelink.appbase_investigationallegation",
+        "name": "Evidence Link appbase_investigationallegation",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidencelink.appbase_investigationfinding",
+        "name": "Evidence Link appbase_investigationfinding",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidencelink.appbase_investigationinterview",
+        "name": "Evidence Link appbase_investigationinterview",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidencelink.appbase_investigativeissue",
+        "name": "Evidence Link appbase_investigativeissue",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_actualcompletiondate",
+        "name": "Investigation appbase_actualcompletiondate",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_actualhours",
+        "name": "Investigation appbase_actualhours",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_assignedorganizationunit",
+        "name": "Investigation appbase_assignedorganizationunit",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_background",
+        "name": "Investigation appbase_background",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_casenumber",
+        "name": "Investigation appbase_casenumber",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_casestatus",
+        "name": "Investigation appbase_casestatus",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_closuredate",
+        "name": "Investigation appbase_closuredate",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_closurerationale",
+        "name": "Investigation appbase_closurerationale",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_complianceframework",
+        "name": "Investigation appbase_complianceframework",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_estimatedhours",
+        "name": "Investigation appbase_estimatedhours",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_intakedate",
+        "name": "Investigation appbase_intakedate",
+        "matchedTerms": [
+          "intake",
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_investigationbudget",
+        "name": "Investigation appbase_investigationbudget",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigation.appbase_investigationbudget_base",
+        "name": "Investigation appbase_investigationbudget_base",
+        "matchedTerms": [
+          "investigation"
+        ],
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceitem.appbase_investigation",
+        "Reuse appbase_evidencelink.appbase_investigation",
+        "Reuse appbase_evidencelink.appbase_investigationallegation",
+        "Reuse appbase_evidencelink.appbase_investigationfinding",
+        "Reuse appbase_evidencelink.appbase_investigationinterview",
+        "Reuse appbase_evidencelink.appbase_investigativeissue",
+        "Reuse appbase_investigation.appbase_actualcompletiondate",
+        "Reuse appbase_investigation.appbase_actualhours",
+        "Reuse appbase_investigation.appbase_assignedorganizationunit",
+        "Reuse appbase_investigation.appbase_background",
+        "Reuse appbase_investigation.appbase_casenumber",
+        "Reuse appbase_investigation.appbase_casestatus",
+        "Reuse appbase_investigation.appbase_closuredate",
+        "Reuse appbase_investigation.appbase_closurerationale",
+        "Reuse appbase_investigation.appbase_complianceframework",
+        "Reuse appbase_investigation.appbase_estimatedhours",
+        "Reuse appbase_investigation.appbase_intakedate",
+        "Reuse appbase_investigation.appbase_investigationbudget",
+        "Reuse appbase_investigation.appbase_investigationbudget_base"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Investigation'; no logical name is inferred.",
+        "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Evidence'; no logical name is inferred.",
+        "Design a new table for 'Evidence Custody Event'; no logical name is inferred.",
+        "Design a new table for 'Report'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "management reports",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": []
+  }
+]

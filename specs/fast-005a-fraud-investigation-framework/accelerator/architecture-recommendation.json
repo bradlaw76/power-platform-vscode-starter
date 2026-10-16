@@ -1,0 +1,36 @@
+{
+  "recommendedOption": "hybrid",
+  "finalChoiceRequired": true,
+  "options": [
+    {
+      "optionId": "hybrid",
+      "rank": 1,
+      "architectureSuitable": true,
+      "executionGateOpen": false,
+      "status": "planning-only-dependency-blocked",
+      "rationale": "Accelerator candidates cover 2 requirement(s), while 2 extension, 4 build, and 1 verification result(s) require explicit delta work.",
+      "dependencies": "FAST-derived portions require verified modules; custom portions remain independent.",
+      "userMaySelect": true
+    },
+    {
+      "optionId": "fully-custom",
+      "rank": 2,
+      "architectureSuitable": true,
+      "executionGateOpen": true,
+      "status": "available",
+      "rationale": "Uses the existing wizard generation path without FAST package or environment prerequisites.",
+      "dependencies": "No FAST dependency.",
+      "userMaySelect": true
+    },
+    {
+      "optionId": "fast-based",
+      "rank": 3,
+      "architectureSuitable": false,
+      "executionGateOpen": false,
+      "status": "not-recommended",
+      "rationale": "Verified reuse requirements: 0; extension requirements: 2; custom-build requirements: 4; verification requirements: 1.",
+      "dependencies": "Requires every selected accelerator module and its transitive prerequisites.",
+      "userMaySelect": true
+    }
+  ]
+}

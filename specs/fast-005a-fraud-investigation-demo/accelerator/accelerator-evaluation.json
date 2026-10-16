@@ -1,0 +1,2454 @@
+{
+  "schemaVersion": "1.0",
+  "analysisId": "sha256:f35e1312ea83c8815689803b5768d0567c74e471ff848e6e50d913fae937dc10",
+  "providerId": "microsoft-fast",
+  "snapshotId": "sha256:777873ba1d2beedcb9fb5de2fe85d17c0f5bb20c6fafe5ce674d0de654be8348",
+  "scenarioSlug": "fast-005a-fraud-investigation-demo",
+  "status": "evaluated",
+  "sourceState": "available",
+  "evaluatedAtUtc": "2026-10-15T21:00:00.0000000Z",
+  "requirementsHash": "a4f84286bdf0b13fff1fd7f56bd3c56091e3c2f9409ec2477efc4765f9977a22",
+  "requirements": [
+    {
+      "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "assign an investigator",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Investigation",
+        "Investigator Assignment"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "assign",
+        "investigator",
+        "object"
+      ]
+    },
+    {
+      "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "maintain evidence chain of custody",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Evidence",
+        "Evidence Custody Event"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "case",
+        "chain",
+        "complete",
+        "custody",
+        "evidence",
+        "fraud",
+        "maintain",
+        "proves",
+        "synthetic",
+        "traceable"
+      ]
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "call an external fraud-scoring service",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "fraud-score audit reference"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Fraud Score"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "call",
+        "external",
+        "fraud",
+        "object",
+        "scoring",
+        "service"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTAKE-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "Capture intake",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "capture",
+        "intake",
+        "object"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "document interviews",
+      "acceptanceCriteria": [
+        "interview history"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Interview"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "document",
+        "history",
+        "interview",
+        "interviews"
+      ]
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "present operational and management reporting",
+      "acceptanceCriteria": [
+        "accurate reporting"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Report"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "accurate",
+        "operational",
+        "present",
+        "reporting"
+      ]
+    },
+    {
+      "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+      "scenarioSlug": "fast-005a-fraud-investigation-demo",
+      "statement": "route the case for supervisor approval",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "supervisor approval"
+      ],
+      "actors": [
+        "and manage cases through supervisor approval",
+        "assign investigators",
+        "Fraud investigator | triage intake"
+      ],
+      "entities": [
+        "Supervisor Approval"
+      ],
+      "integrations": [],
+      "requiredCapabilities": [],
+      "priority": "unspecified",
+      "uncertainties": [],
+      "normalizedTerms": [
+        "approval",
+        "case",
+        "object",
+        "route",
+        "supervisor"
+      ]
+    }
+  ],
+  "coverageMatrix": [
+    {
+      "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+      "description": "assign an investigator",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "candidateVersion": "",
+      "candidates": [],
+      "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+      "evidenceLevel": "unverified",
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Investigation'; no logical name is inferred.",
+          "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "dependencies": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-EVIDENCE",
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-DESIGN",
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+      "description": "maintain evidence chain of custody",
+      "dispositions": [
+        "EXTEND"
+      ],
+      "candidateModuleId": "microsoft-fast:module:investigations",
+      "candidateVersion": "1.2.1.0",
+      "candidates": [
+        {
+          "moduleId": "microsoft-fast:module:investigations",
+          "moduleName": "Investigations",
+          "documentedVersion": "v1.2.1.0",
+          "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+          "packageVersion": "1.2.1.0",
+          "fitBand": "partial-verified-foundation",
+          "matchedDocumentedTerms": [
+            "case",
+            "chain",
+            "custody",
+            "evidence"
+          ],
+          "capabilityCoverage": [],
+          "componentEvidence": [
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_accessdatetime",
+              "name": "Evidence Access Log appbase_accessdatetime",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_accessedby",
+              "name": "Evidence Access Log appbase_accessedby",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_accesspurpose",
+              "name": "Evidence Access Log appbase_accesspurpose",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_accesstype",
+              "name": "Evidence Access Log appbase_accesstype",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+              "name": "Evidence Access Log appbase_documentdownloaded",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_downloadcount",
+              "name": "Evidence Access Log appbase_downloadcount",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+              "name": "Evidence Access Log appbase_evidenceaccesslogid",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_evidenceitem",
+              "name": "Evidence Access Log appbase_evidenceitem",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_ipaddress",
+              "name": "Evidence Access Log appbase_ipaddress",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_name",
+              "name": "Evidence Access Log appbase_name",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_notes",
+              "name": "Evidence Access Log appbase_notes",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_systemuser",
+              "name": "Evidence Access Log appbase_systemuser",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.createdby",
+              "name": "Evidence Access Log createdby",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.createdon",
+              "name": "Evidence Access Log createdon",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.createdonbehalfby",
+              "name": "Evidence Access Log createdonbehalfby",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.importsequencenumber",
+              "name": "Evidence Access Log importsequencenumber",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.modifiedby",
+              "name": "Evidence Access Log modifiedby",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.modifiedon",
+              "name": "Evidence Access Log modifiedon",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.modifiedonbehalfby",
+              "name": "Evidence Access Log modifiedonbehalfby",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.overriddencreatedon",
+              "name": "Evidence Access Log overriddencreatedon",
+              "matchedTerms": [
+                "evidence"
+              ],
+              "evidenceLevel": "package-verified"
+            }
+          ],
+          "unsupportedCapabilities": [],
+          "evidenceLevel": "package-verified",
+          "sourceReferences": [
+            {
+              "itemId": "microsoft-fast:module:investigations",
+              "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+              "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+              "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+              "evidenceLevel": "conceptual"
+            }
+          ],
+          "availability": {
+            "documented": true,
+            "sourceAvailable": true,
+            "packageVerified": true,
+            "environmentVerified": false
+          }
+        }
+      ],
+      "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+      "evidenceLevel": "package-verified",
+      "gaps": [
+        "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+          "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+          "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+          "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+          "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+          "Reuse appbase_evidenceaccesslog.appbase_name",
+          "Reuse appbase_evidenceaccesslog.appbase_notes",
+          "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+          "Reuse appbase_evidenceaccesslog.createdby",
+          "Reuse appbase_evidenceaccesslog.createdon",
+          "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+          "Reuse appbase_evidenceaccesslog.importsequencenumber",
+          "Reuse appbase_evidenceaccesslog.modifiedby",
+          "Reuse appbase_evidenceaccesslog.modifiedon",
+          "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+          "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      },
+      "integrations": [],
+      "dependencies": [
+        {
+          "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+          "sourceModuleId": "microsoft-fast:module:investigations",
+          "targetModuleId": "microsoft-fast:module:core",
+          "targetSolution": "appbase_core",
+          "dependencyType": "required-module",
+          "versionConstraints": [
+            "1.2.0.2"
+          ],
+          "selectedTargetVersion": "1.2.1.0",
+          "versionStatus": "unverified",
+          "componentDependencyCount": 27,
+          "evidenceLevel": "package-verified"
+        }
+      ],
+      "effortAssumptions": [
+        "Moderate customization effort is assumed until every documented gap is designed."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-EVIDENCE",
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-DESIGN",
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+      "description": "call an external fraud-scoring service",
+      "dispositions": [
+        "VERIFY"
+      ],
+      "candidateModuleId": "microsoft-fast:module:programs-and-services",
+      "candidateVersion": "v1.2.1.0",
+      "candidates": [
+        {
+          "moduleId": "microsoft-fast:module:programs-and-services",
+          "moduleName": "Programs and Services",
+          "documentedVersion": "v1.2.1.0",
+          "packageId": "",
+          "packageVersion": "",
+          "fitBand": "documented-only",
+          "matchedDocumentedTerms": [
+            "external",
+            "service"
+          ],
+          "capabilityCoverage": [],
+          "componentEvidence": [],
+          "unsupportedCapabilities": [],
+          "evidenceLevel": "conceptual",
+          "sourceReferences": [
+            {
+              "itemId": "microsoft-fast:module:programs-and-services",
+              "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/programs-and-services.md",
+              "contentHash": "ba7cbe327044da37b530e1e55f77f406e6ddea690a91f9ec8859866f864066ff",
+              "claim": "Define what your organization offers, configure eligibility, track participation, and document service delivery outcomes with structured program and service management.",
+              "evidenceLevel": "conceptual"
+            }
+          ],
+          "availability": {
+            "documented": true,
+            "sourceAvailable": true,
+            "packageVerified": false,
+            "environmentVerified": false
+          }
+        }
+      ],
+      "fitExplanation": "Candidate 'Programs and Services' is classified 'documented-only' from documented claims plus independently reported package evidence.",
+      "evidenceLevel": "conceptual",
+      "gaps": [
+        "Documented relevance exists without sufficient physical or source evidence for implementation reuse."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "dependencies": [],
+      "effortAssumptions": [
+        "Estimation remains provisional until evidence gaps are resolved."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "fraud-score audit reference"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-EVIDENCE",
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-DESIGN",
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTAKE-001",
+      "description": "Capture intake",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "candidateVersion": "",
+      "candidates": [],
+      "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+      "evidenceLevel": "unverified",
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Complete requirement-specific table design before payload generation."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "dependencies": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-INTAKE-001-EVIDENCE",
+        "FAST004-REQ-INTAKE-001-DESIGN",
+        "FAST004-REQ-INTAKE-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "description": "document interviews",
+      "dispositions": [
+        "EXTEND"
+      ],
+      "candidateModuleId": "microsoft-fast:module:investigations",
+      "candidateVersion": "1.2.1.0",
+      "candidates": [
+        {
+          "moduleId": "microsoft-fast:module:investigations",
+          "moduleName": "Investigations",
+          "documentedVersion": "v1.2.1.0",
+          "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+          "packageVersion": "1.2.1.0",
+          "fitBand": "partial-verified-foundation",
+          "matchedDocumentedTerms": [
+            "document",
+            "interview",
+            "interviews"
+          ],
+          "capabilityCoverage": [],
+          "componentEvidence": [
+            {
+              "kind": "attribute",
+              "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+              "name": "Evidence Access Log appbase_documentdownloaded",
+              "matchedTerms": [
+                "document"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_actualdatetime",
+              "name": "Investigation Interview appbase_actualdatetime",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_attendancestatus",
+              "name": "Investigation Interview appbase_attendancestatus",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_cooperationstatus",
+              "name": "Investigation Interview appbase_cooperationstatus",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_durationminutes",
+              "name": "Investigation Interview appbase_durationminutes",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_followupnotes",
+              "name": "Investigation Interview appbase_followupnotes",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_followuprequired",
+              "name": "Investigation Interview appbase_followuprequired",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_interviewlocation",
+              "name": "Investigation Interview appbase_interviewlocation",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_interviewnumber",
+              "name": "Investigation Interview appbase_interviewnumber",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_interviewsubject",
+              "name": "Investigation Interview appbase_interviewsubject",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_interviewsummary",
+              "name": "Investigation Interview appbase_interviewsummary",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_interviewtype",
+              "name": "Investigation Interview appbase_interviewtype",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_investigation",
+              "name": "Investigation Interview appbase_investigation",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_investigationinterviewid",
+              "name": "Investigation Interview appbase_investigationinterviewid",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_keystatements",
+              "name": "Investigation Interview appbase_keystatements",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_name",
+              "name": "Investigation Interview appbase_name",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_notes",
+              "name": "Investigation Interview appbase_notes",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_primaryinterviewer",
+              "name": "Investigation Interview appbase_primaryinterviewer",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_recordingauthorized",
+              "name": "Investigation Interview appbase_recordingauthorized",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            },
+            {
+              "kind": "attribute",
+              "identity": "appbase_investigationinterview.appbase_recordinglocation",
+              "name": "Investigation Interview appbase_recordinglocation",
+              "matchedTerms": [
+                "interview",
+                "interviews"
+              ],
+              "evidenceLevel": "package-verified"
+            }
+          ],
+          "unsupportedCapabilities": [],
+          "evidenceLevel": "package-verified",
+          "sourceReferences": [
+            {
+              "itemId": "microsoft-fast:module:investigations",
+              "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+              "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+              "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+              "evidenceLevel": "conceptual"
+            }
+          ],
+          "availability": {
+            "documented": true,
+            "sourceAvailable": true,
+            "packageVerified": true,
+            "environmentVerified": false
+          }
+        }
+      ],
+      "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+      "evidenceLevel": "package-verified",
+      "gaps": [
+        "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_investigationinterview.appbase_actualdatetime",
+          "Reuse appbase_investigationinterview.appbase_attendancestatus",
+          "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+          "Reuse appbase_investigationinterview.appbase_durationminutes",
+          "Reuse appbase_investigationinterview.appbase_followupnotes",
+          "Reuse appbase_investigationinterview.appbase_followuprequired",
+          "Reuse appbase_investigationinterview.appbase_interviewlocation",
+          "Reuse appbase_investigationinterview.appbase_interviewnumber",
+          "Reuse appbase_investigationinterview.appbase_interviewsubject",
+          "Reuse appbase_investigationinterview.appbase_interviewsummary",
+          "Reuse appbase_investigationinterview.appbase_interviewtype",
+          "Reuse appbase_investigationinterview.appbase_investigation",
+          "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+          "Reuse appbase_investigationinterview.appbase_keystatements",
+          "Reuse appbase_investigationinterview.appbase_name",
+          "Reuse appbase_investigationinterview.appbase_notes",
+          "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+          "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+          "Reuse appbase_investigationinterview.appbase_recordinglocation"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      },
+      "integrations": [],
+      "dependencies": [
+        {
+          "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+          "sourceModuleId": "microsoft-fast:module:investigations",
+          "targetModuleId": "microsoft-fast:module:core",
+          "targetSolution": "appbase_core",
+          "dependencyType": "required-module",
+          "versionConstraints": [
+            "1.2.0.2"
+          ],
+          "selectedTargetVersion": "1.2.1.0",
+          "versionStatus": "unverified",
+          "componentDependencyCount": 27,
+          "evidenceLevel": "package-verified"
+        }
+      ],
+      "effortAssumptions": [
+        "Moderate customization effort is assumed until every documented gap is designed."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "interview history"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+        "FAST004-REQ-INTERVIEW-001-DESIGN",
+        "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "description": "present operational and management reporting",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "candidateVersion": "",
+      "candidates": [],
+      "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+      "evidenceLevel": "unverified",
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Report'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "dependencies": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "accurate reporting"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+      "description": "route the case for supervisor approval",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "candidateVersion": "",
+      "candidates": [],
+      "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+      "evidenceLevel": "unverified",
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "dependencies": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": [],
+      "unresolvedQuestions": [],
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "supervisor approval"
+      ],
+      "taskReferences": [
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-EVIDENCE",
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-DESIGN",
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-ACCEPTANCE"
+      ]
+    }
+  ],
+  "componentDeltaAnalysis": [
+    {
+      "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "existingComponents": [],
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Investigation'; no logical name is inferred.",
+          "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+      "dispositions": [
+        "EXTEND"
+      ],
+      "candidateModuleId": "microsoft-fast:module:investigations",
+      "existingComponents": [
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_accessdatetime",
+          "name": "Evidence Access Log appbase_accessdatetime",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_accessedby",
+          "name": "Evidence Access Log appbase_accessedby",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_accesspurpose",
+          "name": "Evidence Access Log appbase_accesspurpose",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_accesstype",
+          "name": "Evidence Access Log appbase_accesstype",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "name": "Evidence Access Log appbase_documentdownloaded",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_downloadcount",
+          "name": "Evidence Access Log appbase_downloadcount",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+          "name": "Evidence Access Log appbase_evidenceaccesslogid",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_evidenceitem",
+          "name": "Evidence Access Log appbase_evidenceitem",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_ipaddress",
+          "name": "Evidence Access Log appbase_ipaddress",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_name",
+          "name": "Evidence Access Log appbase_name",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_notes",
+          "name": "Evidence Access Log appbase_notes",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_systemuser",
+          "name": "Evidence Access Log appbase_systemuser",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.createdby",
+          "name": "Evidence Access Log createdby",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.createdon",
+          "name": "Evidence Access Log createdon",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.createdonbehalfby",
+          "name": "Evidence Access Log createdonbehalfby",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.importsequencenumber",
+          "name": "Evidence Access Log importsequencenumber",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.modifiedby",
+          "name": "Evidence Access Log modifiedby",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.modifiedon",
+          "name": "Evidence Access Log modifiedon",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.modifiedonbehalfby",
+          "name": "Evidence Access Log modifiedonbehalfby",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.overriddencreatedon",
+          "name": "Evidence Access Log overriddencreatedon",
+          "matchedTerms": [
+            "evidence"
+          ],
+          "evidenceLevel": "package-verified"
+        }
+      ],
+      "gaps": [
+        "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+          "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+          "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+          "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+          "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+          "Reuse appbase_evidenceaccesslog.appbase_name",
+          "Reuse appbase_evidenceaccesslog.appbase_notes",
+          "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+          "Reuse appbase_evidenceaccesslog.createdby",
+          "Reuse appbase_evidenceaccesslog.createdon",
+          "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+          "Reuse appbase_evidenceaccesslog.importsequencenumber",
+          "Reuse appbase_evidenceaccesslog.modifiedby",
+          "Reuse appbase_evidenceaccesslog.modifiedon",
+          "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+          "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Moderate customization effort is assumed until every documented gap is designed."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+      "dispositions": [
+        "VERIFY"
+      ],
+      "candidateModuleId": "microsoft-fast:module:programs-and-services",
+      "existingComponents": [],
+      "gaps": [
+        "Documented relevance exists without sufficient physical or source evidence for implementation reuse."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Estimation remains provisional until evidence gaps are resolved."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-INTAKE-001",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "existingComponents": [],
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Complete requirement-specific table design before payload generation."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "dispositions": [
+        "EXTEND"
+      ],
+      "candidateModuleId": "microsoft-fast:module:investigations",
+      "existingComponents": [
+        {
+          "kind": "attribute",
+          "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "name": "Evidence Access Log appbase_documentdownloaded",
+          "matchedTerms": [
+            "document"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_actualdatetime",
+          "name": "Investigation Interview appbase_actualdatetime",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_attendancestatus",
+          "name": "Investigation Interview appbase_attendancestatus",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_cooperationstatus",
+          "name": "Investigation Interview appbase_cooperationstatus",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_durationminutes",
+          "name": "Investigation Interview appbase_durationminutes",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_followupnotes",
+          "name": "Investigation Interview appbase_followupnotes",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_followuprequired",
+          "name": "Investigation Interview appbase_followuprequired",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_interviewlocation",
+          "name": "Investigation Interview appbase_interviewlocation",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_interviewnumber",
+          "name": "Investigation Interview appbase_interviewnumber",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_interviewsubject",
+          "name": "Investigation Interview appbase_interviewsubject",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_interviewsummary",
+          "name": "Investigation Interview appbase_interviewsummary",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_interviewtype",
+          "name": "Investigation Interview appbase_interviewtype",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_investigation",
+          "name": "Investigation Interview appbase_investigation",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_investigationinterviewid",
+          "name": "Investigation Interview appbase_investigationinterviewid",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_keystatements",
+          "name": "Investigation Interview appbase_keystatements",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_name",
+          "name": "Investigation Interview appbase_name",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_notes",
+          "name": "Investigation Interview appbase_notes",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_primaryinterviewer",
+          "name": "Investigation Interview appbase_primaryinterviewer",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_recordingauthorized",
+          "name": "Investigation Interview appbase_recordingauthorized",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        },
+        {
+          "kind": "attribute",
+          "identity": "appbase_investigationinterview.appbase_recordinglocation",
+          "name": "Investigation Interview appbase_recordinglocation",
+          "matchedTerms": [
+            "interview",
+            "interviews"
+          ],
+          "evidenceLevel": "package-verified"
+        }
+      ],
+      "gaps": [
+        "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_investigationinterview.appbase_actualdatetime",
+          "Reuse appbase_investigationinterview.appbase_attendancestatus",
+          "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+          "Reuse appbase_investigationinterview.appbase_durationminutes",
+          "Reuse appbase_investigationinterview.appbase_followupnotes",
+          "Reuse appbase_investigationinterview.appbase_followuprequired",
+          "Reuse appbase_investigationinterview.appbase_interviewlocation",
+          "Reuse appbase_investigationinterview.appbase_interviewnumber",
+          "Reuse appbase_investigationinterview.appbase_interviewsubject",
+          "Reuse appbase_investigationinterview.appbase_interviewsummary",
+          "Reuse appbase_investigationinterview.appbase_interviewtype",
+          "Reuse appbase_investigationinterview.appbase_investigation",
+          "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+          "Reuse appbase_investigationinterview.appbase_keystatements",
+          "Reuse appbase_investigationinterview.appbase_name",
+          "Reuse appbase_investigationinterview.appbase_notes",
+          "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+          "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+          "Reuse appbase_investigationinterview.appbase_recordinglocation"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Moderate customization effort is assumed until every documented gap is designed."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "existingComponents": [],
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Report'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": []
+    },
+    {
+      "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+      "dispositions": [
+        "BUILD"
+      ],
+      "candidateModuleId": "",
+      "existingComponents": [],
+      "gaps": [
+        "No documented accelerator capability has sufficient evidence for this requirement."
+      ],
+      "proposedSchemaChanges": {
+        "tables": [
+          "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      "integrations": [],
+      "effortAssumptions": [
+        "Custom schema and experience design effort is required."
+      ],
+      "risks": []
+    }
+  ],
+  "schemaPlan": {
+    "reuse": [],
+    "extend": [
+      {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+          "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+          "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+          "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+          "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+          "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+          "Reuse appbase_evidenceaccesslog.appbase_name",
+          "Reuse appbase_evidenceaccesslog.appbase_notes",
+          "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+          "Reuse appbase_evidenceaccesslog.createdby",
+          "Reuse appbase_evidenceaccesslog.createdon",
+          "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+          "Reuse appbase_evidenceaccesslog.importsequencenumber",
+          "Reuse appbase_evidenceaccesslog.modifiedby",
+          "Reuse appbase_evidenceaccesslog.modifiedon",
+          "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+          "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      },
+      {
+        "tables": [],
+        "attributes": [
+          "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+          "Reuse appbase_investigationinterview.appbase_actualdatetime",
+          "Reuse appbase_investigationinterview.appbase_attendancestatus",
+          "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+          "Reuse appbase_investigationinterview.appbase_durationminutes",
+          "Reuse appbase_investigationinterview.appbase_followupnotes",
+          "Reuse appbase_investigationinterview.appbase_followuprequired",
+          "Reuse appbase_investigationinterview.appbase_interviewlocation",
+          "Reuse appbase_investigationinterview.appbase_interviewnumber",
+          "Reuse appbase_investigationinterview.appbase_interviewsubject",
+          "Reuse appbase_investigationinterview.appbase_interviewsummary",
+          "Reuse appbase_investigationinterview.appbase_interviewtype",
+          "Reuse appbase_investigationinterview.appbase_investigation",
+          "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+          "Reuse appbase_investigationinterview.appbase_keystatements",
+          "Reuse appbase_investigationinterview.appbase_name",
+          "Reuse appbase_investigationinterview.appbase_notes",
+          "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+          "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+          "Reuse appbase_investigationinterview.appbase_recordinglocation"
+        ],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": [
+          "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+        ]
+      }
+    ],
+    "build": [
+      {
+        "tables": [
+          "Design a new table for 'Investigation'; no logical name is inferred.",
+          "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      {
+        "tables": [
+          "Complete requirement-specific table design before payload generation."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      {
+        "tables": [
+          "Design a new table for 'Report'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      },
+      {
+        "tables": [
+          "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+        ],
+        "attributes": [],
+        "relationships": [],
+        "forms": [],
+        "views": [],
+        "workflows": []
+      }
+    ],
+    "integrate": [],
+    "verify": [
+      {
+        "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+        "gaps": [
+          "Documented relevance exists without sufficient physical or source evidence for implementation reuse."
+        ],
+        "questions": []
+      }
+    ]
+  },
+  "dependencyManifest": {
+    "selectedModules": [
+      "microsoft-fast:module:investigations",
+      "microsoft-fast:module:programs-and-services"
+    ],
+    "transitiveModules": [
+      "microsoft-fast:module:core",
+      "microsoft-fast:module:investigations",
+      "microsoft-fast:module:programs-and-services"
+    ],
+    "foundationModules": [
+      "microsoft-fast:module:core"
+    ],
+    "specialtyModules": [
+      "microsoft-fast:module:investigations",
+      "microsoft-fast:module:programs-and-services"
+    ],
+    "moduleDependencies": [
+      {
+        "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "versionConstraints": [
+          "1.2.0.2"
+        ],
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "componentDependencyCount": 27,
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "componentDependencies": [
+      {
+        "identity": "microsoft-fast:module:core|60|{661157fe-2fc9-4eaa-835f-5bfa2f7b64f7}|msdynce_AppCommon (9.0.4.0066)|msdynce_AppCommonAnchor (9.0.26031.10002)|||Person|Contact Quick Create",
+        "sourceModuleId": "microsoft-fast:module:core",
+        "targetModuleId": "",
+        "targetSolution": "msdynce_AppCommon",
+        "dependencyType": "external-component",
+        "componentType": "60",
+        "componentIdentity": "{661157fe-2fc9-4eaa-835f-5bfa2f7b64f7}|||Person|Contact Quick Create",
+        "versionConstraint": "9.0.4.0066",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:core|61||AppModuleWebResources (2.5)|AppModuleWebResources (2.5)|msdyn_/Images/AppModule_Default_Icon.png|||msdyn_/Images/AppModule_Default_Icon.png",
+        "sourceModuleId": "microsoft-fast:module:core",
+        "targetModuleId": "",
+        "targetSolution": "AppModuleWebResources",
+        "dependencyType": "external-component",
+        "componentType": "61",
+        "componentIdentity": "|msdyn_/Images/AppModule_Default_Icon.png|||msdyn_/Images/AppModule_Default_Icon.png",
+        "versionConstraint": "2.5",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:core|66||BaseCustomControlsCore (9.0.2603.5012)|BaseCustomControlsCore (9.0.2603.5012)|MscrmControls.CardFeedContainer.CardFeedContainer|||MscrmControls.CardFeedContainer.CardFeedContainer",
+        "sourceModuleId": "microsoft-fast:module:core",
+        "targetModuleId": "",
+        "targetSolution": "BaseCustomControlsCore",
+        "dependencyType": "external-component",
+        "componentType": "66",
+        "componentIdentity": "|MscrmControls.CardFeedContainer.CardFeedContainer|||MscrmControls.CardFeedContainer.CardFeedContainer",
+        "versionConstraint": "9.0.2603.5012",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:core|SettingDefinition||msdyn_AppFrameworkInfraExtensions (1.0.0.16)|PowerAppsAppFramework_Anchor (1.0.0.25)||AppChannel||AppChannel",
+        "sourceModuleId": "microsoft-fast:module:core",
+        "targetModuleId": "",
+        "targetSolution": "msdyn_AppFrameworkInfraExtensions",
+        "dependencyType": "external-component",
+        "componentType": "SettingDefinition",
+        "componentIdentity": "||AppChannel||AppChannel",
+        "versionConstraint": "1.0.0.16",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Compliance Framework|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Compliance Framework|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Document|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Document|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Judicial District|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Judicial District|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Legal Authority|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Legal Authority|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Location|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Location|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|2||appbase_core (1.2.0.2)||appbase_name||Organization Unit|Name",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "2",
+        "componentIdentity": "|appbase_name||Organization Unit|Name",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|61||AppModuleWebResources (2.5)|AppModuleWebResources (2.5)|msdyn_/Images/AppModule_Default_Icon.png|||msdyn_/Images/AppModule_Default_Icon.png",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "",
+        "targetSolution": "AppModuleWebResources",
+        "dependencyType": "external-component",
+        "componentType": "61",
+        "componentIdentity": "|msdyn_/Images/AppModule_Default_Icon.png|||msdyn_/Images/AppModule_Default_Icon.png",
+        "versionConstraint": "2.5",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_accesstype|||Access Type",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_accesstype|||Access Type",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_actionstatus|||Action Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_actionstatus|||Action Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_approvalstatus|||Approval Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_approvalstatus|||Approval Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_attendancestatus|||Attendance Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_attendancestatus|||Attendance Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_caserelationshiptype|||Case Relationship Type",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_caserelationshiptype|||Case Relationship Type",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_cooperationstatus|||Cooperation Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_cooperationstatus|||Cooperation Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_degree|||Degree",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_degree|||Degree",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_findingresult|||Finding Result",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_findingresult|||Finding Result",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_findingstatus|||Finding Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_findingstatus|||Finding Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_issueresolutionstatus|||Issue Resolution Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_issueresolutionstatus|||Issue Resolution Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_methodofcontact|||Method of Contact",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_methodofcontact|||Method of Contact",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_partytype|||Party Type",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_partytype|||Party Type",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_priority|||Priority",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_priority|||Priority",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_publicationstatus|||Publication Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_publicationstatus|||Publication Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_recommendationstatus|||Recommendation Status",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_recommendationstatus|||Recommendation Status",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_referraldirection|||Referral Direction",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_referraldirection|||Referral Direction",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_reporttype|||Report Type",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_reporttype|||Report Type",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_securityclassification|||Security Classification",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_securityclassification|||Security Classification",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_storagetype|||Storage Type",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_storagetype|||Storage Type",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_visibility|||Visibility",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_visibility|||Visibility",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|9||appbase_core (1.2.0.2)||appbase_yesno|||Yes No",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "componentType": "9",
+        "componentIdentity": "|appbase_yesno|||Yes No",
+        "versionConstraint": "1.2.0.2",
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "identity": "microsoft-fast:module:investigations|SettingDefinition||msdyn_AppFrameworkInfraExtensions (1.0.0.16)|PowerAppsAppFramework_Anchor (1.0.0.25)||AppChannel||AppChannel",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "",
+        "targetSolution": "msdyn_AppFrameworkInfraExtensions",
+        "dependencyType": "external-component",
+        "componentType": "SettingDefinition",
+        "componentIdentity": "||AppChannel||AppChannel",
+        "versionConstraint": "1.0.0.16",
+        "selectedTargetVersion": "",
+        "versionStatus": "unverified",
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "unresolvedDependencies": [
+      {
+        "sourceModuleId": "microsoft-fast:module:programs-and-services",
+        "identity": "module-package|microsoft-fast:module:programs-and-services",
+        "reason": "No package-verified metadata is available for this selected module."
+      }
+    ],
+    "duplicateEdgesRemoved": 67,
+    "cycles": [],
+    "versionPolicy": "Exact matches are reported; differing versions remain unverified without an explicit compatibility policy."
+  },
+  "environmentReadiness": {
+    "provided": true,
+    "status": "action-required",
+    "fresh": false,
+    "snapshotMatch": true,
+    "packageMatch": true,
+    "executionGateOpen": false,
+    "environmentUrl": "https://powerplatformvscodestarter.crm9.dynamics.com",
+    "coreAssessment": "missing-prerequisites-potentially-available",
+    "metadataFingerprint": "7654dbb8de75ccc321fa1959a1546a85016f63a8f3bfca3897c5c055e566ea64",
+    "expiresAtUtc": "2026-10-15T20:26:59.6346284Z",
+    "limitations": [
+      "Environment evidence is absent or stale.",
+      "Environment readiness is 'action-required'."
+    ]
+  },
+  "architectureOptions": [
+    {
+      "optionId": "hybrid",
+      "rank": 1,
+      "architectureSuitable": true,
+      "executionGateOpen": false,
+      "status": "planning-only-dependency-blocked",
+      "rationale": "Accelerator candidates cover 3 requirement(s), while 2 extension, 4 build, and 1 verification result(s) require explicit delta work.",
+      "dependencies": "FAST-derived portions require verified modules; custom portions remain independent.",
+      "userMaySelect": true
+    },
+    {
+      "optionId": "fully-custom",
+      "rank": 2,
+      "architectureSuitable": true,
+      "executionGateOpen": true,
+      "status": "available",
+      "rationale": "Uses the existing wizard generation path without FAST package or environment prerequisites.",
+      "dependencies": "No FAST dependency.",
+      "userMaySelect": true
+    },
+    {
+      "optionId": "fast-based",
+      "rank": 3,
+      "architectureSuitable": false,
+      "executionGateOpen": false,
+      "status": "not-recommended",
+      "rationale": "Verified reuse requirements: 0; extension requirements: 2; custom-build requirements: 4; verification requirements: 1.",
+      "dependencies": "Requires every selected accelerator module and its transitive prerequisites.",
+      "userMaySelect": true
+    }
+  ],
+  "recommendedOption": "hybrid",
+  "finalChoiceRequired": true,
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "dispositions": [
+        "BUILD"
+      ],
+      "evidenceReferences": [],
+      "taskReferences": [
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-EVIDENCE",
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-DESIGN",
+        "FAST004-REQ-ASSIGNMENT-INVESTIGATOR-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody"
+      ],
+      "dispositions": [
+        "EXTEND"
+      ],
+      "evidenceReferences": [
+        {
+          "itemId": "microsoft-fast:module:investigations",
+          "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+          "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+          "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+          "evidenceLevel": "conceptual"
+        }
+      ],
+      "taskReferences": [
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-EVIDENCE",
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-DESIGN",
+        "FAST004-REQ-EVIDENCE-CHAIN-CUSTODY-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "fraud-score audit reference"
+      ],
+      "dispositions": [
+        "VERIFY"
+      ],
+      "evidenceReferences": [
+        {
+          "itemId": "microsoft-fast:module:programs-and-services",
+          "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/programs-and-services.md",
+          "contentHash": "ba7cbe327044da37b530e1e55f77f406e6ddea690a91f9ec8859866f864066ff",
+          "claim": "Define what your organization offers, configure eligibility, track participation, and document service delivery outcomes with structured program and service management.",
+          "evidenceLevel": "conceptual"
+        }
+      ],
+      "taskReferences": [
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-EVIDENCE",
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-DESIGN",
+        "FAST004-REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTAKE-001",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "and accurate reporting",
+        "fraud-score audit reference",
+        "interview history",
+        "supervisor approval"
+      ],
+      "dispositions": [
+        "BUILD"
+      ],
+      "evidenceReferences": [],
+      "taskReferences": [
+        "FAST004-REQ-INTAKE-001-EVIDENCE",
+        "FAST004-REQ-INTAKE-001-DESIGN",
+        "FAST004-REQ-INTAKE-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "acceptanceCriteria": [
+        "interview history"
+      ],
+      "dispositions": [
+        "EXTEND"
+      ],
+      "evidenceReferences": [
+        {
+          "itemId": "microsoft-fast:module:investigations",
+          "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+          "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+          "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+          "evidenceLevel": "conceptual"
+        }
+      ],
+      "taskReferences": [
+        "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+        "FAST004-REQ-INTERVIEW-001-DESIGN",
+        "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "acceptanceCriteria": [
+        "accurate reporting"
+      ],
+      "dispositions": [
+        "BUILD"
+      ],
+      "evidenceReferences": [],
+      "taskReferences": [
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+        "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+      ]
+    },
+    {
+      "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+      "acceptanceCriteria": [
+        "A complete synthetic fraud case proves traceable custody",
+        "supervisor approval"
+      ],
+      "dispositions": [
+        "BUILD"
+      ],
+      "evidenceReferences": [],
+      "taskReferences": [
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-EVIDENCE",
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-DESIGN",
+        "FAST004-REQ-THE-CASE-FOR-SUPERVISOR-001-ACCEPTANCE"
+      ]
+    }
+  ],
+  "limitations": [
+    "Matching is explainable planning evidence, not deployment authorization.",
+    "Documentation establishes functional claims; package metadata establishes physical components only.",
+    "A table-name match alone never proves end-to-end business-process coverage.",
+    "Environment evidence affects execution readiness, not architectural relevance.",
+    "The user retains final architecture choice."
+  ]
+}

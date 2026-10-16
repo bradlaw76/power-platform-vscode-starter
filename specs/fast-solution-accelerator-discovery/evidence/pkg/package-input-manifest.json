@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0",
+  "providerId": "microsoft-fast",
+  "packages": [
+    {
+      "path": "core.json",
+      "moduleId": "microsoft-fast:module:core",
+      "packageId": "microsoft-fast:package:core:1.2.1.0:managed:f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3",
+      "version": "1.2.1.0",
+      "sha256": "f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3"
+    },
+    {
+      "path": "investigations.json",
+      "moduleId": "microsoft-fast:module:investigations",
+      "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+      "version": "1.2.1.0",
+      "sha256": "131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+    },
+    {
+      "path": "training-certification.json",
+      "moduleId": "microsoft-fast:module:training-and-certification",
+      "packageId": "microsoft-fast:package:training-and-certification:1.2.1.0:managed:ee636bf278d1cb486ee4f2a22dbed6cd8fa7f3336b1bf336d3c8e0ca2f1a81d9",
+      "version": "1.2.1.0",
+      "sha256": "ee636bf278d1cb486ee4f2a22dbed6cd8fa7f3336b1bf336d3c8e0ca2f1a81d9"
+    }
+  ]
+}

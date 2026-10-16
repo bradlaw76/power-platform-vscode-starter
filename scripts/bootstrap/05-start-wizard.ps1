@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.8.0
+VERSION:      0.9.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-08-28
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
@@ -46,6 +46,7 @@ v0.5.0  2026-08-18  Added entry-table resolution and landing-view action plannin
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 v0.8.0  2026-10-15  Added default-off accelerator architecture recommendations.
+v0.9.0  2026-10-16  Added startup preference and FAST-005A acceptance corrections.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -117,8 +118,11 @@ param(
     [string]$AnswersFile,
     [string]$WorkspaceRoot,
     [switch]$EnableAcceleratorRecommendations,
+    [ValidateSet('', 'evaluate', 'fully-custom', 'prefer-fast')]
+    [string]$AcceleratorPreference = '',
     [string]$AcceleratorCatalogSnapshotPath = '',
     [string[]]$AcceleratorPackageMetadataPaths = @(),
+    [string]$AcceleratorPackageManifestPath = '',
     [string]$AcceleratorEnvironmentValidationPath = '',
     [ValidateSet('', 'fast-based', 'hybrid', 'fully-custom')]
     [string]$AcceleratorArchitectureChoice = '',
@@ -211,6 +215,20 @@ function Read-ChoiceValue {
             return $value
         }
 
+        function Read-AcceleratorPreferenceValue {
+            while ($true) {
+                $value = (Read-RequiredValue `
+                    -Prompt 'Accelerator preference (A=evaluate, B=fully-custom, C=prefer-fast)' `
+                    -Default 'A').Trim().ToLowerInvariant()
+                switch ($value) {
+                    { $_ -in @('a', 'evaluate') } { return 'evaluate' }
+                    { $_ -in @('b', 'fully-custom') } { return 'fully-custom' }
+                    { $_ -in @('c', 'prefer-fast') } { return 'prefer-fast' }
+                    default { Write-Host 'Enter A, B, C, evaluate, fully-custom, or prefer-fast.' -ForegroundColor Yellow }
+                }
+            }
+        }
+
         Write-Host "Choose one of: $($AllowedValues -join ', ')." -ForegroundColor Yellow
     }
 }
@@ -298,14 +316,14 @@ function Convert-ToCustomLogicalName {
 }
 
 function Format-StandardTableMapping {
-    param([string]$Input)
+    param([string]$Value)
 
-    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value.Trim().ToLower() -eq "none") {
         return "- None"
     }
 
     $lines = @()
-    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $items = @($Value -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     foreach ($item in $items) {
         $logical = Resolve-StandardLogicalName $item
         $lines += "- $item -> $logical"
@@ -317,16 +335,16 @@ function Format-StandardTableMapping {
 
 function Format-CustomTableMapping {
     param(
-        [string]$Input,
+        [string]$Value,
         [string]$Prefix
     )
 
-    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value.Trim().ToLower() -eq "none") {
         return "- None"
     }
 
     $lines = @()
-    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $items = @($Value -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     foreach ($item in $items) {
         $logical = Convert-ToCustomLogicalName -Name $item -Prefix $Prefix
         if (-not [string]::IsNullOrWhiteSpace($logical)) {
@@ -531,16 +549,28 @@ function Split-ListValues {
 
 function Format-BulletList {
     param(
-        [string]$Input,
+        [string]$Value,
         [string]$NoneValue = "- None"
     )
 
-    $items = @(Split-ListValues -Value $Input)
+    $items = @(Split-ListValues -Value $Value)
     if ($items.Count -eq 0 -or ($items.Count -eq 1 -and $items[0].ToLowerInvariant() -eq 'none')) {
         return $NoneValue
     }
 
     return (($items | ForEach-Object { "- $_" }) -join "`n")
+}
+
+function Remove-MarkdownTrailingWhitespace {
+    param([Parameter(Mandatory)] [string]$Value)
+
+    $withoutTrailingWhitespace = [regex]::Replace(
+        $Value,
+        '[ \t]+(?=\r?$)',
+        '',
+        [Text.RegularExpressions.RegexOptions]::Multiline
+    )
+    return ($withoutTrailingWhitespace -replace "\r\n?", "`n")
 }
 
 function ConvertTo-ReportMappingRows {
@@ -745,6 +775,21 @@ if ($Retrofit) {
 }
 
 Write-Host ""
+
+$selectedAcceleratorPreference = 'disabled'
+if ($acceleratorRecommendationsEnabled) {
+    Show-WizardAcceleratorPreferenceOptions
+    $selectedAcceleratorPreference = if (-not [string]::IsNullOrWhiteSpace($AcceleratorPreference)) {
+        $AcceleratorPreference
+    } elseif ($null -ne $scriptedAnswers) {
+        'evaluate'
+    } else {
+        Read-AcceleratorPreferenceValue
+    }
+    Write-Host "Selected accelerator preference: $selectedAcceleratorPreference" -ForegroundColor Cyan
+}
+$acceleratorMatchingRequested = $acceleratorRecommendationsEnabled -and
+    $selectedAcceleratorPreference -ne 'fully-custom'
 
 if ($Mode -eq 'demo-builder') {
     $answers = [ordered]@{}
@@ -1148,22 +1193,67 @@ $answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Power Apps neutral' } else { 'Dynamics blue' }
 $answers["ReportSet"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
 
-$standardTableMapping = Format-StandardTableMapping -Input $answers["StandardTablesReused"]
-$customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
+$answers["AcceleratorPreference"] = $selectedAcceleratorPreference
+$answers["AcceleratorMatchingRequested"] = if ($acceleratorMatchingRequested) { 'yes' } else { 'no' }
+$standardTableMapping = Format-StandardTableMapping -Value $answers["StandardTablesReused"]
+$customTableMapping = Format-CustomTableMapping -Value $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
 
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
 
+$acceleratorPreferenceRecord = if ($acceleratorRecommendationsEnabled) {
+    New-WizardAcceleratorPreferenceRecord `
+        -Preference $selectedAcceleratorPreference `
+        -ScenarioSlug $scenarioSlug `
+        -Mode $Mode `
+        -RecordedAtUtc $AcceleratorEvaluationTimeUtc
+} else {
+    $null
+}
 $acceleratorEvaluation = $null
 $acceleratorDecision = $null
-$acceleratorAnswersBlock = ''
-$acceleratorSpecBlock = ''
-$acceleratorPlanBlock = ''
-$acceleratorTasksBlock = ''
+$acceleratorPreferenceAnswersBlock = if ($acceleratorRecommendationsEnabled) {
+@"
+## Accelerator Startup Preference
+- Preference: $selectedAcceleratorPreference
+- Matching requested: $($acceleratorPreferenceRecord.matchingRequested)
+- Final architecture selected at startup: no
+- Deployment authorized at startup: no
+- Preference artifact: accelerator/accelerator-preference.json
+"@
+} else { '' }
+$acceleratorPreferenceSpecBlock = if ($acceleratorRecommendationsEnabled) {
+@"
+## Accelerator Startup Preference
+- Preliminary preference: $selectedAcceleratorPreference
+- Matching requested: $($acceleratorPreferenceRecord.matchingRequested)
+- This preference is separate from final architecture approval and does not authorize deployment.
+"@
+} else { '' }
+$acceleratorPreferencePlanBlock = if ($acceleratorRecommendationsEnabled) {
+@"
+## Accelerator Preference Plan
+- Preserve the preliminary preference $selectedAcceleratorPreference in accelerator/accelerator-preference.json.
+- Run matching only after requirements normalization and only when matching was requested.
+- Keep the final architecture decision separate from this preference.
+"@
+} else { '' }
+$acceleratorPreferenceTasksBlock = if ($acceleratorRecommendationsEnabled) {
+@"
+## Accelerator Preference Tasks
+- [x] Record preliminary accelerator preference `$selectedAcceleratorPreference`.
+- [x] Confirm the preference did not select an architecture or authorize deployment.
+"@
+} else { '' }
+$acceleratorAnswersBlock = $acceleratorPreferenceAnswersBlock
+$acceleratorSpecBlock = $acceleratorPreferenceSpecBlock
+$acceleratorPlanBlock = $acceleratorPreferencePlanBlock
+$acceleratorTasksBlock = $acceleratorPreferenceTasksBlock
 $acceleratorOutputFolder = Join-Path $scenarioFolder 'accelerator'
+$acceleratorPreferencePath = Join-Path $acceleratorOutputFolder 'accelerator-preference.json'
 $acceleratorDecisionPath = Join-Path $acceleratorOutputFolder 'accelerator-decision.json'
 $acceleratorDecisionMarkdownPath = Join-Path $acceleratorOutputFolder 'accelerator-decision.md'
-if ($acceleratorRecommendationsEnabled) {
+if ($acceleratorMatchingRequested) {
     $acceleratorRequirements = ConvertTo-WizardAcceleratorRequirements `
         -Answers $answers `
         -ScenarioSlug $scenarioSlug
@@ -1173,9 +1263,13 @@ if ($acceleratorRecommendationsEnabled) {
         -ScenarioSlug $scenarioSlug `
         -CatalogSnapshotPath $AcceleratorCatalogSnapshotPath `
         -PackageMetadataPaths $AcceleratorPackageMetadataPaths `
+        -PackageManifestPath $AcceleratorPackageManifestPath `
         -EnvironmentValidationPath $AcceleratorEnvironmentValidationPath `
         -EvaluationTimeUtc $AcceleratorEvaluationTimeUtc
-    Show-WizardAcceleratorEvaluation -Evaluation $acceleratorEvaluation -Mode $Mode
+    Show-WizardAcceleratorEvaluation `
+        -Evaluation $acceleratorEvaluation `
+        -Mode $Mode `
+        -Preference $selectedAcceleratorPreference
     $availableArchitectureOptions = @($acceleratorEvaluation.options | ForEach-Object { "$($_.optionId)" })
     $selectedArchitecture = if ([string]::IsNullOrWhiteSpace($AcceleratorArchitectureChoice)) {
         Read-ChoiceValue `
@@ -1206,10 +1300,10 @@ if ($acceleratorRecommendationsEnabled) {
     $acceleratorProjection = Get-WizardAcceleratorPlanningProjection `
         -Evaluation $acceleratorEvaluation `
         -Decision $acceleratorDecision
-    $acceleratorAnswersBlock = $acceleratorProjection.Answers
-    $acceleratorSpecBlock = $acceleratorProjection.Spec
-    $acceleratorPlanBlock = $acceleratorProjection.Plan
-    $acceleratorTasksBlock = $acceleratorProjection.Tasks
+    $acceleratorAnswersBlock = "$acceleratorPreferenceAnswersBlock`n$($acceleratorProjection.Answers)"
+    $acceleratorSpecBlock = "$acceleratorPreferenceSpecBlock`n$($acceleratorProjection.Spec)"
+    $acceleratorPlanBlock = "$acceleratorPreferencePlanBlock`n$($acceleratorProjection.Plan)"
+    $acceleratorTasksBlock = "$acceleratorPreferenceTasksBlock`n$($acceleratorProjection.Tasks)"
 } elseif ($Mode -eq 'demo-builder') {
     $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
     if ($recommendationConfirmation -ne 'yes') {
@@ -1283,9 +1377,9 @@ $gridControlsObject = if ($answers["PowerAppsGridEnabled"] -eq 'yes') {
 } else { $null }
 $gridControlsJson = if ($null -ne $gridControlsObject) { $gridControlsObject | ConvertTo-Json -Depth 8 } else { '' }
 
-$standardFieldsList = Format-BulletList -Input $answers["StandardFieldsReused"]
-$customFieldsList = Format-BulletList -Input $answers["CustomFieldsToAdd"]
-$relationshipList = Format-BulletList -Input $answers["RelationshipsToCreate"]
+$standardFieldsList = Format-BulletList -Value $answers["StandardFieldsReused"]
+$customFieldsList = Format-BulletList -Value $answers["CustomFieldsToAdd"]
+$relationshipList = Format-BulletList -Value $answers["RelationshipsToCreate"]
 $bpfStagesMarkdown = Format-BpfStageBullets -Stages @($answers["BpfStageDefinitions"])
 $bpfPayloadObject = if ($bpf.Enabled) {
     [ordered]@{
@@ -1402,6 +1496,9 @@ if ($bpf.Enabled) {
     $targetFiles += $bpfPayloadPath
 }
 if ($acceleratorRecommendationsEnabled) {
+    $targetFiles += $acceleratorPreferencePath
+}
+if ($acceleratorMatchingRequested) {
     $targetFiles += @($acceleratorDecisionPath, $acceleratorDecisionMarkdownPath)
 }
 $existingFiles = @($targetFiles | Where-Object { Test-Path $_ })
@@ -1756,7 +1853,7 @@ $(if ($Retrofit) { @"
 - Gate: data creation cannot begin until table counts, hero records, relationship distribution, bounded Task activity scope, and synthetic-data constraints are approved.
 
 ## Source Control Plan
-- Standards: `requirements/GithubInstructions_General.md`
+- Standards: requirements/GithubInstructions_General.md
 - Scenario branch: $($answers["SourceControlBranch"])
 - Related work: $($answers["SourceControlWorkItem"])
 - Commit strategy: $($answers["SourceControlCheckpoints"])
@@ -1877,11 +1974,11 @@ $acceleratorTasksBlock
 - [ ] Update 'docs/build-log.md'
 "@
 
-Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
-Set-Content -Path $specPath -Value $specContent -Encoding UTF8
-Set-Content -Path $planPath -Value $planContent -Encoding UTF8
-Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
-Set-Content -Path $reportMappingsPath -Value $reportMappingsContent -Encoding UTF8
+Set-Content -Path $answersPath -Value (Remove-MarkdownTrailingWhitespace -Value $answersContent) -Encoding UTF8
+Set-Content -Path $specPath -Value (Remove-MarkdownTrailingWhitespace -Value $specContent) -Encoding UTF8
+Set-Content -Path $planPath -Value (Remove-MarkdownTrailingWhitespace -Value $planContent) -Encoding UTF8
+Set-Content -Path $tasksPath -Value (Remove-MarkdownTrailingWhitespace -Value $tasksContent) -Encoding UTF8
+Set-Content -Path $reportMappingsPath -Value (Remove-MarkdownTrailingWhitespace -Value $reportMappingsContent) -Encoding UTF8
 Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
 if ($null -ne $gridControlsObject) {
     Set-Content -Path $gridControlsPath -Value $gridControlsJson -Encoding UTF8
@@ -1896,6 +1993,13 @@ if ($bpf.Enabled) {
     Set-Content -Path $bpfPayloadPath -Value $bpfPayloadJson -Encoding UTF8
 }
 if ($acceleratorRecommendationsEnabled) {
+    $acceleratorPreferenceSchemaPath = Join-Path $implementationRoot 'schemas\accelerators\accelerator-preference.schema.json'
+    Write-WizardAcceleratorPreferenceRecord `
+        -PreferenceRecord $acceleratorPreferenceRecord `
+        -OutputPath $acceleratorPreferencePath `
+        -SchemaPath $acceleratorPreferenceSchemaPath
+}
+if ($acceleratorMatchingRequested) {
     $acceleratorDecisionSchemaPath = Join-Path $implementationRoot 'schemas\accelerators\architecture-decision.schema.json'
     $null = Write-WizardAcceleratorPlanningArtifacts `
         -Evaluation $acceleratorEvaluation `
@@ -1923,6 +2027,9 @@ if ($bpf.Enabled) {
     Write-Host "  $bpfPayloadPath"
 }
 if ($acceleratorRecommendationsEnabled) {
+    Write-Host "  $acceleratorPreferencePath"
+}
+if ($acceleratorMatchingRequested) {
     Write-Host "  $acceleratorDecisionPath"
     Write-Host "  $acceleratorDecisionMarkdownPath"
 }

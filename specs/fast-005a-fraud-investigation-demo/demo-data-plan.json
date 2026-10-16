@@ -1,0 +1,34 @@
+{
+  "Enabled": true,
+  "Scope": "all-created",
+  "Tables": [
+    "Investigation",
+    "Investigator Assignment",
+    "Evidence",
+    "Evidence Custody Event",
+    "Interview",
+    "Fraud Score",
+    "Supervisor Approval",
+    "Report"
+  ],
+  "StandardTableStrategy": "none",
+  "RecordCounts": "small synthetic set; counts to be confirmed during planning",
+  "Scenarios": "A complete synthetic fraud case proves traceable custody, interview history, fraud-score audit reference, supervisor approval, and accurate reporting",
+  "HeroRecords": "none",
+  "RelationshipDistribution": "none",
+  "TaskGeneration": {
+    "Enabled": false,
+    "ParentTables": [
+      "none"
+    ],
+    "Scope": "none",
+    "SourceRecordLimit": 0,
+    "OrderBy": "none",
+    "TasksPerRecord": 0
+  },
+  "Method": "scripted",
+  "RerunBehavior": "upsert",
+  "SourceTag": "fast-005a-fraud-investigation-demo",
+  "PrivacyConstraints": "synthetic data only; no personal or production data",
+  "GenerateCleanup": false
+}

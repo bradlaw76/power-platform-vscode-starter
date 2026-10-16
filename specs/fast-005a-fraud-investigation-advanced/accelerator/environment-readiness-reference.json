@@ -1,0 +1,16 @@
+{
+  "provided": true,
+  "status": "action-required",
+  "fresh": false,
+  "snapshotMatch": true,
+  "packageMatch": true,
+  "executionGateOpen": false,
+  "environmentUrl": "https://powerplatformvscodestarter.crm9.dynamics.com",
+  "coreAssessment": "missing-prerequisites-potentially-available",
+  "metadataFingerprint": "7654dbb8de75ccc321fa1959a1546a85016f63a8f3bfca3897c5c055e566ea64",
+  "expiresAtUtc": "2026-10-15T20:26:59.6346284Z",
+  "limitations": [
+    "Environment evidence is absent or stale.",
+    "Environment readiness is 'action-required'."
+  ]
+}

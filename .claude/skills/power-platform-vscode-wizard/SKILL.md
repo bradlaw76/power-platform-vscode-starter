@@ -52,9 +52,13 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 
 Accelerator recommendations are disabled by default. When explicitly enabled
 with `FAST_ENABLED=true` or terminal
-`-EnableAcceleratorRecommendations`, run the provider-neutral analysis after
-the existing requirements discovery and before architecture finalization. Do
-not add an upfront accelerator screen or mandatory discovery question. Demo
+`-EnableAcceleratorRecommendations`, offer an optional preliminary preference
+after mode selection: Evaluate accelerators, Fully Custom, or Prefer FAST
+reuse. Persist it separately from final architecture approval; it does not
+authorize deployment. Fully Custom bypasses matching. Otherwise run the
+provider-neutral analysis after the existing requirements discovery and before architecture finalization.
+Do not add module selection or a mandatory FAST
+business question. Demo
 Builder folds FAST-based, Hybrid, and Fully Custom selection into its existing
 consolidated confirmation; detailed modes show requirement coverage, evidence,
 schema deltas, dependencies, risks, and environment readiness. Persist the

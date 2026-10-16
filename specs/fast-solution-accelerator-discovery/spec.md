@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-005 implemented; architectural review required
-**Phase boundary:** Stop after FAST-005
+**Status:** FAST-005 accepted; FAST-005B corrections implemented for review
+**Phase boundary:** Stop after FAST-005B
 
 ## Problem statement
 
@@ -398,3 +398,28 @@ preflight is invoked. The current GCC evidence has no installed Core or
 specialty modules, so FAST-based and Hybrid planning remain available while
 their execution gate stays closed. FAST-006 build integration and rollout
 remain unauthorized.
+
+## FAST-005B correction boundary
+
+FAST-005B corrects the accepted planning integration without connecting FAST
+to build execution. It:
+
+- offers an optional accelerator preference only after mode selection and only
+  when the default-off feature has already been explicitly enabled;
+- keeps Evaluate accelerators, Fully Custom, and Prefer FAST reuse separate
+  from final architecture approval and deployment authorization;
+- preserves ordinary discovery, including Demo Builder's six business
+  questions;
+- emits independently traceable requirement records when submitted answers
+  contain explicit workflow clauses, while retaining aggregate fallback for
+  non-granular answers;
+- preserves explicit custom tables, fields, and relationships in all planning
+  renderers;
+- accepts a validated package manifest that pins multiple package indexes,
+  versions, and hashes through one unambiguous command-line argument; and
+- removes trailing whitespace at the Markdown generator boundary.
+
+Fully Custom preference bypasses matching. Prefer FAST reuse does not weaken
+evidence thresholds, remove Hybrid or Fully Custom, open readiness gates, or
+select an architecture automatically. FAST remains globally disabled by
+default, and FAST-006 remains unauthorized.

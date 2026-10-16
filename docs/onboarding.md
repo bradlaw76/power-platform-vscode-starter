@@ -334,16 +334,20 @@ Accelerator recommendations are disabled by default.
 
 For controlled local acceptance testing, pass
 `-EnableAcceleratorRecommendations` together with a reviewed catalog snapshot,
-package indexes, and optional environment evidence. `FAST_ENABLED=true` is the
-equivalent process-level feature flag. Enabled runs require explicit
+package manifest, and optional environment evidence. `FAST_ENABLED=true` is the
+equivalent process-level feature flag. After mode selection, explicitly enabled
+interactive runs offer Evaluate accelerators, Fully Custom, or Prefer FAST
+reuse as a preliminary planning preference. This choice is not final
+architecture approval and does not authorize deployment. Enabled matching runs require explicit
 FAST-based, Hybrid, or Fully Custom selection and write planning evidence under
 `specs/<scenario-slug>/accelerator/`.
 
 ```powershell
 pwsh ./scripts/bootstrap/05-start-wizard.ps1 `
   -EnableAcceleratorRecommendations `
+  -AcceleratorPreference evaluate `
   -AcceleratorCatalogSnapshotPath <snapshot.json> `
-  -AcceleratorPackageMetadataPaths <package-index.json>
+  -AcceleratorPackageManifestPath <package-input-manifest.json>
 ```
 
 Fully Custom always remains selectable. Missing, archived, stale, or
@@ -351,6 +355,11 @@ unavailable evidence cannot authorize FAST-dependent execution. The current
 GCC acceptance evidence has no installed Core or specialty modules, so
 FAST-based and Hybrid planning are available but their execution gate remains
 closed.
+
+The selector remains disabled during normal runs. A future default rollout
+requires an explicit profile/contract change; FAST-005B does not activate it
+globally. Fully Custom preference bypasses matching. Prefer FAST reuse still
+shows Hybrid and Fully Custom and does not weaken evidence or readiness gates.
 
 Supported application profiles:
 

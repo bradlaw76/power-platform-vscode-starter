@@ -1,6 +1,6 @@
 {
-  "profileVersion": "1.3",
-  "contractVersion": "1.13.0",
+  "profileVersion": "1.4",
+  "contractVersion": "1.14.0",
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -130,10 +130,19 @@
     "enabled": false,
     "environmentFlag": "FAST_ENABLED",
     "explicitSwitch": "EnableAcceleratorRecommendations",
+    "preferenceSelector": {
+      "enabledByDefault": false,
+      "offeredWhenExplicitlyEnabled": true,
+      "parameter": "AcceleratorPreference",
+      "choices": ["evaluate", "fully-custom", "prefer-fast"],
+      "futureDefaultRolloutRequiresContractChange": true
+    },
     "integrationPoint": "post-discovery-pre-architecture-finalization",
     "service": "scripts/accelerators/wizard-accelerator-integration.ps1",
     "analysisSchema": "schemas/accelerators/requirements-analysis.schema.json",
     "decisionSchema": "schemas/accelerators/architecture-decision.schema.json",
+    "preferenceSchema": "schemas/accelerators/accelerator-preference.schema.json",
+    "packageManifestSchema": "schemas/accelerators/package-input-manifest.schema.json",
     "requiresExplicitArchitectureApproval": true,
     "fullyCustomAlwaysAvailable": true,
     "dataverseGenerationConnected": false

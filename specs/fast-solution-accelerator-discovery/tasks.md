@@ -157,7 +157,33 @@
 - [x] Preserve Fully Custom during catalog outage or user override.
 - [x] Prove disabled mode produces baseline-equivalent planning outputs.
 - [x] Prove no Dataverse mutation, solution import, or build-stage invocation.
-- [ ] Obtain FAST-005 architectural review approval before FAST-006.
+- [x] Obtain FAST-005 architectural review approval before FAST-005A.
+
+## FAST-005A - Acceptance demonstration
+
+- [x] Execute the synthetic fraud scenario through all three existing modes.
+- [x] Use promoted catalog, verified package metadata, and GCC readiness
+  evidence.
+- [x] Prove byte-stable reruns and explicit approval for decision changes.
+- [x] Record missing-Core blocking and no Dataverse mutation.
+- [x] Identify granular-requirement, schema-rendering, package-input, and
+  generated-Markdown corrections.
+
+## FAST-005B - Acceptance corrections
+
+- [x] Add a default-off, post-mode preliminary accelerator preference.
+- [x] Keep feature activation, preliminary preference, final architecture
+  approval, and deployment authorization separate.
+- [x] Add stable granular requirement extraction with aggregate fallback.
+- [x] Fix custom schema rendering at the PowerShell formatter source.
+- [x] Add a validated multi-package input manifest with identity/hash checks.
+- [x] Remove trailing whitespace in the Markdown generator.
+- [x] Add focused preference, granularity, schema, package, lint,
+  reproducibility, and safety regression tests.
+- [x] Repeat and preserve all three corrected acceptance demonstrations.
+- [x] Run complete FAST and wizard regression validation.
+- [ ] Commit, push, and verify the remote feature branch and recovery refs.
+- [ ] Obtain FAST-005B architectural review approval before FAST-006.
 
 ## FAST-006 - Failure, rollback, and rollout (not authorized)
 

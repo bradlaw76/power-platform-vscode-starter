@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "preferenceId": "sha256:0ce4547c875a36040cbf6a4189933449274fbfb2a6849c22bdcfc67cfe2007b9",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "wizardMode": "advanced-builder",
+  "preference": "prefer-fast",
+  "matchingRequested": true,
+  "finalArchitectureSelected": false,
+  "deploymentAuthorized": false,
+  "recordedAtUtc": "2026-10-15T21:00:00.0000000Z"
+}

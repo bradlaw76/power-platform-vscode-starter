@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Wizard Accelerator Recommendation Integration
 FILE:         scripts/accelerators/wizard-accelerator-integration.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-10-15
 ENVIRONMENT:  PowerShell 7 | Local Spec Kit planning
@@ -51,6 +51,67 @@ function Test-WizardAcceleratorRecommendationsEnabled {
     return [Environment]::GetEnvironmentVariable('FAST_ENABLED') -match '^(?i:true|1|yes|on)$'
 }
 
+function Show-WizardAcceleratorPreferenceOptions {
+    Write-Host ''
+    Write-Host 'Accelerator strategy preference (planning only):' -ForegroundColor Cyan
+    Write-Host '  A. Evaluate FAST and available accelerators (Recommended)'
+    Write-Host '     Continue normal discovery, then compare FAST-based, Hybrid, and Fully Custom options.'
+    Write-Host '  B. Fully Custom'
+    Write-Host '     Use the existing custom-only workflow and skip accelerator matching.'
+    Write-Host '  C. Prefer FAST reuse'
+    Write-Host '     Prioritize relevant documented reuse during evaluation while preserving Hybrid and Fully Custom.'
+    Write-Host '  FAST provides reusable Microsoft industry solution components. Reuse depends on functional fit, prerequisites, versions, and environment compatibility.'
+    Write-Host '  This preference does not select an architecture or authorize deployment.'
+}
+
+function New-WizardAcceleratorPreferenceRecord {
+    param(
+        [Parameter(Mandatory)]
+        [ValidateSet('evaluate', 'fully-custom', 'prefer-fast')]
+        [string]$Preference,
+        [Parameter(Mandatory)] [string]$ScenarioSlug,
+        [Parameter(Mandatory)] [string]$Mode,
+        [datetime]$RecordedAtUtc = [DateTime]::UtcNow
+    )
+
+    $basis = [ordered]@{
+        scenarioSlug = $ScenarioSlug
+        wizardMode = $Mode
+        preference = $Preference
+        matchingRequested = $Preference -ne 'fully-custom'
+    }
+    return [pscustomobject][ordered]@{
+        schemaVersion = '1.0'
+        preferenceId = "sha256:$(Get-AcceleratorStringSha256 -Value (ConvertTo-AcceleratorCanonicalJson -InputObject $basis))"
+        scenarioSlug = $ScenarioSlug
+        wizardMode = $Mode
+        preference = $Preference
+        matchingRequested = $Preference -ne 'fully-custom'
+        finalArchitectureSelected = $false
+        deploymentAuthorized = $false
+        recordedAtUtc = $RecordedAtUtc.ToUniversalTime().ToString('o')
+    }
+}
+
+function Write-WizardAcceleratorPreferenceRecord {
+    param(
+        [Parameter(Mandatory)] [object]$PreferenceRecord,
+        [Parameter(Mandatory)] [string]$OutputPath,
+        [Parameter(Mandatory)] [string]$SchemaPath
+    )
+
+    $json = $PreferenceRecord | ConvertTo-Json -Depth 20
+    if (-not (Test-Json -Json $json -SchemaFile $SchemaPath -ErrorAction Stop)) {
+        throw 'Accelerator startup preference failed schema validation.'
+    }
+    if (Test-Path -LiteralPath $OutputPath -PathType Leaf) {
+        $existing = Get-Content -LiteralPath $OutputPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ("$($existing.preferenceId)" -ceq "$($PreferenceRecord.preferenceId)") { return }
+    }
+    New-Item -ItemType Directory -Path (Split-Path $OutputPath -Parent) -Force | Out-Null
+    Set-Content -LiteralPath $OutputPath -Value $json -Encoding utf8NoBOM
+}
+
 function Resolve-WizardAcceleratorInputPath {
     param(
         [Parameter(Mandatory)] [AllowEmptyString()] [string]$Path,
@@ -64,6 +125,66 @@ function Resolve-WizardAcceleratorInputPath {
         Join-Path $WorkspaceRoot $Path
     }
     return [IO.Path]::GetFullPath($resolved)
+}
+
+function Split-WizardRequirementClauses {
+    param([AllowEmptyString()] [string]$Value)
+
+    if ([string]::IsNullOrWhiteSpace($Value)) { return @() }
+    $clauses = @(
+        $Value -split '\s*[;,\r\n]+\s*(?:and\s+)?' |
+            ForEach-Object { $_.Trim().TrimEnd('.') } |
+            Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
+    )
+    if ($clauses.Count -le 1) { return @($Value.Trim()) }
+    return $clauses
+}
+
+function Get-WizardRequirementStableId {
+    param(
+        [Parameter(Mandatory)] [string]$Description,
+        [Parameter(Mandatory)] [Collections.IDictionary]$UsedIds
+    )
+
+    $ignored = @(
+        'add', 'allow', 'call', 'capture', 'create', 'document', 'enable',
+        'maintain', 'manage', 'present', 'provide', 'record', 'route', 'support'
+    )
+    $canonical = @{
+        assigned = 'assignment'; assigns = 'assignment'; assign = 'assignment'
+        approvals = 'approval'; approved = 'approval'
+        investigations = 'investigation'; investigators = 'investigator'
+        interviews = 'interview'; reports = 'reporting'; report = 'reporting'
+        scored = 'scoring'; scores = 'scoring'; score = 'scoring'
+    }
+    $tokens = @(
+        [regex]::Matches($Description.ToLowerInvariant(), '[a-z0-9]+') |
+            ForEach-Object {
+                $token = $_.Value
+                if ($canonical.ContainsKey($token)) { $canonical[$token] } else { $token }
+            } |
+            Where-Object { $_.Length -ge 3 -and $ignored -notcontains $_ } |
+            Select-Object -Unique -First 4
+    )
+    if ($tokens.Count -eq 0) { $tokens = @('requirement') }
+    $baseId = "REQ-$(@($tokens | ForEach-Object { $_.ToUpperInvariant() }) -join '-')"
+    $sequence = if ($UsedIds.Contains($baseId)) { [int]$UsedIds[$baseId] + 1 } else { 1 }
+    $UsedIds[$baseId] = $sequence
+    return "$baseId-$($sequence.ToString('000'))"
+}
+
+function Get-WizardRelevantValues {
+    param(
+        [Parameter(Mandatory)] [string]$Description,
+        [string[]]$Values = @()
+    )
+
+    $descriptionTerms = @(Get-AcceleratorMeaningfulTerms -Text $Description)
+    $matches = @($Values | Where-Object {
+        $valueTerms = @(Get-AcceleratorMeaningfulTerms -Text $_)
+        @(Get-AcceleratorMatchedTerms -RequirementTerms $descriptionTerms -EvidenceTerms $valueTerms).Count -gt 0
+    })
+    return @($matches | Sort-Object -Unique)
 }
 
 function ConvertTo-WizardAcceleratorRequirements {
@@ -81,35 +202,63 @@ function ConvertTo-WizardAcceleratorRequirements {
     )
     $success = "$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'SuccessLooksLike' -DefaultValue '')".Trim()
     $userTasks = "$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'UserTaskDefinitions' -DefaultValue '')".Trim()
-    $integrations = @(
+    $integrationCandidates = @(
         "$businessProblem $artifacts $userTasks" -split '[.;\r\n]+' |
             ForEach-Object { $_.Trim() } |
             Where-Object { $_ -match '(?i)\b(?:api|connector|integrat|external system)\w*' }
     )
+    $acceptanceCriteria = @(Split-WizardRequirementClauses -Value $success)
 
     $requirements = [Collections.Generic.List[object]]::new()
-    if (-not [string]::IsNullOrWhiteSpace($businessProblem)) {
-        $requirements.Add([pscustomobject][ordered]@{
-            id = 'REQ-BUSINESS-001'
-            description = $businessProblem
-            actors = @("$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'Users' -DefaultValue '')")
-            entities = $dataEntities
-            acceptanceCriteria = @($success | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-            integrations = $integrations
-        }) | Out-Null
-    }
-    if (-not [string]::IsNullOrWhiteSpace($artifacts) -or
-        -not [string]::IsNullOrWhiteSpace($userTasks)) {
-        $requirements.Add([pscustomobject][ordered]@{
-            id = 'REQ-EXPERIENCE-001'
-            description = @($artifacts, $userTasks | Where-Object {
-                -not [string]::IsNullOrWhiteSpace($_)
-            }) -join '. '
-            actors = @("$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'Users' -DefaultValue '')")
-            entities = $dataEntities
-            acceptanceCriteria = @($success | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
-            integrations = $integrations
-        }) | Out-Null
+    $businessClauses = @(Split-WizardRequirementClauses -Value $businessProblem)
+    $artifactClauses = @(Split-WizardRequirementClauses -Value $artifacts)
+    $granularClauses = @(
+        if ($businessClauses.Count -gt 1) {
+            $businessClauses
+        } elseif ($artifactClauses.Count -gt 1) {
+            $artifactClauses
+        }
+    )
+    if ($granularClauses.Count -gt 1) {
+        $usedIds = @{}
+        foreach ($clause in $granularClauses) {
+            $criteria = @(Get-WizardRelevantValues -Description $clause -Values $acceptanceCriteria)
+            if ($criteria.Count -eq 0 -and -not [string]::IsNullOrWhiteSpace($success)) {
+                $criteria = @($success)
+            }
+            $requirements.Add([pscustomobject][ordered]@{
+                id = Get-WizardRequirementStableId -Description $clause -UsedIds $usedIds
+                description = $clause
+                actors = @("$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'Users' -DefaultValue '')")
+                entities = @(Get-WizardRelevantValues -Description $clause -Values $dataEntities)
+                acceptanceCriteria = $criteria
+                integrations = @(Get-WizardRelevantValues -Description $clause -Values $integrationCandidates)
+            }) | Out-Null
+        }
+    } else {
+        if (-not [string]::IsNullOrWhiteSpace($businessProblem)) {
+            $requirements.Add([pscustomobject][ordered]@{
+                id = 'REQ-BUSINESS-001'
+                description = $businessProblem
+                actors = @("$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'Users' -DefaultValue '')")
+                entities = $dataEntities
+                acceptanceCriteria = $acceptanceCriteria
+                integrations = $integrationCandidates
+            }) | Out-Null
+        }
+        if (-not [string]::IsNullOrWhiteSpace($artifacts) -or
+            -not [string]::IsNullOrWhiteSpace($userTasks)) {
+            $requirements.Add([pscustomobject][ordered]@{
+                id = 'REQ-EXPERIENCE-001'
+                description = @($artifacts, $userTasks | Where-Object {
+                    -not [string]::IsNullOrWhiteSpace($_)
+                }) -join '. '
+                actors = @("$(Get-WizardAcceleratorValue -InputObject $Answers -Name 'Users' -DefaultValue '')")
+                entities = $dataEntities
+                acceptanceCriteria = $acceptanceCriteria
+                integrations = $integrationCandidates
+            }) | Out-Null
+        }
     }
     if ($requirements.Count -eq 0) {
         $requirements.Add([pscustomobject][ordered]@{
@@ -122,6 +271,71 @@ function ConvertTo-WizardAcceleratorRequirements {
     return @($requirements.ToArray())
 }
 
+function Get-WizardAcceleratorPackageMetadata {
+    param(
+        [Parameter(Mandatory)] [string]$WorkspaceRoot,
+        [string[]]$PackageMetadataPaths = @(),
+        [string]$PackageManifestPath = ''
+    )
+
+    if (-not [string]::IsNullOrWhiteSpace($PackageManifestPath) -and $PackageMetadataPaths.Count -gt 0) {
+        throw 'Supply either AcceleratorPackageManifestPath or AcceleratorPackageMetadataPaths, not both.'
+    }
+    if ([string]::IsNullOrWhiteSpace($PackageManifestPath)) {
+        return @(
+            foreach ($packagePath in $PackageMetadataPaths) {
+                $resolvedPackagePath = Resolve-WizardAcceleratorInputPath -Path $packagePath -WorkspaceRoot $WorkspaceRoot
+                if (-not (Test-Path -LiteralPath $resolvedPackagePath -PathType Leaf)) {
+                    throw "Accelerator package metadata file not found: $resolvedPackagePath"
+                }
+                Get-Content -LiteralPath $resolvedPackagePath -Raw -Encoding UTF8 | ConvertFrom-Json
+            }
+        )
+    }
+
+    $resolvedManifestPath = Resolve-WizardAcceleratorInputPath -Path $PackageManifestPath -WorkspaceRoot $WorkspaceRoot
+    if (-not (Test-Path -LiteralPath $resolvedManifestPath -PathType Leaf)) {
+        throw "Accelerator package input manifest not found: $resolvedManifestPath"
+    }
+    $manifestJson = Get-Content -LiteralPath $resolvedManifestPath -Raw -Encoding UTF8
+    $manifestSchemaPath = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'schemas\accelerators\package-input-manifest.schema.json'
+    if (-not (Test-Json -Json $manifestJson -SchemaFile $manifestSchemaPath -ErrorAction Stop)) {
+        throw 'Accelerator package input manifest failed schema validation.'
+    }
+    $manifest = $manifestJson | ConvertFrom-Json
+    $manifestFolder = Split-Path $resolvedManifestPath -Parent
+    $seenModules = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
+    return @(
+        foreach ($entry in @($manifest.packages)) {
+            if (-not $seenModules.Add("$($entry.moduleId)")) {
+                throw "Accelerator package manifest contains duplicate module '$($entry.moduleId)'."
+            }
+            $packagePath = if ([IO.Path]::IsPathRooted("$($entry.path)")) {
+                "$($entry.path)"
+            } else {
+                Join-Path $manifestFolder "$($entry.path)"
+            }
+            $resolvedPackagePath = [IO.Path]::GetFullPath($packagePath)
+            if (-not (Test-Path -LiteralPath $resolvedPackagePath -PathType Leaf)) {
+                throw "Accelerator package metadata file not found: $resolvedPackagePath"
+            }
+            $package = Get-Content -LiteralPath $resolvedPackagePath -Raw -Encoding UTF8 | ConvertFrom-Json
+            $actualVersion = "$(Get-WizardAcceleratorValue -InputObject $package.solution -Name 'version' -DefaultValue '')"
+            foreach ($comparison in @(
+                @('moduleId', "$($entry.moduleId)", "$($package.moduleId)"),
+                @('packageId', "$($entry.packageId)", "$($package.packageId)"),
+                @('version', "$($entry.version)", $actualVersion),
+                @('sha256', "$($entry.sha256)", "$($package.sha256)")
+            )) {
+                if ($comparison[1] -cne $comparison[2]) {
+                    throw "Accelerator package manifest $($comparison[0]) mismatch for '$resolvedPackagePath'. Expected '$($comparison[1])'; found '$($comparison[2])'."
+                }
+            }
+            $package
+        }
+    )
+}
+
 function Invoke-WizardAcceleratorEvaluation {
     [CmdletBinding()]
     param(
@@ -130,6 +344,7 @@ function Invoke-WizardAcceleratorEvaluation {
         [Parameter(Mandatory)] [string]$ScenarioSlug,
         [string]$CatalogSnapshotPath = '',
         [string[]]$PackageMetadataPaths = @(),
+        [string]$PackageManifestPath = '',
         [string]$EnvironmentValidationPath = '',
         [datetime]$EvaluationTimeUtc = [DateTime]::UtcNow
     )
@@ -157,15 +372,10 @@ function Invoke-WizardAcceleratorEvaluation {
     }
 
     $catalog = Get-Content -LiteralPath $catalogPath -Raw -Encoding UTF8 | ConvertFrom-Json
-    $packages = @(
-        foreach ($packagePath in $PackageMetadataPaths) {
-            $resolvedPackagePath = Resolve-WizardAcceleratorInputPath -Path $packagePath -WorkspaceRoot $WorkspaceRoot
-            if (-not (Test-Path -LiteralPath $resolvedPackagePath -PathType Leaf)) {
-                throw "Accelerator package metadata file not found: $resolvedPackagePath"
-            }
-            Get-Content -LiteralPath $resolvedPackagePath -Raw -Encoding UTF8 | ConvertFrom-Json
-        }
-    )
+    $packages = @(Get-WizardAcceleratorPackageMetadata `
+        -WorkspaceRoot $WorkspaceRoot `
+        -PackageMetadataPaths $PackageMetadataPaths `
+        -PackageManifestPath $PackageManifestPath)
     $environmentEvidence = if ([string]::IsNullOrWhiteSpace($EnvironmentValidationPath)) {
         $null
     } else {
@@ -200,12 +410,15 @@ function Show-WizardAcceleratorEvaluation {
     param(
         [Parameter(Mandatory)] [object]$Evaluation,
         [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
-        [string]$Mode
+        [string]$Mode,
+        [ValidateSet('evaluate', 'prefer-fast')]
+        [string]$Preference = 'evaluate'
     )
 
     Write-Host ''
     Write-Host 'Accelerator architecture recommendation:' -ForegroundColor Cyan
     Write-Host "  $($Evaluation.message)"
+    Write-Host "  Startup preference: $Preference"
     if ($Evaluation.status -ne 'evaluated') {
         Write-Host '  Fully Custom remains available; no accelerator evidence will be used.' -ForegroundColor Yellow
         return
@@ -467,7 +680,7 @@ $coverage
 "@
         Plan = @"
 ## Accelerator Architecture Plan
-- Reproduce from `accelerator/accelerator-evaluation.json` and `accelerator/accelerator-decision.json`.
+- Reproduce from accelerator/accelerator-evaluation.json and accelerator/accelerator-decision.json.
 - Preserve selected architecture `$($Decision.selectedOption)` unless an explicitly approved decision change is recorded.
 - Revalidate environment readiness before any future FAST-dependent execution.
 - Keep fully custom work independent from FAST package prerequisites.

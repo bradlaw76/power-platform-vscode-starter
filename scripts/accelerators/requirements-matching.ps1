@@ -205,7 +205,7 @@ function ConvertTo-NormalizedAcceleratorRequirements {
         $uncertainties = @($ambiguityMarkers | Where-Object {
             $combinedText.IndexOf($_, [StringComparison]::OrdinalIgnoreCase) -ge 0
         } | ForEach-Object { "Requirement contains ambiguity marker '$_'." })
-        if ((Get-AcceleratorMeaningfulTerms -Text $combinedText).Count -lt 2) {
+        if (@(Get-AcceleratorMeaningfulTerms -Text $combinedText).Count -lt 2) {
             $uncertainties += 'Requirement has insufficient distinctive business detail.'
         }
         $normalized.Add([pscustomobject][ordered]@{

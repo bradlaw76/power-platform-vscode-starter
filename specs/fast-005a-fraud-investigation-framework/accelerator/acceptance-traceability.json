@@ -1,0 +1,139 @@
+[
+  {
+    "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+    "acceptanceCriteria": [
+      "custody"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-EVIDENCE",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-DESIGN",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+    "acceptanceCriteria": [
+      "A synthetic fraud case proves intake",
+      "fraud-score auditability"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-EVIDENCE",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-DESIGN",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "acceptanceCriteria": [
+      "interviews"
+    ],
+    "dispositions": [
+      "INTEGRATE",
+      "VERIFY"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+      "FAST004-REQ-INTERVIEW-001-DESIGN",
+      "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+    "acceptanceCriteria": [
+      "A synthetic fraud case proves intake"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      },
+      {
+        "itemId": "microsoft-fast:module:dispute-resolution",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/dispute-resolution.md",
+        "contentHash": "3c66a5ed5190df4beb9a2f53d4f664ccaceab5f568ef31344202366be745fd2c",
+        "claim": "Manage internal complaints, grievances, and disputes with structured intake, investigation, mediation, determination, and appeal processes.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-DESIGN",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+    "acceptanceCriteria": [
+      "assignment"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-DESIGN",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "acceptanceCriteria": [
+      "reporting"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+    "acceptanceCriteria": [
+      "an unchanged approved architecture decision",
+      "approval"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-EVIDENCE",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-DESIGN",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-ACCEPTANCE"
+    ]
+  }
+]

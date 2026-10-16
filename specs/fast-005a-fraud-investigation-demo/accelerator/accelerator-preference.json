@@ -1,0 +1,11 @@
+{
+  "schemaVersion": "1.0",
+  "preferenceId": "sha256:34160ee34ff89a5775a09c39d15877bc20e46faa276854c7a88428015839383f",
+  "scenarioSlug": "fast-005a-fraud-investigation-demo",
+  "wizardMode": "demo-builder",
+  "preference": "evaluate",
+  "matchingRequested": true,
+  "finalArchitectureSelected": false,
+  "deploymentAuthorized": false,
+  "recordedAtUtc": "2026-10-15T21:00:00.0000000Z"
+}

@@ -1,0 +1,168 @@
+[
+  {
+    "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-EVIDENCE",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-DESIGN",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+    "acceptanceCriteria": [
+      "an externally sourced fraud score and audit reference",
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-EVIDENCE",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-DESIGN",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "acceptanceCriteria": [
+      "interview history"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+      "FAST004-REQ-INTERVIEW-001-DESIGN",
+      "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      },
+      {
+        "itemId": "microsoft-fast:module:dispute-resolution",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/dispute-resolution.md",
+        "contentHash": "3c66a5ed5190df4beb9a2f53d4f664ccaceab5f568ef31344202366be745fd2c",
+        "claim": "Manage internal complaints, grievances, and disputes with structured intake, investigation, mediation, determination, and appeal processes.",
+        "evidenceLevel": "conceptual"
+      },
+      {
+        "itemId": "microsoft-fast:module:personnel-security",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/personnel-security.md",
+        "contentHash": "4cfaa9a081cc6fd5cddf398e0567de22f92f6bdaa69c096a4462db7f906a2c8b",
+        "claim": "Manage the lifecycle of evaluating, granting, monitoring, and enforcing trust-based access through security reviews, investigations, adjudications, and credentials.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-DESIGN",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [
+      {
+        "itemId": "microsoft-fast:module:investigations",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md",
+        "contentHash": "1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "claim": "Manage formal investigations from intake through resolution with comprehensive case tracking, evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+        "evidenceLevel": "conceptual"
+      },
+      {
+        "itemId": "microsoft-fast:module:request-tracker",
+        "sourceUrl": "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/request-tracker.md",
+        "contentHash": "af44b7189a7a177a3918435b0368029febec7fc0c89d7200c3005fc5c7f239d2",
+        "claim": "Provide a lightweight, centralized system for intaking, triaging, assigning, and tracking cross-organizational or external requests from submission through completion.",
+        "evidenceLevel": "conceptual"
+      }
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-DESIGN",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "acceptanceCriteria": [
+      "accurate reporting"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+    "acceptanceCriteria": [
+      "supervisor approval"
+    ],
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "evidenceReferences": [],
+    "taskReferences": [
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-EVIDENCE",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-DESIGN",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-ACCEPTANCE"
+    ]
+  }
+]

@@ -91,9 +91,12 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - All three modes emit compatible planning artifacts for the same shared build pipeline.
 - Accelerator recommendations remain disabled by default. With explicit
   `FAST_ENABLED=true` or terminal
-  `-EnableAcceleratorRecommendations`, evaluate normalized requirements after
-  discovery and before architecture finalization without adding an upfront accelerator
-  screen or mandatory discovery question. Demo Builder uses its existing
+  `-EnableAcceleratorRecommendations`, offer an optional preliminary preference
+  after mode selection: Evaluate accelerators, Fully Custom, or Prefer FAST
+  reuse. Persist it separately from final architecture approval. Fully Custom
+  bypasses matching; the other preferences evaluate normalized requirements
+  after discovery and before architecture finalization without adding a module
+  selection screen or mandatory FAST business question. Demo Builder uses its existing
   consolidated approval; Advanced Builder and Framework Acceptance expose
   coverage, evidence, schema deltas, dependencies, risks, and readiness. Fully
   Custom always remains selectable. Persist the approved decision under

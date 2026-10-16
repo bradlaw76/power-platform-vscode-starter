@@ -1,0 +1,69 @@
+# tasks.md
+
+## Ordered Tasks
+
+- [ ] Review 'answers.md' with stakeholder
+- [ ] Confirm wizard mode 'demo-builder' is appropriate for this run
+- [ ] Confirm application profile 'standalone-model-driven' and architecture intent
+## Accelerator Preference Tasks
+- [x] Record preliminary accelerator preference $selectedAcceleratorPreference.
+- [x] Confirm the preference did not select an architecture or authorize deployment.
+## Accelerator Decision Tasks
+- [ ] REQ-ASSIGNMENT-INVESTIGATOR-001: implement BUILD delta and verify acceptance criteria.
+- [ ] REQ-EVIDENCE-CHAIN-CUSTODY-001: implement EXTEND delta and verify acceptance criteria.
+- [ ] REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001: implement VERIFY delta and verify acceptance criteria.
+- [ ] REQ-INTAKE-001: implement BUILD delta and verify acceptance criteria.
+- [ ] REQ-INTERVIEW-001: implement EXTEND delta and verify acceptance criteria.
+- [ ] REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001: implement BUILD delta and verify acceptance criteria.
+- [ ] REQ-THE-CASE-FOR-SUPERVISOR-001: implement BUILD delta and verify acceptance criteria.
+- [ ] Confirm the approved architecture decision ID $(@{schemaVersion=1.0; decisionId=sha256:2549f2be7d14a2fe86d118db485b80add4179378f7a7cf177e17b6e8adfdcbee; scenarioSlug=fast-005a-fraud-investigation-demo; wizardMode=demo-builder; evaluationStatus=evaluated; analysisId=sha256:f35e1312ea83c8815689803b5768d0567c74e471ff848e6e50d913fae937dc10; catalogSnapshotId=sha256:777873ba1d2beedcb9fb5de2fe85d17c0f5bb20c6fafe5ce674d0de654be8348; recommendedOption=hybrid; selectedOption=hybrid; explicitApproval=True; rationale=Reuse verified investigation foundations while extending external scoring, approvals, and reporting.; selectedPackages=System.Object[]; environmentReadiness=; fastDependentExecutionAllowed=False; fullyCustomExecutionAllowed=False; recordedAtUtc=2026-10-15T21:00:00.0000000Z}.decisionId) before implementation.
+- [ ] Obtain fresh ready environment evidence before any FAST-dependent build.
+- [ ] Confirm entry point 'fasta_investigation' opens with 'Active Investigations'
+- [ ] Execute landing-view action 'adopt-generated-active' for 'Active Investigations' on 'fasta_investigation' before app assembly
+- [ ] Verify the named landing view resolves to a saved query before running '62-build-app-module.ps1'
+- [ ] Confirm form strategy 'create-new-forms' for all existing tables
+- [ ] Finalize 'spec.md'
+- [ ] Finalize 'plan.md'
+- [ ] Review source-control standards in 'requirements/GithubInstructions_General.md'
+- [ ] Confirm repository, remote, current/default branch, working-tree state, recent history, and applicable validation commands
+- [ ] Create or switch to scenario branch 'feature/fast-005a-fraud-investigation-demo' before implementation; do not absorb unrelated working-tree changes
+- [ ] Approve build environment and permissions
+- [ ] Review standard table reference: 'docs/standard-dataverse-tables.md'
+- [ ] Complete explicit entity mapping in spec/plan (standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships)
+- [ ] Validate relationship cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface: recommendation pending stakeholder confirmation
+- [ ] Convert approved user tasks into app work with named owners and done definitions: Capture intake, assign an investigator, maintain evidence chain of custody, document interviews, call an external fraud-scoring service, route the case for supervisor approval, and present operational and management reporting | app owner | A complete synthetic fraud case proves traceable custody, interview history, fraud-score audit reference, supervisor approval, and accurate reporting
+- [ ] Map standard names to logical names (for example: Case -> incident, Contact -> contact) before payload design
+- [ ] Confirm table payloads include only true custom tables
+- [ ] Confirm out-of-box fields are reused unless custom fields are explicitly required
+- [ ] Define custom table schemas and payloads
+- [ ] Define Dataverse tables and columns for: Investigation, Investigator Assignment, Evidence, Evidence Custody Event, Interview, Fraud Score, Supervisor Approval, Report
+- [ ] Define required app artifacts for: Capture intake, assign an investigator, maintain evidence chain of custody, document interviews, call an external fraud-scoring service, route the case for supervisor approval, and present operational and management reporting
+- [ ] Review and approve report-mappings.md; every critical table must have an explicit report decision
+- [ ] Validate mapped report table logical names, required fields, and target form/dashboard/view placements against the approved schema
+- [ ] Create report payload and HTML source tasks for each approved mapping when reports are enabled
+- [ ] Validate report data rendering, placement, ownership, and decision-support acceptance criteria for each approved mapping
+- [ ] Confirm whether this scenario has a true staged lifecycle requiring a Business Process Flow
+- [ ] If BPF is enabled, finalize process-fast-005a-fraud-investigation-demo.json with stage order, required fields, entry criteria, exit criteria, and cross-table relationships
+- [ ] Approve demo data table scope and record counts: Investigation, Investigator Assignment, Evidence, Evidence Custody Event, Interview, Fraud Score, Supervisor Approval, Report -- small synthetic set; counts to be confirmed during planning
+- [ ] Approve explicit create/reuse-existing/both decisions for standard reused tables: none
+- [ ] Approve hero records: none
+- [ ] Approve bounded Task activity generation: no -- parents none, scope none, limit 0, order none, tasks per record 0
+- [ ] Approve demo data scenarios, relationship distribution, rerun behavior, source tagging, privacy constraints, and cleanup plan
+- [ ] Confirm solution name 'Fast005AFraudInvestigationDemo' and publisher prefix 'fasta' with stakeholder
+- [ ] Run 'pwsh ./scripts/bootstrap/00-prereq-check.ps1'
+- [ ] Run 'pwsh ./scripts/bootstrap/10-auth-connect.ps1'  # validates solution + prefix via API
+- [ ] Build tables with '20-build-tables.ps1'
+- [ ] Build columns with '30-build-columns.ps1'
+- [ ] Build relationships with '40-build-relationships.ps1'
+- [ ] Add components to solution with '50-add-to-solution.ps1'
+- [ ] If BPF is enabled, run '55-build-business-process-flows.ps1' and review the generated BPF build report
+- [ ] Build starter forms/views with '60-build-forms-views.ps1'
+- [ ] If Power Apps grid is enabled, review grid-controls.json, run stage 61 Preview, complete the classic solution explorer all-views maker handoff, configure inline editing explicitly, and pass stage 61 Verify against exported metadata before app assembly
+- [ ] Create or update the review app with '62-build-app-module.ps1' and validate its entry table and landing view
+- [ ] If reports are enabled, run '70-build-web-resources.ps1'
+- [ ] At each approved checkpoint, inspect git status and git diff, run applicable validation, stage explicit files, and use a typed imperative commit message
+- [ ] Export and unpack solution
+- [ ] Create the final implementation commit after reviewing staged files and validation evidence
+- [ ] Push only after approval, verify the remote branch contains the local commit, and prepare the pull request when enabled
+- [ ] Pack and import solution
+- [ ] Update 'docs/build-log.md'

@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Build App Module
 FILE:         scripts/bootstrap/62-build-app-module.ps1
-VERSION:      0.3.0
+VERSION:      0.3.1
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-10-16
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API | Model-Driven App Metadata
 
 -----------------------------------------------------------------------------
@@ -40,6 +40,7 @@ CHANGELOG
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 v0.2.0  2026-08-10  Added profile-aware sitemap and landing-view validation.
 v0.3.0  2026-08-30  Replaced broad publishing with app-module-scoped PublishXml.
+v0.3.1  2026-10-16  Allowed Preview with a planning-only partial .env.ps1.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -103,10 +104,14 @@ if (-not (Test-Path $dataverseRuntimeHelper)) {
 $envFile = Join-Path $repoRoot '.env.ps1'
 if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
-    $EnvironmentUrl = $global:DV_ENVIRONMENT_URL
-    $AccessToken = $global:DV_TOKEN
-    if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) { $SolutionUniqueName = $global:DV_SOLUTION_NAME }
-    if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) { $PublisherPrefix = $global:DV_PUBLISHER_PREFIX }
+    $EnvironmentUrl = "$(Get-Variable -Name DV_ENVIRONMENT_URL -Scope Global -ValueOnly -ErrorAction SilentlyContinue)"
+    $AccessToken = "$(Get-Variable -Name DV_TOKEN -Scope Global -ValueOnly -ErrorAction SilentlyContinue)"
+    if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) {
+        $SolutionUniqueName = "$(Get-Variable -Name DV_SOLUTION_NAME -Scope Global -ValueOnly -ErrorAction SilentlyContinue)"
+    }
+    if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
+        $PublisherPrefix = "$(Get-Variable -Name DV_PUBLISHER_PREFIX -Scope Global -ValueOnly -ErrorAction SilentlyContinue)"
+    }
 }
 
 function Invoke-Dv {

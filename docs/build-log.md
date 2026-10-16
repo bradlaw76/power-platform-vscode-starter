@@ -18,6 +18,7 @@ Record wizard version changes here so you can trace which behavior applied to ea
 | 2026-07-17 | v2.0.2 | Added disclosed local wizard telemetry (`.wizard-metrics/events.jsonl`) plus `81-build-progress-matrix.ps1` to summarize step completion/drop-off across runs. |
 | 2026-09-30 | Form formatter v1 | Added optional, hash-approved form-layout Preview/Apply for active, customizable, wizard-owned custom Main forms after app assembly. |
 | 2026-10-15 | Contract v1.13.0 | Added default-off, planning-only accelerator recommendations after discovery and before architecture finalization. |
+| 2026-10-16 | Contract v1.14.0 | Added separate accelerator startup preference, granular requirement traceability, validated package manifest input, schema-rendering correction, and generator-level Markdown cleanup. |
 
 ## Release Process
 

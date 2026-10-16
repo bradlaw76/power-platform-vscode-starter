@@ -1,0 +1,24 @@
+{
+  "version": "1.0",
+  "tables": [
+    {
+      "tableLogicalName": "fva_investigation",
+      "scope": "all-views",
+      "enableEditing": true,
+      "filtering": true,
+      "sorting": true,
+      "grouping": false,
+      "aggregation": false,
+      "columnReordering": false,
+      "multiselect": true,
+      "rangeSelection": true,
+      "jumpBar": false,
+      "pagination": false,
+      "optionSetColors": false,
+      "statusIcons": true,
+      "typeIcons": false,
+      "persona": "Fraud investigators, supervisors, evidence custodians, compliance reviewers",
+      "rationale": "Modern table-level grid for the planned operational landing experience."
+    }
+  ]
+}

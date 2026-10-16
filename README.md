@@ -242,13 +242,19 @@ Custom architecture selection. Enabled runs persist analysis and the approved
 decision under `specs/<scenario-slug>/accelerator/`. The integration never
 connects to Dataverse, imports a package, or registers FAST with
 `90-run-build.ps1`; build integration remains deferred to FAST-006.
+FAST-005B adds an optional preliminary preference after mode selection for
+explicitly enabled acceptance runs. Evaluate accelerators, Fully Custom, and
+Prefer FAST reuse are planning preferences only; matching still occurs after
+requirements normalization, and final architecture approval remains separate.
+The feature and selector remain disabled by default.
 
 ```powershell
 # Controlled planning-only wizard integration.
 pwsh ./scripts/bootstrap/05-start-wizard.ps1 `
   -EnableAcceleratorRecommendations `
+  -AcceleratorPreference evaluate `
   -AcceleratorCatalogSnapshotPath <snapshot-path> `
-  -AcceleratorPackageMetadataPaths <package-index-paths> `
+  -AcceleratorPackageManifestPath <package-input-manifest.json> `
   -AcceleratorEnvironmentValidationPath <optional-preflight-report>
 ```
 
@@ -257,6 +263,11 @@ Both mechanisms are off by default. Changing an approved decision requires
 `-ApproveAcceleratorDecisionChange`. The current GCC evidence keeps
 FAST-dependent execution blocked because Core and specialty modules are not
 installed; Fully Custom remains available.
+
+The package manifest is the preferred multi-package contract. It validates and
+pins every package metadata path, module/package identity, version, and
+SHA-256. Direct `-AcceleratorPackageMetadataPaths` remains available for
+in-process callers, but nested `pwsh -File` commands should use the manifest.
 
 ```powershell
 # Explicit local analysis; no wizard stage invokes this command.

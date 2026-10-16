@@ -1,0 +1,120 @@
+{
+  "reuse": [],
+  "extend": [
+    {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+        "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+        "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+        "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+        "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+        "Reuse appbase_evidenceaccesslog.appbase_name",
+        "Reuse appbase_evidenceaccesslog.appbase_notes",
+        "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+        "Reuse appbase_evidenceaccesslog.createdby",
+        "Reuse appbase_evidenceaccesslog.createdon",
+        "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+        "Reuse appbase_evidenceaccesslog.importsequencenumber",
+        "Reuse appbase_evidenceaccesslog.modifiedby",
+        "Reuse appbase_evidenceaccesslog.modifiedon",
+        "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+        "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_investigationinterview.appbase_actualdatetime",
+        "Reuse appbase_investigationinterview.appbase_attendancestatus",
+        "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+        "Reuse appbase_investigationinterview.appbase_durationminutes",
+        "Reuse appbase_investigationinterview.appbase_followupnotes",
+        "Reuse appbase_investigationinterview.appbase_followuprequired",
+        "Reuse appbase_investigationinterview.appbase_interviewlocation",
+        "Reuse appbase_investigationinterview.appbase_interviewnumber",
+        "Reuse appbase_investigationinterview.appbase_interviewsubject",
+        "Reuse appbase_investigationinterview.appbase_interviewsummary",
+        "Reuse appbase_investigationinterview.appbase_interviewtype",
+        "Reuse appbase_investigationinterview.appbase_investigation",
+        "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+        "Reuse appbase_investigationinterview.appbase_keystatements",
+        "Reuse appbase_investigationinterview.appbase_name",
+        "Reuse appbase_investigationinterview.appbase_notes",
+        "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+        "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+        "Reuse appbase_investigationinterview.appbase_recordinglocation"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    }
+  ],
+  "build": [
+    {
+      "tables": [
+        "Design a new table for 'Investigation'; no logical name is inferred.",
+        "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Complete requirement-specific table design before payload generation."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Design a new table for 'Report'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    }
+  ],
+  "integrate": [],
+  "verify": [
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+      "gaps": [
+        "Documented relevance exists without sufficient physical or source evidence for implementation reuse."
+      ],
+      "questions": []
+    }
+  ]
+}

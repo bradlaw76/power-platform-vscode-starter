@@ -31,9 +31,13 @@ Use `framework-acceptance` only after explicit selection. Add authorized-environ
 
 Accelerator recommendations remain disabled by default. When the operator
 explicitly enables them with `FAST_ENABLED=true` or the terminal wizard's
-`-EnableAcceleratorRecommendations` switch, evaluate the already collected
+`-EnableAcceleratorRecommendations` switch, offer a preliminary accelerator
+preference after mode selection: Evaluate accelerators, Fully Custom, or Prefer
+FAST reuse. The preference is optional planning input, not architecture
+approval or deployment authorization. Then evaluate the already collected
 requirements after discovery and before architecture finalization. Do not add
-an upfront FAST screen or mandatory discovery question. Demo Builder includes
+a module-selection screen or mandatory FAST business question. Fully Custom
+preference bypasses matching. Demo Builder includes
 FAST-based, Hybrid, and Fully Custom selection in its existing consolidated
 confirmation; detailed modes show requirement coverage, evidence, schema
 deltas, dependencies, and readiness. Persist the explicit decision under the

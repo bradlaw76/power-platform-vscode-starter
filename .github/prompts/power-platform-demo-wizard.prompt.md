@@ -19,9 +19,12 @@ Use this behavior:
 - Enter `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
 - Keep accelerator recommendations disabled by default. When explicitly
   enabled through `FAST_ENABLED=true` or
-  `-EnableAcceleratorRecommendations`, reuse the provider-neutral matcher after
-  normal discovery and before architecture finalization. Do not add an upfront
-  FAST screen or discovery question. Include FAST-based, Hybrid, and Fully
+  `-EnableAcceleratorRecommendations`, offer an optional preliminary preference
+  after mode selection: Evaluate accelerators, Fully Custom, or Prefer FAST
+  reuse. This does not select an architecture or authorize deployment. Reuse
+  the provider-neutral matcher after normal discovery and before architecture
+  finalization unless Fully Custom bypasses matching. Do not add a module
+  selection screen or FAST-specific business question. Include FAST-based, Hybrid, and Fully
   Custom in Demo Builder's existing consolidated confirmation; detailed modes
   show requirement coverage, evidence, deltas, dependencies, and environment
   readiness. Persist explicit selection under `specs/<slug>/accelerator/` and

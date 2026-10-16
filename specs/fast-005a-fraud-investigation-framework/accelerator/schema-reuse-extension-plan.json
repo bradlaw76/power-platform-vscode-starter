@@ -1,0 +1,213 @@
+{
+  "reuse": [],
+  "extend": [
+    {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+        "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+        "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+        "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+        "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+        "Reuse appbase_evidenceaccesslog.appbase_name",
+        "Reuse appbase_evidenceaccesslog.appbase_notes",
+        "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+        "Reuse appbase_evidenceaccesslog.createdby",
+        "Reuse appbase_evidenceaccesslog.createdon",
+        "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+        "Reuse appbase_evidenceaccesslog.importsequencenumber",
+        "Reuse appbase_evidenceaccesslog.modifiedby",
+        "Reuse appbase_evidenceaccesslog.modifiedon",
+        "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+        "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceitem.appbase_investigation",
+        "Reuse appbase_evidencelink.appbase_investigation",
+        "Reuse appbase_evidencelink.appbase_investigationallegation",
+        "Reuse appbase_evidencelink.appbase_investigationfinding",
+        "Reuse appbase_evidencelink.appbase_investigationinterview",
+        "Reuse appbase_evidencelink.appbase_investigativeissue",
+        "Reuse appbase_investigation.appbase_actualcompletiondate",
+        "Reuse appbase_investigation.appbase_actualhours",
+        "Reuse appbase_investigation.appbase_assignedorganizationunit",
+        "Reuse appbase_investigation.appbase_background",
+        "Reuse appbase_investigation.appbase_casenumber",
+        "Reuse appbase_investigation.appbase_casestatus",
+        "Reuse appbase_investigation.appbase_closuredate",
+        "Reuse appbase_investigation.appbase_closurerationale",
+        "Reuse appbase_investigation.appbase_complianceframework",
+        "Reuse appbase_investigation.appbase_estimatedhours",
+        "Reuse appbase_investigation.appbase_intakedate",
+        "Reuse appbase_investigation.appbase_investigationbudget",
+        "Reuse appbase_investigation.appbase_investigationbudget_base"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    }
+  ],
+  "build": [
+    {
+      "tables": [
+        "Design a new table for 'Fraud Score'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Design a new table for 'Investigation'; no logical name is inferred.",
+        "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Design a new table for 'Evidence'; no logical name is inferred.",
+        "Design a new table for 'Evidence Custody Event'; no logical name is inferred.",
+        "Design a new table for 'Report'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    {
+      "tables": [
+        "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    }
+  ],
+  "integrate": [
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow",
+    "active investigation and custody views",
+    "and acceptance evidence Investigator | triage intake and assign investigator | per intake | fva_investigation/Active Investigations | owner and priority are recorded",
+    "and operational and management reporting with deterministic acceptance evidence Intake and assignment forms",
+    "evidence custody",
+    "external fraud-scoring integration",
+    "interview timeline",
+    "interviews",
+    "investigator assignment",
+    "Manage investigation intake",
+    "management reports",
+    "operational dashboard",
+    "supervisor approval",
+    "supervisor approval workflow"
+  ],
+  "verify": [
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "gaps": [],
+      "questions": [
+        "Requirement has insufficient distinctive business detail."
+      ]
+    }
+  ]
+}

@@ -1,0 +1,46 @@
+{
+  "schemaVersion": "1.0",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "wizardMode": "advanced-builder",
+  "evaluationStatus": "evaluated",
+  "analysisId": "sha256:dd261832bb9f2a9ab2192fb99c1195cedcfd9f7dc3436daa8eb3902eb5e159f6",
+  "catalogSnapshotId": "sha256:777873ba1d2beedcb9fb5de2fe85d17c0f5bb20c6fafe5ce674d0de654be8348",
+  "recommendedOption": "hybrid",
+  "selectedOption": "hybrid",
+  "explicitApproval": true,
+  "rationale": "Prefer verified reuse but retain custom scoring, approval, and reporting work.",
+  "selectedPackages": [
+    {
+      "moduleId": "microsoft-fast:module:core",
+      "packageId": "microsoft-fast:package:core:1.2.1.0:managed:f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3",
+      "version": "1.2.1.0",
+      "sha256": "f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3"
+    },
+    {
+      "moduleId": "microsoft-fast:module:investigations",
+      "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+      "version": "1.2.1.0",
+      "sha256": "131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+    }
+  ],
+  "environmentReadiness": {
+    "provided": true,
+    "status": "action-required",
+    "fresh": false,
+    "snapshotMatch": true,
+    "packageMatch": true,
+    "executionGateOpen": false,
+    "environmentUrl": "https://powerplatformvscodestarter.crm9.dynamics.com",
+    "coreAssessment": "missing-prerequisites-potentially-available",
+    "metadataFingerprint": "7654dbb8de75ccc321fa1959a1546a85016f63a8f3bfca3897c5c055e566ea64",
+    "expiresAtUtc": "2026-10-15T20:26:59.6346284Z",
+    "limitations": [
+      "Environment evidence is absent or stale.",
+      "Environment readiness is 'action-required'."
+    ]
+  },
+  "fastDependentExecutionAllowed": false,
+  "fullyCustomExecutionAllowed": false,
+  "recordedAtUtc": "2026-10-15T21:00:00.0000000Z"
+}

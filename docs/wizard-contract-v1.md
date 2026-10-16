@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.13.0
+Version: 1.14.0
 
 ## Purpose
 
@@ -58,11 +58,18 @@ All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `r
 
 Accelerator recommendations are disabled by default. A controlled planning run
 may opt in with `-EnableAcceleratorRecommendations` or `FAST_ENABLED=true`.
-Evaluation occurs after the existing mode-specific requirements are collected
-and normalized and before architecture is finalized.
+After mode selection, an explicitly enabled interactive run offers a
+preliminary preference: Evaluate accelerators, Fully Custom, or Prefer FAST
+reuse. This preference does not activate the feature, select an architecture,
+or authorize deployment. Noninteractive runs use
+`-AcceleratorPreference <evaluate|fully-custom|prefer-fast>`. Evaluation still
+occurs only after mode-specific requirements are collected and normalized and
+before architecture is finalized.
 
-- No upfront accelerator selection or FAST-specific discovery question is
-  permitted.
+- No startup module selection or FAST-specific business question is permitted.
+- Fully Custom preference bypasses matching and follows the baseline workflow.
+- Prefer FAST reuse preserves Hybrid and Fully Custom and does not weaken
+  evidence or readiness gates.
 - Demo Builder retains six business questions and uses its one consolidated
   approval to select FAST-based, Hybrid, or Fully Custom architecture.
 - Advanced Builder shows requirement coverage, evidence classifications,
@@ -77,10 +84,16 @@ and normalized and before architecture is finalized.
   register a build stage.
 
 Enabled runs write immutable analysis projections and an explicitly approved
-`accelerator/accelerator-decision.json`. A changed decision ID requires the
+`accelerator/accelerator-decision.json`. The preliminary choice is stored
+separately in `accelerator/accelerator-preference.json`. A changed decision ID requires the
 separate `-ApproveAcceleratorDecisionChange` switch after review. Disabled runs
 write no accelerator section or artifact and retain the existing custom-only
 output contract.
+
+Multiple package indexes should be supplied through one validated
+`-AcceleratorPackageManifestPath` file. The manifest pins each metadata path,
+module ID, package ID, version, and SHA-256 and avoids command-line array
+binding ambiguity.
 
 ## Architecture Intent Contract
 

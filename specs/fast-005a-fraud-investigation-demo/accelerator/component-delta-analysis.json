@@ -1,0 +1,606 @@
+[
+  {
+    "requirementId": "REQ-ASSIGNMENT-INVESTIGATOR-001",
+    "dispositions": [
+      "BUILD"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Investigation'; no logical name is inferred.",
+        "Design a new table for 'Investigator Assignment'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-EVIDENCE-CHAIN-CUSTODY-001",
+    "dispositions": [
+      "EXTEND"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "existingComponents": [
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accessdatetime",
+        "name": "Evidence Access Log appbase_accessdatetime",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accessedby",
+        "name": "Evidence Access Log appbase_accessedby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accesspurpose",
+        "name": "Evidence Access Log appbase_accesspurpose",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_accesstype",
+        "name": "Evidence Access Log appbase_accesstype",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "name": "Evidence Access Log appbase_documentdownloaded",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_downloadcount",
+        "name": "Evidence Access Log appbase_downloadcount",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "name": "Evidence Access Log appbase_evidenceaccesslogid",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_evidenceitem",
+        "name": "Evidence Access Log appbase_evidenceitem",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_ipaddress",
+        "name": "Evidence Access Log appbase_ipaddress",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_name",
+        "name": "Evidence Access Log appbase_name",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_notes",
+        "name": "Evidence Access Log appbase_notes",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_systemuser",
+        "name": "Evidence Access Log appbase_systemuser",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdby",
+        "name": "Evidence Access Log createdby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdon",
+        "name": "Evidence Access Log createdon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.createdonbehalfby",
+        "name": "Evidence Access Log createdonbehalfby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.importsequencenumber",
+        "name": "Evidence Access Log importsequencenumber",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedby",
+        "name": "Evidence Access Log modifiedby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedon",
+        "name": "Evidence Access Log modifiedon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.modifiedonbehalfby",
+        "name": "Evidence Access Log modifiedonbehalfby",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.overriddencreatedon",
+        "name": "Evidence Access Log overriddencreatedon",
+        "matchedTerms": [
+          "evidence"
+        ],
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+        "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+        "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+        "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+        "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+        "Reuse appbase_evidenceaccesslog.appbase_name",
+        "Reuse appbase_evidenceaccesslog.appbase_notes",
+        "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+        "Reuse appbase_evidenceaccesslog.createdby",
+        "Reuse appbase_evidenceaccesslog.createdon",
+        "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+        "Reuse appbase_evidenceaccesslog.importsequencenumber",
+        "Reuse appbase_evidenceaccesslog.modifiedby",
+        "Reuse appbase_evidenceaccesslog.modifiedon",
+        "Reuse appbase_evidenceaccesslog.modifiedonbehalfby",
+        "Reuse appbase_evidenceaccesslog.overriddencreatedon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-SERVICE-001",
+    "dispositions": [
+      "VERIFY"
+    ],
+    "candidateModuleId": "microsoft-fast:module:programs-and-services",
+    "existingComponents": [],
+    "gaps": [
+      "Documented relevance exists without sufficient physical or source evidence for implementation reuse."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Estimation remains provisional until evidence gaps are resolved."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-INTAKE-001",
+    "dispositions": [
+      "BUILD"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Complete requirement-specific table design before payload generation."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "dispositions": [
+      "EXTEND"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "existingComponents": [
+      {
+        "kind": "attribute",
+        "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "name": "Evidence Access Log appbase_documentdownloaded",
+        "matchedTerms": [
+          "document"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_actualdatetime",
+        "name": "Investigation Interview appbase_actualdatetime",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_attendancestatus",
+        "name": "Investigation Interview appbase_attendancestatus",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_cooperationstatus",
+        "name": "Investigation Interview appbase_cooperationstatus",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_durationminutes",
+        "name": "Investigation Interview appbase_durationminutes",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_followupnotes",
+        "name": "Investigation Interview appbase_followupnotes",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_followuprequired",
+        "name": "Investigation Interview appbase_followuprequired",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_interviewlocation",
+        "name": "Investigation Interview appbase_interviewlocation",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_interviewnumber",
+        "name": "Investigation Interview appbase_interviewnumber",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_interviewsubject",
+        "name": "Investigation Interview appbase_interviewsubject",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_interviewsummary",
+        "name": "Investigation Interview appbase_interviewsummary",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_interviewtype",
+        "name": "Investigation Interview appbase_interviewtype",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_investigation",
+        "name": "Investigation Interview appbase_investigation",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_investigationinterviewid",
+        "name": "Investigation Interview appbase_investigationinterviewid",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_keystatements",
+        "name": "Investigation Interview appbase_keystatements",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_name",
+        "name": "Investigation Interview appbase_name",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_notes",
+        "name": "Investigation Interview appbase_notes",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_primaryinterviewer",
+        "name": "Investigation Interview appbase_primaryinterviewer",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_recordingauthorized",
+        "name": "Investigation Interview appbase_recordingauthorized",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      },
+      {
+        "kind": "attribute",
+        "identity": "appbase_investigationinterview.appbase_recordinglocation",
+        "name": "Investigation Interview appbase_recordinglocation",
+        "matchedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_investigationinterview.appbase_actualdatetime",
+        "Reuse appbase_investigationinterview.appbase_attendancestatus",
+        "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+        "Reuse appbase_investigationinterview.appbase_durationminutes",
+        "Reuse appbase_investigationinterview.appbase_followupnotes",
+        "Reuse appbase_investigationinterview.appbase_followuprequired",
+        "Reuse appbase_investigationinterview.appbase_interviewlocation",
+        "Reuse appbase_investigationinterview.appbase_interviewnumber",
+        "Reuse appbase_investigationinterview.appbase_interviewsubject",
+        "Reuse appbase_investigationinterview.appbase_interviewsummary",
+        "Reuse appbase_investigationinterview.appbase_interviewtype",
+        "Reuse appbase_investigationinterview.appbase_investigation",
+        "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+        "Reuse appbase_investigationinterview.appbase_keystatements",
+        "Reuse appbase_investigationinterview.appbase_name",
+        "Reuse appbase_investigationinterview.appbase_notes",
+        "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+        "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+        "Reuse appbase_investigationinterview.appbase_recordinglocation"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "dispositions": [
+      "BUILD"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Report'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required."
+    ],
+    "risks": []
+  },
+  {
+    "requirementId": "REQ-THE-CASE-FOR-SUPERVISOR-001",
+    "dispositions": [
+      "BUILD"
+    ],
+    "candidateModuleId": "",
+    "existingComponents": [],
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required."
+    ],
+    "risks": []
+  }
+]

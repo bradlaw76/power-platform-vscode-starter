@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Wizard Accelerator Startup Preference",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "preferenceId",
+    "scenarioSlug",
+    "wizardMode",
+    "preference",
+    "matchingRequested",
+    "finalArchitectureSelected",
+    "deploymentAuthorized",
+    "recordedAtUtc"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "preferenceId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "scenarioSlug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "wizardMode": {
+      "enum": ["demo-builder", "advanced-builder", "framework-acceptance"]
+    },
+    "preference": {
+      "enum": ["evaluate", "fully-custom", "prefer-fast"]
+    },
+    "matchingRequested": {"type": "boolean"},
+    "finalArchitectureSelected": {"const": false},
+    "deploymentAuthorized": {"const": false},
+    "recordedAtUtc": {"type": "string", "format": "date-time"}
+  }
+}
