@@ -1,6 +1,6 @@
 {
-  "profileVersion": "1.4",
-  "contractVersion": "1.14.0",
+  "profileVersion": "1.5",
+  "contractVersion": "1.15.0",
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -146,6 +146,19 @@
     "requiresExplicitArchitectureApproval": true,
     "fullyCustomAlwaysAvailable": true,
     "dataverseGenerationConnected": false
+  },
+  "acceleratorBuildPlanning": {
+    "enabled": false,
+    "explicitSwitch": "EnableDryRunBuildPlanning",
+    "service": "scripts/accelerators/build-planning-adapter.ps1",
+    "command": "scripts/accelerators/invoke-accelerator-build-plan.ps1",
+    "planSchema": "schemas/accelerators/build-plan.schema.json",
+    "projectionSchema": "schemas/accelerators/build-plan-projection.schema.json",
+    "requiresApprovedArchitectureArtifact": true,
+    "providerNeutral": true,
+    "dryRunOnly": true,
+    "buildExecutionConnected": false,
+    "dataverseConnected": false
   },
   "sourceControl": {
     "enabled": true,

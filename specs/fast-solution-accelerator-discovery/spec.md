@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-005 accepted; FAST-005B corrections implemented for review
-**Phase boundary:** Stop after FAST-005B
+**Status:** FAST-006 implemented for architectural review
+**Phase boundary:** Stop after FAST-006
 
 ## Problem statement
 
@@ -44,6 +44,10 @@ repository-level specification or active wizard contract.
    retired, or rejected.
 7. Prevent catalog discovery from authorizing Dataverse changes or package
    installation.
+8. Translate explicitly approved architectures into provider-neutral,
+   component-level dry-run plans without industry-specific production logic.
+9. Preserve managed-solution ownership, environment readiness gates, and an
+   accelerator-independent Fully Custom path.
 
 ## Non-goals
 
@@ -58,6 +62,8 @@ repository-level specification or active wizard contract.
 - Adding a fourth wizard mode.
 - Changing the active build order, profile contract, or script stages.
 - Automatically committing live external content or release packages.
+- Executing FAST-006 plans, invoking build stages, importing solutions, or
+  changing Dataverse.
 
 ## Users and outcomes
 

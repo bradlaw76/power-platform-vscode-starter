@@ -1,0 +1,366 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "ordered-dependency-graph",
+  "planId": "sha256:d996144108d960abf0e17c751c2d9dfdd40f5ded3a0b42a682266579443f5693",
+  "scenarioSlug": "fast-006-fraud-investigation-fully-custom",
+  "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de",
+  "architecture": "fully-custom",
+  "dryRun": true,
+  "items": [
+    {
+      "nodes": [
+        "FAST006-CREATE-071A0AE652FF",
+        "FAST006-CREATE-082C6B89A122",
+        "FAST006-CREATE-0BA59C32F725",
+        "FAST006-CREATE-0DACBECAAE9B",
+        "FAST006-CREATE-133A44CE6369",
+        "FAST006-CREATE-155F8374E67C",
+        "FAST006-CREATE-186C80CF5CB4",
+        "FAST006-CREATE-1E9890A4BC6C",
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-CREATE-252BDE9FB7B3",
+        "FAST006-CREATE-2690B88AD514",
+        "FAST006-CREATE-2E8E0148E733",
+        "FAST006-CREATE-2EC52577E621",
+        "FAST006-CREATE-2F370C3368F3",
+        "FAST006-CREATE-34EC5D6D74A3",
+        "FAST006-CREATE-35B332F9FC3A",
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-CREATE-4BFA633BA051",
+        "FAST006-CREATE-4E0B645415DF",
+        "FAST006-CREATE-661E61EA3D6C",
+        "FAST006-CREATE-67330678DE5C",
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-CREATE-6C071DE91B4B",
+        "FAST006-CREATE-77E72F8F8D7E",
+        "FAST006-CREATE-794E796AD6F2",
+        "FAST006-CREATE-7DFB9204708C",
+        "FAST006-CREATE-93165CB2ED49",
+        "FAST006-CREATE-9A10FE78E32C",
+        "FAST006-CREATE-9B13AFA4A1AF",
+        "FAST006-CREATE-9F3CA7A44A95",
+        "FAST006-CREATE-A13739EFDFBB",
+        "FAST006-CREATE-A6C52873C368",
+        "FAST006-CREATE-ACD297D628C8",
+        "FAST006-CREATE-B327223D5E80",
+        "FAST006-CREATE-B4CCE8691FF2",
+        "FAST006-CREATE-C96BE1801F23",
+        "FAST006-CREATE-CB2180FBD176",
+        "FAST006-CREATE-CC450B7B81F6",
+        "FAST006-CREATE-CD3D9EE318BF",
+        "FAST006-CREATE-CDAB8B2BF627",
+        "FAST006-CREATE-D6B4EC77CFAE",
+        "FAST006-CREATE-DFEE1A1AEC87",
+        "FAST006-CREATE-ED70236ED469",
+        "FAST006-CREATE-F7CBDA73E772",
+        "FAST006-INTEGRATE-07967C8CFD55",
+        "FAST006-INTEGRATE-24E6285F2958",
+        "FAST006-INTEGRATE-38936F97E705",
+        "FAST006-INTEGRATE-46EDF02161EE",
+        "FAST006-INTEGRATE-760C09DFE28D",
+        "FAST006-INTEGRATE-DFE3348456DB",
+        "FAST006-INTEGRATE-F01B51D1E800"
+      ],
+      "edges": [
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-071A0AE652FF",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-082C6B89A122",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-0BA59C32F725",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-35B332F9FC3A",
+          "to": "FAST006-CREATE-0DACBECAAE9B",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-35B332F9FC3A",
+          "to": "FAST006-CREATE-133A44CE6369",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-B327223D5E80",
+          "to": "FAST006-CREATE-155F8374E67C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-6AF68DCB8FA5",
+          "to": "FAST006-CREATE-186C80CF5CB4",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-35B332F9FC3A",
+          "to": "FAST006-CREATE-1E9890A4BC6C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-1E9890A4BC6C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-393A6D2A3E6E",
+          "to": "FAST006-CREATE-252BDE9FB7B3",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A6C52873C368",
+          "to": "FAST006-CREATE-2E8E0148E733",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A6C52873C368",
+          "to": "FAST006-CREATE-2EC52577E621",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-2F370C3368F3",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-393A6D2A3E6E",
+          "to": "FAST006-CREATE-34EC5D6D74A3",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-4BFA633BA051",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-6AF68DCB8FA5",
+          "to": "FAST006-CREATE-4E0B645415DF",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-6AF68DCB8FA5",
+          "to": "FAST006-CREATE-661E61EA3D6C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-661E61EA3D6C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-67330678DE5C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-6C071DE91B4B",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-6C071DE91B4B",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-77E72F8F8D7E",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-794E796AD6F2",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A6C52873C368",
+          "to": "FAST006-CREATE-794E796AD6F2",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-7DFB9204708C",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-93165CB2ED49",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A6C52873C368",
+          "to": "FAST006-CREATE-9B13AFA4A1AF",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-393A6D2A3E6E",
+          "to": "FAST006-CREATE-9F3CA7A44A95",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-9F3CA7A44A95",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-9A10FE78E32C",
+          "to": "FAST006-CREATE-ACD297D628C8",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-ACD297D628C8",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-35B332F9FC3A",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-393A6D2A3E6E",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-6AF68DCB8FA5",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-9A10FE78E32C",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A6C52873C368",
+          "to": "FAST006-CREATE-B327223D5E80",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-9A10FE78E32C",
+          "to": "FAST006-CREATE-B4CCE8691FF2",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-35B332F9FC3A",
+          "to": "FAST006-CREATE-C96BE1801F23",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-2690B88AD514",
+          "to": "FAST006-CREATE-CB2180FBD176",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-CB2180FBD176",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-21481A3AE99D",
+          "to": "FAST006-CREATE-CC450B7B81F6",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-6AF68DCB8FA5",
+          "to": "FAST006-CREATE-CD3D9EE318BF",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-9A10FE78E32C",
+          "to": "FAST006-CREATE-CDAB8B2BF627",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-D6B4EC77CFAE",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-9A10FE78E32C",
+          "to": "FAST006-CREATE-ED70236ED469",
+          "reason": "Prerequisite component or module"
+        },
+        {
+          "from": "FAST006-CREATE-A13739EFDFBB",
+          "to": "FAST006-CREATE-F7CBDA73E772",
+          "reason": "Prerequisite component or module"
+        }
+      ],
+      "orderedTaskIds": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-CREATE-2690B88AD514",
+        "FAST006-CREATE-35B332F9FC3A",
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-CREATE-9A10FE78E32C",
+        "FAST006-CREATE-A13739EFDFBB",
+        "FAST006-CREATE-A6C52873C368",
+        "FAST006-CREATE-DFEE1A1AEC87",
+        "FAST006-INTEGRATE-07967C8CFD55",
+        "FAST006-INTEGRATE-24E6285F2958",
+        "FAST006-INTEGRATE-38936F97E705",
+        "FAST006-INTEGRATE-46EDF02161EE",
+        "FAST006-INTEGRATE-760C09DFE28D",
+        "FAST006-INTEGRATE-DFE3348456DB",
+        "FAST006-INTEGRATE-F01B51D1E800",
+        "FAST006-CREATE-071A0AE652FF",
+        "FAST006-CREATE-082C6B89A122",
+        "FAST006-CREATE-0BA59C32F725",
+        "FAST006-CREATE-0DACBECAAE9B",
+        "FAST006-CREATE-133A44CE6369",
+        "FAST006-CREATE-186C80CF5CB4",
+        "FAST006-CREATE-1E9890A4BC6C",
+        "FAST006-CREATE-252BDE9FB7B3",
+        "FAST006-CREATE-2E8E0148E733",
+        "FAST006-CREATE-2EC52577E621",
+        "FAST006-CREATE-2F370C3368F3",
+        "FAST006-CREATE-34EC5D6D74A3",
+        "FAST006-CREATE-4BFA633BA051",
+        "FAST006-CREATE-4E0B645415DF",
+        "FAST006-CREATE-661E61EA3D6C",
+        "FAST006-CREATE-67330678DE5C",
+        "FAST006-CREATE-6C071DE91B4B",
+        "FAST006-CREATE-77E72F8F8D7E",
+        "FAST006-CREATE-794E796AD6F2",
+        "FAST006-CREATE-7DFB9204708C",
+        "FAST006-CREATE-93165CB2ED49",
+        "FAST006-CREATE-9B13AFA4A1AF",
+        "FAST006-CREATE-9F3CA7A44A95",
+        "FAST006-CREATE-ACD297D628C8",
+        "FAST006-CREATE-B327223D5E80",
+        "FAST006-CREATE-B4CCE8691FF2",
+        "FAST006-CREATE-C96BE1801F23",
+        "FAST006-CREATE-CB2180FBD176",
+        "FAST006-CREATE-CC450B7B81F6",
+        "FAST006-CREATE-CD3D9EE318BF",
+        "FAST006-CREATE-CDAB8B2BF627",
+        "FAST006-CREATE-D6B4EC77CFAE",
+        "FAST006-CREATE-ED70236ED469",
+        "FAST006-CREATE-F7CBDA73E772",
+        "FAST006-CREATE-155F8374E67C"
+      ]
+    }
+  ]
+}

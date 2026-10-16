@@ -1,7 +1,13 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.14.0
+Version: 1.15.0
+
+FAST-006 registers a default-off provider-neutral dry-run planning contract.
+It requires an approved scenario-local architecture artifact, emits
+schema-validated component plans, and remains disconnected from Dataverse and
+all build execution stages. Fully Custom plans do not inherit accelerator
+package or environment prerequisites.
 
 ## Purpose
 

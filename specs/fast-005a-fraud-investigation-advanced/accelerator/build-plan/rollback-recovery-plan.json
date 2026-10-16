@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "rollback-recovery",
+  "planId": "sha256:e990d8f99471175e394c3d621746b39a9304a5e11a8e2cff50df2a08c53a74a7",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "architecture": "hybrid",
+  "dryRun": true,
+  "items": [
+    "Disable accelerator build planning without changing the approved architecture artifacts.",
+    "Restore a prior scenario-local build-plan directory; build plans are content-addressed and contain no environment mutation.",
+    "Roll back code through the FAST feature branch or the pre-FAST recovery references.",
+    "Dataverse recovery is not required because FAST-006 performs no Dataverse operation."
+  ]
+}

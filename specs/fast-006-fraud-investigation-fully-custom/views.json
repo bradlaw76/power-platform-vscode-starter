@@ -1,0 +1,20 @@
+{
+  "Views": [
+    {
+      "TableLogicalName": "fiv_investigation",
+      "Name": "Active Investigations",
+      "Disposition": "adopt-generated-active",
+      "DecisionReason": "exact predictable generated Active-view name on a newly planned custom table",
+      "Columns": [],
+      "Filter": {
+        "Attribute": "statecode",
+        "Operator": "eq",
+        "Value": "0"
+      },
+      "Sort": {
+        "Attribute": "",
+        "Descending": false
+      }
+    }
+  ]
+}

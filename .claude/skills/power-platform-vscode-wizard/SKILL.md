@@ -65,6 +65,13 @@ schema deltas, dependencies, risks, and environment readiness. Persist the
 explicit decision under `specs/<slug>/accelerator/`. This is planning-only and
 must not invoke Dataverse generation, solution import, or deployment.
 
+FAST-006 build planning is also default-off and dry-run only. Invoke
+`scripts/accelerators/invoke-accelerator-build-plan.ps1` only after an explicit
+scenario-local architecture approval. The command must consume that artifact,
+preserve managed-solution ownership, and emit REUSE, EXTEND, CREATE, INTEGRATE,
+or DEFER tasks without calling Dataverse or any build stage. Fully Custom plans
+must not inherit accelerator package or environment dependencies.
+
 Demo Builder may infer a modern table-level Power Apps grid for high-frequency
 operational views inside its consolidated recommendation; do not add a seventh
 business question. Advanced Builder and Framework Acceptance explicitly capture

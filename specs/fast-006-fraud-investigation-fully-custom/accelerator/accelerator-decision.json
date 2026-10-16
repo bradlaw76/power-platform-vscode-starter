@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de",
+  "scenarioSlug": "fast-006-fraud-investigation-fully-custom",
+  "wizardMode": "advanced-builder",
+  "evaluationStatus": "evaluated",
+  "analysisId": "sha256:638bf67049dddfb506455c6c5eb9102135fea5bc4f7ca95aa969ae8858b538c1",
+  "catalogSnapshotId": "sha256:5a59214ec84f70e0bc8f1da052458233ed2eab0f8c7963e6c92b66142e45bd69",
+  "recommendedOption": "hybrid",
+  "selectedOption": "fully-custom",
+  "explicitApproval": true,
+  "rationale": "Approved independent Fully Custom comparison for FAST-006 dry-run acceptance.",
+  "selectedPackages": [],
+  "environmentReadiness": {
+    "provided": false,
+    "status": "not-provided",
+    "fresh": false,
+    "snapshotMatch": false,
+    "packageMatch": false,
+    "executionGateOpen": false,
+    "environmentUrl": "",
+    "coreAssessment": "unverified",
+    "metadataFingerprint": "",
+    "expiresAtUtc": "",
+    "limitations": [
+      "No environment evidence was supplied; matching remains available but FAST-dependent execution is blocked."
+    ]
+  },
+  "fastDependentExecutionAllowed": false,
+  "fullyCustomExecutionAllowed": true,
+  "recordedAtUtc": "2026-10-16T12:00:00.0000000Z"
+}

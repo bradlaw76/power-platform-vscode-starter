@@ -1,0 +1,196 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "integration-automation",
+  "planId": "sha256:d996144108d960abf0e17c751c2d9dfdd40f5ded3a0b42a682266579443f5693",
+  "scenarioSlug": "fast-006-fraud-investigation-fully-custom",
+  "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de",
+  "architecture": "fully-custom",
+  "dryRun": true,
+  "items": [
+    {
+      "taskId": "FAST006-CREATE-DFEE1A1AEC87",
+      "action": "CREATE",
+      "componentKind": "automation",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:automation:REQ-SUPERVISOR-APPROVAL-001",
+      "displayName": "supervisor approval",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned automation design; runtime implementation requires a separate approval."
+      ],
+      "acceptanceChecks": [
+        "supervisor approval"
+      ],
+      "reason": "The normalized requirement explicitly requests approval, workflow, or automation behavior."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-07967C8CFD55",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-SUPERVISOR-APPROVAL-001",
+      "displayName": "supervisor approval",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "supervisor approval"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-24E6285F2958",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-INVESTIGATION-INTAKE-001",
+      "displayName": "Manage investigation intake",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATION-INTAKE-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-38936F97E705",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-INTERVIEW-001",
+      "displayName": "interviews",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INTERVIEW-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "interview history"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-46EDF02161EE",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "displayName": "operational and management reporting",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "accurate reporting"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-760C09DFE28D",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-INVESTIGATOR-ASSIGNMENT-001",
+      "displayName": "investigator assignment",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATOR-ASSIGNMENT-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-DFE3348456DB",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-EVIDENCE-CUSTODY-001",
+      "displayName": "evidence custody",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EVIDENCE-CUSTODY-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-F01B51D1E800",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-006-fraud-investigation-fully-custom:integration:REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+      "displayName": "external fraud-scoring integration",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "an externally sourced fraud score and audit reference",
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    }
+  ]
+}

@@ -101,6 +101,22 @@ foreach ($acceleratorPath in @(
 )) {
     Test-RequiredPath -RelativePath $acceleratorPath -Description 'Accelerator recommendation runtime'
 }
+if ([bool]$wizardProfile.acceleratorBuildPlanning.enabled -or
+    -not [bool]$wizardProfile.acceleratorBuildPlanning.requiresApprovedArchitectureArtifact -or
+    -not [bool]$wizardProfile.acceleratorBuildPlanning.providerNeutral -or
+    -not [bool]$wizardProfile.acceleratorBuildPlanning.dryRunOnly -or
+    [bool]$wizardProfile.acceleratorBuildPlanning.buildExecutionConnected -or
+    [bool]$wizardProfile.acceleratorBuildPlanning.dataverseConnected) {
+    Add-ContractFailure 'Accelerator build-planning contract must remain default-off, provider-neutral, dry-run-only, and disconnected from execution.'
+}
+foreach ($buildPlanningPath in @(
+    "$($wizardProfile.acceleratorBuildPlanning.service)",
+    "$($wizardProfile.acceleratorBuildPlanning.command)",
+    "$($wizardProfile.acceleratorBuildPlanning.planSchema)",
+    "$($wizardProfile.acceleratorBuildPlanning.projectionSchema)"
+)) {
+    Test-RequiredPath -RelativePath $buildPlanningPath -Description 'Accelerator build-planning runtime'
+}
 
 $wizardScriptPath = Join-Path $bootstrapFolder '05-start-wizard.ps1'
 $wizardScriptText = Get-Content -LiteralPath $wizardScriptPath -Raw

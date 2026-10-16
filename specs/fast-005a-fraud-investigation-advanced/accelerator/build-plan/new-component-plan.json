@@ -1,0 +1,460 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "new-component-creation",
+  "planId": "sha256:e990d8f99471175e394c3d621746b39a9304a5e11a8e2cff50df2a08c53a74a7",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "architecture": "hybrid",
+  "dryRun": true,
+  "items": [
+    {
+      "taskId": "FAST006-CREATE-0DACBECAAE9B",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_report.fiv_name",
+      "displayName": "fiv_name",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_name' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-133A44CE6369",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_report:starter-view",
+      "displayName": "report starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-186C80CF5CB4",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_supervisorapproval.fiv_decision",
+      "displayName": "fiv_decision",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_decision' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-21481A3AE99D",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_fraudscore",
+      "displayName": "Fraud Score",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_fraudscore' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-252BDE9FB7B3",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_investigatorassignment:starter-view",
+      "displayName": "investigatorassignment starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-393A6D2A3E6E"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-34EC5D6D74A3",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_investigatorassignment:starter-form",
+      "displayName": "investigatorassignment starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-393A6D2A3E6E"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-35B332F9FC3A",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_report",
+      "displayName": "Report",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_report' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-393A6D2A3E6E",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_investigatorassignment",
+      "displayName": "Investigator Assignment",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATOR-ASSIGNMENT-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_investigatorassignment' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-4BC6D7B48DCE",
+      "action": "CREATE",
+      "componentKind": "report",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:report:REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "displayName": "operational and management reporting",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001"
+      ],
+      "dependencies": [
+        "FAST006-CREATE-540020A1AF76"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a scenario-owned reporting design only after fields, placement, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "accurate reporting"
+      ],
+      "reason": "The normalized requirement explicitly requests reporting."
+    },
+    {
+      "taskId": "FAST006-CREATE-4E0B645415DF",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_supervisorapproval:starter-form",
+      "displayName": "supervisorapproval starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-540020A1AF76",
+      "action": "CREATE",
+      "componentKind": "application",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:model-driven-app",
+      "displayName": "Fast005AFraudAdvanced (new)",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-CREATE-35B332F9FC3A",
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-REUSE-246563BF61C5",
+        "FAST006-REUSE-5905EF030349",
+        "FAST006-REUSE-656E61A45A09",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create or update the scenario-owned review application without modifying an accelerator-managed app."
+      ],
+      "acceptanceChecks": [
+        "Navigation references only validated tables and views.",
+        "Managed application definitions remain unchanged."
+      ],
+      "reason": "The repository contract requires a scenario-owned model-driven review application."
+    },
+    {
+      "taskId": "FAST006-CREATE-6AF68DCB8FA5",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_supervisorapproval",
+      "displayName": "Supervisor Approval",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_supervisorapproval' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-77E72F8F8D7E",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_fraudscore.fiv_score",
+      "displayName": "fiv_score",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_score' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-7DFB9204708C",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_fraudscore.fiv_auditreference",
+      "displayName": "fiv_auditreference",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_auditreference' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-93165CB2ED49",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_fraudscore:starter-view",
+      "displayName": "fraudscore starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-A2266657875F",
+      "action": "CREATE",
+      "componentKind": "automation",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:automation:REQ-SUPERVISOR-APPROVAL-001",
+      "displayName": "supervisor approval",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned automation design; runtime implementation requires a separate approval."
+      ],
+      "acceptanceChecks": [
+        "supervisor approval"
+      ],
+      "reason": "The normalized requirement explicitly requests approval, workflow, or automation behavior."
+    },
+    {
+      "taskId": "FAST006-CREATE-C96BE1801F23",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_report:starter-form",
+      "displayName": "report starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-CC450B7B81F6",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_fraudscore:starter-form",
+      "displayName": "fraudscore starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-CD3D9EE318BF",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_supervisorapproval:starter-view",
+      "displayName": "supervisorapproval starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    }
+  ]
+}

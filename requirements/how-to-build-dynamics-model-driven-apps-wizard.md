@@ -643,3 +643,13 @@ and publishes, Verify reads a supported unmanaged solution export and requires
 mutate internal `customcontroldefaultconfigs` or edit
 `CustomControlDefaultConfigs` solution XML. Form subgrids remain deferred. See
 [Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).
+
+### Approved accelerator build planning
+
+FAST-006 planning is optional, default-off, and occurs only after architecture
+approval. The standalone planner reads the approved scenario decision and
+generates deterministic component, dependency, readiness, authorization,
+rollback, and requirement traceability artifacts. It never executes a build.
+Managed accelerator components are referenced rather than recreated or
+modified, unsupported extensions are deferred, and Fully Custom plans require
+no FAST package or environment evidence.

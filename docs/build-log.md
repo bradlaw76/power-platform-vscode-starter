@@ -19,6 +19,7 @@ Record wizard version changes here so you can trace which behavior applied to ea
 | 2026-09-30 | Form formatter v1 | Added optional, hash-approved form-layout Preview/Apply for active, customizable, wizard-owned custom Main forms after app assembly. |
 | 2026-10-15 | Contract v1.13.0 | Added default-off, planning-only accelerator recommendations after discovery and before architecture finalization. |
 | 2026-10-16 | Contract v1.14.0 | Added separate accelerator startup preference, granular requirement traceability, validated package manifest input, schema-rendering correction, and generator-level Markdown cleanup. |
+| 2026-10-16 | Contract v1.15.0 | Added default-off provider-neutral FAST-006 dry-run build planning with approved-artifact, managed-ownership, readiness, rollback, and traceability gates. |
 
 ## Release Process
 
@@ -131,3 +132,14 @@ Complete this before implementation:
 - Runtime control: `Microsoft.PowerApps.PowerAppsOneGrid`
 - Verification report:
 - Note: view creation alone does not guarantee OneGrid; subgrid support is deferred.
+## Optional accelerator build-planning evidence
+
+- Approved architecture decision ID:
+- Build plan ID:
+- Architecture: FAST-based / Hybrid / Fully Custom / not used
+- Dry-run status:
+- Environment gate status and evidence age:
+- Managed direct modifications permitted: no
+- Execution authorized: no
+- Build-plan artifact folder:
+- Blocked actions and remediation reviewed:

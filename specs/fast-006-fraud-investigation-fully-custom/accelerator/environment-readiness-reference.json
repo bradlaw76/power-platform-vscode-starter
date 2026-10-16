@@ -1,0 +1,15 @@
+{
+  "provided": false,
+  "status": "not-provided",
+  "fresh": false,
+  "snapshotMatch": false,
+  "packageMatch": false,
+  "executionGateOpen": false,
+  "environmentUrl": "",
+  "coreAssessment": "unverified",
+  "metadataFingerprint": "",
+  "expiresAtUtc": "",
+  "limitations": [
+    "No environment evidence was supplied; matching remains available but FAST-dependent execution is blocked."
+  ]
+}

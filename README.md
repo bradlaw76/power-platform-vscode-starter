@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery** *(planning integration; default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Optional post-discovery/pre-architecture recommendation in stage 05 plus standalone catalog, analysis, and read-only preflight tooling; no build stage is registered | Explicit enable flag and architecture approval; immutable snapshots; evidence-grounded REUSE/EXTEND/BUILD/INTEGRATE/VERIFY analysis; decision-change approval; no import or modification |
+| **FAST Solution Accelerator Discovery and Build Planning** *(default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Optional stage-05 recommendations plus a standalone provider-neutral FAST-006 dry-run planner; no build stage is registered | Approved decision artifact; immutable snapshots; managed ownership; evidence-grounded REUSE/EXTEND/CREATE/INTEGRATE/DEFER plan; environment gates; no import or modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -241,7 +241,9 @@ discovery questions, and requires an explicit FAST-based, Hybrid, or Fully
 Custom architecture selection. Enabled runs persist analysis and the approved
 decision under `specs/<scenario-slug>/accelerator/`. The integration never
 connects to Dataverse, imports a package, or registers FAST with
-`90-run-build.ps1`; build integration remains deferred to FAST-006.
+`90-run-build.ps1`. FAST-006 can translate an approved decision into a
+schema-validated dry-run plan, but build execution remains deferred to
+FAST-007.
 FAST-005B adds an optional preliminary preference after mode selection for
 explicitly enabled acceptance runs. Evaluate accelerators, Fully Custom, and
 Prefer FAST reuse are planning preferences only; matching still occurs after
@@ -268,6 +270,22 @@ The package manifest is the preferred multi-package contract. It validates and
 pins every package metadata path, module/package identity, version, and
 SHA-256. Direct `-AcceleratorPackageMetadataPaths` remains available for
 in-process callers, but nested `pwsh -File` commands should use the manifest.
+
+After architecture approval, FAST-006 planning is an explicit standalone step:
+
+```powershell
+pwsh ./scripts/accelerators/invoke-accelerator-build-plan.ps1 `
+  -EnableDryRunBuildPlanning `
+  -ScenarioSlug <scenario-slug> `
+  -PackageManifestPath <package-input-manifest.json> `
+  -ExpectedEnvironmentUrl <approved-target-url>
+```
+
+The command reads the approved decision from the scenario; it has no
+architecture override. It writes deterministic artifacts under
+`specs/<scenario-slug>/accelerator/build-plan/`, never authorizes execution,
+and never calls Dataverse or a bootstrap build stage. Fully Custom plans do not
+require a package manifest or environment evidence.
 
 ```powershell
 # Explicit local analysis; no wizard stage invokes this command.

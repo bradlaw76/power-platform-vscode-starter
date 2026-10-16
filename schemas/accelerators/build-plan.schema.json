@@ -1,0 +1,171 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Provider-Neutral Accelerator Build Plan",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "planId",
+    "scenarioSlug",
+    "decisionId",
+    "architecture",
+    "providerId",
+    "dryRun",
+    "executionAuthorized",
+    "status",
+    "generatedAtUtc",
+    "inputFingerprints",
+    "environment",
+    "managedSolutionPolicy",
+    "componentPlans",
+    "dependencyGraph",
+    "blockedActions",
+    "remediationChecklist",
+    "authorizationRequirements",
+    "rollbackRecovery",
+    "traceability"
+  ],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "planId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "scenarioSlug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "decisionId": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"},
+    "architecture": {"enum": ["fast-based", "hybrid", "fully-custom"]},
+    "providerId": {"type": "string"},
+    "dryRun": {"const": true},
+    "executionAuthorized": {"const": false},
+    "status": {"enum": ["dry-run-ready", "blocked"]},
+    "generatedAtUtc": {"type": "string", "format": "date-time"},
+    "inputFingerprints": {
+      "type": "object",
+      "additionalProperties": {"type": "string"}
+    },
+    "environment": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["requiredForArchitecture", "gateOpen", "status", "limitations"],
+      "properties": {
+        "requiredForArchitecture": {"type": "boolean"},
+        "gateOpen": {"type": "boolean"},
+        "status": {"type": "string"},
+        "limitations": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "managedSolutionPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "directManagedModificationAllowed",
+        "recreateManagedComponentsAllowed",
+        "extensionRequiresCustomizationEvidence",
+        "solutionOwnedPrefix"
+      ],
+      "properties": {
+        "directManagedModificationAllowed": {"const": false},
+        "recreateManagedComponentsAllowed": {"const": false},
+        "extensionRequiresCustomizationEvidence": {"const": true},
+        "solutionOwnedPrefix": {"type": "string"}
+      }
+    },
+    "componentPlans": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/componentPlan"}
+    },
+    "dependencyGraph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nodes", "edges", "orderedTaskIds"],
+      "properties": {
+        "nodes": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "edges": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": ["from", "to", "reason"],
+            "properties": {
+              "from": {"type": "string"},
+              "to": {"type": "string"},
+              "reason": {"type": "string"}
+            }
+          }
+        },
+        "orderedTaskIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "blockedActions": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "remediationChecklist": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "authorizationRequirements": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "rollbackRecovery": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+    "traceability": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["requirementId", "taskIds", "acceptanceCriteria", "decisionId"],
+        "properties": {
+          "requirementId": {"type": "string"},
+          "taskIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "acceptanceCriteria": {"type": "array", "items": {"type": "string"}},
+          "decisionId": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "componentPlan": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "taskId",
+        "action",
+        "componentKind",
+        "componentIdentity",
+        "displayName",
+        "ownership",
+        "managed",
+        "directModificationAllowed",
+        "status",
+        "requirementIds",
+        "dependencies",
+        "sourceReferences",
+        "expectedOutputs",
+        "acceptanceChecks",
+        "reason"
+      ],
+      "properties": {
+        "taskId": {"type": "string", "pattern": "^FAST006-[A-Z]+-[A-F0-9]{12}$"},
+        "action": {"enum": ["REUSE", "EXTEND", "CREATE", "INTEGRATE", "DEFER"]},
+        "componentKind": {
+          "enum": [
+            "table",
+            "column",
+            "relationship",
+            "choice",
+            "form",
+            "view",
+            "application",
+            "business-process-flow",
+            "integration",
+            "automation",
+            "report",
+            "module",
+            "dependency"
+          ]
+        },
+        "componentIdentity": {"type": "string", "minLength": 1},
+        "displayName": {"type": "string"},
+        "ownership": {"enum": ["accelerator-managed", "solution-owned", "external", "unresolved"]},
+        "managed": {"type": "boolean"},
+        "directModificationAllowed": {"type": "boolean"},
+        "status": {"enum": ["planned", "blocked", "verification-required"]},
+        "requirementIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "sourceReferences": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "expectedOutputs": {"type": "array", "items": {"type": "string"}},
+        "acceptanceChecks": {"type": "array", "items": {"type": "string"}},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

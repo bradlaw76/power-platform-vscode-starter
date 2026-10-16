@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** FAST-005 implemented; architectural review required
+**Status:** FAST-006 implemented; architectural review required
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -175,9 +175,22 @@ Exact schemas are defined in
 - Pinned decision artifacts.
 - No change to custom-only outputs when disabled.
 
-### FAST-006 - Failure, rollback, and release
+### FAST-006 - Provider-neutral build planning
 
-- Disabled, absent-provider, outage, retirement, and rollback matrices.
+- Consume only explicitly approved architecture and hash-verified analysis
+  artifacts.
+- Generate deterministic REUSE, EXTEND, CREATE, INTEGRATE, and DEFER tasks.
+- Enforce managed ownership, collision prevention, and evidence-based
+  environment readiness.
+- Emit aggregate and projection schemas without invoking Dataverse or build
+  stages.
+- Prove industry neutrality with unrelated data-only acceptance fixtures.
+- Preserve an independent Fully Custom plan.
+
+### FAST-007 - Execution gate (not authorized)
+
+- Evaluate controlled handoff from an approved build plan to existing build
+  stages through a separately reviewed authorization contract.
 - Repeated-run and snapshot pinning.
 - Security review.
 - Controlled rollout and documentation parity.

@@ -183,12 +183,22 @@
 - [x] Repeat and preserve all three corrected acceptance demonstrations.
 - [x] Run complete FAST and wizard regression validation.
 - [x] Commit, push, and verify the remote feature branch and recovery refs.
-- [ ] Obtain FAST-005B architectural review approval before FAST-006.
+- [x] Obtain FAST-005B architectural review approval before FAST-006.
 
-## FAST-006 - Failure, rollback, and rollout (not authorized)
+## FAST-006 - Provider-neutral dry-run build planning
 
-- [ ] Add absent-provider, outage, no-snapshot, retired-source, broken-candidate,
-  catalog-rollback, and code-rollback tests.
-- [ ] Run security review before promotion.
-- [ ] Complete documentation, contract, skill, and CI parity updates.
-- [ ] Use controlled nonproduction rollout and explicit deployment approvals.
+- [x] Add strict approved-decision and scenario-artifact validation.
+- [x] Generate deterministic aggregate and projection build-plan artifacts.
+- [x] Implement REUSE, EXTEND, CREATE, INTEGRATE, and DEFER tasks.
+- [x] Enforce managed ownership, publisher naming, and collision prevention.
+- [x] Keep accelerator-dependent plans behind fresh environment evidence.
+- [x] Preserve an accelerator-independent Fully Custom plan.
+- [x] Exercise eight unrelated application fixtures without source changes.
+- [x] Demonstrate blocked GCC Hybrid and viable Fully Custom fraud plans.
+- [x] Register schemas, profile contract, CI, documentation, and skills.
+- [x] Prove no Dataverse, PAC, import, or bootstrap-stage integration.
+- [ ] Obtain FAST-006 architectural review approval before FAST-007.
+
+## FAST-007 - Execution-gate integration (not authorized)
+
+- [ ] Define a separately approved handoff to existing build stages.

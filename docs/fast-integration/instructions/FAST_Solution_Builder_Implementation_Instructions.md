@@ -1,7 +1,7 @@
 # FAST Integration — Implementation Instructions for the Existing Solution Builder / Wizard
 
 > [!IMPORTANT]
-> **Repository status:** FAST-000 through FAST-005 are complete and FAST-005 is accepted. FAST-005A executed the three-mode fraud acceptance demonstration, and FAST-005B implements its approved corrections for architectural review. See the [baseline evidence](../baseline.md), [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), [environment compatibility contract](../../../specs/fast-solution-accelerator-discovery/environment-validation.md), and [sanitized GCC evidence](../../../specs/fast-solution-accelerator-discovery/evidence/fast-003a-gcc-validation.md). FAST-005B adds a separate default-off startup preference, granular requirement traceability, corrected schema rendering, a validated package manifest, and generator-level Markdown cleanup. It preserves the three modes and Demo Builder question budget and does not import solutions, call Dataverse, or connect FAST to build execution. The current GCC evidence keeps FAST execution blocked because Core and specialty modules are absent. FAST-006 build integration and rollout remain unimplemented. The authoritative sequence remains [`docs/onboarding.md`](../../onboarding.md).
+> **Repository status:** FAST-000 through FAST-005B are complete and accepted. FAST-006 implements a provider-neutral, industry-agnostic, dry-run-only build-planning adapter for approved FAST-based, Hybrid, and Fully Custom decisions. See the [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), [FAST-006 evidence](../../../specs/fast-solution-accelerator-discovery/evidence/fast-006-build-planning.md), and [ADR 0009](../../../specs/fast-solution-accelerator-discovery/adrs/0009-provider-neutral-dry-run-build-planning.md). Managed accelerator definitions are never overwritten, Fully Custom remains independent, and the current GCC FAST-dependent plan stays blocked. FAST-006 does not call Dataverse, import solutions, authorize execution, or register a build stage. FAST-007 execution-gate integration remains unimplemented. The authoritative sequence remains [`docs/onboarding.md`](../../onboarding.md).
 
 **Instruction ID:** FAST-IMPLEMENTATION-001  
 **Intended executor:** GitHub Copilot Agent in Visual Studio Code, working in the existing wizard repository  
@@ -285,7 +285,8 @@ Produce narrowly scoped PRs with explicit stop/go reviews:
 | FAST-003 | Live read-only environment preflight | Versioned readiness report, mocked transport/cache/failure tests, no mutation |
 | FAST-004 | Requirements matching/delta planner | Golden requirement scenarios, traceability/evidence |
 | FAST-005 | Mode UX and generator wiring | Feature-flagged behavior, no added mandatory questions |
-| FAST-006 | Failure/rollback/regression/ALM | Disabled/offline tests, nonproduction restore verification |
+| FAST-006 | Provider-neutral dry-run build planning | Approved-artifact validation, managed ownership, deterministic plans, blocked GCC and Fully Custom evidence |
+| FAST-007 | Execution-gate integration | Not authorized; requires a separate reviewed contract |
 
 **Do not ship all six engineering phases in one giant PR.** Each PR must contain changed-file inventory, motivation, tests that actually ran (with command/output), failures/skips, screenshots only where UI changes are relevant, risks, dependency/source versions and exact rollback steps.
 

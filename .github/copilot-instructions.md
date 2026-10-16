@@ -44,6 +44,11 @@ deltas, dependencies, and readiness. Persist the explicit decision under the
 scenario's `accelerator/` folder. Never treat this planning decision as
 Dataverse build, import, or deployment authorization.
 
+FAST-006 planning is a separate explicit, default-off dry run that
+must consume the approved decision artifact, preserve managed ownership, keep
+Fully Custom independent of FAST prerequisites, and never call Dataverse or
+bootstrap build stages.
+
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
 Optional UI enhancement stages are

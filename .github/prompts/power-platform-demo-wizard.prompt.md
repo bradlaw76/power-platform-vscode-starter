@@ -27,7 +27,11 @@ Use this behavior:
   selection screen or FAST-specific business question. Include FAST-based, Hybrid, and Fully
   Custom in Demo Builder's existing consolidated confirmation; detailed modes
   show requirement coverage, evidence, deltas, dependencies, and environment
-  readiness. Persist explicit selection under `specs/<slug>/accelerator/` and
+  readiness. If FAST-006 planning is explicitly requested after approval, use
+  the scenario-local decision artifact and emit only a provider-neutral dry-run
+  REUSE/EXTEND/CREATE/INTEGRATE/DEFER plan. Never authorize execution, modify a
+  managed accelerator definition, call Dataverse, or invoke a build stage.
+  Persist explicit selection under `specs/<slug>/accelerator/` and
   do not authorize Dataverse generation or solution import.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).

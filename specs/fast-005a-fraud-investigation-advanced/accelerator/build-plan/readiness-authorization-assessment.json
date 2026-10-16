@@ -1,0 +1,32 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "readiness-authorization",
+  "planId": "sha256:e990d8f99471175e394c3d621746b39a9304a5e11a8e2cff50df2a08c53a74a7",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "architecture": "hybrid",
+  "dryRun": true,
+  "items": [
+    {
+      "requiredForArchitecture": true,
+      "environmentUrl": "https://powerplatformvscodestarter.crm9.dynamics.com",
+      "metadataFingerprint": "7654dbb8de75ccc321fa1959a1546a85016f63a8f3bfca3897c5c055e566ea64",
+      "gateOpen": false,
+      "status": "action-required",
+      "fresh": false,
+      "snapshotMatch": true,
+      "packageMatch": true,
+      "limitations": [
+        "Environment evidence is absent or stale.",
+        "Environment readiness is 'action-required'."
+      ]
+    },
+    {
+      "requirements": [
+        "FAST-006 produces dry-run plans only; a later phase must explicitly authorize build-stage integration.",
+        "Revalidate the approved decision and all input fingerprints immediately before any future execution."
+      ],
+      "executionAuthorized": false
+    }
+  ]
+}

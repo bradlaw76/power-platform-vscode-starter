@@ -1,0 +1,1975 @@
+{
+  "schemaVersion": "1.0",
+  "planId": "sha256:e990d8f99471175e394c3d621746b39a9304a5e11a8e2cff50df2a08c53a74a7",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "architecture": "hybrid",
+  "providerId": "microsoft-fast",
+  "dryRun": true,
+  "executionAuthorized": false,
+  "status": "blocked",
+  "generatedAtUtc": "2026-10-15T21:00:00.0000000Z",
+  "inputFingerprints": {
+    "analysisManifest": "e342a7243af646b359ba1020e7a06c22dc6631fddb18b8165c3d1a26eb7aec63",
+    "componentDelta": "c653d20dca6e30929b298cebe9d4377e209a128151ff37be1412b3aaa21dc2ab",
+    "coverage": "0433be959a1c9c682ec781f629e128e76bf6c5f94d109b95eedf962600cba304",
+    "decision": "6ba1c0fc381f7eae520dc34ae7aa5fd2c0534fa9c0dad75d75cb692af7b2ff0d",
+    "dependencies": "d51a7481f50c4330fdf80378f4bcef421cef7cd591f8a28766a3b4b4594eae73",
+    "environment": "a37b3c07f20935d2cd501299bef1f3a1f9d922943573b14effdb9854844d4420",
+    "packageManifest": "726be9f29a375801b733cf7e73850260136d85dea2448e315f394147952a58e5",
+    "schemaPlan": "af909c45d8100db80bb7b1e2eac50e1d15561db413bdc93ca90cc2538d9fa2a0",
+    "spec": "346997478cfe76c6cbceb5776739296e50361b0bddd5c5dae8a7667ca2693fd6",
+    "traceability": "871321ec441559245c214efdedf885c624b375501f1c7762e2e117848802fbf7"
+  },
+  "environment": {
+    "requiredForArchitecture": true,
+    "environmentUrl": "https://powerplatformvscodestarter.crm9.dynamics.com",
+    "metadataFingerprint": "7654dbb8de75ccc321fa1959a1546a85016f63a8f3bfca3897c5c055e566ea64",
+    "gateOpen": false,
+    "status": "action-required",
+    "fresh": false,
+    "snapshotMatch": true,
+    "packageMatch": true,
+    "limitations": [
+      "Environment evidence is absent or stale.",
+      "Environment readiness is 'action-required'."
+    ]
+  },
+  "managedSolutionPolicy": {
+    "directManagedModificationAllowed": false,
+    "recreateManagedComponentsAllowed": false,
+    "extensionRequiresCustomizationEvidence": true,
+    "solutionOwnedPrefix": "fiv"
+  },
+  "componentPlans": [
+    {
+      "taskId": "FAST006-CREATE-0DACBECAAE9B",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_report.fiv_name",
+      "displayName": "fiv_name",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_name' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-133A44CE6369",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_report:starter-view",
+      "displayName": "report starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-186C80CF5CB4",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_supervisorapproval.fiv_decision",
+      "displayName": "fiv_decision",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_decision' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-21481A3AE99D",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_fraudscore",
+      "displayName": "Fraud Score",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_fraudscore' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-252BDE9FB7B3",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_investigatorassignment:starter-view",
+      "displayName": "investigatorassignment starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-393A6D2A3E6E"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-34EC5D6D74A3",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_investigatorassignment:starter-form",
+      "displayName": "investigatorassignment starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-393A6D2A3E6E"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-35B332F9FC3A",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_report",
+      "displayName": "Report",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_report' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-393A6D2A3E6E",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_investigatorassignment",
+      "displayName": "Investigator Assignment",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATOR-ASSIGNMENT-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_investigatorassignment' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-4BC6D7B48DCE",
+      "action": "CREATE",
+      "componentKind": "report",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:report:REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "displayName": "operational and management reporting",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001"
+      ],
+      "dependencies": [
+        "FAST006-CREATE-540020A1AF76"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a scenario-owned reporting design only after fields, placement, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "accurate reporting"
+      ],
+      "reason": "The normalized requirement explicitly requests reporting."
+    },
+    {
+      "taskId": "FAST006-CREATE-4E0B645415DF",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_supervisorapproval:starter-form",
+      "displayName": "supervisorapproval starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-540020A1AF76",
+      "action": "CREATE",
+      "componentKind": "application",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:model-driven-app",
+      "displayName": "Fast005AFraudAdvanced (new)",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-CREATE-35B332F9FC3A",
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-REUSE-246563BF61C5",
+        "FAST006-REUSE-5905EF030349",
+        "FAST006-REUSE-656E61A45A09",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create or update the scenario-owned review application without modifying an accelerator-managed app."
+      ],
+      "acceptanceChecks": [
+        "Navigation references only validated tables and views.",
+        "Managed application definitions remain unchanged."
+      ],
+      "reason": "The repository contract requires a scenario-owned model-driven review application."
+    },
+    {
+      "taskId": "FAST006-CREATE-6AF68DCB8FA5",
+      "action": "CREATE",
+      "componentKind": "table",
+      "componentIdentity": "fiv_supervisorapproval",
+      "displayName": "Supervisor Approval",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create solution-owned Dataverse table 'fiv_supervisorapproval' in a future separately authorized build."
+      ],
+      "acceptanceChecks": [
+        "Logical name uses the approved publisher prefix.",
+        "No managed or solution-owned table identity conflict exists."
+      ],
+      "reason": "Approved scenario mapping requires a new solution-owned table not supplied by selected accelerator evidence."
+    },
+    {
+      "taskId": "FAST006-CREATE-77E72F8F8D7E",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_fraudscore.fiv_score",
+      "displayName": "fiv_score",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_score' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-7DFB9204708C",
+      "action": "CREATE",
+      "componentKind": "column",
+      "componentIdentity": "fiv_fraudscore.fiv_auditreference",
+      "displayName": "fiv_auditreference",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_auditreference' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The approved scenario mapping requires a solution-owned column on a solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-93165CB2ED49",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_fraudscore:starter-view",
+      "displayName": "fraudscore starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-A2266657875F",
+      "action": "CREATE",
+      "componentKind": "automation",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:automation:REQ-SUPERVISOR-APPROVAL-001",
+      "displayName": "supervisor approval",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned automation design; runtime implementation requires a separate approval."
+      ],
+      "acceptanceChecks": [
+        "supervisor approval"
+      ],
+      "reason": "The normalized requirement explicitly requests approval, workflow, or automation behavior."
+    },
+    {
+      "taskId": "FAST006-CREATE-C96BE1801F23",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_report:starter-form",
+      "displayName": "report starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-CC450B7B81F6",
+      "action": "CREATE",
+      "componentKind": "form",
+      "componentIdentity": "fiv_fraudscore:starter-form",
+      "displayName": "fraudscore starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "A starter form is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-CREATE-CD3D9EE318BF",
+      "action": "CREATE",
+      "componentKind": "view",
+      "componentIdentity": "fiv_supervisorapproval:starter-view",
+      "displayName": "supervisorapproval starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "A starter view is required for the solution-owned table."
+    },
+    {
+      "taskId": "FAST006-DEFER-061D31B1EC81",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "fiv_fraudscore->appbase_investigation",
+      "displayName": "Fraud Score -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-09F08488D319",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_investigationinterview.fiv_interviewdate",
+      "displayName": "fiv_interviewdate",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-246563BF61C5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_interviewdate' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-15E1F6697F87",
+      "action": "DEFER",
+      "componentKind": "dependency",
+      "componentIdentity": "microsoft-fast:module:investigations:extension:REQ-INTERVIEW-001",
+      "displayName": "interviews",
+      "ownership": "unresolved",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [
+        "REQ-INTERVIEW-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md#1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672"
+      ],
+      "expectedOutputs": [
+        "Use only a separately owned extension after target component customizability is environment-verified."
+      ],
+      "acceptanceChecks": [
+        "No managed-layer definition is overwritten.",
+        "Customization support is proven from fresh target-environment metadata."
+      ],
+      "reason": "Functional fit is partial and package presence does not prove that direct customization is supported."
+    },
+    {
+      "taskId": "FAST006-DEFER-221138036593",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "fiv_report->appbase_investigation",
+      "displayName": "Report -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-35B332F9FC3A",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-29CDDCBFD909",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_evidenceitem.fiv_name",
+      "displayName": "fiv_name",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-5905EF030349"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_name' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-2B24CB42F48D",
+      "action": "DEFER",
+      "componentKind": "view",
+      "componentIdentity": "appbase_investigation:starter-view",
+      "displayName": "investigation starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned view can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-2E7A4FC9CC5F",
+      "action": "DEFER",
+      "componentKind": "form",
+      "componentIdentity": "appbase_evidencecustodyrecord:starter-form",
+      "displayName": "evidencecustodyevent starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-656E61A45A09"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned form can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-2EB8698397AA",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_investigation.fiv_summary",
+      "displayName": "fiv_summary",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_summary' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-3017D88DC1D9",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_evidencecustodyrecord.fiv_action",
+      "displayName": "fiv_action",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-656E61A45A09"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_action' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-3F0C9BCB0B19",
+      "action": "DEFER",
+      "componentKind": "form",
+      "componentIdentity": "appbase_investigationinterview:starter-form",
+      "displayName": "interview starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-246563BF61C5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned form can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-471193038AE8",
+      "action": "DEFER",
+      "componentKind": "dependency",
+      "componentIdentity": "microsoft-fast:module:investigations:extension:REQ-INVESTIGATOR-ASSIGNMENT-001",
+      "displayName": "investigator assignment",
+      "ownership": "unresolved",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [
+        "REQ-INVESTIGATOR-ASSIGNMENT-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md#1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/request-tracker.md#af44b7189a7a177a3918435b0368029febec7fc0c89d7200c3005fc5c7f239d2"
+      ],
+      "expectedOutputs": [
+        "Use only a separately owned extension after target component customizability is environment-verified."
+      ],
+      "acceptanceChecks": [
+        "No managed-layer definition is overwritten.",
+        "Customization support is proven from fresh target-environment metadata."
+      ],
+      "reason": "Functional fit is partial and package presence does not prove that direct customization is supported."
+    },
+    {
+      "taskId": "FAST006-DEFER-4924DF1837CC",
+      "action": "DEFER",
+      "componentKind": "form",
+      "componentIdentity": "appbase_evidenceitem:starter-form",
+      "displayName": "evidence starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-5905EF030349"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned form can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-5BB4FA66E2ED",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "fiv_investigatorassignment->appbase_investigation",
+      "displayName": "Investigator Assignment -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-5FDC4A5255A7",
+      "action": "DEFER",
+      "componentKind": "view",
+      "componentIdentity": "appbase_evidenceitem:starter-view",
+      "displayName": "evidence starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-5905EF030349"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned view can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-70B8205013DF",
+      "action": "DEFER",
+      "componentKind": "dependency",
+      "componentIdentity": "microsoft-fast:module:investigations:extension:REQ-INVESTIGATION-INTAKE-001",
+      "displayName": "Manage investigation intake",
+      "ownership": "unresolved",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [
+        "REQ-INVESTIGATION-INTAKE-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/dispute-resolution.md#3c66a5ed5190df4beb9a2f53d4f664ccaceab5f568ef31344202366be745fd2c",
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md#1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672",
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/personnel-security.md#4cfaa9a081cc6fd5cddf398e0567de22f92f6bdaa69c096a4462db7f906a2c8b"
+      ],
+      "expectedOutputs": [
+        "Use only a separately owned extension after target component customizability is environment-verified."
+      ],
+      "acceptanceChecks": [
+        "No managed-layer definition is overwritten.",
+        "Customization support is proven from fresh target-environment metadata."
+      ],
+      "reason": "Functional fit is partial and package presence does not prove that direct customization is supported."
+    },
+    {
+      "taskId": "FAST006-DEFER-728D34C5A416",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "fiv_supervisorapproval->appbase_investigation",
+      "displayName": "Supervisor Approval -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-9559885B4B28",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_investigation.fiv_status",
+      "displayName": "fiv_status",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_status' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-9EBD4AB1D5C2",
+      "action": "DEFER",
+      "componentKind": "dependency",
+      "componentIdentity": "microsoft-fast:module:investigations:extension:REQ-EVIDENCE-CUSTODY-001",
+      "displayName": "evidence custody",
+      "ownership": "unresolved",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [
+        "REQ-EVIDENCE-CUSTODY-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "https://raw.githubusercontent.com/microsoft/industry-solutions/main/_modules/investigations.md#1d145d87ace685c4d6cb954406ab7887bdf3c2cac4f7ab7fa9857c8fe9ab5672"
+      ],
+      "expectedOutputs": [
+        "Use only a separately owned extension after target component customizability is environment-verified."
+      ],
+      "acceptanceChecks": [
+        "No managed-layer definition is overwritten.",
+        "Customization support is proven from fresh target-environment metadata."
+      ],
+      "reason": "Functional fit is partial and package presence does not prove that direct customization is supported."
+    },
+    {
+      "taskId": "FAST006-DEFER-C2A19AD2480F",
+      "action": "DEFER",
+      "componentKind": "form",
+      "componentIdentity": "appbase_investigation:starter-form",
+      "displayName": "investigation starter form",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned form without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and form ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned form can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-C9CDA3E94ED6",
+      "action": "DEFER",
+      "componentKind": "column",
+      "componentIdentity": "appbase_investigation.fiv_name",
+      "displayName": "fiv_name",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Define solution-owned column 'fiv_name' only after data type and target customization support are approved."
+      ],
+      "acceptanceChecks": [
+        "Column type, requiredness, ownership, and target-table customization support are explicitly validated."
+      ],
+      "reason": "The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred."
+    },
+    {
+      "taskId": "FAST006-DEFER-CEDD82FE932A",
+      "action": "DEFER",
+      "componentKind": "view",
+      "componentIdentity": "appbase_evidencecustodyrecord:starter-view",
+      "displayName": "evidencecustodyevent starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-656E61A45A09"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned view can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-DEFER-D27F089A3107",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "appbase_investigationinterview->appbase_investigation",
+      "displayName": "Interview -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-246563BF61C5",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-E5D9C20C6AB1",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "appbase_evidencecustodyrecord->appbase_evidenceitem",
+      "displayName": "Evidence Custody Event -> Evidence",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-5905EF030349",
+        "FAST006-REUSE-656E61A45A09"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-E8CE352D114A",
+      "action": "DEFER",
+      "componentKind": "relationship",
+      "componentIdentity": "appbase_evidenceitem->appbase_investigation",
+      "displayName": "Evidence -> Investigation",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-5905EF030349",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Create a solution-owned relationship only after cardinality, requiredness, cascade behavior, and ownership are approved."
+      ],
+      "acceptanceChecks": [
+        "Relationship identity is unique.",
+        "Managed endpoint customization support is verified when applicable."
+      ],
+      "reason": "At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified."
+    },
+    {
+      "taskId": "FAST006-DEFER-F841A8EED763",
+      "action": "DEFER",
+      "componentKind": "view",
+      "componentIdentity": "appbase_investigationinterview:starter-view",
+      "displayName": "interview starter view",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "verification-required",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-246563BF61C5"
+      ],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Plan a solution-owned view without overwriting an accelerator-managed definition."
+      ],
+      "acceptanceChecks": [
+        "Target table and view ownership are verified."
+      ],
+      "reason": "Package metadata does not prove that a solution-owned view can safely extend this managed table."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-2C9ED312A453",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-SUPERVISOR-APPROVAL-001",
+      "displayName": "supervisor approval",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-SUPERVISOR-APPROVAL-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "supervisor approval"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-3F0EB79F02A0",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-INVESTIGATOR-ASSIGNMENT-001",
+      "displayName": "investigator assignment",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATOR-ASSIGNMENT-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-44A0707EC4D1",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-EVIDENCE-CUSTODY-001",
+      "displayName": "evidence custody",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EVIDENCE-CUSTODY-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-5235A9977FF5",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-INVESTIGATION-INTAKE-001",
+      "displayName": "Manage investigation intake",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INVESTIGATION-INTAKE-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-5F43B194E603",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+      "displayName": "external fraud-scoring integration",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "an externally sourced fraud score and audit reference",
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-8EF70D8EE846",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "displayName": "operational and management reporting",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "accurate reporting"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-INTEGRATE-F6A23E1B4B70",
+      "action": "INTEGRATE",
+      "componentKind": "integration",
+      "componentIdentity": "fast-005a-fraud-investigation-advanced:integration:REQ-INTERVIEW-001",
+      "displayName": "interviews",
+      "ownership": "external",
+      "managed": false,
+      "directModificationAllowed": false,
+      "status": "planned",
+      "requirementIds": [
+        "REQ-INTERVIEW-001"
+      ],
+      "dependencies": [],
+      "sourceReferences": [],
+      "expectedOutputs": [
+        "Produce a connector/automation design covering authentication, error handling, observability, and data ownership."
+      ],
+      "acceptanceChecks": [
+        "interview history"
+      ],
+      "reason": "The approved requirement disposition includes integration work; no connector or endpoint is inferred."
+    },
+    {
+      "taskId": "FAST006-REUSE-246563BF61C5",
+      "action": "REUSE",
+      "componentKind": "table",
+      "componentIdentity": "appbase_investigationinterview",
+      "displayName": "Investigation Interview",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [
+        "REQ-INTERVIEW-001",
+        "REQ-INVESTIGATION-INTAKE-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+      ],
+      "expectedOutputs": [
+        "Reference the existing managed table; emit no table-creation payload for this identity."
+      ],
+      "acceptanceChecks": [
+        "No solution-owned table duplicates the managed component.",
+        "Managed table identity is environment-verified before execution."
+      ],
+      "reason": "The approved package supplies a compatible table; planned 'fiv_interview' creation is suppressed."
+    },
+    {
+      "taskId": "FAST006-REUSE-5905EF030349",
+      "action": "REUSE",
+      "componentKind": "table",
+      "componentIdentity": "appbase_evidenceitem",
+      "displayName": "Evidence Item",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [
+        "REQ-EVIDENCE-CUSTODY-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+      ],
+      "expectedOutputs": [
+        "Reference the existing managed table; emit no table-creation payload for this identity."
+      ],
+      "acceptanceChecks": [
+        "No solution-owned table duplicates the managed component.",
+        "Managed table identity is environment-verified before execution."
+      ],
+      "reason": "The approved package supplies a compatible table; planned 'fiv_evidence' creation is suppressed."
+    },
+    {
+      "taskId": "FAST006-REUSE-656E61A45A09",
+      "action": "REUSE",
+      "componentKind": "table",
+      "componentIdentity": "appbase_evidencecustodyrecord",
+      "displayName": "Evidence Custody Record",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [
+        "REQ-EVIDENCE-CUSTODY-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+      ],
+      "expectedOutputs": [
+        "Reference the existing managed table; emit no table-creation payload for this identity."
+      ],
+      "acceptanceChecks": [
+        "No solution-owned table duplicates the managed component.",
+        "Managed table identity is environment-verified before execution."
+      ],
+      "reason": "The approved package supplies a compatible table; planned 'fiv_evidencecustodyevent' creation is suppressed."
+    },
+    {
+      "taskId": "FAST006-REUSE-7AF5DCE817E8",
+      "action": "REUSE",
+      "componentKind": "module",
+      "componentIdentity": "microsoft-fast:module:core",
+      "displayName": "microsoft-fast:module:core",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [],
+      "dependencies": [],
+      "sourceReferences": [
+        "microsoft-fast:package:core:1.2.1.0:managed:f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3",
+        "sha256:f813e8500b97db1fd74f938da28f22ba53c1c4593f6374b34e8a0f7d52e895b3"
+      ],
+      "expectedOutputs": [
+        "Use the installed, version-matched managed solution without recreating it."
+      ],
+      "acceptanceChecks": [
+        "Installed solution identity, version, hash provenance, and dependencies match the approved decision."
+      ],
+      "reason": "Approved architecture pins this accelerator module; direct managed-layer modification is prohibited."
+    },
+    {
+      "taskId": "FAST006-REUSE-D1F838530C1D",
+      "action": "REUSE",
+      "componentKind": "table",
+      "componentIdentity": "appbase_investigation",
+      "displayName": "Investigation",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [
+        "REQ-INVESTIGATION-INTAKE-001"
+      ],
+      "dependencies": [
+        "FAST006-REUSE-E49393996B67"
+      ],
+      "sourceReferences": [
+        "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+      ],
+      "expectedOutputs": [
+        "Reference the existing managed table; emit no table-creation payload for this identity."
+      ],
+      "acceptanceChecks": [
+        "No solution-owned table duplicates the managed component.",
+        "Managed table identity is environment-verified before execution."
+      ],
+      "reason": "The approved package supplies a compatible table; planned 'fiv_investigation' creation is suppressed."
+    },
+    {
+      "taskId": "FAST006-REUSE-E49393996B67",
+      "action": "REUSE",
+      "componentKind": "module",
+      "componentIdentity": "microsoft-fast:module:investigations",
+      "displayName": "microsoft-fast:module:investigations",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "status": "blocked",
+      "requirementIds": [],
+      "dependencies": [
+        "FAST006-REUSE-7AF5DCE817E8"
+      ],
+      "sourceReferences": [
+        "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+        "sha256:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391"
+      ],
+      "expectedOutputs": [
+        "Use the installed, version-matched managed solution without recreating it."
+      ],
+      "acceptanceChecks": [
+        "Installed solution identity, version, hash provenance, and dependencies match the approved decision."
+      ],
+      "reason": "Approved architecture pins this accelerator module; direct managed-layer modification is prohibited."
+    }
+  ],
+  "dependencyGraph": {
+    "nodes": [
+      "FAST006-CREATE-0DACBECAAE9B",
+      "FAST006-CREATE-133A44CE6369",
+      "FAST006-CREATE-186C80CF5CB4",
+      "FAST006-CREATE-21481A3AE99D",
+      "FAST006-CREATE-252BDE9FB7B3",
+      "FAST006-CREATE-34EC5D6D74A3",
+      "FAST006-CREATE-35B332F9FC3A",
+      "FAST006-CREATE-393A6D2A3E6E",
+      "FAST006-CREATE-4BC6D7B48DCE",
+      "FAST006-CREATE-4E0B645415DF",
+      "FAST006-CREATE-540020A1AF76",
+      "FAST006-CREATE-6AF68DCB8FA5",
+      "FAST006-CREATE-77E72F8F8D7E",
+      "FAST006-CREATE-7DFB9204708C",
+      "FAST006-CREATE-93165CB2ED49",
+      "FAST006-CREATE-A2266657875F",
+      "FAST006-CREATE-C96BE1801F23",
+      "FAST006-CREATE-CC450B7B81F6",
+      "FAST006-CREATE-CD3D9EE318BF",
+      "FAST006-DEFER-061D31B1EC81",
+      "FAST006-DEFER-09F08488D319",
+      "FAST006-DEFER-15E1F6697F87",
+      "FAST006-DEFER-221138036593",
+      "FAST006-DEFER-29CDDCBFD909",
+      "FAST006-DEFER-2B24CB42F48D",
+      "FAST006-DEFER-2E7A4FC9CC5F",
+      "FAST006-DEFER-2EB8698397AA",
+      "FAST006-DEFER-3017D88DC1D9",
+      "FAST006-DEFER-3F0C9BCB0B19",
+      "FAST006-DEFER-471193038AE8",
+      "FAST006-DEFER-4924DF1837CC",
+      "FAST006-DEFER-5BB4FA66E2ED",
+      "FAST006-DEFER-5FDC4A5255A7",
+      "FAST006-DEFER-70B8205013DF",
+      "FAST006-DEFER-728D34C5A416",
+      "FAST006-DEFER-9559885B4B28",
+      "FAST006-DEFER-9EBD4AB1D5C2",
+      "FAST006-DEFER-C2A19AD2480F",
+      "FAST006-DEFER-C9CDA3E94ED6",
+      "FAST006-DEFER-CEDD82FE932A",
+      "FAST006-DEFER-D27F089A3107",
+      "FAST006-DEFER-E5D9C20C6AB1",
+      "FAST006-DEFER-E8CE352D114A",
+      "FAST006-DEFER-F841A8EED763",
+      "FAST006-INTEGRATE-2C9ED312A453",
+      "FAST006-INTEGRATE-3F0EB79F02A0",
+      "FAST006-INTEGRATE-44A0707EC4D1",
+      "FAST006-INTEGRATE-5235A9977FF5",
+      "FAST006-INTEGRATE-5F43B194E603",
+      "FAST006-INTEGRATE-8EF70D8EE846",
+      "FAST006-INTEGRATE-F6A23E1B4B70",
+      "FAST006-REUSE-246563BF61C5",
+      "FAST006-REUSE-5905EF030349",
+      "FAST006-REUSE-656E61A45A09",
+      "FAST006-REUSE-7AF5DCE817E8",
+      "FAST006-REUSE-D1F838530C1D",
+      "FAST006-REUSE-E49393996B67"
+    ],
+    "edges": [
+      {
+        "from": "FAST006-CREATE-35B332F9FC3A",
+        "to": "FAST006-CREATE-0DACBECAAE9B",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-35B332F9FC3A",
+        "to": "FAST006-CREATE-133A44CE6369",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-6AF68DCB8FA5",
+        "to": "FAST006-CREATE-186C80CF5CB4",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-393A6D2A3E6E",
+        "to": "FAST006-CREATE-252BDE9FB7B3",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-393A6D2A3E6E",
+        "to": "FAST006-CREATE-34EC5D6D74A3",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-540020A1AF76",
+        "to": "FAST006-CREATE-4BC6D7B48DCE",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-6AF68DCB8FA5",
+        "to": "FAST006-CREATE-4E0B645415DF",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-35B332F9FC3A",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-393A6D2A3E6E",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-6AF68DCB8FA5",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-246563BF61C5",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-656E61A45A09",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-CREATE-540020A1AF76",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-CREATE-77E72F8F8D7E",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-CREATE-7DFB9204708C",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-CREATE-93165CB2ED49",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-35B332F9FC3A",
+        "to": "FAST006-CREATE-C96BE1801F23",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-CREATE-CC450B7B81F6",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-6AF68DCB8FA5",
+        "to": "FAST006-CREATE-CD3D9EE318BF",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-21481A3AE99D",
+        "to": "FAST006-DEFER-061D31B1EC81",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-061D31B1EC81",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-246563BF61C5",
+        "to": "FAST006-DEFER-09F08488D319",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-DEFER-15E1F6697F87",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-35B332F9FC3A",
+        "to": "FAST006-DEFER-221138036593",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-221138036593",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-DEFER-29CDDCBFD909",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-2B24CB42F48D",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-656E61A45A09",
+        "to": "FAST006-DEFER-2E7A4FC9CC5F",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-2EB8698397AA",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-656E61A45A09",
+        "to": "FAST006-DEFER-3017D88DC1D9",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-246563BF61C5",
+        "to": "FAST006-DEFER-3F0C9BCB0B19",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-DEFER-471193038AE8",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-DEFER-4924DF1837CC",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-393A6D2A3E6E",
+        "to": "FAST006-DEFER-5BB4FA66E2ED",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-5BB4FA66E2ED",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-DEFER-5FDC4A5255A7",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-DEFER-70B8205013DF",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-CREATE-6AF68DCB8FA5",
+        "to": "FAST006-DEFER-728D34C5A416",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-728D34C5A416",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-9559885B4B28",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-DEFER-9EBD4AB1D5C2",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-C2A19AD2480F",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-C9CDA3E94ED6",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-656E61A45A09",
+        "to": "FAST006-DEFER-CEDD82FE932A",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-246563BF61C5",
+        "to": "FAST006-DEFER-D27F089A3107",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-D27F089A3107",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-DEFER-E5D9C20C6AB1",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-656E61A45A09",
+        "to": "FAST006-DEFER-E5D9C20C6AB1",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-5905EF030349",
+        "to": "FAST006-DEFER-E8CE352D114A",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-D1F838530C1D",
+        "to": "FAST006-DEFER-E8CE352D114A",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-246563BF61C5",
+        "to": "FAST006-DEFER-F841A8EED763",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-REUSE-246563BF61C5",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-REUSE-5905EF030349",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-REUSE-656E61A45A09",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-E49393996B67",
+        "to": "FAST006-REUSE-D1F838530C1D",
+        "reason": "Prerequisite component or module"
+      },
+      {
+        "from": "FAST006-REUSE-7AF5DCE817E8",
+        "to": "FAST006-REUSE-E49393996B67",
+        "reason": "Prerequisite component or module"
+      }
+    ],
+    "orderedTaskIds": [
+      "FAST006-CREATE-21481A3AE99D",
+      "FAST006-CREATE-35B332F9FC3A",
+      "FAST006-CREATE-393A6D2A3E6E",
+      "FAST006-CREATE-6AF68DCB8FA5",
+      "FAST006-CREATE-A2266657875F",
+      "FAST006-INTEGRATE-2C9ED312A453",
+      "FAST006-INTEGRATE-3F0EB79F02A0",
+      "FAST006-INTEGRATE-44A0707EC4D1",
+      "FAST006-INTEGRATE-5235A9977FF5",
+      "FAST006-INTEGRATE-5F43B194E603",
+      "FAST006-INTEGRATE-8EF70D8EE846",
+      "FAST006-INTEGRATE-F6A23E1B4B70",
+      "FAST006-REUSE-7AF5DCE817E8",
+      "FAST006-CREATE-0DACBECAAE9B",
+      "FAST006-CREATE-133A44CE6369",
+      "FAST006-CREATE-186C80CF5CB4",
+      "FAST006-CREATE-252BDE9FB7B3",
+      "FAST006-CREATE-34EC5D6D74A3",
+      "FAST006-CREATE-4E0B645415DF",
+      "FAST006-CREATE-77E72F8F8D7E",
+      "FAST006-CREATE-7DFB9204708C",
+      "FAST006-CREATE-93165CB2ED49",
+      "FAST006-CREATE-C96BE1801F23",
+      "FAST006-CREATE-CC450B7B81F6",
+      "FAST006-CREATE-CD3D9EE318BF",
+      "FAST006-REUSE-E49393996B67",
+      "FAST006-DEFER-15E1F6697F87",
+      "FAST006-DEFER-471193038AE8",
+      "FAST006-DEFER-70B8205013DF",
+      "FAST006-DEFER-9EBD4AB1D5C2",
+      "FAST006-REUSE-246563BF61C5",
+      "FAST006-REUSE-5905EF030349",
+      "FAST006-REUSE-656E61A45A09",
+      "FAST006-REUSE-D1F838530C1D",
+      "FAST006-CREATE-540020A1AF76",
+      "FAST006-DEFER-061D31B1EC81",
+      "FAST006-DEFER-09F08488D319",
+      "FAST006-DEFER-221138036593",
+      "FAST006-DEFER-29CDDCBFD909",
+      "FAST006-DEFER-2B24CB42F48D",
+      "FAST006-DEFER-2E7A4FC9CC5F",
+      "FAST006-DEFER-2EB8698397AA",
+      "FAST006-DEFER-3017D88DC1D9",
+      "FAST006-DEFER-3F0C9BCB0B19",
+      "FAST006-DEFER-4924DF1837CC",
+      "FAST006-DEFER-5BB4FA66E2ED",
+      "FAST006-DEFER-5FDC4A5255A7",
+      "FAST006-DEFER-728D34C5A416",
+      "FAST006-DEFER-9559885B4B28",
+      "FAST006-DEFER-C2A19AD2480F",
+      "FAST006-DEFER-C9CDA3E94ED6",
+      "FAST006-DEFER-CEDD82FE932A",
+      "FAST006-DEFER-D27F089A3107",
+      "FAST006-DEFER-E5D9C20C6AB1",
+      "FAST006-DEFER-E8CE352D114A",
+      "FAST006-DEFER-F841A8EED763",
+      "FAST006-CREATE-4BC6D7B48DCE"
+    ]
+  },
+  "blockedActions": [
+    "All FAST-dependent reuse and extension execution is blocked.",
+    "FAST006-DEFER-061D31B1EC81: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-09F08488D319: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-15E1F6697F87: Functional fit is partial and package presence does not prove that direct customization is supported.",
+    "FAST006-DEFER-221138036593: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-29CDDCBFD909: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-2B24CB42F48D: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+    "FAST006-DEFER-2E7A4FC9CC5F: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+    "FAST006-DEFER-2EB8698397AA: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-3017D88DC1D9: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-3F0C9BCB0B19: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+    "FAST006-DEFER-471193038AE8: Functional fit is partial and package presence does not prove that direct customization is supported.",
+    "FAST006-DEFER-4924DF1837CC: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+    "FAST006-DEFER-5BB4FA66E2ED: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-5FDC4A5255A7: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+    "FAST006-DEFER-70B8205013DF: Functional fit is partial and package presence does not prove that direct customization is supported.",
+    "FAST006-DEFER-728D34C5A416: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-9559885B4B28: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-9EBD4AB1D5C2: Functional fit is partial and package presence does not prove that direct customization is supported.",
+    "FAST006-DEFER-C2A19AD2480F: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+    "FAST006-DEFER-C9CDA3E94ED6: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+    "FAST006-DEFER-CEDD82FE932A: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+    "FAST006-DEFER-D27F089A3107: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-E5D9C20C6AB1: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-E8CE352D114A: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+    "FAST006-DEFER-F841A8EED763: Package metadata does not prove that a solution-owned view can safely extend this managed table."
+  ],
+  "remediationChecklist": [
+    "Environment evidence is absent or stale.",
+    "Environment readiness is 'action-required'.",
+    "Run a separately authorized fresh read-only environment preflight after required managed solutions and dependencies are available.",
+    "Verify required customization permissions without modifying managed-layer definitions."
+  ],
+  "authorizationRequirements": [
+    "FAST-006 produces dry-run plans only; a later phase must explicitly authorize build-stage integration.",
+    "Revalidate the approved decision and all input fingerprints immediately before any future execution."
+  ],
+  "rollbackRecovery": [
+    "Disable accelerator build planning without changing the approved architecture artifacts.",
+    "Restore a prior scenario-local build-plan directory; build plans are content-addressed and contain no environment mutation.",
+    "Roll back code through the FAST feature branch or the pre-FAST recovery references.",
+    "Dataverse recovery is not required because FAST-006 performs no Dataverse operation."
+  ],
+  "traceability": [
+    {
+      "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+      "taskIds": [
+        "FAST006-DEFER-9EBD4AB1D5C2",
+        "FAST006-INTEGRATE-44A0707EC4D1",
+        "FAST006-REUSE-5905EF030349",
+        "FAST006-REUSE-656E61A45A09"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+      "taskIds": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-INTEGRATE-5F43B194E603"
+      ],
+      "acceptanceCriteria": [
+        "an externally sourced fraud score and audit reference",
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "taskIds": [
+        "FAST006-DEFER-15E1F6697F87",
+        "FAST006-INTEGRATE-F6A23E1B4B70",
+        "FAST006-REUSE-246563BF61C5"
+      ],
+      "acceptanceCriteria": [
+        "interview history"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+      "taskIds": [
+        "FAST006-DEFER-70B8205013DF",
+        "FAST006-INTEGRATE-5235A9977FF5",
+        "FAST006-REUSE-246563BF61C5",
+        "FAST006-REUSE-D1F838530C1D"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+      "taskIds": [
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-DEFER-471193038AE8",
+        "FAST006-INTEGRATE-3F0EB79F02A0"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "taskIds": [
+        "FAST006-CREATE-4BC6D7B48DCE",
+        "FAST006-INTEGRATE-8EF70D8EE846"
+      ],
+      "acceptanceCriteria": [
+        "accurate reporting"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    },
+    {
+      "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+      "taskIds": [
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-CREATE-A2266657875F",
+        "FAST006-INTEGRATE-2C9ED312A453"
+      ],
+      "acceptanceCriteria": [
+        "supervisor approval"
+      ],
+      "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124"
+    }
+  ]
+}

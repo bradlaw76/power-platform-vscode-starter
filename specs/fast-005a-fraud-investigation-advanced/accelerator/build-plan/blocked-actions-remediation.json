@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "blocked-actions-remediation",
+  "planId": "sha256:e990d8f99471175e394c3d621746b39a9304a5e11a8e2cff50df2a08c53a74a7",
+  "scenarioSlug": "fast-005a-fraud-investigation-advanced",
+  "decisionId": "sha256:b2168d8eb950d6da6bd9c4dbcfadcd67219f23e72c4cd12c72e4192c1a5df124",
+  "architecture": "hybrid",
+  "dryRun": true,
+  "items": [
+    {
+      "blockedActions": [
+        "All FAST-dependent reuse and extension execution is blocked.",
+        "FAST006-DEFER-061D31B1EC81: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-09F08488D319: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-15E1F6697F87: Functional fit is partial and package presence does not prove that direct customization is supported.",
+        "FAST006-DEFER-221138036593: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-29CDDCBFD909: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-2B24CB42F48D: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+        "FAST006-DEFER-2E7A4FC9CC5F: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+        "FAST006-DEFER-2EB8698397AA: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-3017D88DC1D9: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-3F0C9BCB0B19: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+        "FAST006-DEFER-471193038AE8: Functional fit is partial and package presence does not prove that direct customization is supported.",
+        "FAST006-DEFER-4924DF1837CC: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+        "FAST006-DEFER-5BB4FA66E2ED: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-5FDC4A5255A7: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+        "FAST006-DEFER-70B8205013DF: Functional fit is partial and package presence does not prove that direct customization is supported.",
+        "FAST006-DEFER-728D34C5A416: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-9559885B4B28: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-9EBD4AB1D5C2: Functional fit is partial and package presence does not prove that direct customization is supported.",
+        "FAST006-DEFER-C2A19AD2480F: Package metadata does not prove that a solution-owned form can safely extend this managed table.",
+        "FAST006-DEFER-C9CDA3E94ED6: The target table is accelerator-managed and package metadata does not prove supported customization; direct modification is deferred.",
+        "FAST006-DEFER-CEDD82FE932A: Package metadata does not prove that a solution-owned view can safely extend this managed table.",
+        "FAST006-DEFER-D27F089A3107: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-E5D9C20C6AB1: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-E8CE352D114A: At least one endpoint is accelerator-managed; relationship creation is deferred until customization support is environment-verified.",
+        "FAST006-DEFER-F841A8EED763: Package metadata does not prove that a solution-owned view can safely extend this managed table."
+      ],
+      "remediationChecklist": [
+        "Environment evidence is absent or stale.",
+        "Environment readiness is 'action-required'.",
+        "Run a separately authorized fresh read-only environment preflight after required managed solutions and dependencies are available.",
+        "Verify required customization permissions without modifying managed-layer definitions."
+      ]
+    }
+  ]
+}

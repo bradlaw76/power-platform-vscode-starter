@@ -1,0 +1,91 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "requirement-build-traceability",
+  "planId": "sha256:d996144108d960abf0e17c751c2d9dfdd40f5ded3a0b42a682266579443f5693",
+  "scenarioSlug": "fast-006-fraud-investigation-fully-custom",
+  "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de",
+  "architecture": "fully-custom",
+  "dryRun": true,
+  "items": [
+    {
+      "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+      "taskIds": [
+        "FAST006-CREATE-2690B88AD514",
+        "FAST006-CREATE-A6C52873C368",
+        "FAST006-INTEGRATE-DFE3348456DB"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+      "taskIds": [
+        "FAST006-CREATE-21481A3AE99D",
+        "FAST006-INTEGRATE-F01B51D1E800"
+      ],
+      "acceptanceCriteria": [
+        "an externally sourced fraud score and audit reference",
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-INTERVIEW-001",
+      "taskIds": [
+        "FAST006-CREATE-9A10FE78E32C",
+        "FAST006-INTEGRATE-38936F97E705"
+      ],
+      "acceptanceCriteria": [
+        "interview history"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+      "taskIds": [
+        "FAST006-CREATE-A13739EFDFBB",
+        "FAST006-INTEGRATE-24E6285F2958"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+      "taskIds": [
+        "FAST006-CREATE-393A6D2A3E6E",
+        "FAST006-INTEGRATE-760C09DFE28D"
+      ],
+      "acceptanceCriteria": [
+        "An investigator completes a synthetic fraud case with traceable custody"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+      "taskIds": [
+        "FAST006-CREATE-155F8374E67C",
+        "FAST006-INTEGRATE-46EDF02161EE"
+      ],
+      "acceptanceCriteria": [
+        "accurate reporting"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    },
+    {
+      "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+      "taskIds": [
+        "FAST006-CREATE-6AF68DCB8FA5",
+        "FAST006-CREATE-DFEE1A1AEC87",
+        "FAST006-INTEGRATE-07967C8CFD55"
+      ],
+      "acceptanceCriteria": [
+        "supervisor approval"
+      ],
+      "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de"
+    }
+  ]
+}

@@ -99,7 +99,11 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   selection screen or mandatory FAST business question. Demo Builder uses its existing
   consolidated approval; Advanced Builder and Framework Acceptance expose
   coverage, evidence, schema deltas, dependencies, risks, and readiness. Fully
-  Custom always remains selectable. Persist the approved decision under
+  Custom remains independent. After approval, the separate FAST-006 planner may
+  emit a provider-neutral dry-run plan with REUSE, EXTEND, CREATE, INTEGRATE,
+  and DEFER dispositions. It must read the approved artifact, preserve managed
+  ownership, and remain disconnected from Dataverse and build stages.
+  Fully Custom always remains selectable. Persist the approved decision under
   `specs/<slug>/accelerator/`; never invoke Dataverse generation or import from
   this planning integration.
 - Architecture intent captured directly or confirmed from Demo Builder recommendations includes:

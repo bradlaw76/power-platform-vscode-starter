@@ -1,0 +1,15 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "blocked-actions-remediation",
+  "planId": "sha256:d996144108d960abf0e17c751c2d9dfdd40f5ded3a0b42a682266579443f5693",
+  "scenarioSlug": "fast-006-fraud-investigation-fully-custom",
+  "decisionId": "sha256:bd498fe625b6cfa9ad5f8b0e88dfdf0a8f9a7e84d248efee2282af19532f67de",
+  "architecture": "fully-custom",
+  "dryRun": true,
+  "items": [
+    {
+      "blockedActions": [],
+      "remediationChecklist": []
+    }
+  ]
+}

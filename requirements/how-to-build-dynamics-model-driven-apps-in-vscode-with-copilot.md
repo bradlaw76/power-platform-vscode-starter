@@ -875,3 +875,11 @@ Verify checks exported metadata for
 `Microsoft.PowerApps.PowerAppsOneGrid` and declared properties. It never
 mutates internal metadata or import XML. Subgrid support is deferred. See
 [Microsoft Learn](https://learn.microsoft.com/power-apps/maker/model-driven-apps/the-power-apps-grid-control).
+
+### Approved accelerator build planning
+
+An explicitly approved FAST-based, Hybrid, or Fully Custom decision can be
+translated by the default-off FAST-006 standalone planner. Treat its output as
+a reviewable dry run only: it cannot authorize execution or connect to
+Dataverse/build stages. Preserve managed ownership and keep Fully Custom free
+of accelerator dependencies.

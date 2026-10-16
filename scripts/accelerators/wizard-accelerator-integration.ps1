@@ -153,15 +153,22 @@ function Get-WizardRequirementStableId {
     $canonical = @{
         assigned = 'assignment'; assigns = 'assignment'; assign = 'assignment'
         approvals = 'approval'; approved = 'approval'
-        investigations = 'investigation'; investigators = 'investigator'
-        interviews = 'interview'; reports = 'reporting'; report = 'reporting'
+        reports = 'reporting'; report = 'reporting'
         scored = 'scoring'; scores = 'scoring'; score = 'scoring'
     }
     $tokens = @(
         [regex]::Matches($Description.ToLowerInvariant(), '[a-z0-9]+') |
             ForEach-Object {
                 $token = $_.Value
-                if ($canonical.ContainsKey($token)) { $canonical[$token] } else { $token }
+                if ($canonical.ContainsKey($token)) {
+                    $canonical[$token]
+                } elseif ($token.EndsWith('ies') -and $token.Length -gt 4) {
+                    "$($token.Substring(0, $token.Length - 3))y"
+                } elseif ($token.EndsWith('s') -and -not $token.EndsWith('ss') -and $token.Length -gt 3) {
+                    $token.Substring(0, $token.Length - 1)
+                } else {
+                    $token
+                }
             } |
             Where-Object { $_.Length -ge 3 -and $ignored -notcontains $_ } |
             Select-Object -Unique -First 4

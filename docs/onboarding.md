@@ -361,6 +361,15 @@ requires an explicit profile/contract change; FAST-005B does not activate it
 globally. Fully Custom preference bypasses matching. Prefer FAST reuse still
 shows Hybrid and Fully Custom and does not weaken evidence or readiness gates.
 
+FAST-006 adds a separate, default-off dry-run planner after explicit
+architecture approval. Run
+`scripts/accelerators/invoke-accelerator-build-plan.ps1` only with
+`-EnableDryRunBuildPlanning`; the command reads the approved scenario artifact
+and cannot override architecture from the command line. Accelerator-dependent
+plans remain blocked unless fresh environment, package, snapshot, and
+dependency evidence matches. Fully Custom remains independent. These plans are
+not connected to the authoritative bootstrap sequence or Dataverse execution.
+
 Supported application profiles:
 
 - `standalone-model-driven`

@@ -85,6 +85,10 @@ foreach ($file in $jsonFiles) {
         Join-Path $acceleratorSchemaRoot 'package-metadata.schema.json'
     } elseif ($relativePath -ceq 'specs\fast-solution-accelerator-discovery\evidence\pkg\package-input-manifest.json') {
         Join-Path $acceleratorSchemaRoot 'package-input-manifest.schema.json'
+    } elseif ($relativePath -match '^specs[\\/][^\\/]+[\\/]accelerator[\\/]build-plan[\\/]build-plan-manifest\.json$') {
+        Join-Path $acceleratorSchemaRoot 'build-plan.schema.json'
+    } elseif ($relativePath -match '^specs[\\/][^\\/]+[\\/]accelerator[\\/]build-plan[\\/](?!build-plan-manifest\.json$).+\.json$') {
+        Join-Path $acceleratorSchemaRoot 'build-plan-projection.schema.json'
     } else {
         $null
     }

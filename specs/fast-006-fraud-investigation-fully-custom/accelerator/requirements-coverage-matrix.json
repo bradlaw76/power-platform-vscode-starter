@@ -1,0 +1,1405 @@
+[
+  {
+    "requirementId": "REQ-EVIDENCE-CUSTODY-001",
+    "description": "evidence custody",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "candidateVersion": "1.2.1.0",
+    "candidates": [
+      {
+        "moduleId": "microsoft-fast:module:investigations",
+        "moduleName": "Investigations",
+        "documentedVersion": "v1.2.1.0",
+        "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+        "packageVersion": "1.2.1.0",
+        "fitBand": "partial-verified-foundation",
+        "matchedDocumentedTerms": [
+          "custody",
+          "evidence",
+          "investigator"
+        ],
+        "capabilityCoverage": [],
+        "componentEvidence": [
+          {
+            "kind": "application",
+            "identity": "appbase_Investigations",
+            "name": "appbase_Investigations model-driven-app",
+            "matchedTerms": [
+              "investigator"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_accessdatetime",
+            "name": "Evidence Access Log appbase_accessdatetime",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_accessedby",
+            "name": "Evidence Access Log appbase_accessedby",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_accesspurpose",
+            "name": "Evidence Access Log appbase_accesspurpose",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_accesstype",
+            "name": "Evidence Access Log appbase_accesstype",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_documentdownloaded",
+            "name": "Evidence Access Log appbase_documentdownloaded",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_downloadcount",
+            "name": "Evidence Access Log appbase_downloadcount",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+            "name": "Evidence Access Log appbase_evidenceaccesslogid",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_evidenceitem",
+            "name": "Evidence Access Log appbase_evidenceitem",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_ipaddress",
+            "name": "Evidence Access Log appbase_ipaddress",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_name",
+            "name": "Evidence Access Log appbase_name",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_notes",
+            "name": "Evidence Access Log appbase_notes",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.appbase_systemuser",
+            "name": "Evidence Access Log appbase_systemuser",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.createdby",
+            "name": "Evidence Access Log createdby",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.createdon",
+            "name": "Evidence Access Log createdon",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.createdonbehalfby",
+            "name": "Evidence Access Log createdonbehalfby",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.importsequencenumber",
+            "name": "Evidence Access Log importsequencenumber",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.modifiedby",
+            "name": "Evidence Access Log modifiedby",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.modifiedon",
+            "name": "Evidence Access Log modifiedon",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidenceaccesslog.modifiedonbehalfby",
+            "name": "Evidence Access Log modifiedonbehalfby",
+            "matchedTerms": [
+              "evidence"
+            ],
+            "evidenceLevel": "package-verified"
+          }
+        ],
+        "unsupportedCapabilities": [],
+        "evidenceLevel": "package-verified",
+        "sourceReferences": [
+          {
+            "itemId": "microsoft-fast:module:investigations",
+            "sourceUrl": "https://microsoft.github.io/industry-solutions/modules/investigations/",
+            "contentHash": "",
+            "claim": "Manage formal investigations from intake through resolution with evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+            "evidenceLevel": "conceptual"
+          }
+        ],
+        "availability": {
+          "documented": true,
+          "sourceAvailable": true,
+          "packageVerified": true,
+          "environmentVerified": false
+        }
+      }
+    ],
+    "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+    "evidenceLevel": "package-verified",
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidenceaccesslog.appbase_accessdatetime",
+        "Reuse appbase_evidenceaccesslog.appbase_accessedby",
+        "Reuse appbase_evidenceaccesslog.appbase_accesspurpose",
+        "Reuse appbase_evidenceaccesslog.appbase_accesstype",
+        "Reuse appbase_evidenceaccesslog.appbase_documentdownloaded",
+        "Reuse appbase_evidenceaccesslog.appbase_downloadcount",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceaccesslogid",
+        "Reuse appbase_evidenceaccesslog.appbase_evidenceitem",
+        "Reuse appbase_evidenceaccesslog.appbase_ipaddress",
+        "Reuse appbase_evidenceaccesslog.appbase_name",
+        "Reuse appbase_evidenceaccesslog.appbase_notes",
+        "Reuse appbase_evidenceaccesslog.appbase_systemuser",
+        "Reuse appbase_evidenceaccesslog.createdby",
+        "Reuse appbase_evidenceaccesslog.createdon",
+        "Reuse appbase_evidenceaccesslog.createdonbehalfby",
+        "Reuse appbase_evidenceaccesslog.importsequencenumber",
+        "Reuse appbase_evidenceaccesslog.modifiedby",
+        "Reuse appbase_evidenceaccesslog.modifiedon",
+        "Reuse appbase_evidenceaccesslog.modifiedonbehalfby"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [
+      {
+        "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "versionConstraints": [
+          "1.2.0.2"
+        ],
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "componentDependencyCount": 27,
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-EVIDENCE",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-DESIGN",
+      "FAST004-REQ-EVIDENCE-CUSTODY-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001",
+    "description": "external fraud-scoring integration",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "candidateVersion": "",
+    "candidates": [],
+    "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+    "evidenceLevel": "unverified",
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Fraud Score'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "an externally sourced fraud score and audit reference",
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-EVIDENCE",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-DESIGN",
+      "FAST004-REQ-EXTERNAL-FRAUD-SCORING-INTEGRATION-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INTERVIEW-001",
+    "description": "interviews",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "candidateVersion": "1.2.1.0",
+    "candidates": [
+      {
+        "moduleId": "microsoft-fast:module:investigations",
+        "moduleName": "Investigations",
+        "documentedVersion": "v1.2.1.0",
+        "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+        "packageVersion": "1.2.1.0",
+        "fitBand": "partial-verified-foundation",
+        "matchedDocumentedTerms": [
+          "interview",
+          "interviews"
+        ],
+        "capabilityCoverage": [],
+        "componentEvidence": [
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_actualdatetime",
+            "name": "Investigation Interview appbase_actualdatetime",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_attendancestatus",
+            "name": "Investigation Interview appbase_attendancestatus",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_cooperationstatus",
+            "name": "Investigation Interview appbase_cooperationstatus",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_durationminutes",
+            "name": "Investigation Interview appbase_durationminutes",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_followupnotes",
+            "name": "Investigation Interview appbase_followupnotes",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_followuprequired",
+            "name": "Investigation Interview appbase_followuprequired",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_interviewlocation",
+            "name": "Investigation Interview appbase_interviewlocation",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_interviewnumber",
+            "name": "Investigation Interview appbase_interviewnumber",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_interviewsubject",
+            "name": "Investigation Interview appbase_interviewsubject",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_interviewsummary",
+            "name": "Investigation Interview appbase_interviewsummary",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_interviewtype",
+            "name": "Investigation Interview appbase_interviewtype",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_investigation",
+            "name": "Investigation Interview appbase_investigation",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_investigationinterviewid",
+            "name": "Investigation Interview appbase_investigationinterviewid",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_keystatements",
+            "name": "Investigation Interview appbase_keystatements",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_name",
+            "name": "Investigation Interview appbase_name",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_notes",
+            "name": "Investigation Interview appbase_notes",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_primaryinterviewer",
+            "name": "Investigation Interview appbase_primaryinterviewer",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_recordingauthorized",
+            "name": "Investigation Interview appbase_recordingauthorized",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_recordinglocation",
+            "name": "Investigation Interview appbase_recordinglocation",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_investigationinterview.appbase_scheduleddatetime",
+            "name": "Investigation Interview appbase_scheduleddatetime",
+            "matchedTerms": [
+              "interview",
+              "interviews"
+            ],
+            "evidenceLevel": "package-verified"
+          }
+        ],
+        "unsupportedCapabilities": [],
+        "evidenceLevel": "package-verified",
+        "sourceReferences": [
+          {
+            "itemId": "microsoft-fast:module:investigations",
+            "sourceUrl": "https://microsoft.github.io/industry-solutions/modules/investigations/",
+            "contentHash": "",
+            "claim": "Manage formal investigations from intake through resolution with evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+            "evidenceLevel": "conceptual"
+          }
+        ],
+        "availability": {
+          "documented": true,
+          "sourceAvailable": true,
+          "packageVerified": true,
+          "environmentVerified": false
+        }
+      }
+    ],
+    "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+    "evidenceLevel": "package-verified",
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_investigationinterview.appbase_actualdatetime",
+        "Reuse appbase_investigationinterview.appbase_attendancestatus",
+        "Reuse appbase_investigationinterview.appbase_cooperationstatus",
+        "Reuse appbase_investigationinterview.appbase_durationminutes",
+        "Reuse appbase_investigationinterview.appbase_followupnotes",
+        "Reuse appbase_investigationinterview.appbase_followuprequired",
+        "Reuse appbase_investigationinterview.appbase_interviewlocation",
+        "Reuse appbase_investigationinterview.appbase_interviewnumber",
+        "Reuse appbase_investigationinterview.appbase_interviewsubject",
+        "Reuse appbase_investigationinterview.appbase_interviewsummary",
+        "Reuse appbase_investigationinterview.appbase_interviewtype",
+        "Reuse appbase_investigationinterview.appbase_investigation",
+        "Reuse appbase_investigationinterview.appbase_investigationinterviewid",
+        "Reuse appbase_investigationinterview.appbase_keystatements",
+        "Reuse appbase_investigationinterview.appbase_name",
+        "Reuse appbase_investigationinterview.appbase_notes",
+        "Reuse appbase_investigationinterview.appbase_primaryinterviewer",
+        "Reuse appbase_investigationinterview.appbase_recordingauthorized",
+        "Reuse appbase_investigationinterview.appbase_recordinglocation",
+        "Reuse appbase_investigationinterview.appbase_scheduleddatetime"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [
+      {
+        "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "versionConstraints": [
+          "1.2.0.2"
+        ],
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "componentDependencyCount": 27,
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "interview history"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INTERVIEW-001-EVIDENCE",
+      "FAST004-REQ-INTERVIEW-001-DESIGN",
+      "FAST004-REQ-INTERVIEW-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATION-INTAKE-001",
+    "description": "Manage investigation intake",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "candidateVersion": "1.2.1.0",
+    "candidates": [
+      {
+        "moduleId": "microsoft-fast:module:investigations",
+        "moduleName": "Investigations",
+        "documentedVersion": "v1.2.1.0",
+        "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+        "packageVersion": "1.2.1.0",
+        "fitBand": "partial-verified-foundation",
+        "matchedDocumentedTerms": [
+          "custody",
+          "intake",
+          "investigation",
+          "investigator"
+        ],
+        "capabilityCoverage": [],
+        "componentEvidence": [
+          {
+            "kind": "application",
+            "identity": "appbase_Investigations",
+            "name": "appbase_Investigations model-driven-app",
+            "matchedTerms": [
+              "investigation",
+              "investigator"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_conditionafter",
+            "name": "Evidence Custody Record appbase_conditionafter",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_conditionbefore",
+            "name": "Evidence Custody Record appbase_conditionbefore",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_custodyeventtype",
+            "name": "Evidence Custody Record appbase_custodyeventtype",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_eventdatetime",
+            "name": "Evidence Custody Record appbase_eventdatetime",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_evidencecustodyrecordid",
+            "name": "Evidence Custody Record appbase_evidencecustodyrecordid",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_evidenceitem",
+            "name": "Evidence Custody Record appbase_evidenceitem",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_fromcustodian",
+            "name": "Evidence Custody Record appbase_fromcustodian",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_fromlocation",
+            "name": "Evidence Custody Record appbase_fromlocation",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_name",
+            "name": "Evidence Custody Record appbase_name",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_notes",
+            "name": "Evidence Custody Record appbase_notes",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_purpose",
+            "name": "Evidence Custody Record appbase_purpose",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_recordedby",
+            "name": "Evidence Custody Record appbase_recordedby",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_sealintact",
+            "name": "Evidence Custody Record appbase_sealintact",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_sealnumber",
+            "name": "Evidence Custody Record appbase_sealnumber",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_tocustodian",
+            "name": "Evidence Custody Record appbase_tocustodian",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_tolocation",
+            "name": "Evidence Custody Record appbase_tolocation",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_witness",
+            "name": "Evidence Custody Record appbase_witness",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.createdby",
+            "name": "Evidence Custody Record createdby",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.createdon",
+            "name": "Evidence Custody Record createdon",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          }
+        ],
+        "unsupportedCapabilities": [],
+        "evidenceLevel": "package-verified",
+        "sourceReferences": [
+          {
+            "itemId": "microsoft-fast:module:investigations",
+            "sourceUrl": "https://microsoft.github.io/industry-solutions/modules/investigations/",
+            "contentHash": "",
+            "claim": "Manage formal investigations from intake through resolution with evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+            "evidenceLevel": "conceptual"
+          }
+        ],
+        "availability": {
+          "documented": true,
+          "sourceAvailable": true,
+          "packageVerified": true,
+          "environmentVerified": false
+        }
+      }
+    ],
+    "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+    "evidenceLevel": "package-verified",
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidencecustodyrecord.appbase_conditionafter",
+        "Reuse appbase_evidencecustodyrecord.appbase_conditionbefore",
+        "Reuse appbase_evidencecustodyrecord.appbase_custodyeventtype",
+        "Reuse appbase_evidencecustodyrecord.appbase_eventdatetime",
+        "Reuse appbase_evidencecustodyrecord.appbase_evidencecustodyrecordid",
+        "Reuse appbase_evidencecustodyrecord.appbase_evidenceitem",
+        "Reuse appbase_evidencecustodyrecord.appbase_fromcustodian",
+        "Reuse appbase_evidencecustodyrecord.appbase_fromlocation",
+        "Reuse appbase_evidencecustodyrecord.appbase_name",
+        "Reuse appbase_evidencecustodyrecord.appbase_notes",
+        "Reuse appbase_evidencecustodyrecord.appbase_purpose",
+        "Reuse appbase_evidencecustodyrecord.appbase_recordedby",
+        "Reuse appbase_evidencecustodyrecord.appbase_sealintact",
+        "Reuse appbase_evidencecustodyrecord.appbase_sealnumber",
+        "Reuse appbase_evidencecustodyrecord.appbase_tocustodian",
+        "Reuse appbase_evidencecustodyrecord.appbase_tolocation",
+        "Reuse appbase_evidencecustodyrecord.appbase_witness",
+        "Reuse appbase_evidencecustodyrecord.createdby",
+        "Reuse appbase_evidencecustodyrecord.createdon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [
+      {
+        "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "versionConstraints": [
+          "1.2.0.2"
+        ],
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "componentDependencyCount": 27,
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-DESIGN",
+      "FAST004-REQ-INVESTIGATION-INTAKE-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-INVESTIGATOR-ASSIGNMENT-001",
+    "description": "investigator assignment",
+    "dispositions": [
+      "EXTEND",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "microsoft-fast:module:investigations",
+    "candidateVersion": "1.2.1.0",
+    "candidates": [
+      {
+        "moduleId": "microsoft-fast:module:investigations",
+        "moduleName": "Investigations",
+        "documentedVersion": "v1.2.1.0",
+        "packageId": "microsoft-fast:package:investigations:1.2.1.0:managed:131be1ade134e838e3d824777b6655331a7149eaf80ae14bc26583a4f1bb8391",
+        "packageVersion": "1.2.1.0",
+        "fitBand": "partial-verified-foundation",
+        "matchedDocumentedTerms": [
+          "custody",
+          "investigator"
+        ],
+        "capabilityCoverage": [],
+        "componentEvidence": [
+          {
+            "kind": "application",
+            "identity": "appbase_Investigations",
+            "name": "appbase_Investigations model-driven-app",
+            "matchedTerms": [
+              "investigator"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_conditionafter",
+            "name": "Evidence Custody Record appbase_conditionafter",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_conditionbefore",
+            "name": "Evidence Custody Record appbase_conditionbefore",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_custodyeventtype",
+            "name": "Evidence Custody Record appbase_custodyeventtype",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_eventdatetime",
+            "name": "Evidence Custody Record appbase_eventdatetime",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_evidencecustodyrecordid",
+            "name": "Evidence Custody Record appbase_evidencecustodyrecordid",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_evidenceitem",
+            "name": "Evidence Custody Record appbase_evidenceitem",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_fromcustodian",
+            "name": "Evidence Custody Record appbase_fromcustodian",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_fromlocation",
+            "name": "Evidence Custody Record appbase_fromlocation",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_name",
+            "name": "Evidence Custody Record appbase_name",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_notes",
+            "name": "Evidence Custody Record appbase_notes",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_purpose",
+            "name": "Evidence Custody Record appbase_purpose",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_recordedby",
+            "name": "Evidence Custody Record appbase_recordedby",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_sealintact",
+            "name": "Evidence Custody Record appbase_sealintact",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_sealnumber",
+            "name": "Evidence Custody Record appbase_sealnumber",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_tocustodian",
+            "name": "Evidence Custody Record appbase_tocustodian",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_tolocation",
+            "name": "Evidence Custody Record appbase_tolocation",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.appbase_witness",
+            "name": "Evidence Custody Record appbase_witness",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.createdby",
+            "name": "Evidence Custody Record createdby",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          },
+          {
+            "kind": "attribute",
+            "identity": "appbase_evidencecustodyrecord.createdon",
+            "name": "Evidence Custody Record createdon",
+            "matchedTerms": [
+              "custody"
+            ],
+            "evidenceLevel": "package-verified"
+          }
+        ],
+        "unsupportedCapabilities": [],
+        "evidenceLevel": "package-verified",
+        "sourceReferences": [
+          {
+            "itemId": "microsoft-fast:module:investigations",
+            "sourceUrl": "https://microsoft.github.io/industry-solutions/modules/investigations/",
+            "contentHash": "",
+            "claim": "Manage formal investigations from intake through resolution with evidence chain-of-custody, interview documentation, and corrective action monitoring.",
+            "evidenceLevel": "conceptual"
+          }
+        ],
+        "availability": {
+          "documented": true,
+          "sourceAvailable": true,
+          "packageVerified": true,
+          "environmentVerified": false
+        }
+      }
+    ],
+    "fitExplanation": "Candidate 'Investigations' is classified 'partial-verified-foundation' from documented claims plus independently reported package evidence.",
+    "evidenceLevel": "package-verified",
+    "gaps": [
+      "Package components provide a verified foundation, but documentation does not establish complete process coverage."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [],
+      "attributes": [
+        "Reuse appbase_evidencecustodyrecord.appbase_conditionafter",
+        "Reuse appbase_evidencecustodyrecord.appbase_conditionbefore",
+        "Reuse appbase_evidencecustodyrecord.appbase_custodyeventtype",
+        "Reuse appbase_evidencecustodyrecord.appbase_eventdatetime",
+        "Reuse appbase_evidencecustodyrecord.appbase_evidencecustodyrecordid",
+        "Reuse appbase_evidencecustodyrecord.appbase_evidenceitem",
+        "Reuse appbase_evidencecustodyrecord.appbase_fromcustodian",
+        "Reuse appbase_evidencecustodyrecord.appbase_fromlocation",
+        "Reuse appbase_evidencecustodyrecord.appbase_name",
+        "Reuse appbase_evidencecustodyrecord.appbase_notes",
+        "Reuse appbase_evidencecustodyrecord.appbase_purpose",
+        "Reuse appbase_evidencecustodyrecord.appbase_recordedby",
+        "Reuse appbase_evidencecustodyrecord.appbase_sealintact",
+        "Reuse appbase_evidencecustodyrecord.appbase_sealnumber",
+        "Reuse appbase_evidencecustodyrecord.appbase_tocustodian",
+        "Reuse appbase_evidencecustodyrecord.appbase_tolocation",
+        "Reuse appbase_evidencecustodyrecord.appbase_witness",
+        "Reuse appbase_evidencecustodyrecord.createdby",
+        "Reuse appbase_evidencecustodyrecord.createdon"
+      ],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": [
+        "Design extension for: Package components provide a verified foundation, but documentation does not establish complete process coverage."
+      ]
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [
+      {
+        "identity": "microsoft-fast:module:investigations|microsoft-fast:module:core",
+        "sourceModuleId": "microsoft-fast:module:investigations",
+        "targetModuleId": "microsoft-fast:module:core",
+        "targetSolution": "appbase_core",
+        "dependencyType": "required-module",
+        "versionConstraints": [
+          "1.2.0.2"
+        ],
+        "selectedTargetVersion": "1.2.1.0",
+        "versionStatus": "unverified",
+        "componentDependencyCount": 27,
+        "evidenceLevel": "package-verified"
+      }
+    ],
+    "effortAssumptions": [
+      "Moderate customization effort is assumed until every documented gap is designed.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "An investigator completes a synthetic fraud case with traceable custody"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-EVIDENCE",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-DESIGN",
+      "FAST004-REQ-INVESTIGATOR-ASSIGNMENT-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001",
+    "description": "operational and management reporting",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "candidateVersion": "",
+    "candidates": [],
+    "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+    "evidenceLevel": "unverified",
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Report'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "accurate reporting"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-EVIDENCE",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-DESIGN",
+      "FAST004-REQ-OPERATIONAL-AND-MANAGEMENT-REPORTING-001-ACCEPTANCE"
+    ]
+  },
+  {
+    "requirementId": "REQ-SUPERVISOR-APPROVAL-001",
+    "description": "supervisor approval",
+    "dispositions": [
+      "BUILD",
+      "INTEGRATE"
+    ],
+    "candidateModuleId": "",
+    "candidateVersion": "",
+    "candidates": [],
+    "fitExplanation": "No evidence-grounded accelerator candidate was found.",
+    "evidenceLevel": "unverified",
+    "gaps": [
+      "No documented accelerator capability has sufficient evidence for this requirement."
+    ],
+    "proposedSchemaChanges": {
+      "tables": [
+        "Design a new table for 'Supervisor Approval'; no logical name is inferred."
+      ],
+      "attributes": [],
+      "relationships": [],
+      "forms": [],
+      "views": [],
+      "workflows": []
+    },
+    "integrations": [
+      "active investigation and custody views",
+      "and management reports Investigator | triage intake and assign investigator | per intake | fiv_investigation/Active Investigations | owner and priority are recorded",
+      "and operational and management reporting Intake and assignment forms",
+      "evidence custody",
+      "external fraud-scoring integration",
+      "interview timeline",
+      "interviews",
+      "investigator assignment",
+      "Manage investigation intake",
+      "operational dashboard",
+      "supervisor approval",
+      "supervisor approval workflow"
+    ],
+    "dependencies": [],
+    "effortAssumptions": [
+      "Custom schema and experience design effort is required.",
+      "Connector, security, error handling, and external API lifecycle effort is required."
+    ],
+    "risks": [],
+    "unresolvedQuestions": [],
+    "acceptanceCriteria": [
+      "supervisor approval"
+    ],
+    "taskReferences": [
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-EVIDENCE",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-DESIGN",
+      "FAST004-REQ-SUPERVISOR-APPROVAL-001-ACCEPTANCE"
+    ]
+  }
+]
