@@ -1,0 +1,159 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "unauthorized-decision",
+  "status": "BLOCKED_DECISION_CHANGE",
+  "eligibleForHumanApproval": false,
+  "executionAuthorized": false,
+  "evaluatedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+  "decisionId": "sha256:d61beedceb5b6193fb61887fc1b479d23861188086dbd7c16d46dfee91f7db48",
+  "planId": "sha256:5a5b7f278bf7e208da444dea24c8ffc2b23dd17302275438d4e37d286eaaf0f3",
+  "planSha256": "1b4c95258e34e17973db7dc1539441d2165f32db0d5945095ae5edd963d0a03d",
+  "decisionSha256": "41d7fad23eb322650685a18a60f3b83ff401e31aef4d6fe9b1ebd591db426b40",
+  "evidenceSha256": "e4217caa79382197d0e168cd056b2daa5e27b57f9079b70de549ba62f4bdf2cc",
+  "scopeSha256": "80240b8b38bb0ae63232c0591d96b11474d681bb8a4ab29968cab45c0bb5a222",
+  "environment": {
+    "environmentId": "11111111-1111-4111-8111-111111111111",
+    "tenantId": "22222222-2222-4222-8222-222222222222",
+    "url": "https://synthetic.example.test"
+  },
+  "authorizedOperationCategories": [],
+  "findings": [
+    {
+      "status": "BLOCKED_DECISION_CHANGE",
+      "code": "DECISION_SCHEMA",
+      "taskId": "",
+      "message": "Architecture approval is missing or malformed.",
+      "remediation": "Obtain an explicit, schema-valid architecture approval."
+    }
+  ],
+  "blockedOperations": [
+    "FAST006-CREATE-24BAC22E1EDD",
+    "FAST006-CREATE-A867C7D48145",
+    "FAST006-CREATE-B9CD3CC28AAE",
+    "FAST006-CREATE-E6ED656839ED"
+  ],
+  "dependencyOrder": [],
+  "packageDependencyOrder": [],
+  "componentOwnership": [
+    {
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "componentKind": "form",
+      "componentIdentity": "tst_record:starter-form",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-24BAC22E1EDD",
+          "componentKind": "form",
+          "componentIdentity": "tst_record:starter-form",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-A867C7D48145",
+      "componentKind": "application",
+      "componentIdentity": "unauthorized-decision:model-driven-app",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-A867C7D48145",
+          "componentKind": "application",
+          "componentIdentity": "unauthorized-decision:model-driven-app",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "componentKind": "view",
+      "componentIdentity": "tst_record:starter-view",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+          "componentKind": "view",
+          "componentIdentity": "tst_record:starter-view",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "componentKind": "table",
+      "componentIdentity": "tst_record",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-E6ED656839ED",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    }
+  ],
+  "securityRequirements": [],
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-001",
+      "taskIds": [
+        "FAST006-CREATE-24BAC22E1EDD",
+        "FAST006-CREATE-A867C7D48145",
+        "FAST006-CREATE-B9CD3CC28AAE",
+        "FAST006-CREATE-E6ED656839ED"
+      ],
+      "acceptanceCriteria": [
+        "Users can complete the primary task."
+      ],
+      "decisionId": "sha256:d61beedceb5b6193fb61887fc1b479d23861188086dbd7c16d46dfee91f7db48"
+    }
+  ]
+}

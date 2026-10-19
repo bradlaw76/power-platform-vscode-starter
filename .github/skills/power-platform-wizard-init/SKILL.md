@@ -106,6 +106,32 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   Fully Custom always remains selectable. Persist the approved decision under
   `specs/<slug>/accelerator/`; never invoke Dataverse generation or import from
   this planning integration.
+- FAST-007 readiness is local-only and default-off in all modes. Explicitly use
+  `invoke-execution-readiness.ps1 -EnableExecutionReadiness` with
+  `-ScenarioSlug -EvidencePath -EnvironmentUrl -EnvironmentId -TenantId`;
+  optional `-WorkspaceRoot`, `-OutputFolder`, and `-EvaluationTimeUtc` control
+  workspace, output, and the deterministic clock. Validate approved
+  decision/build-plan
+  manifest, file SHA-256, canonical IDs, input fingerprints, and external
+  evidence schema. Match URL/environment ID/tenant ID exactly (URL normalized)
+  and enforce a hard 24-hour evidence lifetime maximum. `READY_FOR_APPROVAL`
+  is human review only and never authorizes execution; `executionAuthorized`
+  is always false. Blocking statuses are `BLOCKED_PREREQUISITES`,
+  `BLOCKED_EVIDENCE`, `BLOCKED_COMPATIBILITY`, `BLOCKED_SECURITY`, and
+  `BLOCKED_DECISION_CHANGE`. Scope SHA-256
+  binds decision/plan/evidence/inputs/target. No approval/authorization records
+  are generated or consumed; `build-authorization.schema.json` is future-only.
+  Orchestrator `-ExecutionReadinessOnly -ExecutionEvidencePath` also requires
+  `-ReadinessEnvironmentId -ReadinessTenantId`, with optional
+  `-ReadinessEvaluationTimeUtc`, and returns before helpers/stages/payload
+  requirements. Never combine preflight with Apply. Normal Apply rejects
+  approved `fast-based`/`hybrid` decisions regardless of readiness;
+  legacy/Fully Custom builds remain unchanged. No
+  Dataverse/PAC/network/authentication/install/import/build execution or live
+  platform-provenance verification occurs. See
+  `docs/fast-integration/execution-readiness.md`. FAST-008 trusted collection,
+  independent approver/signature verification, authorization
+  consumption/revalidation, and a separately approved executor remain proposed.
 - Architecture intent captured directly or confirmed from Demo Builder recommendations includes:
   - OOB extension only, custom tables only, or hybrid?
   - If OOB extension: update forms in place or clone new business forms?

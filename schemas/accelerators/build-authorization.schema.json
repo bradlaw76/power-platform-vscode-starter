@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Future Build Authorization Contract v1 (No Issuer or Executor)",
+  "description": "Structural contract only. Schema validity is neither trusted approval nor execution permission. No FAST-007 command issues or consumes authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "authorizationId", "decisionId", "decisionSha256", "planId", "planSha256", "scopeSha256", "environment", "operationCategories", "taskIds", "approver", "approvedAtUtc", "expiresAtUtc", "prerequisiteEvidence"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "authorizationId": {"type": "string", "format": "uuid"},
+    "decisionId": {"$ref": "#/$defs/identity"},
+    "decisionSha256": {"$ref": "#/$defs/hash"},
+    "planId": {"$ref": "#/$defs/identity"},
+    "planSha256": {"$ref": "#/$defs/hash"},
+    "scopeSha256": {"$ref": "#/$defs/hash"},
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["environmentId", "tenantId", "url"],
+      "properties": {
+        "environmentId": {"type": "string", "format": "uuid"},
+        "tenantId": {"type": "string", "format": "uuid"},
+        "url": {"type": "string", "pattern": "^https://[A-Za-z0-9.-]+(?::443)?/?$"}
+      }
+    },
+    "operationCategories": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"enum": ["REUSE", "EXTEND", "CREATE", "INTEGRATE"]}},
+    "taskIds": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "pattern": "^FAST006-[A-Z]+-[A-F0-9]{12}$"}},
+    "approver": {
+      "type": "object", "additionalProperties": false,
+      "required": ["tenantId", "objectId", "approvalEvidenceReference"],
+      "properties": {
+        "tenantId": {"type": "string", "format": "uuid"},
+        "objectId": {"type": "string", "format": "uuid"},
+        "approvalEvidenceReference": {"type": "string", "minLength": 1}
+      }
+    },
+    "approvedAtUtc": {"type": "string", "format": "date-time"},
+    "expiresAtUtc": {"type": "string", "format": "date-time"},
+    "prerequisiteEvidence": {
+      "type": "object", "additionalProperties": false,
+      "required": ["sha256", "observedAtUtc", "expiresAtUtc", "inputFingerprints"],
+      "properties": {
+        "sha256": {"$ref": "#/$defs/hash"},
+        "observedAtUtc": {"type": "string", "format": "date-time"},
+        "expiresAtUtc": {"type": "string", "format": "date-time"},
+        "inputFingerprints": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/hash"}}
+      }
+    }
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "identity": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+  }
+}

@@ -160,6 +160,22 @@
     "buildExecutionConnected": false,
     "dataverseConnected": false
   },
+  "executionReadiness": {
+    "enabled": false,
+    "explicitSwitch": "EnableExecutionReadiness",
+    "orchestratorSwitch": "ExecutionReadinessOnly",
+    "service": "scripts/accelerators/execution-readiness.ps1",
+    "command": "scripts/accelerators/invoke-execution-readiness.ps1",
+    "evidenceSchema": "schemas/accelerators/execution-evidence.schema.json",
+    "reportSchema": "schemas/accelerators/execution-readiness.schema.json",
+    "authorizationSchema": "schemas/accelerators/build-authorization.schema.json",
+    "maximumEvidenceLifetimeHours": 24,
+    "providerNeutral": true,
+    "humanReviewOnly": true,
+    "buildExecutionConnected": false,
+    "dataverseConnected": false,
+    "issuesAuthorization": false
+  },
   "sourceControl": {
     "enabled": true,
     "branchPattern": "feature/<scenario-slug>",

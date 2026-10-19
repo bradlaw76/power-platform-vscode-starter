@@ -41,7 +41,22 @@ compatible versions of:
 
 It remains disabled by default and is planning-only. A copied skill must not
 assume that accelerator runtime files are installed, enable the feature, or
-connect it to build orchestration.
+connect it to executing build stages.
+
+The optional FAST-007 local execution-readiness route also requires:
+
+- `scripts/accelerators/execution-readiness.ps1`
+- `scripts/accelerators/invoke-execution-readiness.ps1`
+- `schemas/accelerators/execution-evidence.schema.json`
+- `schemas/accelerators/execution-readiness.schema.json`
+- `schemas/accelerators/build-authorization.schema.json`
+- `scripts/ci/test-execution-readiness.ps1`
+- the compatible `90-run-build.ps1 -ExecutionReadinessOnly` early-return hook
+
+This route remains default-off and requires independent environment and tenant
+identifiers plus local prerequisite evidence. It emits human-review readiness,
+not approval or authorization. The authorization schema has no issuer or
+consumer. FAST-dependent Apply remains disabled, including after a ready result.
 
 The reporting skill additionally requires compatible versions of:
 

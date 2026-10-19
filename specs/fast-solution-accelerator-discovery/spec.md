@@ -2,8 +2,8 @@
 
 **Feature ID:** FAST-ACCELERATOR-DISCOVERY  
 **Instruction:** FAST-IMPLEMENTATION-001  
-**Status:** FAST-006 implemented for architectural review
-**Phase boundary:** Stop after FAST-006
+**Status:** FAST-007 local execution readiness implemented and validated; FAST-006 remains dry-run only
+**Phase boundary:** Stop after FAST-007 local readiness; no execution authorization
 
 ## Problem statement
 
@@ -429,3 +429,39 @@ Fully Custom preference bypasses matching. Prefer FAST reuse does not weaken
 evidence thresholds, remove Hybrid or Fully Custom, open readiness gates, or
 select an architecture automatically. FAST remains globally disabled by
 default, and FAST-006 remains unauthorized.
+
+## FAST-007 completion update (supersedes historical stop conditions)
+
+The authorized FAST-007 scope supersedes earlier FAST-005B/FAST-006 stop
+conditions for local readiness only. It is not FAST-006 continuation into
+execution. The dedicated implementation artifacts are under
+[`../fast-007-execution-readiness/`](../fast-007-execution-readiness/); the
+decision is recorded in [ADR 0010](adrs/0010-local-execution-readiness.md).
+
+The authorized local-only implementation and readiness-only orchestrator
+integration are complete and validated. The authoritative results and
+historical validation limitations are recorded in
+[FAST-007 validation evidence](../fast-007-execution-readiness/evidence/fast-007-validation.md).
+Completion does not establish live readiness or authorize execution.
+
+The local engine and explicit CLI consume the approved scenario decision and
+build-plan manifest, verify file SHA-256/canonical IDs/input fingerprints, and
+validate externally supplied evidence. URL, environment ID, and tenant ID are
+independently supplied and compared against the full evidence target (URL
+normalized). Evidence lifetime cannot exceed 24 hours. The report has six
+readiness statuses; `READY_FOR_APPROVAL` is human review only and
+`executionAuthorized` is always false. Scope SHA-256 binds decision, plan,
+evidence, inputs, and target. No approval or authorization records are
+generated or consumed; the build-authorization schema is future-only.
+
+The orchestrator's explicit readiness-only branch returns before helpers,
+stages, and payload requirements and cannot be combined with Apply. Normal
+Apply blocks approved `fast-based`/`hybrid` decisions regardless of readiness.
+Legacy/Fully Custom builds and default-off behavior in all modes are unchanged.
+There is no Dataverse/PAC/network/authentication/install/import/build execution
+or live platform-provenance verification. Synthetic evidence demonstrates local
+behavior only, not live readiness or authorization.
+
+Stop after FAST-007 review. FAST-008 trusted evidence collection, independent
+approver/signature verification, authorization consumption/revalidation, and a
+separately approved executor are proposed only.

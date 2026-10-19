@@ -199,6 +199,48 @@
 - [x] Prove no Dataverse, PAC, import, or bootstrap-stage integration.
 - [ ] Obtain FAST-006 architectural review approval before FAST-007.
 
-## FAST-007 - Execution-gate integration (not authorized)
+## FAST-007 - Historical execution-gate proposal (superseded)
 
-- [ ] Define a separately approved handoff to existing build stages.
+The former execution-stage handoff proposal is not authorized. The authorized
+FAST-007 scope is local-only execution readiness, defined below.
+
+## FAST-007 - Completed local readiness status
+
+This update supersedes earlier stop conditions only for the bounded local
+readiness implementation; it does not mark historical architectural review
+tasks complete or authorize execution. Detailed implementation tasks and
+synthetic evidence are owned by `specs/fast-007-execution-readiness/`.
+The authorized local-only implementation and readiness-only orchestrator
+integration are complete and validated; no runtime readiness integration
+remains pending.
+
+- [x] Record the local-only boundary in ADR 0010 and the operational guide.
+- [x] Require approved scenario decision/build-plan manifest integrity, canonical
+  IDs, input fingerprints, schema-valid external evidence, independent full
+  target identity, and a maximum 24-hour evidence lifetime.
+- [x] Emit six statuses; `READY_FOR_APPROVAL` is human review only and
+  `executionAuthorized` is always false.
+- [x] Bind decision/plan/evidence/inputs/target with scope SHA-256; keep
+  `build-authorization.schema.json` future-only, with no approval or
+  authorization records generated or consumed.
+- [x] Return from readiness-only orchestration before helpers/stages/payload
+  requirements; forbid combining preflight with Apply and block FAST-dependent
+  normal Apply regardless of readiness.
+- [x] Preserve default-off behavior in all modes and legacy/Fully Custom normal
+  builds; perform no Dataverse/PAC/network/authentication/install/import/build
+  execution or live platform-provenance verification.
+- [x] Persist authoritative
+  [FAST-007 validation evidence](../fast-007-execution-readiness/evidence/fast-007-validation.md):
+  129 readiness assertions, four cross-domain applications, 26 negative
+  scenarios, 11 byte-identical regenerated samples, and 107 passing Pester
+  tests. Standalone CI finished at 33/34 passing after the isolated formatter
+  rerun; its assertions had passed before OneDrive cleanup locks. The sole
+  standalone failure is the historical `test-script-smoke.ps1` expectation.
+  The historical `run-quality.ps1` parser failure is recorded separately.
+  PSScriptAnalyzer reported zero findings and Markdown lint zero errors.
+
+Stop after FAST-007 review. FAST-008 trusted collection, independent
+approver/signature verification, authorization consumption/revalidation, and a
+separately approved executor remain proposed, not approved. These validation
+results do not establish live readiness or authorize execution; no approval
+or authorization records are generated or consumed.

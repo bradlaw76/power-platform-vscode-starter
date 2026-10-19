@@ -370,6 +370,52 @@ plans remain blocked unless fresh environment, package, snapshot, and
 dependency evidence matches. Fully Custom remains independent. These plans are
 not connected to the authoritative bootstrap sequence or Dataverse execution.
 
+### FAST-007 local execution-readiness preflight (optional)
+
+Readiness means checking whether a pinned plan and supplied evidence are ready
+for human review; it is not approval to build. After architecture approval and
+FAST-006 planning, explicitly opt in to the standalone local preflight:
+
+```powershell
+pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
+  -EnableExecutionReadiness `
+  -ScenarioSlug <scenario-slug> `
+  -EvidencePath <execution-evidence.json> `
+  -EnvironmentUrl <approved-target-url> `
+  -EnvironmentId <environment-guid> `
+  -TenantId <tenant-guid> `
+  -WorkspaceRoot <repository-root>
+```
+
+`-WorkspaceRoot`, `-OutputFolder`, and `-EvaluationTimeUtc` are optional.
+The engine checks the
+scenario's approved `accelerator/accelerator-decision.json` and
+`accelerator/build-plan/build-plan-manifest.json`, hashes, canonical IDs, input
+fingerprints, and schema-valid external evidence. The independently supplied
+URL/environment ID/tenant ID must match the evidence target exactly after URL
+normalization. Evidence has a hard maximum lifetime of 24 hours.
+
+The optional orchestrator entry uses `90-run-build.ps1
+-ExecutionReadinessOnly -ExecutionEvidencePath <path>` with
+`-ReadinessEnvironmentId <guid> -ReadinessTenantId <guid>` and optional
+`-ReadinessEvaluationTimeUtc <utc-time>`, plus scenario and target URL parameters.
+This branch returns before helpers, stages, and payload requirements; never
+combine it with `-Mode Apply`. It does not add a stage to the normal build
+sequence.
+
+**Checkpoint:** Review `execution-readiness.json` against its schema and
+inspect every blocker and scope binding. `READY_FOR_APPROVAL` means human
+review only. All six statuses retain `executionAuthorized: false`; no approval
+or authorization record is generated or consumed. Even a ready report cannot
+unlock Apply for a `fast-based` or `hybrid` approved decision. Legacy/Fully
+Custom builds and all modes' default-off behavior are preserved.
+
+No Dataverse, PAC CLI, network, authentication, installation, import, or build
+execution occurs in this preflight. Local evidence is supplied externally;
+platform provenance is not verified. See
+[FAST-007 operations](fast-integration/execution-readiness.md) for the six
+statuses and the separately proposed, unimplemented FAST-008 work.
+
 Supported application profiles:
 
 - `standalone-model-driven`

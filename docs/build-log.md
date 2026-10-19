@@ -20,6 +20,7 @@ Record wizard version changes here so you can trace which behavior applied to ea
 | 2026-10-15 | Contract v1.13.0 | Added default-off, planning-only accelerator recommendations after discovery and before architecture finalization. |
 | 2026-10-16 | Contract v1.14.0 | Added separate accelerator startup preference, granular requirement traceability, validated package manifest input, schema-rendering correction, and generator-level Markdown cleanup. |
 | 2026-10-16 | Contract v1.15.0 | Added default-off provider-neutral FAST-006 dry-run build planning with approved-artifact, managed-ownership, readiness, rollback, and traceability gates. |
+| 2026-10-19 | FAST-007 | Added local-only execution-readiness reporting and an early-return orchestrator preflight; readiness never authorizes execution and FAST-dependent Apply stays blocked. See the operational guide; this entry claims no live readiness or test result. |
 
 ## Release Process
 
@@ -49,7 +50,17 @@ Accelerator Analysis ID / Catalog Snapshot:
 Accelerator Recommended / Selected Architecture:
 Accelerator Selected Packages (version/hash):
 Accelerator Environment Readiness / Evidence Expiry:
-FAST-Dependent Execution Gate (open/closed/not applicable):
+FAST-Dependent Execution Gate (closed/not applicable; FAST-007 cannot open it):
+Execution Readiness Enabled / Report Path:
+Execution Readiness Status / Blockers:
+Execution Readiness Evaluation Time UTC / Evidence Expiry (maximum 24h lifetime):
+Execution Readiness Target URL / Environment ID / Tenant ID:
+Execution Readiness Decision ID / Plan ID / Evidence Hash / Input Fingerprints:
+Execution Readiness Scope SHA-256:
+Execution Readiness Evidence Source (external local/synthetic; not live-verified):
+Execution Authorized (false for every FAST-007 status, including READY_FOR_APPROVAL):
+FAST-Dependent Apply Block Verified / Readiness-Only Early Return:
+Execution Readiness Validation Commands / Actual Outcomes / Skips:
 Accelerator Decision Change Approval (yes/no/not applicable):
 Scripts Run (15,20,30,optional 35,40,50,55,60,optional 61,64,62,optional 63,65,66,80,85,95):
 Tables (created/skipped/failed):

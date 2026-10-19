@@ -28,8 +28,10 @@ $bootstrapFiles = @(Get-ChildItem -LiteralPath (Join-Path $repoRoot 'scripts/boo
 foreach ($file in $bootstrapFiles) {
     $source = Get-Content -LiteralPath $file.FullName -Raw
     if ($source -match '(?i)scripts[\\/]accelerators|sync-fast-catalog|microsoft-fast') {
-        if ($file.Name -ne '05-start-wizard.ps1' -or
-            $source -notmatch 'EnableAcceleratorRecommendations') {
+        $discoverySeam = $file.Name -eq '05-start-wizard.ps1' -and $source -match 'EnableAcceleratorRecommendations'
+        $nonexecutingSeam = $file.Name -eq '90-run-build.ps1' -and
+            $source -match 'ExecutionReadinessOnly' -and $source -match 'FAST-dependent or unresolved build execution is disabled'
+        if (-not ($discoverySeam -or $nonexecutingSeam)) {
             throw "FAST is wired into an unauthorized wizard runtime stage: $($file.Name)"
         }
     }

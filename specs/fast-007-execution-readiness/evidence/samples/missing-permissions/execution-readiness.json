@@ -1,0 +1,286 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "missing-permissions",
+  "status": "BLOCKED_SECURITY",
+  "eligibleForHumanApproval": false,
+  "executionAuthorized": false,
+  "evaluatedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+  "decisionId": "sha256:5c6dc47c7f0fa6a74c5ccd055cc9edeab379a1a08f1574f57c2f44358cbc6519",
+  "planId": "sha256:6c30b60a9a4d5c16de3908b12a3429223073975b49f9cd2af9174ccd3997c670",
+  "planSha256": "55723d18152e241d700b9e59a4763d0bfc8d5f8ff530e5f0b927706737601bd8",
+  "decisionSha256": "1a4f4252488424a73254b8f67d3d98bf5a6a09bf79063172024fa3db7c320d7f",
+  "evidenceSha256": "afa7a8c0aabf81d86e6676ddec7a9b0fbfbaded597fc3ba5b791507f2360a965",
+  "scopeSha256": "cdc34f029e8127d8fb4144fb3104cb5c5bb55c351d8f224d6ec72a17e516b45f",
+  "environment": {
+    "environmentId": "11111111-1111-4111-8111-111111111111",
+    "tenantId": "22222222-2222-4222-8222-222222222222",
+    "url": "https://synthetic.example.test"
+  },
+  "authorizedOperationCategories": [],
+  "findings": [
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "message": "Principal lacks 'customize' for 'FAST006-CREATE-24BAC22E1EDD'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "message": "Principal lacks 'write-solution' for 'FAST006-CREATE-24BAC22E1EDD'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "message": "Principal lacks 'customize' for 'FAST006-CREATE-B9CD3CC28AAE'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "message": "Principal lacks 'write-solution' for 'FAST006-CREATE-B9CD3CC28AAE'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "message": "Principal lacks 'customize' for 'FAST006-CREATE-E5038F5CEAA4'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "message": "Principal lacks 'write-solution' for 'FAST006-CREATE-E5038F5CEAA4'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "message": "Principal lacks 'customize' for 'FAST006-CREATE-E6ED656839ED'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    },
+    {
+      "status": "BLOCKED_SECURITY",
+      "code": "PERMISSION_MISSING",
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "message": "Principal lacks 'write-solution' for 'FAST006-CREATE-E6ED656839ED'.",
+      "remediation": "Have an authorized administrator verify the required scoped permission; preflight grants nothing."
+    }
+  ],
+  "blockedOperations": [
+    "FAST006-CREATE-24BAC22E1EDD",
+    "FAST006-CREATE-B9CD3CC28AAE",
+    "FAST006-CREATE-E5038F5CEAA4",
+    "FAST006-CREATE-E6ED656839ED"
+  ],
+  "dependencyOrder": [
+    "FAST006-CREATE-E6ED656839ED",
+    "FAST006-CREATE-24BAC22E1EDD",
+    "FAST006-CREATE-B9CD3CC28AAE",
+    "FAST006-CREATE-E5038F5CEAA4"
+  ],
+  "packageDependencyOrder": [],
+  "componentOwnership": [
+    {
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "componentKind": "form",
+      "componentIdentity": "tst_record:starter-form",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-24BAC22E1EDD",
+          "componentKind": "form",
+          "componentIdentity": "tst_record:starter-form",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "componentKind": "view",
+      "componentIdentity": "tst_record:starter-view",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+          "componentKind": "view",
+          "componentIdentity": "tst_record:starter-view",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "componentKind": "application",
+      "componentIdentity": "missing-permissions:model-driven-app",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-E5038F5CEAA4",
+          "componentKind": "application",
+          "componentIdentity": "missing-permissions:model-driven-app",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    },
+    {
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "componentKind": "table",
+      "componentIdentity": "tst_record",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-E6ED656839ED",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": true,
+          "allowedActions": [
+            "CREATE",
+            "REUSE",
+            "EXTEND",
+            "INTEGRATE"
+          ]
+        }
+      ]
+    }
+  ],
+  "securityRequirements": [
+    {
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-24BAC22E1EDD",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-B9CD3CC28AAE",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-E5038F5CEAA4",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    },
+    {
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-E6ED656839ED",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": false
+    }
+  ],
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-001",
+      "taskIds": [
+        "FAST006-CREATE-24BAC22E1EDD",
+        "FAST006-CREATE-B9CD3CC28AAE",
+        "FAST006-CREATE-E5038F5CEAA4",
+        "FAST006-CREATE-E6ED656839ED"
+      ],
+      "acceptanceCriteria": [
+        "Users can complete the primary task."
+      ],
+      "decisionId": "sha256:5c6dc47c7f0fa6a74c5ccd055cc9edeab379a1a08f1574f57c2f44358cbc6519"
+    }
+  ]
+}

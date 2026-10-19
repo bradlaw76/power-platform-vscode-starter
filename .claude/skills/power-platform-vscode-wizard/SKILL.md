@@ -72,6 +72,35 @@ preserve managed-solution ownership, and emit REUSE, EXTEND, CREATE, INTEGRATE,
 or DEFER tasks without calling Dataverse or any build stage. Fully Custom plans
 must not inherit accelerator package or environment dependencies.
 
+FAST-007 execution readiness is separately authorized, local-only, and
+default-off in all modes. Use `invoke-execution-readiness.ps1
+-EnableExecutionReadiness` with `-ScenarioSlug -EvidencePath -EnvironmentUrl
+-EnvironmentId -TenantId`; optional `-WorkspaceRoot`, `-OutputFolder`, and
+`-EvaluationTimeUtc` select workspace, output, and the deterministic clock.
+Validate the
+approved decision/build-plan manifest, file SHA-256, canonical IDs, input
+fingerprints, and external evidence schema. Match the complete target triple
+exactly (URL normalized) and enforce a hard evidence lifetime maximum of 24
+hours. `READY_FOR_APPROVAL` means human review only and never authorizes
+execution; `executionAuthorized` is always false. Blocking statuses are
+`BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`, `BLOCKED_COMPATIBILITY`,
+`BLOCKED_SECURITY`, and `BLOCKED_DECISION_CHANGE`.
+Scope SHA-256 binds decision/plan/evidence/inputs/target. No
+approval/authorization records are generated or consumed;
+`build-authorization.schema.json` is future-only.
+
+Orchestrator `-ExecutionReadinessOnly -ExecutionEvidencePath` also requires
+`-ReadinessEnvironmentId -ReadinessTenantId`, with optional
+`-ReadinessEvaluationTimeUtc`, and returns before helpers/stages/payload
+requirements. Never combine it with Apply. Normal Apply rejects approved
+`fast-based`/`hybrid` decisions regardless of readiness; legacy/Fully Custom
+builds remain unchanged. No Dataverse/PAC/network/authentication/install/import/
+build execution or live platform-provenance verification occurs. Follow
+`docs/fast-integration/execution-readiness.md`; FAST-008 trusted collection,
+independent approver/signature verification, authorization
+consumption/revalidation, and a separately approved executor remain proposed,
+not implemented.
+
 Demo Builder may infer a modern table-level Power Apps grid for high-frequency
 operational views inside its consolidated recommendation; do not add a seventh
 business question. Advanced Builder and Framework Acceptance explicitly capture

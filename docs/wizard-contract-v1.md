@@ -9,6 +9,11 @@ schema-validated component plans, and remains disconnected from Dataverse and
 all build execution stages. Fully Custom plans do not inherit accelerator
 package or environment prerequisites.
 
+FAST-007 adds a default-off local-only execution-readiness contract and an
+early-return orchestrator preflight, not execution authorization. Its detailed
+operational contract is in
+[`fast-integration/execution-readiness.md`](fast-integration/execution-readiness.md).
+
 ## Purpose
 
 Define one canonical workflow contract across discovery, planning, and execution.
@@ -84,8 +89,8 @@ before architecture is finalized.
   stale-evidence, missing-Core, and rerun evidence.
 - Fully Custom is always selectable.
 - A selected FAST-based or Hybrid architecture is planning evidence only.
-- FAST-dependent execution remains blocked unless fresh matching environment
-  evidence opens the readiness gate.
+- FAST-dependent execution remains blocked regardless of readiness. Fresh
+  matching local evidence can support human review only, not open Apply.
 - The integration does not authenticate, import packages, call Dataverse, or
   register a build stage.
 
@@ -100,6 +105,43 @@ Multiple package indexes should be supplied through one validated
 `-AcceleratorPackageManifestPath` file. The manifest pins each metadata path,
 module ID, package ID, version, and SHA-256 and avoids command-line array
 binding ambiguity.
+
+## Execution Readiness Contract (FAST-007)
+
+- `execution-readiness.ps1` is the local-only engine;
+  `invoke-execution-readiness.ps1` requires `-EnableExecutionReadiness`,
+  `-ScenarioSlug`, `-EvidencePath`, `-EnvironmentUrl`, `-EnvironmentId`,
+  and `-TenantId`. `-WorkspaceRoot`, `-OutputFolder`, and `-EvaluationTimeUtc`
+  are optional.
+- Read the approved scenario-local `accelerator/accelerator-decision.json` and
+  `accelerator/build-plan/build-plan-manifest.json`; validate file SHA-256,
+  canonical decision/plan IDs, and input fingerprints. Reject changed
+  decisions rather than silently reapproving them.
+- Validate external evidence with `execution-evidence.schema.json`. Compare
+  its full target triple to independently supplied URL/environment ID/tenant
+  ID (URL normalized). Enforce a hard evidence lifetime maximum of 24 hours
+  against the explicit evaluation clock.
+- Emit `execution-readiness.json` under `execution-readiness.schema.json` with
+  one of `READY_FOR_APPROVAL`, `BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`,
+  `BLOCKED_COMPATIBILITY`, `BLOCKED_SECURITY`, or `BLOCKED_DECISION_CHANGE`.
+  `READY_FOR_APPROVAL` is human review only; `executionAuthorized` is always
+  false.
+- The SHA-256 scope binds decision, plan, evidence, inputs, and target.
+  `build-authorization.schema.json` is a future contract only; no approval or
+  authorization records are generated or consumed.
+- `90-run-build.ps1 -ExecutionReadinessOnly` accepts
+  `-ExecutionEvidencePath`, `-ReadinessEnvironmentId`,
+  `-ReadinessTenantId`, and optional `-ReadinessEvaluationTimeUtc`. It returns
+  before helper loading, stage execution, and payload requirements.
+  `-Mode Apply` combined with readiness-only preflight is forbidden.
+- Normal Apply rejects an approved decision whose `selectedOption` is
+  `fast-based` or `hybrid`, regardless of any readiness report. Legacy and
+  Fully Custom normal builds remain unchanged; FAST remains default-off in
+  all three modes.
+- No Dataverse/PAC/network/authentication/install/import/build operations or
+  live platform-provenance verification occur. FAST-008 trusted collection,
+  independent approver/signature verification, authorization consumption and
+  revalidation, and a separately approved executor remain proposed only.
 
 ## Architecture Intent Contract
 

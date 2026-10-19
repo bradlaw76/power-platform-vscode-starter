@@ -1,6 +1,6 @@
 # FAST Solution Accelerator Discovery Plan
 
-**Status:** FAST-006 implemented; architectural review required
+**Status:** FAST-007 local execution readiness implemented and validated; execution remains out of scope
 **Baseline:** `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28`
 
 ## Approach
@@ -187,13 +187,17 @@ Exact schemas are defined in
 - Prove industry neutrality with unrelated data-only acceptance fixtures.
 - Preserve an independent Fully Custom plan.
 
-### FAST-007 - Execution gate (not authorized)
+### FAST-007 - Local execution readiness (completed)
 
-- Evaluate controlled handoff from an approved build plan to existing build
-  stages through a separately reviewed authorization contract.
-- Repeated-run and snapshot pinning.
-- Security review.
-- Controlled rollout and documentation parity.
+- Evaluate approved decisions and pinned plans with external local evidence,
+  not a handoff to execution stages.
+- Bind decision/plan/evidence/inputs/target with SHA-256; validate canonical IDs,
+  fingerprints, the full independently supplied target identity, and the hard
+  maximum 24-hour evidence lifetime using an explicit evaluation clock.
+- Emit six fail-closed statuses with `executionAuthorized: false` always.
+- Add an early-return readiness-only orchestrator branch and independently
+  block FAST-dependent Apply; preserve legacy/Fully Custom normal builds.
+- Keep approval/authorization records and execution out of scope; see ADR 0010.
 
 ## Testing strategy
 
@@ -368,6 +372,33 @@ The final decision continues to pin the analysis and package identities.
 
 ## Stop condition
 
-Stop after FAST-005B review handoff. Do not begin FAST-006 build integration,
-package installation, Dataverse mutation, or rollout without further
-authorization.
+Historical FAST-005B/FAST-006 stop conditions are superseded only by the
+authorized FAST-007 local readiness scope below. Package installation,
+Dataverse mutation, and execution rollout remain unauthorized.
+
+## FAST-007 completion and current stop condition
+
+Implemented and validated local-only readiness through
+`execution-readiness.ps1`, `invoke-execution-readiness.ps1`, and the
+orchestrator's `-ExecutionReadinessOnly` early return. The implementation
+requires independent environment URL, environment ID, and tenant ID,
+schema-valid externally supplied evidence,
+approved decision/plan/input integrity, and deterministic evaluation. No live
+authentication or platform-provenance verification is included. The
+`build-authorization.schema.json` contract is future-only; neither approvals
+nor authorization records are generated or consumed.
+
+Follow [ADR 0010](adrs/0010-local-execution-readiness.md) and
+[the operational guide](../../docs/fast-integration/execution-readiness.md).
+Implementation planning and synthetic evidence belong to
+`specs/fast-007-execution-readiness/`. The authoritative
+[validation evidence](../fast-007-execution-readiness/evidence/fast-007-validation.md)
+records completed readiness and regression validation, including the
+historical smoke-test and aggregate-runner parser failures and the isolated
+formatter rerun. Runtime readiness integration is complete, not pending.
+Completion does not establish live readiness or approval to execute.
+
+Stop after FAST-007 review handoff. FAST-008 is proposed only: trusted evidence
+collection, independent approver/signature verification, authorization
+consumption/revalidation, and a separately approved executor design require
+further authorization.

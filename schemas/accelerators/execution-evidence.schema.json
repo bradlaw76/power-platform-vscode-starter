@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Local Execution Prerequisite Evidence v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "decisionId", "planId", "planSha256", "environment", "observedAtUtc", "expiresAtUtc", "inputArtifacts", "packages", "components", "security"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "decisionId": {"$ref": "#/$defs/identity"},
+    "planId": {"$ref": "#/$defs/identity"},
+    "planSha256": {"$ref": "#/$defs/hash"},
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["environmentId", "tenantId", "url"],
+      "properties": {
+        "environmentId": {"type": "string", "format": "uuid"},
+        "tenantId": {"type": "string", "format": "uuid"},
+        "url": {"type": "string", "pattern": "^https://[A-Za-z0-9.-]+(?::443)?/?$"}
+      }
+    },
+    "observedAtUtc": {"type": "string", "format": "date-time"},
+    "expiresAtUtc": {"type": "string", "format": "date-time"},
+    "inputArtifacts": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["key", "path"],
+        "properties": {"key": {"type": "string", "minLength": 1}, "path": {"type": "string", "minLength": 1}}
+      }
+    },
+    "packages": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["moduleId", "packageId", "sha256", "solutionUniqueName", "version", "installed", "dependencies"],
+        "properties": {
+          "moduleId": {"type": "string", "minLength": 1},
+          "packageId": {"type": "string", "minLength": 1},
+          "sha256": {"$ref": "#/$defs/hash"},
+          "solutionUniqueName": {"type": "string", "minLength": 1},
+          "version": {"type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$"},
+          "installed": {"type": "boolean"},
+          "dependencies": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+        }
+      }
+    },
+    "components": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["taskId", "componentKind", "componentIdentity", "exists", "ownership", "managed", "customizable", "allowedActions"],
+        "properties": {
+          "taskId": {"type": "string", "minLength": 1},
+          "componentKind": {"type": "string", "minLength": 1},
+          "componentIdentity": {"type": "string", "minLength": 1},
+          "exists": {"type": "boolean"},
+          "ownership": {"enum": ["accelerator-managed", "solution-owned", "external", "unresolved"]},
+          "managed": {"type": "boolean"},
+          "customizable": {"type": "boolean"},
+          "allowedActions": {"type": "array", "uniqueItems": true, "items": {"enum": ["REUSE", "EXTEND", "CREATE", "INTEGRATE"]}}
+        }
+      }
+    },
+    "security": {
+      "type": "object", "additionalProperties": false,
+      "required": ["principalId", "grantedPermissions"],
+      "properties": {
+        "principalId": {"type": "string", "format": "uuid"},
+        "grantedPermissions": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    }
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "identity": {"type": "string", "pattern": "^sha256:[a-f0-9]{64}$"}
+  }
+}

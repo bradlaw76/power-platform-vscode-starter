@@ -883,3 +883,37 @@ translated by the default-off FAST-006 standalone planner. Treat its output as
 a reviewable dry run only: it cannot authorize execution or connect to
 Dataverse/build stages. Preserve managed ownership and keep Fully Custom free
 of accelerator dependencies.
+
+### Local execution readiness (FAST-007)
+
+After approval and dry-run planning, explicitly opt in with
+`scripts/accelerators/invoke-execution-readiness.ps1
+-EnableExecutionReadiness -ScenarioSlug -EvidencePath -EnvironmentUrl
+-EnvironmentId -TenantId`; optional `-WorkspaceRoot`, `-OutputFolder`, and
+`-EvaluationTimeUtc` select workspace, output, and a deterministic clock.
+Validate the
+scenario's approved decision and build-plan manifest, file SHA-256, canonical
+decision/plan IDs, and input fingerprints. Externally supplied local evidence
+must satisfy `execution-evidence.schema.json`, match the complete independently
+supplied target triple exactly (URL normalized), and have a hard maximum
+lifetime of 24 hours.
+
+The schema-valid `execution-readiness.json` reports `READY_FOR_APPROVAL`,
+`BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`, `BLOCKED_COMPATIBILITY`,
+`BLOCKED_SECURITY`, or `BLOCKED_DECISION_CHANGE`. Ready means human review only:
+`executionAuthorized` is always false. Scope SHA-256 binds decision, plan,
+evidence, inputs, and target. `build-authorization.schema.json` is future-only;
+never generate or consume approval or authorization records.
+
+The orchestrator's `-ExecutionReadinessOnly -ExecutionEvidencePath` path
+requires `-ReadinessEnvironmentId -ReadinessTenantId`, accepts optional
+`-ReadinessEvaluationTimeUtc`, and returns before helpers/stages/payload
+requirements. Combining it with Apply is forbidden. Approved
+`fast-based`/`hybrid` decisions block normal Apply regardless of readiness;
+legacy/Fully Custom normal builds and all modes' default-off behavior remain
+unchanged. No Dataverse/PAC/network/authentication/install/import/build
+execution or live platform-provenance verification occurs. See
+[FAST-007 operations](../docs/fast-integration/execution-readiness.md).
+FAST-008 trusted evidence collection, independent approver/signature
+verification, authorization consumption/revalidation, and a separately approved
+executor remain proposed, not implemented.

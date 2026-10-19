@@ -52,6 +52,11 @@ param(
     [string]$ApprovedChoicePresentationPlanHash = '',
     [string]$ApprovedFormFormattingPlanHash = '',
     [string]$GridControlUnpackedSolutionFolder = '',
+    [switch]$ExecutionReadinessOnly,
+    [string]$ExecutionEvidencePath = '',
+    [guid]$ReadinessEnvironmentId,
+    [guid]$ReadinessTenantId,
+    [DateTimeOffset]$ReadinessEvaluationTimeUtc = [DateTimeOffset]::UtcNow,
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
     [scriptblock]$RequestInvoker
@@ -61,6 +66,32 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+if ($ExecutionReadinessOnly) {
+    if ($Mode -ne 'Preview') { throw 'Execution readiness is nonexecuting and cannot be combined with Apply.' }
+    if ([string]::IsNullOrWhiteSpace($ExecutionEvidencePath) -or
+        $ReadinessEnvironmentId -eq [guid]::Empty -or $ReadinessTenantId -eq [guid]::Empty) {
+        throw 'Execution readiness requires ExecutionEvidencePath, ReadinessEnvironmentId and ReadinessTenantId.'
+    }
+    & (Join-Path $repoRoot 'scripts\accelerators\invoke-execution-readiness.ps1') `
+        -EnableExecutionReadiness -ScenarioSlug $ScenarioSlug -EvidencePath $ExecutionEvidencePath `
+        -EnvironmentUrl $EnvironmentUrl -EnvironmentId $ReadinessEnvironmentId -TenantId $ReadinessTenantId `
+        -EvaluationTimeUtc $ReadinessEvaluationTimeUtc
+    return
+}
+$architectureDecisionPath = Join-Path $repoRoot "specs\$ScenarioSlug\accelerator\accelerator-decision.json"
+$acceleratorBuildPlanPath = Join-Path $repoRoot "specs\$ScenarioSlug\accelerator\build-plan\build-plan-manifest.json"
+if ($Mode -eq 'Apply' -and (Test-Path -LiteralPath $acceleratorBuildPlanPath -PathType Leaf)) {
+    $acceleratorBuildPlan = Get-Content -LiteralPath $acceleratorBuildPlanPath -Raw | ConvertFrom-Json
+    if ($acceleratorBuildPlan.architecture -cne 'fully-custom') {
+        throw 'FAST-dependent or unresolved build execution is disabled. FAST-007 readiness never authorizes build stages.'
+    }
+}
+if ($Mode -eq 'Apply' -and (Test-Path -LiteralPath $architectureDecisionPath -PathType Leaf)) {
+    $architectureDecision = Get-Content -LiteralPath $architectureDecisionPath -Raw | ConvertFrom-Json
+    if ($architectureDecision.selectedOption -cne 'fully-custom') {
+        throw 'FAST-dependent or unresolved build execution is disabled. FAST-007 readiness never authorizes build stages.'
+    }
+}
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
 

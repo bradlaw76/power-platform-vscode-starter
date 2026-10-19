@@ -653,3 +653,35 @@ rollback, and requirement traceability artifacts. It never executes a build.
 Managed accelerator components are referenced rather than recreated or
 modified, unsupported extensions are deferred, and Fully Custom plans require
 no FAST package or environment evidence.
+
+### Local execution readiness (FAST-007)
+
+FAST-007 is separately authorized, default-off, and local-only. The standalone
+`scripts/accelerators/invoke-execution-readiness.ps1` requires
+`-EnableExecutionReadiness -ScenarioSlug -EvidencePath -EnvironmentUrl
+-EnvironmentId -TenantId`; `-WorkspaceRoot`, `-OutputFolder`, and
+`-EvaluationTimeUtc` are optional. It consumes the approved scenario decision
+and build-plan manifest, verifying file SHA-256, canonical plan/decision IDs,
+and input fingerprints. External evidence must satisfy
+`execution-evidence.schema.json`, match the independently supplied full target
+identity (URL normalized), and have a maximum lifetime of 24 hours.
+
+`execution-readiness.json` satisfies `execution-readiness.schema.json` with six
+statuses: `READY_FOR_APPROVAL`, `BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`,
+`BLOCKED_COMPATIBILITY`, `BLOCKED_SECURITY`, and `BLOCKED_DECISION_CHANGE`.
+Ready means human review only; `executionAuthorized` is always false. The
+scope SHA-256 binds decision/plan/evidence/inputs/target.
+`build-authorization.schema.json` is future-only; no approval/authorization
+record is generated or consumed.
+
+Orchestrator `-ExecutionReadinessOnly -ExecutionEvidencePath` with
+`-ReadinessEnvironmentId -ReadinessTenantId` and optional
+`-ReadinessEvaluationTimeUtc` returns before helpers/stages/payload
+requirements and cannot be combined with Apply. Normal Apply always blocks
+approved `fast-based`/`hybrid` decisions regardless of readiness. Legacy/Fully
+Custom builds and default-off behavior in all modes are unchanged. No live
+authentication/provenance check or Dataverse/PAC/network/install/import/build
+operation occurs. See [the operational guide](../docs/fast-integration/execution-readiness.md).
+FAST-008 trusted collection, independent approver/signature verification,
+authorization consumption/revalidation, and a separately approved executor
+remain proposed only.

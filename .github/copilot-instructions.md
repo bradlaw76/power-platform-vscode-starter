@@ -49,6 +49,31 @@ must consume the approved decision artifact, preserve managed ownership, keep
 Fully Custom independent of FAST prerequisites, and never call Dataverse or
 bootstrap build stages.
 
+FAST-007 is authorized local-only execution readiness, not a continuation of
+FAST-006 execution planning. Use `invoke-execution-readiness.ps1` only with
+`-EnableExecutionReadiness -ScenarioSlug -EvidencePath -EnvironmentUrl
+-EnvironmentId -TenantId` (optional `-WorkspaceRoot`, `-OutputFolder`,
+`-EvaluationTimeUtc`). Require the approved scenario decision, pinned build-plan
+manifest, SHA-256/canonical IDs/input fingerprints, schema-valid external
+evidence, exact full target identity (URL normalized), and a maximum 24-hour
+evidence lifetime. `READY_FOR_APPROVAL` is human review only;
+`executionAuthorized` is always false. The SHA-256 scope binds decision, plan,
+evidence, inputs, and target; never generate or consume approval/authorization
+records. `build-authorization.schema.json` is future-only.
+
+`90-run-build.ps1 -ExecutionReadinessOnly` uses `-ExecutionEvidencePath`,
+`-ReadinessEnvironmentId`, `-ReadinessTenantId`, and optional
+`-ReadinessEvaluationTimeUtc`, and returns before helpers/stages/payload
+requirements. Never combine preflight with Apply. Approved `fast-based` and
+`hybrid` decisions block normal Apply regardless of readiness; legacy/Fully
+Custom builds are unchanged. FAST stays default-off in every mode. Readiness
+never performs Dataverse/PAC/network/authentication/install/import/build work
+or verifies live platform provenance. Follow
+`docs/fast-integration/execution-readiness.md`; FAST-008 trusted evidence,
+independent approver/signature verification, authorization
+consumption/revalidation, and a separately approved executor are proposed,
+not implemented.
+
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
 Optional UI enhancement stages are

@@ -33,6 +33,30 @@ Use this behavior:
   managed accelerator definition, call Dataverse, or invoke a build stage.
   Persist explicit selection under `specs/<slug>/accelerator/` and
   do not authorize Dataverse generation or solution import.
+- FAST-007 is an explicit default-off, local-only readiness check. Use
+  `invoke-execution-readiness.ps1 -EnableExecutionReadiness` with
+  `-ScenarioSlug -EvidencePath -EnvironmentUrl -EnvironmentId -TenantId`
+  (optional `-WorkspaceRoot`, `-OutputFolder`, `-EvaluationTimeUtc`). Validate
+  the
+  approved decision, pinned build-plan manifest, file SHA-256, canonical IDs,
+  input fingerprints, and external evidence schema. Match the full target
+  triple exactly (URL normalized); cap evidence lifetime at 24 hours.
+  `READY_FOR_APPROVAL` means human review only; `executionAuthorized` stays
+  false for all six statuses. Bind decision/plan/evidence/inputs/target in the
+  scope SHA-256; generate or consume no approval or authorization record.
+  `build-authorization.schema.json` is future-only. Orchestrator
+  `-ExecutionReadinessOnly -ExecutionEvidencePath` also requires
+  `-ReadinessEnvironmentId -ReadinessTenantId` (optional
+  `-ReadinessEvaluationTimeUtc`) and returns before helpers/stages/payload
+  requirements; never combine it with Apply. Normal Apply blocks approved
+  `fast-based`/`hybrid` decisions regardless of readiness; legacy/Fully Custom
+  builds and default-off behavior in all modes remain unchanged. No
+  Dataverse/PAC/network/authentication/install/import/build execution or live
+  platform-provenance check is permitted. Use
+  [the operational guide](../../docs/fast-integration/execution-readiness.md);
+  FAST-008 trusted collection, independent approver/signature verification,
+  authorization consumption/revalidation, and separately approved execution
+  remain proposed only.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.

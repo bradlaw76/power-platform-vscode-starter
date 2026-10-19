@@ -214,7 +214,7 @@ valid app depend on them:
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery and Build Planning** *(default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`specs/fast-solution-accelerator-discovery/`](specs/fast-solution-accelerator-discovery/) | Optional stage-05 recommendations plus a standalone provider-neutral FAST-006 dry-run planner; no build stage is registered | Approved decision artifact; immutable snapshots; managed ownership; evidence-grounded REUSE/EXTEND/CREATE/INTEGRATE/DEFER plan; environment gates; no import or modification |
+| **FAST Solution Accelerator Discovery, Build Planning, and Execution Readiness** *(default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`execution-readiness.md`](docs/fast-integration/execution-readiness.md) | Optional stage-05 recommendations, standalone FAST-006 dry-run planner, and FAST-007 local-only readiness preflight; no execution stage | Approved decision and pinned plan/evidence/inputs/target; six fail-closed readiness statuses; `executionAuthorized: false` always; no import, authorization, or platform modification |
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
@@ -240,10 +240,10 @@ FAST-005 adds a controlled, default-off post-discovery recommendation seam in
 discovery questions, and requires an explicit FAST-based, Hybrid, or Fully
 Custom architecture selection. Enabled runs persist analysis and the approved
 decision under `specs/<scenario-slug>/accelerator/`. The integration never
-connects to Dataverse, imports a package, or registers FAST with
-`90-run-build.ps1`. FAST-006 can translate an approved decision into a
-schema-validated dry-run plan, but build execution remains deferred to
-FAST-007.
+connects to Dataverse or imports a package. FAST-006 translates an approved
+decision into a schema-validated dry-run plan. FAST-007 adds only a local
+execution-readiness report and an early-return preflight branch in
+`90-run-build.ps1`; it does not connect the plan to build execution.
 FAST-005B adds an optional preliminary preference after mode selection for
 explicitly enabled acceptance runs. Evaluate accelerators, Fully Custom, and
 Prefer FAST reuse are planning preferences only; matching still occurs after
@@ -286,6 +286,33 @@ architecture override. It writes deterministic artifacts under
 `specs/<scenario-slug>/accelerator/build-plan/`, never authorizes execution,
 and never calls Dataverse or a bootstrap build stage. Fully Custom plans do not
 require a package manifest or environment evidence.
+
+FAST-007 evaluates externally supplied local evidence, not live platform state:
+
+```powershell
+pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
+  -EnableExecutionReadiness `
+  -ScenarioSlug <scenario-slug> `
+  -EvidencePath <execution-evidence.json> `
+  -EnvironmentUrl <approved-target-url> `
+  -EnvironmentId <environment-guid> `
+  -TenantId <tenant-guid> `
+  -WorkspaceRoot <repository-root>
+```
+
+Optional `-WorkspaceRoot`, `-OutputFolder`, and `-EvaluationTimeUtc` select the
+workspace, report location, and deterministic evaluation clock.
+`READY_FOR_APPROVAL` means human review only,
+never permission to execute; `executionAuthorized` is always false.
+The orchestrator equivalent uses `-ExecutionReadinessOnly`,
+`-ExecutionEvidencePath`, `-ReadinessEnvironmentId`, `-ReadinessTenantId`,
+and optional `-ReadinessEvaluationTimeUtc`, with the scenario and target URL.
+It returns before helpers, stages, or payload requirements. Combining
+`-Mode Apply` with this preflight is forbidden. Normal Apply also rejects an
+approved `fast-based` or `hybrid` decision regardless of readiness; legacy and
+Fully Custom builds are unchanged. FAST remains off by default in every mode.
+See the [operational guide](docs/fast-integration/execution-readiness.md) for
+statuses, evidence lifetime, target binding, and the proposed FAST-008 boundary.
 
 ```powershell
 # Explicit local analysis; no wizard stage invokes this command.
@@ -331,6 +358,10 @@ surface in the same change:
    set and `git diff --check`. Record any intentional unsupported boundary.
 9. Keep `docs/onboarding.md` authoritative. If another document conflicts with
    it, fix that document rather than creating another sequence.
+10. For local readiness changes, maintain the FAST operational guide and ADR,
+    distinguish synthetic evidence from live verification, and document both
+    the preflight early-return path and the unconditional FAST-dependent Apply
+    block. A readiness result must never be described as execution approval.
 
 An enhancement is not documentation-complete until the checklist above is
 satisfied and the credential-free consistency/parity tests pass.
@@ -946,6 +977,8 @@ Release and rollback references for this update bundle:
 | `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
 | `81-build-progress-matrix.ps1` | Summarize disclosed wizard telemetry into a per-run step matrix | No | Yes |
 | `82-build-progress-report.ps1` | Generate a local HTML dashboard from wizard telemetry analytics | No | Yes |
+| `execution-readiness.ps1` / `invoke-execution-readiness.ps1` | Local FAST-007 engine / CLI; evaluate pinned decision, plan, evidence, inputs, and explicit target identity; never authorize execution | No | Yes, with an explicit evaluation clock |
+| `90-run-build.ps1 -ExecutionReadinessOnly` | Early-return local readiness preflight; rejects `-Mode Apply`; normal Apply blocks FAST-dependent decisions independently | No in readiness-only mode | Yes, with an explicit evaluation clock |
 
 ---
 
@@ -974,6 +1007,7 @@ power-platform-vscode-starter/
     build-log.md              -- Log template for recording each build run
     wizard-contract-v1.md     -- Canonical workflow contract (discovery/planning/execution)
     fast-integration/
+      execution-readiness.md  -- Local-only FAST-007 readiness operations and safety boundary
       instructions/
         FAST_Solution_Builder_Implementation_Instructions.md -- Reviewed FAST enhancement implementation directive
   payloads/                   -- Add table-*.json, columns-*.json, relationships-*.json here
@@ -981,7 +1015,7 @@ power-platform-vscode-starter/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
     how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
   schemas/
-    accelerators/             -- FAST registry, analysis, decision, package, and environment evidence contracts
+    accelerators/             -- FAST registry, analysis, decision, package, environment/execution evidence, readiness, and future authorization contracts
   scripts/
     accelerators/
       accelerator-catalog.ps1 -- Provider-neutral immutable catalog snapshots
@@ -991,6 +1025,8 @@ power-platform-vscode-starter/
       wizard-accelerator-integration.ps1 -- Default-off post-discovery planning seam
       dataverse-environment-inspector.ps1 -- Authenticated read-only Level 2 evidence
       invoke-accelerator-requirements-analysis.ps1 -- Explicit standalone local analysis
+      execution-readiness.ps1 -- Local-only FAST-007 integrity, evidence, and target evaluation
+      invoke-execution-readiness.ps1 -- Explicit standalone readiness CLI; never authorizes execution
       invoke-fast-environment-preflight.ps1 -- Explicit standalone live preflight
       sync-fast-catalog.ps1   -- Explicit standalone catalog synchronization
     ci/
@@ -1006,6 +1042,7 @@ power-platform-vscode-starter/
       test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
   specs/
     fast-solution-accelerator-discovery/ -- FAST Spec Kit, ADRs, contracts, and package evidence
+    fast-007-execution-readiness/ -- Authorized local readiness planning and synthetic evidence
   scripts/
     bootstrap/
       00-prereq-check.ps1          -- Verify tools are installed (no changes made)

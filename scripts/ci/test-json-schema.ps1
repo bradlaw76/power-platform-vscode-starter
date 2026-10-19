@@ -87,6 +87,12 @@ foreach ($file in $jsonFiles) {
         Join-Path $acceleratorSchemaRoot 'package-input-manifest.schema.json'
     } elseif ($relativePath -match '^specs[\\/][^\\/]+[\\/]accelerator[\\/]build-plan[\\/]build-plan-manifest\.json$') {
         Join-Path $acceleratorSchemaRoot 'build-plan.schema.json'
+    } elseif ($file.Name -ceq 'execution-readiness.json') {
+        Join-Path $acceleratorSchemaRoot 'execution-readiness.schema.json'
+    } elseif ($file.Name -ceq 'execution-evidence.json') {
+        Join-Path $acceleratorSchemaRoot 'execution-evidence.schema.json'
+    } elseif ($file.Name -ceq 'build-authorization.json') {
+        Join-Path $acceleratorSchemaRoot 'build-authorization.schema.json'
     } elseif ($relativePath -match '^specs[\\/][^\\/]+[\\/]accelerator[\\/]build-plan[\\/](?!build-plan-manifest\.json$).+\.json$') {
         Join-Path $acceleratorSchemaRoot 'build-plan-projection.schema.json'
     } else {

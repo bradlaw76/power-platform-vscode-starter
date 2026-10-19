@@ -49,6 +49,17 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    It '<Skill> preserves FAST-007 nonexecuting readiness' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match 'ExecutionReadinessOnly'
+        $skillContent[$Skill] | Should -Match 'READY_FOR_APPROVAL'
+        $skillContent[$Skill] | Should -Match 'BLOCKED_SECURITY'
+        $skillContent[$Skill] | Should -Match 'build-authorization.schema.json'
+        $skillContent[$Skill] | Should -Match '(?i)never authorizes\s+(?:build\s+)?execution'
+    }
+
     It '<Skill> preserves default-off accelerator planning boundaries' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }

@@ -118,6 +118,23 @@ foreach ($buildPlanningPath in @(
     Test-RequiredPath -RelativePath $buildPlanningPath -Description 'Accelerator build-planning runtime'
 }
 
+if ([bool]$wizardProfile.executionReadiness.enabled -or
+    [bool]$wizardProfile.executionReadiness.buildExecutionConnected -or
+    [bool]$wizardProfile.executionReadiness.dataverseConnected -or
+    [bool]$wizardProfile.executionReadiness.issuesAuthorization -or
+    -not [bool]$wizardProfile.executionReadiness.humanReviewOnly -or
+    -not [bool]$wizardProfile.executionReadiness.providerNeutral -or
+    $wizardProfile.executionReadiness.maximumEvidenceLifetimeHours -ne 24) {
+    Add-ContractFailure 'Execution readiness must remain local-only, default-off, nonexecuting and unable to issue authorization.'
+}
+foreach ($readinessPath in @(
+    $wizardProfile.executionReadiness.service, $wizardProfile.executionReadiness.command,
+    $wizardProfile.executionReadiness.evidenceSchema, $wizardProfile.executionReadiness.reportSchema,
+    $wizardProfile.executionReadiness.authorizationSchema
+)) {
+    Test-RequiredPath -RelativePath $readinessPath -Description 'Execution readiness runtime'
+}
+
 $wizardScriptPath = Join-Path $bootstrapFolder '05-start-wizard.ps1'
 $wizardScriptText = Get-Content -LiteralPath $wizardScriptPath -Raw
 if ($wizardScriptText -notmatch "\[string\]\`$Mode\s*=\s*'demo-builder'" -or

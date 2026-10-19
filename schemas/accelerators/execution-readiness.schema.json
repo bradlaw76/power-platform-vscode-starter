@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Nonexecuting Execution Readiness v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "scenarioSlug", "status", "eligibleForHumanApproval", "executionAuthorized", "evaluatedAtUtc", "decisionId", "planId", "planSha256", "decisionSha256", "evidenceSha256", "scopeSha256", "environment", "authorizedOperationCategories", "findings", "blockedOperations", "dependencyOrder", "packageDependencyOrder", "componentOwnership", "securityRequirements", "acceptanceTraceability"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "scenarioSlug": {"type": "string", "minLength": 1},
+    "status": {"enum": ["READY_FOR_APPROVAL", "BLOCKED_PREREQUISITES", "BLOCKED_EVIDENCE", "BLOCKED_COMPATIBILITY", "BLOCKED_SECURITY", "BLOCKED_DECISION_CHANGE"]},
+    "eligibleForHumanApproval": {"type": "boolean"},
+    "executionAuthorized": {"const": false},
+    "evaluatedAtUtc": {"type": "string", "format": "date-time"},
+    "decisionId": {"type": "string"},
+    "planId": {"type": "string"},
+    "planSha256": {"$ref": "#/$defs/hash"},
+    "decisionSha256": {"$ref": "#/$defs/hash"},
+    "evidenceSha256": {"$ref": "#/$defs/hash"},
+    "scopeSha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "environment": {
+      "type": "object", "additionalProperties": false,
+      "required": ["environmentId", "tenantId", "url"],
+      "properties": {
+        "environmentId": {"type": "string", "format": "uuid"},
+        "tenantId": {"type": "string", "format": "uuid"},
+        "url": {"type": "string", "pattern": "^https://[A-Za-z0-9.-]+(?::443)?/?$"}
+      }
+    },
+    "authorizedOperationCategories": {"type": "array", "maxItems": 0},
+    "findings": {"type": "array", "items": {"$ref": "#/$defs/finding"}},
+    "blockedOperations": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "dependencyOrder": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "packageDependencyOrder": {"type": "array", "uniqueItems": true, "items": {"type": "string"}},
+    "componentOwnership": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["taskId", "componentKind", "componentIdentity", "action", "ownership", "managed", "directModificationAllowed", "evidence"],
+        "properties": {
+          "taskId": {"type": "string"}, "componentKind": {"type": "string"},
+          "componentIdentity": {"type": "string"},
+          "action": {"enum": ["REUSE", "EXTEND", "CREATE", "INTEGRATE", "DEFER"]},
+          "ownership": {"enum": ["accelerator-managed", "solution-owned", "external", "unresolved"]},
+          "managed": {"type": "boolean"}, "directModificationAllowed": {"type": "boolean"},
+          "evidence": {"type": "array", "items": {"type": "object"}}
+        }
+      }
+    },
+    "securityRequirements": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["taskId", "permission", "principalId", "satisfied"],
+        "properties": {
+          "taskId": {"type": "string"}, "permission": {"type": "string"},
+          "principalId": {"type": "string", "format": "uuid"}, "satisfied": {"type": "boolean"}
+        }
+      }
+    },
+    "acceptanceTraceability": {
+      "type": "array", "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["requirementId", "taskIds", "acceptanceCriteria", "decisionId"],
+        "properties": {
+          "requirementId": {"type": "string"},
+          "taskIds": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+          "acceptanceCriteria": {"type": "array", "items": {"type": "string"}},
+          "decisionId": {"type": "string"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hash": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+    "finding": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "code", "taskId", "message", "remediation"],
+      "properties": {
+        "status": {"enum": ["BLOCKED_PREREQUISITES", "BLOCKED_EVIDENCE", "BLOCKED_COMPATIBILITY", "BLOCKED_SECURITY", "BLOCKED_DECISION_CHANGE"]},
+        "code": {"type": "string", "minLength": 1},
+        "taskId": {"type": "string"},
+        "message": {"type": "string", "minLength": 1},
+        "remediation": {"type": "string", "minLength": 1}
+      }
+    }
+  },
+  "allOf": [
+    {"if": {"properties": {"status": {"const": "READY_FOR_APPROVAL"}}},
+     "then": {"properties": {"eligibleForHumanApproval": {"const": true}, "findings": {"maxItems": 0}, "blockedOperations": {"maxItems": 0}}},
+     "else": {"properties": {"eligibleForHumanApproval": {"const": false}, "findings": {"minItems": 1}}}}
+  ]
+}
