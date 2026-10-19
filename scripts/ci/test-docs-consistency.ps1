@@ -118,7 +118,7 @@ foreach ($requiredStartupText in @('First Response Contract', 'Initial setup', '
   }
 }
 
-foreach ($requiredInitBehavior in @('do not ask for confirmation again', 'Select scenario type and wizard mode before the start path', 'continue the intake in the current conversation', '05-start-wizard.ps1 -Mode advanced-builder -Retrofit', '.wizard-metrics/', 'non-destructive')) {
+foreach ($requiredInitBehavior in @('do not ask for confirmation again', 'Select scenario type and wizard mode before the start path', 'continue the intake in the current conversation', '05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode advanced-builder -Retrofit', '.wizard-metrics/', 'non-destructive')) {
   if ($initSkill -notmatch [regex]::Escape($requiredInitBehavior)) {
     throw "Init skill is missing orchestration behavior: $requiredInitBehavior"
   }

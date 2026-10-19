@@ -10,6 +10,8 @@ if (-not (Test-Path $scriptPath)) {
 
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("post-build-analysis-test-" + [System.Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+$env:WIZARD_TARGET_PROJECT_ROOT = $tempRoot
 
 try {
   $specPath = Join-Path $tempRoot 'spec.md'
@@ -164,8 +166,8 @@ Line after marker.
     throw 'Generated summary did not include recommended next enhancements section.'
   }
 
-  $mindMapPath = Join-Path $repoRoot '.wizard-metrics/artifacts/analysis/build-mind-map.md'
-  $mindMapJsonPath = Join-Path $repoRoot '.wizard-metrics/artifacts/analysis/build-mind-map.json'
+  $mindMapPath = Join-Path $tempRoot '.wizard-metrics/artifacts/analysis/build-mind-map.md'
+  $mindMapJsonPath = Join-Path $tempRoot '.wizard-metrics/artifacts/analysis/build-mind-map.json'
   if (-not (Test-Path $mindMapPath)) {
     throw 'Expected post-build analysis to generate a Mermaid mind map markdown artifact.'
   }
@@ -250,6 +252,7 @@ Main form, active view
   Write-Host 'Post-build analysis tests passed.' -ForegroundColor Green
 }
 finally {
+  $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
   if (Test-Path $tempRoot) {
     Remove-Item -Path $tempRoot -Recurse -Force
   }

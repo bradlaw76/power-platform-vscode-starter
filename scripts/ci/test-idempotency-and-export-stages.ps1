@@ -11,8 +11,12 @@ ENVIRONMENT:  PowerShell 7 | Credential-free CI
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+$targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('pp-idempotency-target-' + [guid]::NewGuid().ToString('N'))
+$null = New-Item -ItemType Directory -Path $targetRoot -Force
+$env:WIZARD_TARGET_PROJECT_ROOT = $targetRoot
 $scenario = 'ci-idempotency-export'
-$artifactRoot = Join-Path $repoRoot '.wizard-metrics/artifacts'
+$artifactRoot = Join-Path $targetRoot '.wizard-metrics/artifacts'
 $testPaths = @(
     (Join-Path $artifactRoot "manifest/$scenario"),
     (Join-Path $artifactRoot 'reporting'),
@@ -50,7 +54,7 @@ try {
     try { & (Join-Path $repoRoot 'scripts/bootstrap/85-verify-idempotency.ps1') -ScenarioSlug $scenario -Phase Verify; throw 'Expected changed-ID failure.' } catch { if ($_.Exception.Message -notmatch 'ID changed') { throw } }
     $data.records[0].id='record-1'; $data | ConvertTo-Json -Depth 10 | Set-Content $dataPath
 
-    $outputFolder = Join-Path $repoRoot ".wizard-metrics/exports/$scenario"
+    $outputFolder = Join-Path $targetRoot ".wizard-metrics/exports/$scenario"
     $pacCalls = [Collections.Generic.List[string]]::new()
     $includeUnrelatedComponent = $false
     $omitExpectedComponent = $false
@@ -83,6 +87,8 @@ try {
     if ($source -match '(?i)solution[''"\s,]+import') { throw 'Export stage contains a solution import command.' }
 } finally {
     Remove-Item -LiteralPath (Join-Path $artifactRoot "manifest/$scenario") -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $reportingPath,$dataPath,(Join-Path $artifactRoot "contamination/$scenario"),(Join-Path $artifactRoot "idempotency/$scenario"),(Join-Path $artifactRoot "export/$scenario.json"),(Join-Path $repoRoot ".wizard-metrics/exports/$scenario") -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $reportingPath,$dataPath,(Join-Path $artifactRoot "contamination/$scenario"),(Join-Path $artifactRoot "idempotency/$scenario"),(Join-Path $artifactRoot "export/$scenario.json"),(Join-Path $targetRoot ".wizard-metrics/exports/$scenario") -Recurse -Force -ErrorAction SilentlyContinue
+    $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
+    Remove-Item -LiteralPath $targetRoot -Recurse -Force -ErrorAction SilentlyContinue
 }
 Write-Host 'Idempotency and export stage tests passed.' -ForegroundColor Green

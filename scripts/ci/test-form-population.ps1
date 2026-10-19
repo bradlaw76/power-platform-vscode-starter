@@ -9,12 +9,10 @@ $sourceDataverseRuntimeHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/d
 
 function New-TestRepo {
   $path = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-form-tests-" + [guid]::NewGuid().ToString('N'))
-  New-Item -ItemType Directory -Path (Join-Path $path 'scripts/bootstrap/helpers') -Force | Out-Null
+  New-Item -ItemType Directory -Path $path -Force | Out-Null
   New-Item -ItemType Directory -Path (Join-Path $path 'payloads') -Force | Out-Null
-  Copy-Item -Path $sourceScript -Destination (Join-Path $path 'scripts/bootstrap/60-build-forms-views.ps1') -Force
-  Copy-Item -Path $sourceTelemetryHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-telemetry.ps1') -Force
-  Copy-Item -Path $sourceHardeningHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Force
-  Copy-Item -Path $sourceDataverseRuntimeHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/dataverse-runtime.ps1') -Force
+  $testRoots.Add($path)
+  $env:WIZARD_TARGET_PROJECT_ROOT = $path
   return $path
 }
 
@@ -259,6 +257,8 @@ function Invoke-RestMethod {
 $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
 $originalSolutionName = $env:DV_SOLUTION_NAME
 $originalPublisherPrefix = $env:DV_PUBLISHER_PREFIX
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+$testRoots = [Collections.Generic.List[string]]::new()
 [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
 $env:DV_SOLUTION_NAME = 'TestSolution'
 $env:DV_PUBLISHER_PREFIX = 'tst'
@@ -312,7 +312,7 @@ try {
     (New-Attribute -LogicalName 'createdon' -Label 'Created On' -AttributeType 'DateTime')
   )
 
-  . (Join-Path $richRepo 'scripts/bootstrap/60-build-forms-views.ps1')
+  . $sourceScript
 
   $firstRunExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $richRepo 'payloads') -ScenarioSlug 'case-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $true -IncludeOwnerInViews $true -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($firstRunExitCode -eq 0) -Message 'Expected populated form scenario to succeed.'
@@ -399,7 +399,7 @@ try {
     (New-Attribute -LogicalName 'ownerid' -Label 'Owner' -AttributeType 'Lookup')
   )
 
-  . (Join-Path $sparseRepo 'scripts/bootstrap/60-build-forms-views.ps1')
+  . $sourceScript
   $failureExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $sparseRepo 'payloads') -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Information' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($failureExitCode -eq 1) -Message 'Expected under-populated form scenario to fail.'
 
@@ -439,7 +439,7 @@ try {
   $existingFormXml = '<form><tabs><tab name="general"><columns><column><sections><section name="general_section"><rows><row><cell><control id="name" datafieldname="name" /></cell></row></rows></section></sections></column></columns></tab></tabs></form>'
   $script:MockContext.Forms.Add([pscustomobject]@{ formid = [guid]::NewGuid().ToString(); name = 'Information'; type = 2; formxml = $existingFormXml }) | Out-Null
 
-  . (Join-Path $mixedRepo 'scripts/bootstrap/60-build-forms-views.ps1')
+  . $sourceScript
   $mixedExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $mixedRepo 'payloads') -ScenarioSlug 'mixed-scenario' -MinBusinessFieldsPerForm 1 -MinBusinessColumnsPerView 1 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $true -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($mixedExitCode -eq 0) -Message 'Expected mixed standard-table extension to succeed.'
   Assert-Condition -Condition ($script:MockContext.Forms.Count -eq 2) -Message 'Expected a new wizard form alongside the existing Information form.'
@@ -493,7 +493,7 @@ try {
   $script:MockContext.Views.Add($generatedView) | Out-Null
   $script:MockContext.Views.Add($otherView) | Out-Null
 
-  . (Join-Path $adoptionRepo 'scripts/bootstrap/60-build-forms-views.ps1')
+  . $sourceScript
   Add-WizardArtifactManifestItem -RepoRoot $adoptionRepo -ScenarioSlug 'adoption-scenario' -SolutionName 'TestSolution' -PublisherPrefix 'tst' -Kind 'table' -Name 'tst_request' -Status 'created' -Step '20-build-tables.ps1' | Out-Null
   $adoptionExitCode = Invoke-WizardFormsViewsBuild -EnvironmentUrl 'https://mock.crm.dynamics.com' -AccessToken 'token' -PublisherPrefix 'tst' -PayloadsFolder (Join-Path $adoptionRepo 'payloads') -ScenarioSlug 'adoption-scenario' -MinBusinessFieldsPerForm 4 -MinBusinessColumnsPerView 4 -IncludeOwnerOnForms $false -IncludeOwnerInViews $false -IncludeStatusInViews $false -PreferFormName 'Starter Main Form' -FormStrategy 'create-new-forms' -FailIfUnderpopulatedForms $true -FailIfUnderpopulatedViews $true
   Assert-Condition -Condition ($adoptionExitCode -eq 0) -Message 'A current-scenario-created custom table should adopt its generated Active view.'
@@ -541,6 +541,10 @@ finally {
   [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', $originalSkipMain)
   $env:DV_SOLUTION_NAME = $originalSolutionName
   $env:DV_PUBLISHER_PREFIX = $originalPublisherPrefix
+  $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
+  foreach ($testRoot in $testRoots) {
+    Remove-Item -LiteralPath $testRoot -Recurse -Force -ErrorAction SilentlyContinue
+  }
 }
 
 exit 0

@@ -13,6 +13,16 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $scriptPath = Join-Path $repoRoot 'scripts/bootstrap/62-build-app-module.ps1'
 $payloads = Join-Path $repoRoot 'payloads/scenarios/gcc-framework-acceptance'
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+$targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('pp-app-module-target-' + [guid]::NewGuid().ToString('N'))
+$null = New-Item -ItemType Directory -Path $targetRoot -Force
+$scenarioRoot = Join-Path $targetRoot 'specs/gcc-framework-acceptance'
+$null = New-Item -ItemType Directory -Path (Split-Path $scenarioRoot -Parent) -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'specs/gcc-framework-acceptance') -Destination $scenarioRoot -Recurse -Force
+$payloads = Join-Path $targetRoot 'payloads/scenarios/gcc-framework-acceptance'
+$null = New-Item -ItemType Directory -Path (Split-Path $payloads -Parent) -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads/scenarios/gcc-framework-acceptance') -Destination $payloads -Recurse -Force
+$env:WIZARD_TARGET_PROJECT_ROOT = $targetRoot
 $calls = [Collections.Generic.List[object]]::new()
 $appState = [Collections.Generic.List[object]]::new()
 $siteMapState = [Collections.Generic.List[object]]::new()
@@ -51,14 +61,19 @@ $requestInvoker = {
     return [pscustomobject]@{}
 }
 
-& $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
-$firstSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/artifacts/app-module/app-module-summary.json') -Raw | ConvertFrom-Json
-& $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
-$secondSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/artifacts/app-module/app-module-summary.json') -Raw | ConvertFrom-Json
-if ($appState.Count -ne 1 -or $siteMapState.Count -ne 1) { throw 'App/sitemap rerun created duplicates.' }
-if ($firstSummary.appModuleId -cne $secondSummary.appModuleId -or $firstSummary.siteMapId -cne $secondSummary.siteMapId) { throw 'App/sitemap IDs changed on rerun.' }
-if (@($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -in @('appmodules','sitemaps') }).Count -ne 2) { throw 'App/sitemap second run issued a create request.' }
-if (@($calls | Where-Object Path -like 'solutioncomponents?*').Count -lt 2) { throw 'App/sitemap updates did not verify target-solution ownership.' }
-$publishCalls = @($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'PublishXml' })
-if ($publishCalls.Count -ne 2 -or @($publishCalls | Where-Object { $_.Body.ParameterXml -notmatch '<appmodules><appmodule>11111111-1111-1111-1111-111111111111</appmodule></appmodules>' }).Count -gt 0) { throw 'App publication was not scoped to the stable app ID.' }
+try {
+    & $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
+    $firstSummary = Get-Content -LiteralPath (Join-Path $targetRoot '.wizard-metrics/artifacts/app-module/app-module-summary.json') -Raw | ConvertFrom-Json
+    & $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
+    $secondSummary = Get-Content -LiteralPath (Join-Path $targetRoot '.wizard-metrics/artifacts/app-module/app-module-summary.json') -Raw | ConvertFrom-Json
+    if ($appState.Count -ne 1 -or $siteMapState.Count -ne 1) { throw 'App/sitemap rerun created duplicates.' }
+    if ($firstSummary.appModuleId -cne $secondSummary.appModuleId -or $firstSummary.siteMapId -cne $secondSummary.siteMapId) { throw 'App/sitemap IDs changed on rerun.' }
+    if (@($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -in @('appmodules','sitemaps') }).Count -ne 2) { throw 'App/sitemap second run issued a create request.' }
+    if (@($calls | Where-Object Path -like 'solutioncomponents?*').Count -lt 2) { throw 'App/sitemap updates did not verify target-solution ownership.' }
+    $publishCalls = @($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'PublishXml' })
+    if ($publishCalls.Count -ne 2 -or @($publishCalls | Where-Object { $_.Body.ParameterXml -notmatch '<appmodules><appmodule>11111111-1111-1111-1111-111111111111</appmodule></appmodules>' }).Count -gt 0) { throw 'App publication was not scoped to the stable app ID.' }
+} finally {
+    $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
+    Remove-Item -LiteralPath $targetRoot -Recurse -Force -ErrorAction SilentlyContinue
+}
 Write-Host 'App module create/rerun test passed.' -ForegroundColor Green
