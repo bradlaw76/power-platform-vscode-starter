@@ -197,16 +197,18 @@ Common mistake:
 
 ## Step 4A: Start a Direct Wizard Path
 
+Before discovery, identify the installed wizard as the read-only `FrameworkRoot` and explicitly resolve a separate application `TargetProjectRoot`. Follow the Framework Source Protection Contract in `docs/wizard-contract-v1.md`; no planning, telemetry, or generated output may be written until the target is resolved.
+
 If you already started `/power-platform-wizard-init`, continue in that conversation and do not start another wizard command. For the manual sequence, start one direct path:
 
 - VS Code chat prompt (direct wizard path): run `/power-platform-demo-wizard` in Copilot Chat.
-- Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`.
-- Terminal retrofit wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Retrofit`.
+- Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root>`.
+- Terminal retrofit wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Retrofit`.
 
 What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
-- Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
+- Terminal wizard: asks discovery questions in PowerShell and creates starter files under the approved target's `specs/<scenario-slug>/`.
 - Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
 - Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
@@ -222,7 +224,7 @@ Validation checkpoint:
 After the first wizard creates your scenario files, generate the demo artifacts for both engineer and presenter:
 
 ```powershell
-pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 What this step does:
@@ -236,12 +238,12 @@ What this step does:
 Optional rehearsal step:
 
 ```powershell
-pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 Validation checkpoint:
 
-- `demo-walkthrough.md` and `demo-talk-track.md` exist under `specs/<scenario-slug>/`.
+- `demo-walkthrough.md` and `demo-talk-track.md` exist under the target project's `specs/<scenario-slug>/`.
 - The story, hero record, and talking points reflect the business problem and success criteria.
 
 ---

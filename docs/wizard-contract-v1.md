@@ -42,13 +42,13 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 
 - Exposes the complete core discovery, architecture intent, entity mapping, user-task, relationship, report, demo-data, solution identity, and source-control controls.
 - Must not ask about disposable environments, destructive cleanup, retention policy, or framework rerun-proof evidence.
-- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder`.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode advanced-builder`.
 
 ### Framework Acceptance (explicit only)
 
 - Includes Advanced Builder controls plus authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved destructive cleanup, and an evidence plan.
 - Never select this mode implicitly from an app idea or environment name.
-- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode framework-acceptance`.
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
 
@@ -208,8 +208,8 @@ Required gate before execution:
 
 ### Core Modules (always)
 
-1. `00-prereq-check.ps1`
-2. `10-auth-connect.ps1`
+1. `00-prereq-check.ps1 -TargetProjectRoot <target-project-root>`
+2. `10-auth-connect.ps1 -TargetProjectRoot <target-project-root>`
 3. `15-dry-validate.ps1`
 4. `20-build-tables.ps1`
 5. `30-build-columns.ps1`

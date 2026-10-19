@@ -37,7 +37,10 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 if ($PreviewOnly) { $Mode = 'Preview' }
 
@@ -48,7 +51,7 @@ function Get-WizardSecurityRolesPayload {
     if ($files.Count -ne 1) {
         throw "Expected exactly one security-role payload; found $($files.Count)."
     }
-    $schemaPath = Join-Path $repoRoot 'schemas/payloads/security-roles.schema.json'
+    $schemaPath = Join-Path $frameworkRoot 'schemas/payloads/security-roles.schema.json'
     $json = Get-Content -LiteralPath $files[0].FullName -Raw -Encoding UTF8
     if (-not (Test-Json -Json $json -SchemaFile $schemaPath -ErrorAction Stop)) {
         throw "Security-role payload '$($files[0].Name)' failed schema validation."

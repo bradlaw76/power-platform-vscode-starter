@@ -87,9 +87,11 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
-    $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-}
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$requestedTargetRoot = if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $env:WIZARD_TARGET_PROJECT_ROOT } else { $RepoRoot }
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $requestedTargetRoot
+$RepoRoot = $applicationRoots.TargetProjectRoot
 
 $metricsRoot = Join-Path $RepoRoot '.wizard-metrics'
 if ([string]::IsNullOrWhiteSpace($OutputPath)) {
@@ -101,6 +103,8 @@ if ([string]::IsNullOrWhiteSpace($DataJsonPath)) {
 if ([string]::IsNullOrWhiteSpace($EventsPath)) {
     $EventsPath = Join-Path $metricsRoot 'events.jsonl'
 }
+$null = Assert-WizardWritablePath -Path $OutputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $RepoRoot
+$null = Assert-WizardWritablePath -Path $DataJsonPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $RepoRoot
 
 New-Item -ItemType Directory -Path $metricsRoot -Force | Out-Null
 

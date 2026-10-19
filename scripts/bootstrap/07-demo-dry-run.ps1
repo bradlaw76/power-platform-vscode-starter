@@ -68,6 +68,8 @@ NON-NEGOTIABLES
 
 param(
     [string]$ScenarioSlug,
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot,
     [switch]$Force
 )
 
@@ -94,7 +96,14 @@ function Confirm-Overwrite {
     return $answer -match '^(y|yes)$'
 }
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
+    throw 'Application Authoring Mode requires an explicit -TargetProjectRoot; dry-run evidence cannot be written to FrameworkRoot.'
+}
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$TargetProjectRoot = $projectRoots.TargetProjectRoot
+$repoRoot = $TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -115,8 +124,13 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
 }
 
 $scenarioFolder = Join-Path $specsRoot $ScenarioSlug
+if ($ScenarioSlug -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+    throw "Scenario slug '$ScenarioSlug' must contain lowercase letters, numbers, and single hyphens."
+}
+$null = Assert-WizardWritablePath -Path $scenarioFolder -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 $demoScriptPath = Join-Path $scenarioFolder "demo-script.md"
 $dryRunPath = Join-Path $scenarioFolder "demo-dry-run.md"
+$null = Assert-WizardWritablePath -Path $dryRunPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 
 if (-not (Test-Path $demoScriptPath)) {
     throw "Missing demo script: $demoScriptPath. Run 06-demo-script-wizard.ps1 first."

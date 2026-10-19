@@ -18,6 +18,8 @@ Skill availability is not runtime installation. A copied `SKILL.md` does not pro
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for installation and provenance checks.
 
+The authoritative Framework Source Protection Contract in `docs/wizard-contract-v1.md` applies to every mode. Resolve a separate `TargetProjectRoot` explicitly before any write, treat the installed framework as read-only, and reject overlapping roots or framework repository Git operations. Do not silently move or reinterpret existing scenario files.
+
 ## What This Produces
 
 - A selected start path (chat or terminal)
@@ -41,25 +43,27 @@ Before intake, inspect the target repository without modifying it. Report presen
 
 Before asking discovery questions or listing build commands, give the user a short startup preview with these exact headings:
 
-- `Initial setup`: preview that, after confirmation, you will inspect the target repository without modifying tracked project files and run the non-destructive prerequisite check.
+- `Initial setup`: preview that, after confirmation, you will inspect the selected application target without modifying tracked project files and run the non-destructive prerequisite check.
 - `Before discovery`: explain that the user will identify the application type first, then identify a new build or retrofit, and then choose chat or terminal.
 - `What will change`: state that initial setup writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but does not authenticate, create Dataverse resources, run build scripts, commit, or push. Planning files are created only after intake begins and the user approves the path.
-- `First decision`: ask the user to confirm the target repository. Ask only this one question in the first response.
+- `First decision`: ask the user to identify and confirm the application `TargetProjectRoot`, distinct from the read-only framework installation. Ask only this one question in the first response.
 
 Keep this preview beginner-safe. Expand `PAC CLI`, `Dataverse`, and `Spec Kit` the first time each term appears. If the user arrived from the GitHub URL and has not cloned the repository, do not assume a folder location or project name. Ask the user two things first: (1) where they want to keep their Power Platform projects (a parent folder path), and (2) what to name this project (used as the clone's folder name). Only after they answer, give the exact clone/open commands built from their answers, then tell them to enter `/power-platform-wizard-init` in Copilot Chat. Also accept the natural-language fallback: `Start the Power Platform wizard in this repository.`
 
 After repository confirmation, do not ask for confirmation again. Perform the repository preflight and run:
 
 ```powershell
-pwsh ./scripts/bootstrap/00-prereq-check.ps1
+pwsh ./scripts/bootstrap/00-prereq-check.ps1 -TargetProjectRoot <target-project-root>
 ```
+
+Pass the resolved target explicitly with `-TargetProjectRoot <target-project-root>`; the framework checkout is never an application target.
 
 Summarize pass/fail results in plain language. Resolve missing setup requirements before beginning discovery. Treat the check as non-destructive rather than read-only because local telemetry files may be updated.
 
 ## Procedure
 
 1. Confirm target repo
-- Verify the user wants to run in the current workspace repository.
+- Verify the user has identified the application target repository separately from the read-only framework installation.
 - If repository confirmation is already present in the conversation, reuse it and do not ask again.
 - Apply `requirements/GithubInstructions_General.md` to the app or demo being created.
 - Run a read-only preflight for repository root, remote, current/default branch, working-tree state, recent history, existing tooling, and applicable validation commands.
@@ -79,10 +83,10 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 
 3. Select the start path
 - Chat path: continue the intake in the current conversation. Do not invoke `/power-platform-demo-wizard` and restart setup.
-- Demo Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1`
-- Advanced Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder`
-- Framework Acceptance terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`
-- Retrofit terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit`
+- Demo Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root>`
+- Advanced Builder terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode advanced-builder`
+- Framework Acceptance terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode framework-acceptance`
+- Retrofit terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode advanced-builder -Retrofit`
 
 4. Run the selected mode's intake (do not mix modes)
 - Demo Builder asks six business questions plus one consolidated technical recommendation confirmation. Infer application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, and solution identity. Do not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
@@ -152,6 +156,7 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Never bypass planning to jump straight to build scripts.
 - Keep unrelated working-tree changes untouched.
 - Require explicit approval before commit and separate approval before push.
+- Before staging, committing, pushing, or preparing a pull request, use the contract's repository-identity check and reject the framework repository in Application Authoring Mode.
 - After push, verify that the remote branch contains the local commit before reporting success.
 
 ## Progress Commands

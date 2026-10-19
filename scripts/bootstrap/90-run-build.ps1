@@ -49,6 +49,9 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder = '',
+    [Parameter(Mandatory)]
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot,
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
     [scriptblock]$RequestInvoker
@@ -57,7 +60,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
 
@@ -84,10 +90,14 @@ $hasSecurityRolesPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Fi
 $idempotencyEnabled = $hasReportingPayload -or $hasDataPayload -or $hasSecurityRolesPayload
 
 $runRoot = Join-Path $repoRoot ".wizard-metrics/runs/$ScenarioSlug"
+$null = Assert-WizardWritablePath -Path $runRoot -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
 $statePath = Join-Path $runRoot 'current-run.json'
 $summaryJsonPath = Join-Path $runRoot 'run-summary.json'
 $summaryMarkdownPath = Join-Path $runRoot 'run-summary.md'
+foreach ($outputPath in @($statePath, $summaryJsonPath, $summaryMarkdownPath)) {
+    $null = Assert-WizardWritablePath -Path $outputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
+}
 
 $scope = [ordered]@{
     scenarioSlug = $ScenarioSlug

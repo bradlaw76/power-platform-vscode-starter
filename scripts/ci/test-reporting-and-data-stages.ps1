@@ -16,7 +16,7 @@ $testRepoRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-report-data-$([guid
 New-Item -ItemType Directory -Path $testRepoRoot -Force | Out-Null
 $env:WIZARD_REPORTING_SKIP_MAIN = 'true'
 $env:WIZARD_DATA_SKIP_MAIN = 'true'
-. (Join-Path $repoRoot 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug 'ignored'
+. (Join-Path $repoRoot 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug 'ignored' -TargetProjectRoot $testRepoRoot
 . (Join-Path $repoRoot 'scripts/bootstrap/66-seed-synthetic-data.ps1') -ScenarioSlug 'ignored'
 Remove-Item Env:WIZARD_REPORTING_SKIP_MAIN, Env:WIZARD_DATA_SKIP_MAIN
 

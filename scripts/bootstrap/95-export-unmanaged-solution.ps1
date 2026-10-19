@@ -18,7 +18,10 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 if ([string]::IsNullOrWhiteSpace($SolutionUniqueName) -and -not $PreviewOnly) { throw 'SolutionUniqueName is required.' }
 $effectiveSolutionName = if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) { '[not configured]' } else { $SolutionUniqueName }
 if ([string]::IsNullOrWhiteSpace($OutputFolder)) { $OutputFolder = Join-Path $repoRoot ".wizard-metrics/exports/$ScenarioSlug" }
@@ -26,6 +29,10 @@ $membershipPath = Join-Path $repoRoot ".wizard-metrics/artifacts/contamination/$
 $evidencePath = Join-Path $repoRoot ".wizard-metrics/artifacts/export/$ScenarioSlug.json"
 $zipPath = Join-Path $OutputFolder "$effectiveSolutionName.zip"
 $unpackPath = Join-Path $OutputFolder 'unpacked'
+$null = Assert-WizardWritablePath -Path $evidencePath -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
+$null = Assert-WizardWritablePath -Path $OutputFolder -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
+$null = Assert-WizardWritablePath -Path $zipPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
+$null = Assert-WizardWritablePath -Path $unpackPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
 $commands = @(
     @('solution','export','--name',$effectiveSolutionName,'--path',$zipPath,'--managed','false','--overwrite'),
     @('solution','unpack','--zipfile',$zipPath,'--folder',$unpackPath,'--packagetype','Unmanaged','--allowDelete','false')

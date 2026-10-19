@@ -75,11 +75,6 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
-if (Test-Path $telemetryHelper) {
-    . $telemetryHelper
-    Initialize-WizardStepTelemetry -RepoRoot $repoRoot -StepName "01-install-skills.ps1"
-}
 
 $skillsSource = Join-Path $repoRoot ".claude\skills"
 $skillsDest   = Join-Path $HOME ".claude\skills"
@@ -92,9 +87,6 @@ Write-Host ""
 
 if (-not (Test-Path $skillsSource)) {
     Write-Host "No skills found in repo at $skillsSource. Nothing to install." -ForegroundColor Yellow
-    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
-        Complete-WizardStepTelemetry -Message "No skills folder found."
-    }
     exit 0
 }
 
@@ -135,6 +127,3 @@ Write-Host "  and a report-only skill at .github/skills/dataverse-report-wizard"
 Write-Host "  Invoke it in Copilot Chat with:"
 Write-Host "  /power-platform-wizard-init"
 Write-Host "  /dataverse-report-wizard"
-if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
-    Complete-WizardStepTelemetry -Message "Skills installed."
-}

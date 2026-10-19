@@ -100,7 +100,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -310,12 +313,13 @@ function New-BuildMindMapArtifacts {
 
     $defaultOutputPath = Join-Path $RepoRootPath ".wizard-metrics\artifacts\analysis\build-mind-map.md"
     $outputPath = if ([string]::IsNullOrWhiteSpace($RequestedOutputPath)) { $defaultOutputPath } else { $RequestedOutputPath }
+    $jsonOutputPath = [System.IO.Path]::ChangeExtension($outputPath, ".json")
     $outputFolder = Split-Path -Path $outputPath -Parent
+    $null = Assert-WizardWritablePath -Path $outputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $RepoRootPath
+    $null = Assert-WizardWritablePath -Path $jsonOutputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $RepoRootPath
     if (-not [string]::IsNullOrWhiteSpace($outputFolder)) {
         New-Item -ItemType Directory -Path $outputFolder -Force | Out-Null
     }
-
-    $jsonOutputPath = [System.IO.Path]::ChangeExtension($outputPath, ".json")
 
     $cleanStandard = @($StandardTableExtensions | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and $_ -ne "Not available" } | Sort-Object -Unique)
     $cleanCustom = @($CustomTables | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and $_ -ne "Not available" } | Sort-Object -Unique)
@@ -581,6 +585,7 @@ function Set-ReadmeGeneratedSummary {
         [System.Text.RegularExpressions.MatchEvaluator]{ param($m) $replacement }
     )
 
+    $null = Assert-WizardWritablePath -Path $ReadmeFile -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
     Set-Content -Path $ReadmeFile -Value $updated -Encoding UTF8
 }
 
@@ -590,16 +595,16 @@ function Show-RepoTargetDetails {
     Write-Host ""
     Write-Host "Repository target safety check:" -ForegroundColor Cyan
 
-    $top = (& git rev-parse --show-toplevel 2>$null)
-    $branch = (& git branch --show-current 2>$null)
-    $remote = (& git remote -v 2>$null)
-
-    if ($LASTEXITCODE -ne 0) {
-        Write-Host "Unable to read git repository details. Skipping git actions." -ForegroundColor Yellow
+    try {
+        $identity = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot -Operation stage
+    } catch {
+        Write-Host "Critical repository identity failure: $($_.Exception.Message)" -ForegroundColor Red
         return $false
     }
 
-    $topPath = ($top -join "`n").Trim()
+    $top = $identity.Root
+    $branch = (& git -C $identity.Root branch --show-current 2>$null)
+    $remote = (& git -C $identity.Root remote -v 2>$null)
 
     Write-Host "  git rev-parse --show-toplevel"
     Write-Host "  $($top -join "`n")" -ForegroundColor DarkGray
@@ -613,12 +618,10 @@ function Show-RepoTargetDetails {
     Write-Host "  $($branch -join "`n")" -ForegroundColor DarkGray
 
     if (-not [string]::IsNullOrWhiteSpace($ExpectedRepoRoot)) {
-        $expected = (Resolve-Path $ExpectedRepoRoot).Path
-        if ($topPath -ne $expected) {
-            Write-Host ""
-            Write-Host "Git top-level does not match script repository root." -ForegroundColor Yellow
-            Write-Host "Expected: $expected" -ForegroundColor DarkGray
-            Write-Host "Actual:   $topPath" -ForegroundColor DarkGray
+        $expected = Resolve-WizardPhysicalPath -Path $ExpectedRepoRoot
+        if (-not $top.Equals($expected, [StringComparison]::OrdinalIgnoreCase)) {
+            Write-Host "Git top-level does not match the approved target project root." -ForegroundColor Red
+            return $false
         }
     }
 
@@ -1024,6 +1027,7 @@ if ($updateReadme) {
         if (Show-RepoTargetDetails -ExpectedRepoRoot $repoRoot) {
             Push-Location $repoRoot
             try {
+                $null = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot -Operation stage
                 & git add README.md
                 if ($LASTEXITCODE -ne 0) {
                     throw "git add README.md failed."
@@ -1033,6 +1037,7 @@ if ($updateReadme) {
                 if ([string]::IsNullOrWhiteSpace(($status -join "").Trim())) {
                     Write-Host "No README changes to commit." -ForegroundColor Yellow
                 } else {
+                    $null = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot -Operation commit
                     & git commit -m "docs: refresh generated build summary in README"
                     if ($LASTEXITCODE -ne 0) {
                         throw "git commit failed."
@@ -1047,6 +1052,7 @@ if ($updateReadme) {
 
                     $pushThisBranch = Read-YesNo "Push to origin/$branchName now? (y/N)"
                     if ($pushThisBranch) {
+                        $null = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot -Operation push
                         & git push origin $branchName
                         if ($LASTEXITCODE -ne 0) {
                             throw "git push origin $branchName failed."

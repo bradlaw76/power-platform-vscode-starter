@@ -226,10 +226,15 @@ project. Run the skill from a compatible clone of this repository.
 
 ## Run the wizard directly
 
+Resolve a separate application `TargetProjectRoot` first. The installed framework
+is read-only during application authoring; generated payloads, previews, and
+mappings are written only to that target, as defined in
+[`wizard-contract-v1.md`](wizard-contract-v1.md).
+
 You can bypass the AI skill and run the PowerShell wizard:
 
 ```powershell
-pwsh .\scripts\bootstrap\08-report-wizard.ps1
+pwsh .\scripts\bootstrap\08-report-wizard.ps1 -TargetProjectRoot C:\Projects\case-operations
 ```
 
 The interactive wizard asks for:
@@ -282,7 +287,7 @@ Choose live preview when prompted.
 ### Using the terminal
 
 ```powershell
-pwsh .\scripts\bootstrap\08-report-wizard.ps1
+pwsh .\scripts\bootstrap\08-report-wizard.ps1 -TargetProjectRoot C:\Projects\case-operations
 ```
 
 The wizard asks for an HTTPS Dataverse environment URL such as:
@@ -376,6 +381,7 @@ Run:
 ```powershell
 pwsh .\scripts\bootstrap\08-report-wizard.ps1 `
   -ScenarioSlug case-operations `
+  -TargetProjectRoot C:\Projects\case-operations `
   -Force `
   -Deploy
 ```
@@ -567,6 +573,7 @@ Run a preview using sanitized metadata:
 ```powershell
 pwsh .\scripts\bootstrap\08-report-wizard.ps1 `
   -ScenarioSlug case-operations `
+  -TargetProjectRoot C:\Projects\case-operations `
   -MetadataSnapshotPath .\scripts\ci\fixtures\report-wizard-metadata.json `
   -ConfigurationPath C:\Temp\case-report.json
 ```

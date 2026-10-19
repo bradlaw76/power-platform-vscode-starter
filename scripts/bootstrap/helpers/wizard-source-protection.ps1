@@ -71,6 +71,36 @@ function Assert-WizardApplicationRoots {
     }
 }
 
+function Initialize-WizardApplicationContext {
+    param(
+        [Parameter(Mandatory)] [string]$FrameworkRoot,
+        [string]$TargetProjectRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+    )
+
+    if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
+        throw 'Application Authoring Mode requires an explicitly resolved TargetProjectRoot before this stage can run.'
+    }
+    $roots = Assert-WizardApplicationRoots -FrameworkRoot $FrameworkRoot -TargetProjectRoot $TargetProjectRoot
+    foreach ($relativeRoot in @('specs', 'payloads', '.wizard-metrics', 'out', 'exports', 'solutions', 'docs')) {
+        $treeRoot = Join-Path $roots.TargetProjectRoot $relativeRoot
+        if (-not (Test-Path -LiteralPath $treeRoot -PathType Container)) { continue }
+        $null = Assert-WizardWritablePath -Path $treeRoot -FrameworkRoot $roots.FrameworkRoot -TargetProjectRoot $roots.TargetProjectRoot
+        foreach ($item in @(Get-ChildItem -LiteralPath $treeRoot -Force -Recurse -ErrorAction Stop)) {
+            $physicalItem = Resolve-WizardPhysicalPath -Path $item.FullName
+            if (-not (Test-WizardPathWithin -Path $physicalItem -Root $roots.TargetProjectRoot)) {
+                throw "Critical: Application Authoring Mode found a symbolic-link escape from TargetProjectRoot: $($item.FullName) -> $physicalItem"
+            }
+            if ($item.PSIsContainer -and (Test-Path -LiteralPath (Join-Path $item.FullName '.git')) -and
+                -not $physicalItem.Equals($roots.TargetProjectRoot, [StringComparison]::OrdinalIgnoreCase)) {
+                throw "Application Authoring Mode found a nested Git repository in generated-output tree: $($item.FullName)"
+            }
+        }
+    }
+    $env:WIZARD_FRAMEWORK_ROOT = $roots.FrameworkRoot
+    $env:WIZARD_TARGET_PROJECT_ROOT = $roots.TargetProjectRoot
+    return $roots
+}
+
 function Assert-WizardWritablePath {
     param(
         [Parameter(Mandatory)] [string]$Path,
@@ -115,7 +145,11 @@ function Get-WizardGitIdentity {
         if ($remote -match '^git@([^:]+):(.+)$') {
             $remote = "https://$($Matches[1])/$($Matches[2])"
         }
-        $remote.TrimEnd('/').TrimEnd('.git').ToLowerInvariant()
+        $remote = $remote.TrimEnd('/')
+        if ($remote.EndsWith('.git', [StringComparison]::OrdinalIgnoreCase)) {
+            $remote = $remote.Substring(0, $remote.Length - 4)
+        }
+        $remote.ToLowerInvariant()
     } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
 
     return [pscustomobject]@{ Root = $root; Remotes = @($remotes) }

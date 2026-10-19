@@ -23,7 +23,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $runtimeHelper = Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1'
 if (-not (Test-Path -LiteralPath $runtimeHelper -PathType Leaf)) {
     throw "Dataverse runtime helper not found: $runtimeHelper"

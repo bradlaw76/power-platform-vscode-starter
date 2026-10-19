@@ -1518,7 +1518,10 @@ function New-ReportHtml {
 "@.Replace('__REPORT_MODE__', (ConvertTo-HtmlSafeText $ReportConfig.report.mode))
 }
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $specsRoot = Join-Path $repoRoot 'specs'
 
 $telemetryHelper = Join-Path $PSScriptRoot 'helpers\wizard-telemetry.ps1'

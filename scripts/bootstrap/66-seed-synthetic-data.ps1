@@ -17,7 +17,10 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 $envFile = Join-Path $repoRoot '.env.ps1'
 if ($env:WIZARD_DATA_SKIP_MAIN -ne 'true' -and (Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {

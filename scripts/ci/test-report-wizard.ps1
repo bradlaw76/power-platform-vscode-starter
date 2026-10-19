@@ -2,11 +2,14 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $scenarioSlug = "report-wizard-test-$([guid]::NewGuid().ToString('N').Substring(0, 8))"
-$configurationPath = Join-Path ([IO.Path]::GetTempPath()) "$scenarioSlug.json"
-$payloadFolder = Join-Path $repoRoot "payloads/scenarios/$scenarioSlug"
-$scenarioFolder = Join-Path $repoRoot "specs/$scenarioSlug"
+$testRoot = Join-Path ([IO.Path]::GetTempPath()) "report-wizard-$([guid]::NewGuid().ToString('N'))"
+$targetProjectRoot = Join-Path $testRoot 'target'
+$configurationPath = Join-Path $testRoot "$scenarioSlug.json"
+$payloadFolder = Join-Path $targetProjectRoot "payloads/scenarios/$scenarioSlug"
+$scenarioFolder = Join-Path $targetProjectRoot "specs/$scenarioSlug"
 
 try {
+    New-Item -ItemType Directory -Path $targetProjectRoot -Force | Out-Null
     [ordered]@{
         ReportRequest = 'Show open cases grouped by priority for service managers.'
         TargetAppUniqueName = 'ppvs_customer_service'
@@ -47,7 +50,7 @@ try {
             throw "Interactive report wizard is missing required prompt '$requiredPrompt'."
         }
     }
-    & $wizard -ScenarioSlug $scenarioSlug -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath
+    & $wizard -ScenarioSlug $scenarioSlug -TargetProjectRoot $targetProjectRoot -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath
 
     $payloadPath = Join-Path $payloadFolder "reporting-$scenarioSlug.json"
     $previewPath = Join-Path $scenarioFolder 'report-artifacts/query-preview.json'
@@ -74,12 +77,12 @@ try {
     }
 
     try {
-        & $wizard -ScenarioSlug $scenarioSlug -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath
+        & $wizard -ScenarioSlug $scenarioSlug -TargetProjectRoot $targetProjectRoot -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath
         throw 'Expected overwrite protection to fail.'
     } catch {
         if ($_.Exception.Message -notmatch 'already exists') { throw }
     }
-    & $wizard -ScenarioSlug $scenarioSlug -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath -Force
+    & $wizard -ScenarioSlug $scenarioSlug -TargetProjectRoot $targetProjectRoot -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath -Force
 
     $calls = [Collections.Generic.List[object]]::new()
     $chartState = [Collections.Generic.List[object]]::new()
@@ -134,7 +137,7 @@ try {
         return [pscustomobject]@{}
     }
 
-    & $wizard -ScenarioSlug $scenarioSlug -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ConfigurationPath $configurationPath -Force -Deploy -RequestInvoker $requestInvoker
+    & $wizard -ScenarioSlug $scenarioSlug -TargetProjectRoot $targetProjectRoot -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ConfigurationPath $configurationPath -Force -Deploy -RequestInvoker $requestInvoker
     $appComponentCall = @($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'AddAppComponents' })
     if ($appComponentCall.Count -ne 1 -or @($appComponentCall[0].Body.Components).Count -ne 2) {
         throw 'Deployment did not attach the generated chart and dashboard to the selected app.'
@@ -151,7 +154,7 @@ try {
     $invalidConfiguration.Charts[0].Aggregate = 'sum'
     $invalidConfiguration | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $configurationPath -Encoding UTF8
     try {
-        & $wizard -ScenarioSlug $scenarioSlug -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath -Force
+        & $wizard -ScenarioSlug $scenarioSlug -TargetProjectRoot $targetProjectRoot -MetadataSnapshotPath $snapshot -ConfigurationPath $configurationPath -Force
         throw 'Expected nonnumeric aggregate validation to fail.'
     } catch {
         if ($_.Exception.Message -notmatch 'requires a numeric measure') { throw }
@@ -160,6 +163,5 @@ try {
     Write-Host 'Report wizard tests passed.' -ForegroundColor Green
 } finally {
     Remove-Item -LiteralPath $configurationPath -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $payloadFolder -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item -LiteralPath $scenarioFolder -Recurse -Force -ErrorAction SilentlyContinue
+    Remove-Item -LiteralPath $testRoot -Recurse -Force -ErrorAction SilentlyContinue
 }

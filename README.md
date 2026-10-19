@@ -290,6 +290,8 @@ Official upstream project:
 
 Use this setup so Spec Kit artifacts can be created consistently:
 
+The wizard checkout is the read-only `FrameworkRoot`. Choose an existing, separate application repository as `TargetProjectRoot` before starting; generated application artifacts must never be written into the framework checkout.
+
 1. Install repo skills (once per machine):
 
 ```powershell
@@ -299,7 +301,8 @@ pwsh ./scripts/bootstrap/01-install-skills.ps1
 2. Start the guided planning flow (creates `spec.md`, `plan.md`, `tasks.md`):
 
 ```powershell
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
+$targetProjectRoot = "$HOME/projects/my-app"
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot
 ```
 
 The default `demo-builder` asks six business questions and presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering.
@@ -356,14 +359,16 @@ Primary path:
 Direct wizard alternatives (still supported):
 
 ```powershell
+$targetProjectRoot = "$HOME/projects/my-app"
+
 # Demo Builder (default)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot
 
 # Advanced Builder (explicit technical controls)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot -Mode advanced-builder
 
 # Framework Acceptance (explicit authorized acceptance only)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot -Mode framework-acceptance
 ```
 
 ```text
@@ -443,7 +448,8 @@ Validation: `az account show` and `pac auth list` both return your profile and e
 Optional but recommended before authentication and build scripts:
 
 ```powershell
-pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+$targetProjectRoot = "$HOME/projects/my-app"
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot $targetProjectRoot
 ```
 
 This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates:

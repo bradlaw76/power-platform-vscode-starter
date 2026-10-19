@@ -126,7 +126,7 @@ $frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
     throw 'Application Authoring Mode requires an explicit -TargetProjectRoot. Existing scenario files are not moved automatically.'
 }
-$projectRoots = Assert-WizardApplicationRoots -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 $TargetProjectRoot = $projectRoots.TargetProjectRoot
 $repoRoot = $TargetProjectRoot
 $scriptedAnswers = $null
@@ -1142,9 +1142,11 @@ New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
 # 10-auth-connect.ps1 will overwrite this file with full auth + config when it runs.
 $envFilePath = Join-Path $repoRoot ".env.ps1"
 $null = Assert-WizardWritablePath -Path $envFilePath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$escapedTargetRoot = $TargetProjectRoot.Replace("'", "''")
 $planEnvContent = @"
 # Planning values set by 05-start-wizard.ps1 -- do not commit this file.
 # Run 10-auth-connect.ps1 next to complete authentication and full configuration.
+`$env:WIZARD_TARGET_PROJECT_ROOT = '$escapedTargetRoot'
 `$env:DV_SOLUTION_NAME       = "$($answers["SolutionName"])"
 `$env:DV_PUBLISHER_PREFIX    = "$($answers["PublisherPrefix"])"
 `$global:DV_SOLUTION_NAME    = "`$env:DV_SOLUTION_NAME"
@@ -1789,12 +1791,12 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 if ($Retrofit) {
     Write-Host "  1. Review spec.md — confirm it reflects current state accurately."
     Write-Host "  2. Review plan.md — confirm remaining work is complete and correct."
-    Write-Host "  3. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
+    Write-Host "  3. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug -TargetProjectRoot `"$TargetProjectRoot`""
     Write-Host "  4. Get stakeholder approval on current state + remaining work."
     Write-Host "  5. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
 } else {
     Write-Host "  1. Review and refine the generated files."
-    Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
+    Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug -TargetProjectRoot `"$TargetProjectRoot`""
     Write-Host "  3. Get approval on scope, success criteria, and demo story."
     Write-Host "  4. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
 }
