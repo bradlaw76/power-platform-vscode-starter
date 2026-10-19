@@ -94,18 +94,19 @@ NON-NEGOTIABLES
     Optional JSON file containing an ordered array of answers for unattended
     acceptance testing.
 
-.PARAMETER WorkspaceRoot
-    Optional repository root used for isolated acceptance testing. Defaults to
-    the repository containing this script.
+.PARAMETER TargetProjectRoot
+    Required existing application project directory. WorkspaceRoot is retained
+    only as an explicit compatibility alias; neither value defaults to the
+    framework repository containing this script.
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Force
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application -Force
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application -Mode advanced-builder -Retrofit
 #>
 
 param(

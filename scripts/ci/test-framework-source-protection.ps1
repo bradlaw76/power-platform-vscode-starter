@@ -34,6 +34,10 @@ try {
     Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('config', 'user.name', 'Source Protection Test')
     Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('config', 'user.email', 'source-protection@example.invalid')
     Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('remote', 'add', 'origin', $sharedRemote)
+    Set-Content -LiteralPath (Join-Path $frameworkRoot 'README.md') -Value 'framework maintenance baseline'
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('add', 'README.md')
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('commit', '-m', 'baseline')
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('branch', 'main')
 
     Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('init', '-b', 'feature/application')
     Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('config', 'user.name', 'Source Protection Test')
@@ -58,6 +62,17 @@ try {
 
     $frameworkDocs = Join-Path $frameworkRoot 'docs'
     New-Item -ItemType Directory -Path $frameworkDocs -Force | Out-Null
+    $protectedFile = Join-Path $frameworkDocs 'protected.md'
+    Set-Content -LiteralPath $protectedFile -Value 'framework-owned'
+    foreach ($caller in @('ordinary user', 'repository owner')) {
+        Assert-Throws {
+            $writePath = Assert-WizardWritablePath -Path $protectedFile -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot
+            Set-Content -LiteralPath $writePath -Value "unauthorized by $caller"
+        } 'outside TargetProjectRoot'
+        if ((Get-Content -LiteralPath $protectedFile -Raw).Trim() -cne 'framework-owned') {
+            throw "Application Authoring Mode modified a framework file for $caller."
+        }
+    }
     $frameworkLink = Join-Path $targetRoot 'framework-docs'
     New-Item -ItemType SymbolicLink -Path $frameworkLink -Target $frameworkDocs | Out-Null
     Assert-Throws {
@@ -72,9 +87,11 @@ try {
 
     $null = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot -Operation stage
     Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', $sharedRemote)
-    Assert-Throws {
-        Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot -Operation push
-    } 'shares a remote'
+    foreach ($operation in @('stage', 'commit', 'push', 'pull-request')) {
+        Assert-Throws {
+            $null = Assert-WizardApplicationGitOperation -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot -Operation $operation
+        } 'shares a remote'
+    }
 
     Assert-Throws {
         Assert-WizardFrameworkMaintenanceApproval -FrameworkRoot $frameworkRoot -Operation modify -Approved:$false
@@ -92,13 +109,19 @@ try {
     if ($modifyApproval.Mode -ne 'Framework Maintenance' -or @($modifyApproval.ApprovedPaths) -notcontains 'docs/new.md') {
         throw 'Framework Maintenance Mode did not return the exact approved modification scope.'
     }
-    foreach ($operation in @('commit', 'push')) {
-        $switchName = "Approve$($operation.Substring(0, 1).ToUpperInvariant())$($operation.Substring(1))"
-        $approvalArgs = @{}
-        $approvalArgs[$switchName] = $true
-        $approval = & $maintenanceScript -Task test -Operation $operation -FrameworkRoot $frameworkRoot @approvalArgs
-        if ($approval.Operation -ne $operation) { throw "Framework Maintenance Mode failed the separate '$operation' approval." }
-    }
+    Set-Content -LiteralPath (Join-Path $frameworkDocs 'new.md') -Value 'approved change'
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('add', 'docs/new.md')
+    Assert-Throws {
+        & $maintenanceScript -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -ApproveCommit
+    } 'exactly match the affected files'
+    $commitApproval = & $maintenanceScript -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -ApproveCommit
+    if ($commitApproval.Operation -ne 'commit') { throw 'Framework Maintenance Mode failed the separate commit approval.' }
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('commit', '-m', 'approved change')
+    Assert-Throws {
+        & $maintenanceScript -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -BaseRef main -ApprovePush
+    } 'exactly match the affected files'
+    $pushApproval = & $maintenanceScript -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -BaseRef main -ApprovePush
+    if ($pushApproval.Operation -ne 'push') { throw 'Framework Maintenance Mode failed the separate push approval.' }
     Assert-Throws {
         & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('../escape.md') -ApproveModify
     } 'safe FrameworkRoot-relative approved path'

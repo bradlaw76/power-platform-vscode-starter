@@ -18,6 +18,7 @@ param(
     [Parameter(Mandatory)]
     [string]$FrameworkRoot,
     [string[]]$ApprovedPaths = @(),
+    [string]$BaseRef = '',
     [switch]$ApproveModify,
     [switch]$ApproveCommit,
     [switch]$ApprovePush
@@ -63,14 +64,50 @@ foreach ($relativePath in @($ApprovedPaths)) {
         (Test-WizardPathWithin -Path $resolvedPath -Root (Join-Path $frameworkRootPath '.git'))) {
         throw "Framework Maintenance Mode rejected an approved path outside framework source: '$relativePath'."
     }
+    $parent = Split-Path -Parent $resolvedPath
+    while (-not [string]::IsNullOrWhiteSpace($parent) -and
+        (Test-WizardPathWithin -Path $parent -Root $frameworkRootPath) -and
+        -not $parent.Equals($frameworkRootPath, [StringComparison]::OrdinalIgnoreCase)) {
+        if (Test-Path -LiteralPath (Join-Path $parent '.git')) {
+            throw "Framework Maintenance Mode rejected a path inside a nested Git repository: '$relativePath'."
+        }
+        $nextParent = Split-Path -Parent $parent
+        if ($nextParent -eq $parent) { break }
+        $parent = $nextParent
+    }
     $approvedPathsResolved.Add([IO.Path]::GetRelativePath($frameworkRootPath, $resolvedPath).Replace('\', '/'))
 }
 
-if ($Operation -eq 'modify' -and $approvedPathsResolved.Count -eq 0) {
-    throw 'Framework Maintenance Mode requires at least one explicitly approved file path for modifications.'
+if ($approvedPathsResolved.Count -eq 0) {
+    throw "Framework Maintenance Mode requires exact approved file paths for '$Operation'."
 }
-if ($Operation -ne 'modify' -and $approvedPathsResolved.Count -gt 0) {
-    throw 'Commit and push approvals are separate and cannot be combined with modification path approval.'
+
+$approvedSet = @($approvedPathsResolved.ToArray() | Sort-Object -Unique)
+if ($approvedSet.Count -ne $approvedPathsResolved.Count) {
+    throw 'Framework Maintenance Mode rejects duplicate approved file paths.'
+}
+if ($Operation -eq 'commit') {
+    $operationPaths = @(& git -C $identity.Root diff --cached --name-only)
+    if ($LASTEXITCODE -ne 0) { throw 'Unable to verify staged framework paths for commit approval.' }
+} elseif ($Operation -eq 'push') {
+    if ([string]::IsNullOrWhiteSpace($BaseRef)) {
+        $upstreamOutput = @(& git -C $identity.Root rev-parse --abbrev-ref '@{upstream}' 2>$null)
+        if ($LASTEXITCODE -ne 0 -or $upstreamOutput.Count -eq 0) {
+            throw 'Framework Maintenance Mode push approval requires an upstream branch or an explicit -BaseRef.'
+        }
+        $BaseRef = ($upstreamOutput -join "`n").Trim()
+    }
+    $null = @(& git -C $identity.Root rev-parse --verify "$BaseRef^{commit}" 2>$null)
+    if ($LASTEXITCODE -ne 0) { throw "Framework Maintenance Mode could not resolve push comparison ref '$BaseRef'." }
+    $operationPaths = @(& git -C $identity.Root diff --name-only "$BaseRef...HEAD")
+    if ($LASTEXITCODE -ne 0) { throw "Unable to verify framework paths pending push against '$BaseRef'." }
+} else {
+    $operationPaths = $approvedSet
+}
+$normalizedOperationPaths = @($operationPaths | ForEach-Object { "$_".Replace('\', '/') } | Sort-Object -Unique)
+if ($normalizedOperationPaths.Count -eq 0 -or
+    (@(Compare-Object $approvedSet $normalizedOperationPaths).Count -gt 0)) {
+    throw "Framework Maintenance Mode '$Operation' approval paths must exactly match the affected files."
 }
 
 [pscustomobject]@{
@@ -78,5 +115,5 @@ if ($Operation -ne 'modify' -and $approvedPathsResolved.Count -gt 0) {
     FrameworkRoot = $frameworkRootPath
     Branch = $approval.Branch
     Operation = $Operation
-    ApprovedPaths = @($approvedPathsResolved.ToArray())
+    ApprovedPaths = $approvedSet
 }
