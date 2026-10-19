@@ -10,12 +10,19 @@ ENVIRONMENT:  PowerShell 7 | Credential-free CI
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $scenario = 'federal-foia-management'
-$payloadFolder = Join-Path $repoRoot "payloads/scenarios/$scenario"
+$targetRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-security-role-target-$([guid]::NewGuid().ToString('N'))"
+$null = New-Item -ItemType Directory -Path (Join-Path $targetRoot 'specs') -Force
+$null = New-Item -ItemType Directory -Path (Join-Path $targetRoot 'payloads/scenarios') -Force
+Copy-Item -LiteralPath (Join-Path $frameworkRoot "specs/$scenario") -Destination (Join-Path $targetRoot "specs/$scenario") -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $frameworkRoot "payloads/scenarios/$scenario") -Destination (Join-Path $targetRoot "payloads/scenarios/$scenario") -Recurse -Force
+$payloadFolder = Join-Path $targetRoot "payloads/scenarios/$scenario"
 $payloadPath = Join-Path $payloadFolder "security-roles-$scenario.json"
-$schemaPath = Join-Path $repoRoot 'schemas/payloads/security-roles.schema.json'
-$scriptPath = Join-Path $repoRoot 'scripts/bootstrap/68-build-security-roles.ps1'
+$schemaPath = Join-Path $frameworkRoot 'schemas/payloads/security-roles.schema.json'
+$scriptPath = Join-Path $frameworkRoot 'scripts/bootstrap/68-build-security-roles.ps1'
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+$env:WIZARD_TARGET_PROJECT_ROOT = $targetRoot
 
 $json = Get-Content -LiteralPath $payloadPath -Raw -Encoding UTF8
 if (-not (Test-Json -Json $json -SchemaFile $schemaPath -ErrorAction Stop)) {
@@ -46,7 +53,7 @@ $previewInvoker = {
     [void]$previewCalls.Add($request)
     throw 'Preview must not invoke Dataverse.'
 }.GetNewClosure()
-$preview = @(Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+$preview = @(Invoke-WizardSecurityRoleStage -RepoRoot $targetRoot -ScenarioSlug $scenario `
     -PayloadsFolder $payloadFolder -Mode Preview -RequestInvoker $previewInvoker)
 if ($preview.Count -ne 3 -or @($preview | Where-Object action -ne 'planned').Count -gt 0) {
     throw 'Preview must plan exactly three roles.'
@@ -146,7 +153,7 @@ $requestInvoker = {
     throw "Unexpected Dataverse request: $($request.Method) $path"
 }.GetNewClosure()
 
-$firstPass = @(Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+$firstPass = @(Invoke-WizardSecurityRoleStage -RepoRoot $targetRoot -ScenarioSlug $scenario `
     -PayloadsFolder $payloadFolder -Mode Apply -EnvironmentUrl 'https://unit.test' `
     -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -RequestInvoker $requestInvoker)
 if ($firstPass.Count -ne 3 -or @($firstPass | Where-Object action -ne 'created').Count -gt 0) {
@@ -168,7 +175,7 @@ foreach ($replaceCall in $replaceCalls) {
 }
 
 $firstPassCallCount = $calls.Count
-$secondPass = @(Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+$secondPass = @(Invoke-WizardSecurityRoleStage -RepoRoot $targetRoot -ScenarioSlug $scenario `
     -PayloadsFolder $payloadFolder -Mode Apply -EnvironmentUrl 'https://unit.test' `
     -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -RequestInvoker $requestInvoker)
 $secondPassCalls = @($calls | Select-Object -Skip $firstPassCallCount)
@@ -185,7 +192,7 @@ foreach ($role in @($rolesByName.Values)) {
 }
 $foreignRoles['FOIA Demo Processor'].description = 'Foreign role'
 try {
-    Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+    Invoke-WizardSecurityRoleStage -RepoRoot $targetRoot -ScenarioSlug $scenario `
         -PayloadsFolder $payloadFolder -Mode Apply -EnvironmentUrl 'https://unit.test' `
         -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -RequestInvoker $requestInvoker | Out-Null
     throw 'Expected ownership collision failure.'
@@ -199,7 +206,7 @@ $memberships.Clear()
 $calls.Clear()
 $testState.MissingPrivilegeName = 'prvReadfoia_aiassistancerecord'
 try {
-    Invoke-WizardSecurityRoleStage -RepoRoot $repoRoot -ScenarioSlug $scenario `
+    Invoke-WizardSecurityRoleStage -RepoRoot $targetRoot -ScenarioSlug $scenario `
         -PayloadsFolder $payloadFolder -Mode Apply -EnvironmentUrl 'https://unit.test' `
         -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -RequestInvoker $requestInvoker | Out-Null
     throw 'Expected unresolved privilege preflight failure.'
@@ -211,4 +218,6 @@ if (@($calls | Where-Object Method -eq 'Post').Count -ne 0) {
 }
 
 Remove-Item Env:WIZARD_SECURITY_ROLES_SKIP_MAIN -ErrorAction SilentlyContinue
+$env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
+Remove-Item -LiteralPath $targetRoot -Recurse -Force -ErrorAction SilentlyContinue
 Write-Host 'Security role stage tests passed.' -ForegroundColor Green

@@ -14,6 +14,10 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $orchestrator = Join-Path $repoRoot 'scripts/bootstrap/90-run-build.ps1'
 . (Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-run-state.ps1')
+$targetRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-run-preview-$([guid]::NewGuid().ToString('N'))"
+New-Item -ItemType Directory -Path $targetRoot -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $repoRoot 'specs') -Destination $targetRoot -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads') -Destination $targetRoot -Recurse -Force
 
 function Get-TrackedFileSnapshot {
     param([string]$RepositoryRoot)
@@ -51,15 +55,15 @@ $transport = {
 }
 
 for ($run = 1; $run -le 2; $run++) {
-    & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation -RequestInvoker $transport
-    $summaryPath = Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json'
+    & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -TargetProjectRoot $targetRoot -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation -RequestInvoker $transport
+    $summaryPath = Join-Path $targetRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json'
     $summary = Read-WizardJsonFile -Path $summaryPath
     if ($summary.status -ne 'preview-complete') { throw "Framework Acceptance preview $run did not complete." }
     foreach ($stageName in @('native-reporting', 'idempotency-baseline', 'idempotency-verification')) {
         $stage = @($summary.stages | Where-Object name -eq $stageName)
         if ($stage.Count -ne 1 -or $stage[0].status -ne 'completed') { throw "Framework Acceptance preview $run did not complete '$stageName'." }
     }
-    $statePath = Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/current-run.json'
+    $statePath = Join-Path $targetRoot '.wizard-metrics/runs/gcc-framework-acceptance/current-run.json'
     $state = Read-WizardJsonFile -Path $statePath
     if (@($state.stages).Count -ne @($summary.stages).Count) { throw "Framework Acceptance preview $run persisted an incomplete run state." }
     foreach ($evidencePath in @($statePath, $summaryPath)) {
@@ -73,6 +77,7 @@ $trackedAfter = @(Get-TrackedFileSnapshot -RepositoryRoot $repoRoot)
 $gitAfter = Get-GitStateSnapshot -RepositoryRoot $repoRoot
 if (@(Compare-Object $trackedBefore $trackedAfter).Count -ne 0) { throw 'Framework Acceptance previews changed checked-in file content.' }
 if ($gitBefore -cne $gitAfter) { throw 'Framework Acceptance previews changed Git HEAD, index, or worktree state.' }
+Remove-Item -LiteralPath $targetRoot -Recurse -Force -ErrorAction SilentlyContinue
 
 $atomicRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-run-state-$([guid]::NewGuid().ToString('N'))"
 $atomicPath = Join-Path $atomicRoot 'current-run.json'

@@ -152,6 +152,7 @@ The wizard framework is a read-only dependency during normal application develop
 - Framework changes require the separately selected Framework Maintenance Mode; Application Authoring Mode never grants framework-write access.
 - Maintenance operations require a dedicated `framework-maintenance/<task>` branch and distinct explicit approvals for modifying files, committing, and pushing. Approval for one operation does not authorize another.
 - Application build commands and application credentials cannot be reused as implicit framework maintenance authorization.
+- The source-level authorization gate is `scripts/bootstrap/framework-maintenance.ps1`; invoke it separately for each operation and provide exact FrameworkRoot-relative paths for modification approval.
 
 ### Compatibility and Migration
 

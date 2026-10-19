@@ -3,6 +3,7 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-source-protection.ps1')
+$maintenanceScript = Join-Path $repoRoot 'scripts/bootstrap/framework-maintenance.ps1'
 $testRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-source-protection-$([guid]::NewGuid().ToString('N'))"
 $frameworkRoot = Join-Path $testRoot 'framework'
 $targetRoot = Join-Path $testRoot 'application'
@@ -84,6 +85,23 @@ try {
             throw "Framework maintenance approval did not isolate the '$operation' operation."
         }
     }
+    Assert-Throws {
+        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md')
+    } 'separate explicit approval'
+    $modifyApproval = & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -ApproveModify
+    if ($modifyApproval.Mode -ne 'Framework Maintenance' -or @($modifyApproval.ApprovedPaths) -notcontains 'docs/new.md') {
+        throw 'Framework Maintenance Mode did not return the exact approved modification scope.'
+    }
+    foreach ($operation in @('commit', 'push')) {
+        $switchName = "Approve$($operation.Substring(0, 1).ToUpperInvariant())$($operation.Substring(1))"
+        $approvalArgs = @{}
+        $approvalArgs[$switchName] = $true
+        $approval = & $maintenanceScript -Task test -Operation $operation -FrameworkRoot $frameworkRoot @approvalArgs
+        if ($approval.Operation -ne $operation) { throw "Framework Maintenance Mode failed the separate '$operation' approval." }
+    }
+    Assert-Throws {
+        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('../escape.md') -ApproveModify
+    } 'safe FrameworkRoot-relative approved path'
 
     Write-Host 'Framework source protection tests passed.' -ForegroundColor Green
 } finally {
