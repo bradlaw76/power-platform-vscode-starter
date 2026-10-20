@@ -21,7 +21,7 @@ artifacts as part of its guided workflow.
 
 | Workload | Entry point | Use when |
 | --- | --- | --- |
-| Model-driven app development | `/power-platform-wizard-init` | You need to plan and build or retrofit a model-driven Power App or Dynamics 365 extension. |
+| Model-driven app development | `/power-platform-wizard-init` | You need a standalone Power Apps model-driven app, a New Dynamics 365 app, or an extension of an existing Dynamics 365 app. |
 | Reporting for an existing model-driven app | `/dataverse-report-wizard` | The app and tables already exist and you want guided native Dataverse charts, dashboards, and FetchXML previews. |
 | Direct reporting runtime | `pwsh .\scripts\bootstrap\08-report-wizard.ps1` | You want to run the report wizard directly from PowerShell. |
 
@@ -179,13 +179,13 @@ Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard
 | --- | --- | --- |
 | **VS Code shared skill (primary)** | `/power-platform-wizard-init` in Copilot Chat | Guided chat-or-terminal kickoff plus progress monitoring |
 | **VS Code Copilot Chat (direct wizard path)** | `/power-platform-demo-wizard` in Copilot Chat | Direct chat-first planning and Spec Kit generation |
-| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Seven-prompt Demo Builder by default; scaffold planning files |
+| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Workload/materials intake, six business questions and confirmation; scaffold planning files |
 | **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
 
 All three paths converge on the same sequence:
 
 ```text
-Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
+Workload choice -> Requirements-material intake/review -> Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
 ```
 
 For reporting against an existing model-driven app, use
@@ -380,10 +380,15 @@ Canonical source for discovery/planning/execution contract:
 **Application profiles (selected before discovery):**
 
 - `standalone-model-driven`: a normal Power Apps model-driven app, usually built from custom tables, with neutral operational report labels.
+- `new-dynamics-365-app`: **New Dynamics 365 app**, a separate model-driven app on Dataverse in a Dynamics 365 context, not an extension of an existing app. Confirm Dynamics modules, installed dependencies, and licensing in planning; the wizard does not provision first-party products or licenses.
 - `dynamics-sales-extension`, `dynamics-customer-service-extension`, or `dynamics-field-service-extension`: an extension that can reuse standard Dynamics tables and either create dedicated forms or update selected forms in place.
 - `generic-dataverse-solution`: Dataverse components packaged in a solution with the same explicit app contract.
 
 Every new profile-based run records its table/form strategy, primary entry-point table, named landing view, required app artifacts, and navigation group. The wizard creates or updates the model-driven review app on every run. App assembly places the entry-point table first in an app-aware sitemap and attaches the requested view; it does not change that table's environment-wide default view.
+
+**Requirements-material intake/review (all modes, before business discovery):** Provide/upload or point to requirements documents, related images, and public-source links. Chat reviews accessible authorized content and summarizes source-specific findings, planning impact, and open questions in the Requirements Materials section of `answers.md`, `spec.md`, and `plan.md`, with follow-up tasks in `tasks.md`. Findings inform discovery for your confirmation. If none, record `none` and continue with user answers and labeled assumptions. Never treat inaccessible/private links as reviewed; use authorized redacted uploads/excerpts or explicitly confirm assumptions before planning approval. Do not share credentials, secrets, personal data, signed URLs, or raw sensitive documents, or send content to third-party services.
+
+Terminal intake records human/chat review notes; it does not fetch URLs or interpret documents/images. Use `-RequirementsMaterialsFile <path>` with `schemas/requirements-materials.schema.json` to reuse review notes. Legacy `-AnswersFile` arrays without notes record `not-collected`, requiring intake/review or explicit none before approval. Workload selection and materials intake are separate from the six Demo Builder business questions; scripted Demo Builder can select `-ApplicationProfile new-dynamics-365-app`. See the [canonical intake contract](docs/wizard-contract-v1.md#requirements-material-intakereview-all-modes).
 
 **Discovery questions:**
 

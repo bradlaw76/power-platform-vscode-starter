@@ -1158,7 +1158,7 @@ function Get-WizardAppModuleConfig {
             $validationErrors.Add('App module wiring requires at least one expected table.') | Out-Null
         }
         if ($featureConfig.ProfileSectionPresent) {
-            if (@('standalone-model-driven', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -notcontains $featureConfig.ApplicationProfile) {
+            if (@('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -notcontains $featureConfig.ApplicationProfile) {
                 $validationErrors.Add("Unsupported application profile '$($featureConfig.ApplicationProfile)'.") | Out-Null
             }
             if (@('oob-only', 'custom-only', 'hybrid') -notcontains $featureConfig.TableStrategy) {
