@@ -611,7 +611,7 @@ if ($reportingPayloads.Count -gt 1) {
             $localValidationIssues.Add("Dashboard '$($dashboard.Name)' must resolve exactly once; found $($dashboardMatches.Count).") | Out-Null
         } else {
             $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.systemform' -IdProperty 'formid' -IdValue $dashboardMatches[0].formid)) | Out-Null
-            $dashboardTitle = "$($dashboard.Name)" -replace '^Federal FOIA\s+', ''
+            $dashboardTitle = "$($dashboard.Name)"
             $dashboardNavigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; title=$dashboardTitle; id=$dashboardMatches[0].formid }) | Out-Null
             $navigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; isEntryPoint=$false }) | Out-Null
         }
