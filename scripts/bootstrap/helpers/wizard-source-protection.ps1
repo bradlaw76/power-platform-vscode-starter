@@ -81,6 +81,8 @@ function Initialize-WizardApplicationContext {
         throw 'Application Authoring Mode requires an explicitly resolved TargetProjectRoot before this stage can run.'
     }
     $roots = Assert-WizardApplicationRoots -FrameworkRoot $FrameworkRoot -TargetProjectRoot $TargetProjectRoot
+    # Fail before telemetry, planning, or any application files are written.
+    $null = Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $roots.FrameworkRoot -TargetProjectRoot $roots.TargetProjectRoot
     foreach ($relativeRoot in @('specs', 'payloads', '.wizard-metrics', 'out', 'exports', 'solutions', 'docs')) {
         $treeRoot = Join-Path $roots.TargetProjectRoot $relativeRoot
         if (-not (Test-Path -LiteralPath $treeRoot -PathType Container)) { continue }
@@ -140,19 +142,51 @@ function Get-WizardGitIdentity {
         throw "Unable to establish Git repository identity for '$RepositoryPath'."
     }
     $root = Resolve-WizardPhysicalPath -Path (($rootOutput -join "`n").Trim())
-    $remotes = @(& git -C $RepositoryPath remote get-url --all 2>$null | ForEach-Object {
-        $remote = "$_".Trim()
-        if ($remote -match '^git@([^:]+):(.+)$') {
-            $remote = "https://$($Matches[1])/$($Matches[2])"
+    $remoteNames = @(& git -C $RepositoryPath remote 2>$null)
+    if ($LASTEXITCODE -ne 0) { throw "Unable to list Git remotes for '$RepositoryPath'." }
+    $remoteValues = [Collections.Generic.List[string]]::new()
+    foreach ($remoteName in $remoteNames) {
+        $urls = @(& git -C $RepositoryPath remote get-url --all "$remoteName" 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw "Unable to resolve Git remote '$remoteName'." }
+        foreach ($url in $urls) {
+            $remote = "$url".Trim()
+            if ($remote -match '^git@([^:]+):(.+)$') {
+                $remote = "https://$($Matches[1])/$($Matches[2])"
+            }
+            $remote = $remote.TrimEnd('/')
+            if ($remote.EndsWith('.git', [StringComparison]::OrdinalIgnoreCase)) {
+                $remote = $remote.Substring(0, $remote.Length - 4)
+            }
+            if (-not [string]::IsNullOrWhiteSpace($remote)) { $remoteValues.Add($remote.ToLowerInvariant()) }
         }
-        $remote = $remote.TrimEnd('/')
-        if ($remote.EndsWith('.git', [StringComparison]::OrdinalIgnoreCase)) {
-            $remote = $remote.Substring(0, $remote.Length - 4)
-        }
-        $remote.ToLowerInvariant()
-    } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+    }
+    $remotes = @($remoteValues.ToArray() | Sort-Object -Unique)
 
     return [pscustomobject]@{ Root = $root; Remotes = @($remotes) }
+}
+
+function Assert-WizardApplicationRepositoryIdentity {
+    param(
+        [Parameter(Mandatory)] [string]$FrameworkRoot,
+        [Parameter(Mandatory)] [string]$TargetProjectRoot
+    )
+
+    $frameworkIdentity = Get-WizardGitIdentity -RepositoryPath $FrameworkRoot
+    $targetIdentity = Get-WizardGitIdentity -RepositoryPath $TargetProjectRoot
+    if (-not $targetIdentity.Root.Equals($TargetProjectRoot, [StringComparison]::OrdinalIgnoreCase)) {
+        throw "Application Authoring Mode requires TargetProjectRoot to identify its Git repository root."
+    }
+    if ($targetIdentity.Root.Equals($frameworkIdentity.Root, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Critical: Application Authoring Mode rejected the framework repository as an application target.'
+    }
+    if ($frameworkIdentity.Remotes.Count -eq 0 -or $targetIdentity.Remotes.Count -eq 0) {
+        throw 'Application Authoring Mode requires identifiable framework and target Git remotes.'
+    }
+    $sharedRemotes = @($targetIdentity.Remotes | Where-Object { $frameworkIdentity.Remotes -contains $_ })
+    if ($sharedRemotes.Count -gt 0) {
+        throw 'Critical: Application Authoring Mode rejected a target sharing the framework Git remote.'
+    }
+    return $targetIdentity
 }
 
 function Assert-WizardApplicationGitOperation {
