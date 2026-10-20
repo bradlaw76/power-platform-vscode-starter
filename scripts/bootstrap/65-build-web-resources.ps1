@@ -952,7 +952,7 @@ function Get-MetricCandidates {
             Title             = "$entityDisplayName by Priority"
             Kind              = 'aggregate-group'
             EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryid__', 'prioritycode|cct_priority|priorityid|*_priority')
+            RequiredFields    = @('__primaryid__', 'prioritycode|priorityid|*_priority')
             Optional          = $false
             Reason            = 'Priority visibility is explicitly referenced in case-style scenario artifacts.'
         })
