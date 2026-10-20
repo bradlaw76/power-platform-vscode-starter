@@ -17,6 +17,7 @@ param(
     [Parameter(Mandatory)] [string]$ScenarioSlug,
     [string]$PayloadsFolder = '',
     [switch]$PreviewOnly,
+    [switch]$AcknowledgeWriteFreeze,
     [scriptblock]$RequestInvoker
 )
 
@@ -92,8 +93,13 @@ function Invoke-WizardReportingStage {
     param(
         [string]$RepoRoot, [string]$ScenarioSlug, [string]$PayloadsFolder,
         [string]$EnvironmentUrl, [string]$AccessToken, [string]$SolutionUniqueName, [string]$PublisherPrefix,
-        [switch]$PreviewOnly, [scriptblock]$RequestInvoker
+        [switch]$PreviewOnly, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze
     )
+    . (Join-Path $PSScriptRoot 'helpers/choice-migration.ps1')
+    if (-not $PreviewOnly) {
+        Assert-WizardChoiceCutover -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
+            -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+    }
     $payload = Get-WizardSinglePayload -Folder $PayloadsFolder -Pattern 'reporting-*.json'
     if (-not $payload.Enabled) { return @() }
     $dashboards = @(Get-WizardDashboardDefinitions -Payload $payload)
@@ -238,5 +244,5 @@ function Invoke-WizardReportingStage {
 
 if ($env:WIZARD_REPORTING_SKIP_MAIN -ne 'true') {
     if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) { $PayloadsFolder = Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug" }
-    Invoke-WizardReportingStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker | Out-Null
+    Invoke-WizardReportingStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze | Out-Null
 }

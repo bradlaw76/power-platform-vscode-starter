@@ -148,6 +148,7 @@ function Invoke-WizardDataverseRequest {
         [Parameter(Mandatory)] [string]$EnvironmentUrl,
         [Parameter(Mandatory)] [string]$AccessToken,
         [object]$Body,
+        [hashtable]$AdditionalHeaders = @{},
         [switch]$PreviewOnly,
         [int]$MaxAttempts = 5,
         [scriptblock]$TokenProvider,
@@ -190,6 +191,12 @@ function Invoke-WizardDataverseRequest {
             Accept = 'application/json'
             'OData-Version' = '4.0'
             'OData-MaxVersion' = '4.0'
+        }
+        foreach ($key in $AdditionalHeaders.Keys) {
+            if ($key -notin @('If-Match', 'MSCRM.SolutionUniqueName', 'Prefer')) {
+                throw "Unsupported additional Dataverse header."
+            }
+            $headers[$key] = $AdditionalHeaders[$key]
         }
         $request = [pscustomobject]@{
             Method = $Method

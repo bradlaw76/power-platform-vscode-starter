@@ -313,6 +313,7 @@ function Get-SolutionComponentInventory {
     $typeMap = Get-SolutionComponentTypeMap
     $entityType = Get-ComponentTypeValue -Map $typeMap -Labels @('Entity') -Fallback 1
     $attributeType = Get-ComponentTypeValue -Map $typeMap -Labels @('Attribute') -Fallback 2
+    $globalChoiceType = Get-ComponentTypeValue -Map $typeMap -Labels @('Option Set', 'OptionSet', 'Global Choice') -Fallback 9
     $relationshipTypes = @(
         Get-ComponentTypeValue -Map $typeMap -Labels @('Entity Relationship', 'Relationship') -Fallback 10
         Get-ComponentTypeValue -Map $typeMap -Labels @('Entity Relationship Role', 'Relationship Role') -Fallback 11
@@ -344,6 +345,16 @@ function Get-SolutionComponentInventory {
             continue
         }
 
+        if ($componentType -eq $globalChoiceType) {
+            $choice = & $InvokeGet "GlobalOptionSetDefinitions($objectId)?`$select=Name,MetadataId"
+            if ($null -eq $choice -or [string]::IsNullOrWhiteSpace("$($choice.Name)") -or
+                ([guid]$choice.MetadataId) -ne ([guid]$objectId)) { throw 'Global Choice inventory identity could not be verified.' }
+            $items.Add([pscustomobject]@{
+                Kind='global-choice'; Category='global-choices'; Name=$choice.Name; ObjectId=$objectId
+                SolutionComponentId="$($component.solutioncomponentid)"; ComponentType=$componentType
+            }) | Out-Null
+            continue
+        }
         if ($componentType -eq $attributeType) {
             try {
                 $entities = Invoke-Dv "Get" "EntityDefinitions?`$select=LogicalName&`$expand=Attributes(`$select=LogicalName,MetadataId;`$filter=MetadataId eq $objectId)"

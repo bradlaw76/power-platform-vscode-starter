@@ -132,7 +132,7 @@
 5. Create queues and routing rules for Intake, Search, Review, Legal, Supervisory Approval, Release, and Appeals.
 6. Configure SLAs against authoritative due-date fields while preserving the statutory Clock Event ledger.
 7. Produce supported designer handoffs for the primary and appeal BPFs; do not fabricate unsupported workflow metadata.
-8. Treat BPF chevrons as the authoritative interactive process-stage indicator. Keep `foia_lifecyclestage` and `foia_stage` as reporting/status-projection columns, but do not repeat them as steps in every stage.
+8. Treat BPF chevrons as the authoritative interactive process-stage indicator. After the approved Choice migration, use `foia_lifecyclestagechoice` and `foia_stagechoice` as reporting/status projections; retain original text columns for rollback, not visible input.
 9. Permit Due Date, Disposition, and Outcome in multiple stages only as contextual reuse of the same record values; store detailed search, review, redaction, decision, and release evidence in the related child tables.
 
 ## Plug-In And Flow Work
@@ -289,3 +289,89 @@ Follow [docs/onboarding.md](../../docs/onboarding.md):
 - [x] Environment selection plus authentication and GET-only verification are explicitly authorized and complete as an exception to the reconciliation gate.
 - [x] The 300-item catalog crosswalk is reviewed, deterministically validated, and approved.
 - [ ] Dataverse mutation, publishing, data seeding, export, and release authorization are explicitly granted at their applicable gates.
+# Choice migration preparation — 2026-10-20
+
+Repository prepared, not deployed; all existing live evidence is historical.
+Offline tests use injected transports only. Future operator approval must cover
+the environment and solution before any metadata or row access.
+Use stage 32 to preview metadata, apply additive metadata, preview bounded paged
+backfill, then apply backfill with optimistic row concurrency. Review the complete
+mapping contract first. Validate a fresh preview with zero pending rows before
+cutting forms, views, BPFs, reports and synthetic data over. Default orchestration
+must stop before cutover until this gate passes. Keep legacy fields for rollback;
+never convert or delete them. Export requires membership and usability checks.
+
+### Future operator sequence (not authorized or executed in this change)
+
+Follow `docs/onboarding.md` for the underlying bootstrap order. This is an
+additive migration exception before experience stages, not an in-place conversion:
+
+1. Review the contract independently, approve the target environment and
+   `FederalFOIAManagement` solution, freeze edits and capture a secure backup.
+   Confirm source tag `federal-foia-synthetic-v1` ownership, existing String
+   columns and table solution membership. For a fresh environment, complete
+   the normal schema and first table-membership stages before this migration.
+2. Invoke `32-migrate-choices.ps1` with explicit `-PayloadsFolder`,
+   `-ScenarioSlug federal-foia-management`, `-SolutionUniqueName FederalFOIAManagement`,
+   `-EnvironmentUrl` and `-AccessToken`. Do not save tokens in commands or Git;
+   pass an approved in-memory token variable. Default `-Mode Metadata` is
+   read-only; inspect planned counts and conflicts.
+3. Separately approve and repeat with `-Mode Metadata -Apply`. This creates
+   global Choices and side-by-side Picklists, explicitly syncs components 9
+   and 2, verifies membership and publishes only selected entities/Choices.
+   Metadata inventory (names, IDs and membership only) is saved under
+   `.wizard-metrics/artifacts/choices/federal-foia-management.json`.
+4. Invoke `-Mode Backfill` without `-Apply`, reviewing counts and resolving
+   errors privately. `-MaxRows` defaults to 10,000 total selected rows across
+   tables, `-PageSize` to 250. Reads select only IDs, source tag and mapped
+   categorical columns and include every row with nonnull mapped data.
+   Any such row owned by another scenario or lacking the approved tag blocks
+   the run; do not expand ownership scope without separate review.
+5. After approval, repeat the exact scope with
+   `-Mode Backfill -Apply -ApproveBackfill -AcknowledgeWriteFreeze`. The explicit
+   acknowledgement confirms an active maintenance window/write freeze, not a
+   transactional guarantee. All pages, values, mappings,
+   existing targets and ETags are validated before the first write. Each PATCH
+   contains only new Choice fields and uses If-Match. A concurrency failure
+   stops the run; some earlier rows may have succeeded. Preview again and rerun
+   safely. There is no cross-row transaction or automatic rollback.
+6. Run `-Mode Validate -AcknowledgeWriteFreeze` with the same bound and require
+   zero pending rows while the freeze is still active. For the default orchestrator
+   or direct experience/data stages, pass `-AcknowledgeWriteFreeze` only after
+   confirming the maintenance window. This is human
+   acknowledgement, not proof of migration completion or an alternative to live reads.
+   The default orchestrator and direct stages 55/60/64/66 repeat fresh read-only
+   validation before mutating surfaces/data; no stale local success flag bypasses it.
+   Keep all writers stopped until all surfaces have been validated; independent
+   read calls cannot guarantee a stable dataset if concurrent writers are active.
+7. Update the existing designer-authored BPFs to the new payload field contract,
+   publish those processes, then follow the authoritative experience sequence
+   for forms/views, BPF/app linkage, charts/dashboards and optional seed rerun.
+   Never claim the old process IDs imply the designer steps already changed.
+8. Verify scoped publish, final inventory/membership, legacy-control absence,
+   Choice labels, null open outcomes, app usability and report correctness before
+   export. Preserve historical manifests and text data for controlled rollback.
+
+Clock/Audit rows are excluded from automatic backfill and cutover row validation:
+their original evidence text is immutable and retained unchanged. Additive Choice
+metadata is still prepared there for newly created future synthetic rows.
+The seed stage skips all updates to existing Clock/Audit records; it may create
+new explicitly approved synthetic rows with integer Choice values. Historical
+evidence is a deliberate UI exception: retain legacy Clock/Audit categorical
+controls read-only and labeled `(Legacy evidence)` alongside new Choice controls.
+Their views include both old evidence and new Choice columns. Other tables remove
+legacy categorical controls normally. The Clock Events by Type chart retains
+legacy evidence grouping and excludes null legacy categories; it is not a migrated
+future-Choice or mixed historical series. Any future Choice-only clock chart
+requires a separately reviewed reporting payload change.
+There is no switch authorizing this helper to rewrite historical Clock/Audit rows.
+Approved decisions may also be protected by deployed server enforcement; an
+authorized maintenance role is required and this helper never bypasses enforcement.
+
+The current cutover gate intentionally compares populated legacy text with
+nonnull business Choices on nonhistorical tables. After cutover, a legitimate
+Choice edit can therefore conflict with its retained legacy snapshot and block
+a later migration/surface rerun. This is a conservative hard stop, not evidence
+that the newer Choice is wrong. Do not overwrite Choices to satisfy the gate;
+separately review reconciliation/retirement of this migration-only gate before
+routine post-cutover reruns. There is no stale success flag or implicit override.

@@ -141,7 +141,7 @@ All new relationships use `Restrict` delete and `NoCascade` for assign, share, u
 
 Each stage shall define entry criteria, required fields, exit criteria, allowed roles, and exception handling in the process payload and designer handoff.
 
-The BPF stage chevrons are authoritative for the interactive process position. `foia_lifecyclestage` remains a reporting, view, sample-data, and external status-projection column, but it is not repeated as a required step in each BPF stage. Due Date and Disposition may appear in more than one stage as contextual access to the same FOIA Request value; this does not create duplicate storage. Search, review, redaction, approval, and release evidence remains in the related child tables.
+The BPF stage chevrons are authoritative for the interactive process position. After approved migration, `foia_lifecyclestagechoice` is the reporting/view/sample-data projection; legacy `foia_lifecyclestage` is rollback data. The projection is not repeated as a required step in each BPF stage. Due Date and Disposition may appear in more than one stage as contextual access to the same FOIA Request value; this does not create duplicate storage. Search, review, redaction, approval, and release evidence remains in the related child tables.
 
 ### Appeal Process
 
@@ -154,7 +154,7 @@ The BPF stage chevrons are authoritative for the interactive process position. `
 
 Appeal dates use the same immutable clock-event mechanism but a distinct clock type and reporting classification.
 
-The same rule applies to appeals: the BPF chevrons are authoritative for interactive stage position, while `foia_stage` (display label **Appeal Stage**) remains available for reporting, views, sample data, and external status projection without being repeated as a BPF step. Due Date and Outcome may be reused contextually across stages as references to the same Appeal record values.
+The same rule applies to appeals: after approved migration, `foia_stagechoice` (display label **Appeal Stage**) supplies reporting/view/sample-data projections; legacy `foia_stage` is rollback data. It is not repeated as a BPF step. Due Date and Outcome may be reused contextually across stages as references to the same Appeal record values.
 
 ## Statutory Clock Design
 
@@ -233,3 +233,12 @@ The implementation plan shall define deterministic synthetic data for normal, ex
 10. Inventory and solution membership pass before export.
 11. An unmanaged development artifact and documented rollback path exist; managed release remains a separate approval.
 12. No automatic deployment, unauthorized live access, or production data use occurs.
+# Choice migration preparation — 2026-10-20
+
+Repository preparation only; NOT deployed. Existing deployment evidence describes
+the historical text-column build, not the new Choice metadata or migrated rows.
+Preserve all legacy String columns and historical IDs. Add side-by-side global
+Choice columns ending in `choice`, with explicit field-specific mappings.
+Unknown, ambiguous, invalid or conflicting values block the entire backfill
+before any row writes. Review findings are not request dispositions; `Open`
+means no final outcome and maps explicitly to null. No live access is authorized.

@@ -15,9 +15,9 @@
       "StageName": "Intake",
       "RequiredFields": [
         "foia_trackingnumber",
-        "foia_intakechannel",
+        "foia_intakechannelchoice",
         "foia_receiveddate",
-        "foia_validationstate"
+        "foia_validationstatechoice"
       ],
       "ExitCriteria": "Validation, tracking, and acknowledgment complete; FOIA-INT-002..005.",
       "EntityLogicalName": "foia_foiarequest",
@@ -27,7 +27,7 @@
       "Order": 2,
       "StageName": "Clarification",
       "RequiredFields": [
-        "foia_validationstate",
+        "foia_validationstatechoice",
         "foia_clarificationduedate"
       ],
       "ExitCriteria": "Scope is clarified and perfected or controlled disposition recorded; FOIA-CAS-001.",
@@ -68,7 +68,7 @@
       "Order": 6,
       "StageName": "Approval",
       "RequiredFields": [
-        "foia_disposition"
+        "foia_dispositionchoice"
       ],
       "ExitCriteria": "Independent human approvals are recorded; FOIA-CAS-005; FOIA-SEC-002.",
       "EntityLogicalName": "foia_foiarequest",
@@ -78,7 +78,7 @@
       "Order": 7,
       "StageName": "Release",
       "RequiredFields": [
-        "foia_disposition"
+        "foia_dispositionchoice"
       ],
       "ExitCriteria": "Method, recipient, hash, and timestamp are recorded; FOIA-REV-005.",
       "EntityLogicalName": "foia_foiarequest",
@@ -88,7 +88,7 @@
       "Order": 8,
       "StageName": "Closure",
       "RequiredFields": [
-        "foia_disposition",
+        "foia_dispositionchoice",
         "foia_closeddate"
       ],
       "ExitCriteria": "Closure reconciles to clock and audit history; FOIA-RPT-003.",

@@ -15,7 +15,7 @@
         }
       ],
       "Name": "Active Requests by Lifecycle Stage",
-      "CategoryField": "foia_lifecyclestage",
+      "CategoryField": "foia_lifecyclestagechoice",
       "TableLogicalName": "foia_foiarequest",
       "ChartType": "column",
       "AggregateField": "foia_trackingnumber",
@@ -30,7 +30,7 @@
         }
       ],
       "Name": "Expedited Requests by Decision",
-      "CategoryField": "foia_expediteddecision",
+      "CategoryField": "foia_expediteddecisionchoice",
       "TableLogicalName": "foia_foiarequest",
       "ChartType": "doughnut",
       "AggregateField": "foia_trackingnumber",
@@ -46,7 +46,7 @@
     },
     {
       "Name": "Appeals by Outcome",
-      "CategoryField": "foia_outcome",
+      "CategoryField": "foia_outcomechoice",
       "TableLogicalName": "foia_appeal",
       "ChartType": "pie",
       "AggregateField": "foia_appealnumber",
@@ -56,8 +56,8 @@
       "Filters": [
         {
           "Operator": "eq",
-          "Field": "foia_approvalstate",
-          "Value": "Approved"
+          "Field": "foia_approvalstatechoice",
+          "Value": 100000003
         }
       ],
       "Name": "Approved Exemptions by Authority",
@@ -70,6 +70,7 @@
     {
       "Name": "Clock Events by Type",
       "CategoryField": "foia_eventtype",
+      "Filters": [{"Field": "foia_eventtype", "Operator": "not-null"}],
       "TableLogicalName": "foia_clockevent",
       "ChartType": "column",
       "AggregateField": "foia_eventidentifier",
@@ -83,7 +84,7 @@
         }
       ],
       "Name": "Open Reviews by Type",
-      "CategoryField": "foia_reviewtype",
+      "CategoryField": "foia_reviewtypechoice",
       "TableLogicalName": "foia_reviewtask",
       "ChartType": "bar",
       "AggregateField": "foia_reviewtasknumber",
@@ -91,7 +92,7 @@
     },
     {
       "Name": "Release Packages by Approval State",
-      "CategoryField": "foia_approvalstate",
+      "CategoryField": "foia_approvalstatechoice",
       "TableLogicalName": "foia_releasepackage",
       "ChartType": "doughnut",
       "AggregateField": "foia_packagenumber",

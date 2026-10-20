@@ -92,6 +92,7 @@ param(
     [bool]$FailIfBpfDefinitionIncomplete = $true,
     [bool]$PreferUpdateExistingBpf = $true,
     [bool]$PreviewOnly = $false,
+    [switch]$AcknowledgeWriteFreeze,
     [int]$MinimumStageCount = 2,
     [int]$MinimumConditionCount = 2,
     [int]$MinimumStepCount = 2
@@ -154,6 +155,11 @@ if (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)
 $artifactPaths = Get-ScenarioArtifactPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
 $artifactText = Get-PlanningArtifactContent -Paths @($artifactPaths.AnswersPath, $artifactPaths.SpecPath, $artifactPaths.PlanPath, $artifactPaths.TasksPath)
 $scenarioPayloadFolder = Get-ScenarioPayloadFolder -RepoRoot $repoRoot -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug
+. (Join-Path $PSScriptRoot 'helpers/choice-migration.ps1')
+if (-not $PreviewOnly) {
+    Assert-WizardChoiceCutover -PayloadsFolder $scenarioPayloadFolder -ScenarioSlug $ScenarioSlug `
+        -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+}
 $processDefinitions = @(Get-BpfDefinitions -PayloadFolder $scenarioPayloadFolder)
 $reportFolder = Join-Path $artifactPaths.ScenarioFolder 'reports'
 $aggregateReportPath = Join-Path $reportFolder 'business-process-flow-report.json'

@@ -109,7 +109,7 @@ must never be reused. New values append above the current maximum.
 ## Business Process Stage And Field Contract
 
 - The request and appeal BPF chevrons are authoritative for the interactive process position.
-- `foia_lifecyclestage` and `foia_stage` remain authoritative reporting, view, sample-data, and external status-projection columns; they are not repeated as required steps in each BPF stage.
+- After migration approval, `foia_lifecyclestagechoice` and `foia_stagechoice` are the reporting/view/sample-data projections; original String columns remain rollback data. Neither projection is repeated as a step in every BPF stage.
 - Due Date, Disposition, and Outcome can appear in multiple stages as contextual references to one underlying value on the current record. Their reuse does not create duplicate columns or records.
 - Search Tasks, Responsive Records, Review Tasks, Exemption Decisions, Redaction Decisions, Release Packages, Clock Events, and Audit Events retain the detailed operational evidence rather than duplicating it on the parent process record.
 - The request process has 8 stages, 16 entry/exit criteria, and 13 steps. The appeal process has 6 stages, 12 entry/exit criteria, and 10 steps.
@@ -293,3 +293,95 @@ With every `AZ_*_ENABLED=false` and no Azure connection or endpoint:
 6. AI/OCR/search adapters return explicit `Disabled`; no core step waits for them.
 
 This path is the mandatory release gate for GCC High and IL5 portability.
+# Choice migration preparation — 2026-10-20
+
+NOT deployed. Historical deployment paragraphs above remain historical evidence.
+The machine-readable `choices-federal-foia-management.json` contract defines
+new side-by-side columns; original String metadata remains unchanged.
+Stable shared Choice values below are preserved. Table-specific enums append
+explicit contracts where no shared domain exists (especially review findings,
+appeal outcomes, package state and redaction state).
+Request `Open` and appeal `Open` explicitly mean null final outcome, not a grant.
+`Responsive`, `Partial Exemption`, and `Approved for Release` are review findings,
+never request disposition. `Educational` aliases Educational or scientific;
+`Perfected` aliases Valid; clock event aliases retain their event semantics.
+Free-text rationale, reason, detail, identifiers and user-defined classification
+or source labels remain text unless an explicit controlled domain is declared.
+
+Choice array position `i` defines the immutable integer `100000000 + i`.
+Never reorder/remove entries; append new options only after semantic review.
+Aliases explicitly bind legacy text to those integers, including explicit null
+for open request/appeal outcomes. Trimming/case-insensitive label matching is
+allowed; fuzzy matching, default-to-other, and guessed outcomes are forbidden.
+Shared global values match the Stable Choice Contract; the new table-specific
+domains in the JSON are prepared contracts requiring operator review, not proof
+of deployed metadata. They are business Picklists, not replacements for native
+`statecode`/`statuscode`; the separate status-reason table above is unchanged.
+
+Scope is the 21 fields listed in the contract. User-defined case-work labels,
+collection source/custodian labels, repository/media classifications, access and
+record-review evidence labels, release methods, provider/version and AI-operation
+labels have no approved global finite domain in this contract and remain text.
+These are explicit exclusions, not implicit guessed enum conversions. Free-text
+appeal decision summaries, exemption authority/scope/rationale, redaction basis,
+clock reason, and audit purpose/details also remain text.
+
+### Prepared table-specific business Choice decisions
+
+These are proposed migration domains for independent operator review, not
+claims that native status reasons or deployed metadata have changed. The
+contract's integer rule applies to every position, including appended values.
+
+| Business Choice | Prepared labels in numeric order starting at 100000000 |
+| --- | --- |
+| `foia_expediteddecision` | Pending; Granted; Denied |
+| `foia_reviewfinding` | Responsive; Non-responsive; Partial exemption; Approved for release; Returned for review |
+| `foia_packagestate` | Draft; Pending approval; Approved; Released; Rejected; Returned; Superseded; Assembling; Cancelled |
+| `foia_redactionstate` | Proposed; Approved; Rejected; Applied |
+| `foia_appealstage` | Intake; Validation; Reconsideration; Decision; Response; Closed |
+| `foia_appealoutcome` | Affirmed; Reversed; Partially affirmed; Remanded; Withdrawn; Other closure |
+| `foia_clocktype` | Request; Appeal |
+
+In particular, Package State is a business Picklist projected from legacy
+`foia_approvalstate`, not the complete native package status/status-reason
+contract. Assembling (`100000007`) and Cancelled (`100000008`) are explicit
+prepared business values; their numbers do not mirror the native status-reason
+numbers above. Rejected and Returned remain distinct prepared business states.
+No real value outside these explicit labels/aliases is inferred or defaulted.
+
+### Independently checked Appeal BPF mapping
+
+`process-02-appeal.json` and `spec.md` define the display stages below.
+Detailed design's controlled-state transition names are the canonical business
+Choice labels; explicit aliases reconcile the display labels without guessing:
+
+| BPF display stage (order) | Canonical business Choice | Integer |
+| --- | --- | ---: |
+| 1. Appeal Intake | Intake | 100000000 |
+| 2. Validation | Validation | 100000001 |
+| 3. Reconsideration and Legal Review | Reconsideration | 100000002 |
+| 4. Appeal Decision | Decision | 100000003 |
+| 5. Response | Response | 100000004 |
+| 6. Closure | Closed | 100000005 |
+
+Stage fields remain: intake = Appeal Number/Received Date/Challenged
+Determination; validation = Due Date; reconsideration = Challenged Determination;
+decision = free-text Decision plus `foia_outcomechoice`; response =
+`foia_outcomechoice`; closure = `foia_outcomechoice` plus Closed Date.
+`foia_stagechoice` is a reporting projection, not a repeated BPF step.
+`foia_outcomechoice` uses the separate appeal-outcome domain and explicitly
+maps legacy Open to null; it never derives an outcome from the stage.
+Existing Active designer processes still require operator reauthoring and
+field/step validation; changing this payload is not evidence of a deployed change.
+
+Clock/Audit rows are preserved historical evidence, excluded from automatic
+backfill and cutover row comparisons. Existing seed records on those tables
+must never be patched by the seed rerun; newly created synthetic rows can use
+the prepared Choice fields. This exclusion is not a claim that historical
+categorical reports have been migrated.
+Clock/Audit main forms therefore retain legacy evidence controls, explicitly
+disabled and labeled `(Legacy evidence)`, beside the future Choice controls.
+Existing legacy controls are relabeled/disabled on rerun rather than removed.
+Their views retain both fields. The historical clock chart still groups nonnull
+legacy event types; new Choice-only rows are not presented as migrated history.
+All other tables use the normal legacy-control removal strategy.
