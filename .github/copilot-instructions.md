@@ -16,6 +16,7 @@ This repository is registered with the SpeckKit registry using raw registry URLs
 
 ## Primary Workflow
 This repository is a guided Power Platform and Dynamics 365 wizard for VS Code.
+Application Authoring Mode must use a verified read-only framework installation and a separately resolved writable `TargetProjectRoot`; framework source checkouts are for explicitly authorized maintenance only. Follow `docs/wizard-contract-v1.md` for the authoritative source-protection policy.
 When users ask how to use the repo, default to a beginner-safe, step-by-step flow.
 Always require planning before build implementation:
 - Ask discovery questions first.

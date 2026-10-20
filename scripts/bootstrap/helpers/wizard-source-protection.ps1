@@ -139,30 +139,97 @@ function Get-WizardGitIdentity {
 
     $rootOutput = @(& git -C $RepositoryPath rev-parse --show-toplevel 2>$null)
     if ($LASTEXITCODE -ne 0 -or $rootOutput.Count -eq 0) {
-        throw "Unable to establish Git repository identity for '$RepositoryPath'."
+        $manifestPath = Join-Path $RepositoryPath 'wizard-framework-install.json'
+        if (-not (Test-Path -LiteralPath $manifestPath -PathType Leaf)) {
+            throw "Unable to establish Git repository identity for '$RepositoryPath'."
+        }
+        $manifest = Get-Content -LiteralPath $manifestPath -Raw -Encoding UTF8 | ConvertFrom-Json
+        if ($manifest.readOnlyDistribution -ne $true -or
+            $manifest.repositoryUrl -ne 'https://github.com/bradlaw76/power-platform-vscode-starter' -or
+            $manifest.commit -notmatch '^[a-f0-9]{40}$') {
+            throw "Framework installation identity manifest is invalid: $manifestPath"
+        }
+        $root = Resolve-WizardPhysicalPath -Path $RepositoryPath
+        $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url $manifest.repositoryUrl
+        return [pscustomobject]@{
+            Root = $root
+            CommonDirectory = Join-Path $root '.wizard-framework-install'
+            Remotes = @($remoteIdentity)
+            InstalledCommit = $manifest.commit
+        }
     }
     $root = Resolve-WizardPhysicalPath -Path (($rootOutput -join "`n").Trim())
+    $commonOutput = @(& git -C $RepositoryPath rev-parse --git-common-dir 2>$null)
+    if ($LASTEXITCODE -ne 0 -or $commonOutput.Count -eq 0) {
+        throw "Unable to establish Git common directory for '$RepositoryPath'."
+    }
+    $commonDirectory = ($commonOutput -join "`n").Trim()
+    if (-not [IO.Path]::IsPathRooted($commonDirectory)) {
+        $commonDirectory = Join-Path $root $commonDirectory
+    }
+    $commonDirectory = Resolve-WizardPhysicalPath -Path $commonDirectory
+
     $remoteNames = @(& git -C $RepositoryPath remote 2>$null)
     if ($LASTEXITCODE -ne 0) { throw "Unable to list Git remotes for '$RepositoryPath'." }
     $remoteValues = [Collections.Generic.List[string]]::new()
     foreach ($remoteName in $remoteNames) {
-        $urls = @(& git -C $RepositoryPath remote get-url --all "$remoteName" 2>$null)
-        if ($LASTEXITCODE -ne 0) { throw "Unable to resolve Git remote '$remoteName'." }
+        $fetchUrls = @(& git -C $RepositoryPath remote get-url --all "$remoteName" 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw "Unable to resolve fetch URL for Git remote '$remoteName'." }
+        $pushUrls = @(& git -C $RepositoryPath remote get-url --push --all "$remoteName" 2>$null)
+        if ($LASTEXITCODE -ne 0) { throw "Unable to resolve push URL for Git remote '$remoteName'." }
+        $urls = @($fetchUrls) + @($pushUrls)
         foreach ($url in $urls) {
-            $remote = "$url".Trim()
-            if ($remote -match '^git@([^:]+):(.+)$') {
-                $remote = "https://$($Matches[1])/$($Matches[2])"
-            }
-            $remote = $remote.TrimEnd('/')
-            if ($remote.EndsWith('.git', [StringComparison]::OrdinalIgnoreCase)) {
-                $remote = $remote.Substring(0, $remote.Length - 4)
-            }
-            if (-not [string]::IsNullOrWhiteSpace($remote)) { $remoteValues.Add($remote.ToLowerInvariant()) }
+            $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url "$url"
+            if (-not [string]::IsNullOrWhiteSpace($remoteIdentity)) { $remoteValues.Add($remoteIdentity) }
         }
     }
     $remotes = @($remoteValues.ToArray() | Sort-Object -Unique)
 
-    return [pscustomobject]@{ Root = $root; Remotes = @($remotes) }
+    return [pscustomobject]@{ Root = $root; CommonDirectory = $commonDirectory; Remotes = @($remotes) }
+}
+
+function ConvertTo-WizardCanonicalGitRemote {
+    param([Parameter(Mandatory)] [string]$Url)
+
+    $value = $Url.Trim()
+    if ($value -notmatch '^[a-zA-Z][a-zA-Z0-9+.-]*://' -and
+        $value -match '^(?:[^@/]+@)?(?<host>[^:/]+):(?<path>.+)$') {
+        $hostName = $Matches.host
+        $path = $Matches.path
+        $scheme = 'ssh'
+    } else {
+        $uri = $null
+        if (-not [Uri]::TryCreate($value, [UriKind]::Absolute, [ref]$uri) -or
+            $uri.Scheme -notin @('https', 'http', 'ssh', 'git') -or
+            [string]::IsNullOrWhiteSpace($uri.Host)) {
+            throw "Unable to canonicalize Git remote URL '$Url'."
+        }
+        $hostName = $uri.IdnHost
+        $path = [Uri]::UnescapeDataString($uri.AbsolutePath).TrimStart('/')
+        $scheme = $uri.Scheme
+        if ($uri.Port -gt 0 -and
+            -not (($scheme -eq 'https' -and $uri.Port -eq 443) -or
+                ($scheme -eq 'http' -and $uri.Port -eq 80) -or
+                ($scheme -eq 'ssh' -and $uri.Port -eq 22) -or
+                ($scheme -eq 'git' -and $uri.Port -eq 9418))) {
+            $hostName = "$hostName`:$($uri.Port)"
+        }
+    }
+
+    $path = $path.Trim().Trim('/')
+    if ($path.EndsWith('.git', [StringComparison]::OrdinalIgnoreCase)) {
+        $path = $path.Substring(0, $path.Length - 4)
+    }
+    if ([string]::IsNullOrWhiteSpace($path)) {
+        throw "Git remote URL '$Url' does not identify a repository path."
+    }
+
+    $normalizedHost = $hostName.ToLowerInvariant()
+    $normalizedPath = ($path -split '/' | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }) -join '/'
+    if ([string]::IsNullOrWhiteSpace($normalizedPath)) {
+        throw "Git remote URL '$Url' does not identify a repository path."
+    }
+    return "$normalizedHost/$($normalizedPath.ToLowerInvariant())"
 }
 
 function Assert-WizardApplicationRepositoryIdentity {
@@ -176,11 +243,14 @@ function Assert-WizardApplicationRepositoryIdentity {
     if (-not $targetIdentity.Root.Equals($TargetProjectRoot, [StringComparison]::OrdinalIgnoreCase)) {
         throw "Application Authoring Mode requires TargetProjectRoot to identify its Git repository root."
     }
+    if ($targetIdentity.CommonDirectory.Equals($frameworkIdentity.CommonDirectory, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Critical: Application Authoring Mode rejected a target sharing the framework Git directory or worktree.'
+    }
     if ($targetIdentity.Root.Equals($frameworkIdentity.Root, [StringComparison]::OrdinalIgnoreCase)) {
         throw 'Critical: Application Authoring Mode rejected the framework repository as an application target.'
     }
-    if ($frameworkIdentity.Remotes.Count -eq 0 -or $targetIdentity.Remotes.Count -eq 0) {
-        throw 'Application Authoring Mode requires identifiable framework and target Git remotes.'
+    if ($frameworkIdentity.Remotes.Count -ne 1 -or $targetIdentity.Remotes.Count -ne 1) {
+        throw 'Application Authoring Mode requires exactly one identifiable framework and target Git remote.'
     }
     $sharedRemotes = @($targetIdentity.Remotes | Where-Object { $frameworkIdentity.Remotes -contains $_ })
     if ($sharedRemotes.Count -gt 0) {
@@ -197,20 +267,8 @@ function Assert-WizardApplicationGitOperation {
     )
 
     $roots = Assert-WizardApplicationRoots -FrameworkRoot $FrameworkRoot -TargetProjectRoot $TargetProjectRoot
-    $frameworkIdentity = Get-WizardGitIdentity -RepositoryPath $roots.FrameworkRoot
-    $targetIdentity = Get-WizardGitIdentity -RepositoryPath $roots.TargetProjectRoot
-    if (-not $targetIdentity.Root.Equals($roots.TargetProjectRoot, [StringComparison]::OrdinalIgnoreCase)) {
-        throw "Application Authoring Mode requires TargetProjectRoot to be the Git repository root before $Operation."
-    }
-    if ($targetIdentity.Root.Equals($frameworkIdentity.Root, [StringComparison]::OrdinalIgnoreCase)) {
-        throw "Critical: Application Authoring Mode rejected $Operation against the framework repository."
-    }
-    $sharedRemotes = @($targetIdentity.Remotes | Where-Object { $frameworkIdentity.Remotes -contains $_ })
-    if ($sharedRemotes.Count -gt 0) {
-        throw "Critical: Application Authoring Mode rejected $Operation because the target shares a remote with the framework repository."
-    }
-
-    return $targetIdentity
+    $identity = Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $roots.FrameworkRoot -TargetProjectRoot $roots.TargetProjectRoot
+    return $identity
 }
 
 function Assert-WizardFrameworkMaintenanceApproval {

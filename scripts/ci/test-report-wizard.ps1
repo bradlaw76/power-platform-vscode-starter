@@ -7,9 +7,18 @@ $targetProjectRoot = Join-Path $testRoot 'target'
 $configurationPath = Join-Path $testRoot "$scenarioSlug.json"
 $payloadFolder = Join-Path $targetProjectRoot "payloads/scenarios/$scenarioSlug"
 $scenarioFolder = Join-Path $targetProjectRoot "specs/$scenarioSlug"
+$reportSkillPath = Join-Path $repoRoot '.github/skills/dataverse-report-wizard/SKILL.md'
+$reportSkill = Get-Content -LiteralPath $reportSkillPath -Raw -Encoding UTF8
+if ($reportSkill -match 'contoso_customer_service|TargetAppUniqueName.*contoso') {
+    throw 'The report wizard skill example must use a neutral sample app identity.'
+}
 
 try {
     New-Item -ItemType Directory -Path $targetProjectRoot -Force | Out-Null
+    $null = & git -C $targetProjectRoot init -b test-report
+    if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the reporting target test repository.' }
+    $null = & git -C $targetProjectRoot remote add origin 'https://github.com/example/report-wizard-target.git'
+    if ($LASTEXITCODE -ne 0) { throw 'Could not configure the reporting target test remote.' }
     [ordered]@{
         ReportRequest = 'Show open cases grouped by priority for service managers.'
         TargetAppUniqueName = 'ppvs_customer_service'

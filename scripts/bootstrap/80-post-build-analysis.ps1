@@ -59,8 +59,7 @@ NON-NEGOTIABLES
     confirmations before README, commit, or push actions.
 
 .PARAMETER ScenarioSlug
-    Scenario folder under specs/. If omitted and there is exactly one scenario,
-    that scenario is selected automatically.
+    Explicit scenario folder under specs/.
 
 .PARAMETER SpecPath
     Optional explicit path to spec markdown.
@@ -87,7 +86,9 @@ NON-NEGOTIABLES
 #>
 
 param(
-    [string]$ScenarioSlug = "",
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
     [string]$SpecPath = "",
     [string]$PlanPath = "",
     [string]$TasksPath = "",
@@ -146,13 +147,7 @@ function Get-ScenarioSlug {
     if (-not [string]::IsNullOrWhiteSpace($RequestedSlug)) {
         return $RequestedSlug.Trim()
     }
-
-    $scenarioDirs = @(Get-ChildItem -Path $SpecsRootPath -Directory -ErrorAction SilentlyContinue)
-    if ($scenarioDirs.Count -eq 1) {
-        return $scenarioDirs[0].Name
-    }
-
-    return ""
+    throw 'Post-build analysis requires an explicit -ScenarioSlug.'
 }
 
 function Get-MarkdownSection {

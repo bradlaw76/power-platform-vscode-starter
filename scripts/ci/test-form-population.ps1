@@ -10,6 +10,10 @@ $sourceDataverseRuntimeHelper = Join-Path $repoRoot 'scripts/bootstrap/helpers/d
 function New-TestRepo {
   $path = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-form-tests-" + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Path $path -Force | Out-Null
+  & git -C $path init -b test-forms | Out-Null
+  if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the forms test target repository.' }
+  & git -C $path remote add origin "https://github.com/example/forms-$([guid]::NewGuid().ToString('N')).git"
+  if ($LASTEXITCODE -ne 0) { throw 'Could not configure the forms test target identity.' }
   New-Item -ItemType Directory -Path (Join-Path $path 'payloads') -Force | Out-Null
   $testRoots.Add($path)
   $env:WIZARD_TARGET_PROJECT_ROOT = $path

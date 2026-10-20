@@ -144,15 +144,17 @@ The wizard framework is a read-only dependency during normal application develop
 - `TargetProjectRoot` identifies the user's application repository and must be explicitly supplied and physically resolved before discovery, telemetry, planning, preview, build, or other generated writes begin. No default may resolve to `FrameworkRoot`.
 - Application Authoring Mode must reject identical or overlapping roots, traversal, symlink/junction redirection into framework-owned paths, and output paths inside nested Git repositories. Every generated specification, payload, log, manifest, export, deployment manifest, and evidence file belongs under the approved `TargetProjectRoot`.
 - Framework resources are read from `FrameworkRoot`; application inputs and outputs are read from and written to `TargetProjectRoot`. Any failed or ambiguous root/identity check is a hard stop and a **Critical failure**.
+- Scenario-producing and scenario-consuming stages require an explicit scenario slug (or an explicitly supplied scenario-scoped payload directory where the contract permits it). A single discovered scenario is never selected implicitly, and payload metadata must not be aggregated from another scenario.
 - Application Authoring Mode must reject staging, committing, pushing, or pull-request operations whose Git root or remote identifies the framework repository, independent of the caller's repository permissions.
 - Where practical, run the framework from a read-only installation or packaged distribution. Source-level checks are mandatory and do not rely on agent prompts or repository ownership.
+- Supported consumer installations are versioned release packages installed by `scripts/bootstrap/install-framework.ps1`; the installer verifies the archive SHA-256 and embedded repository/commit identity, installs only to a protected system location, and removes application-user write permission. A source checkout is not the application-authoring runtime.
 
 ### Framework Maintenance Mode
 
 - Framework changes require the separately selected Framework Maintenance Mode; Application Authoring Mode never grants framework-write access.
 - Maintenance operations require a dedicated `framework-maintenance/<task>` branch and distinct explicit approvals for modifying files, committing, and pushing. Approval for one operation does not authorize another.
 - Application build commands and application credentials cannot be reused as implicit framework maintenance authorization.
-- The source-level authorization gate is `scripts/bootstrap/framework-maintenance.ps1`; invoke it separately for each operation and provide exact FrameworkRoot-relative paths. Commit approval must match the staged paths; push approval must match the paths changed against the upstream or an explicit `-BaseRef`.
+- The source-level operation gate is `scripts/bootstrap/framework-maintenance.ps1`; invoke it separately for each operation on the canonical framework repository and exact `framework-maintenance/<task>` branch. `modify` accepts text content only through `-FileUpdates`; `commit` requires an explicit message and exact staged-path match; `push` requires an upstream or remote-tracking `-BaseRef`, exact changed-path match, and verifies the remote head after a non-forced push. Each operation requires its own approval switch and `ShouldProcess` gate.
 
 ### Compatibility and Migration
 

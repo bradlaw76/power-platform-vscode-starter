@@ -39,6 +39,15 @@ $targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('wizard-preview-targe
 $null = New-Item -ItemType Directory -Path $targetRoot -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'specs') -Destination $targetRoot -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads') -Destination $targetRoot -Recurse -Force
+& git -C $targetRoot init -b test-preview | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the preview test target repository.' }
+& git -C $targetRoot config user.name 'Wizard Preview Test'
+& git -C $targetRoot config user.email 'wizard-preview@example.invalid'
+& git -C $targetRoot add specs payloads
+& git -C $targetRoot commit -m 'test: initialize preview target'
+if ($LASTEXITCODE -ne 0) { throw 'Could not commit the preview test target baseline.' }
+& git -C $targetRoot remote add origin "https://github.com/example/preview-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the preview test target identity.' }
 
 function Get-GitPreviewSnapshot {
     param([string]$RepositoryRoot)

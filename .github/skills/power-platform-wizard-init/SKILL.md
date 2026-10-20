@@ -18,7 +18,7 @@ Skill availability is not runtime installation. A copied `SKILL.md` does not pro
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for installation and provenance checks.
 
-The authoritative Framework Source Protection Contract in `docs/wizard-contract-v1.md` applies to every mode. Resolve a separate `TargetProjectRoot` explicitly before any write, treat the installed framework as read-only, and reject overlapping roots or framework repository Git operations. Do not silently move or reinterpret existing scenario files.
+The authoritative Framework Source Protection Contract in `docs/wizard-contract-v1.md` applies to every mode. Application Authoring Mode must run from a verified, read-only framework release installation and use a separate writable application repository. Resolve `TargetProjectRoot` explicitly before any write, reject framework repository Git operations, and do not silently move or reinterpret existing scenario files. A framework source checkout is for separately authorized maintenance only.
 
 ## What This Produces
 

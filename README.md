@@ -14,6 +14,12 @@ artifacts as part of its guided workflow.
 
 > [!IMPORTANT]
 > **Spec Kit planning is a mandatory gate for model-driven app builds.** Do not run app build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The app wizard helps you create them. For reporting against an existing app, use the focused [Dataverse Report Wizard guide](docs/dataverse-report-wizard.md).
+>
+> **Framework isolation is mandatory.** Application Authoring Mode uses a
+> verified, read-only framework package and a distinct writable application
+> repository. Do not use this source checkout as the application target. See
+> [Framework distribution](docs/skill-distribution.md) and the authoritative
+> [wizard contract](docs/wizard-contract-v1.md).
 
 ---
 
@@ -43,8 +49,8 @@ separate implementation.
 
 ### What happens when you use this starter
 
-1. You create a local **authoring workspace**: a full clone of this reusable
-   wizard.
+1. You install a reviewed framework release read-only and open a separate
+   writable application repository.
 2. The wizard checks prerequisites, confirms the workload, asks discovery
    questions, and prepares planning artifacts before it runs any build steps.
 3. It can then guide or run the model-driven build sequence for the specific
@@ -54,17 +60,15 @@ The wizard keeps generic capabilities, templates, and workflow instructions
 separate from each build's generated artifacts. Follow the guided workflow;
 it determines where its planning and build artifacts belong.
 
-If Git, VS Code, and Copilot Chat are already available, clone this canonical
-repository:
+If Git, VS Code, and Copilot Chat are already available, install a reviewed
+framework release and create or open a separate application repository. Follow
+the [framework distribution guide](docs/skill-distribution.md) for checksum
+verification and protected installation. Cloning this repository is only for
+explicit framework maintenance; it is not an application-authoring workspace.
 
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter.git
-cd power-platform-vscode-starter
-code .
-```
-
-When the folder opens in VS Code, open Copilot Chat and choose the entry point
-for your workload. For model-driven app development, enter:
+Open the installed read-only `FrameworkRoot` in VS Code and identify the
+application repository separately as `TargetProjectRoot`. For model-driven app
+development, open Copilot Chat and enter:
 
 ```text
 /power-platform-wizard-init

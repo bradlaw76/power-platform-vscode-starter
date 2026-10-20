@@ -18,6 +18,15 @@ $targetRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-run-preview-$([guid]:
 New-Item -ItemType Directory -Path $targetRoot -Force | Out-Null
 Copy-Item -LiteralPath (Join-Path $repoRoot 'specs') -Destination $targetRoot -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads') -Destination $targetRoot -Recurse -Force
+& git -C $targetRoot init -b test-run-state | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the run-state test target repository.' }
+& git -C $targetRoot config user.name 'Wizard Run State Test'
+& git -C $targetRoot config user.email 'wizard-run-state@example.invalid'
+& git -C $targetRoot add specs payloads
+& git -C $targetRoot commit -m 'test: initialize run-state target'
+if ($LASTEXITCODE -ne 0) { throw 'Could not commit the run-state test target baseline.' }
+& git -C $targetRoot remote add origin "https://github.com/example/run-state-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the run-state test target identity.' }
 
 function Get-TrackedFileSnapshot {
     param([string]$RepositoryRoot)

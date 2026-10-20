@@ -14,6 +14,10 @@ $frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $payloads = Join-Path $frameworkRoot 'payloads/scenarios/gcc-framework-acceptance'
 $testRepoRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-report-data-$([guid]::NewGuid())"
 New-Item -ItemType Directory -Path $testRepoRoot -Force | Out-Null
+& git -C $testRepoRoot init -b test-report-data | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the reporting/data test target repository.' }
+& git -C $testRepoRoot remote add origin "https://github.com/example/report-data-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the reporting/data test target identity.' }
 $env:WIZARD_REPORTING_SKIP_MAIN = 'true'
 $env:WIZARD_DATA_SKIP_MAIN = 'true'
 . (Join-Path $frameworkRoot 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug 'ignored' -TargetProjectRoot $testRepoRoot

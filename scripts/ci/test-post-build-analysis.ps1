@@ -10,6 +10,10 @@ if (-not (Test-Path $scriptPath)) {
 
 $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("post-build-analysis-test-" + [System.Guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
+$null = & git -C $tempRoot init -b test-analysis
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the post-build analysis target repository.' }
+$null = & git -C $tempRoot remote add origin 'https://github.com/example/post-build-analysis-target.git'
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the post-build analysis target remote.' }
 $originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
 $env:WIZARD_TARGET_PROJECT_ROOT = $tempRoot
 

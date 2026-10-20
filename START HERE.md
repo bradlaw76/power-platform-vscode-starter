@@ -13,8 +13,8 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 
 ## Is this the right guide?
 
-This guide creates an authoring workspace for the **model-driven app** and
-**existing-app reporting** workflows in this starter:
+This guide sets up the **model-driven app** and **existing-app reporting**
+workflows in this starter:
 
 - A **model-driven Power App or Dynamics 365 extension**: continue with this
   guide.
@@ -61,103 +61,41 @@ To use Path A:
 - Open the Copilot Chat panel with `Ctrl+Alt+I`. If it opens, this step is
   complete.
 
-## 1. Create an authoring workspace
+## 1. Install the framework and choose an application repository
 
-Choose **one** path below:
+Application Authoring Mode requires a verified release package installed
+read-only and a separate writable application repository. A framework source
+checkout is for separately authorized maintenance only; never use it as the
+application target. Follow [Framework distribution](docs/skill-distribution.md)
+to download the release ZIP and checksum, verify the checksum and release commit,
+and run the package's `scripts/bootstrap/install-framework.ps1` from an elevated
+PowerShell session. The installer refuses to overwrite an existing installation.
 
-- **Path A — Create the authoring workspace folder first, then let Copilot
-  clone into it.** This is the guided option: you choose the folder name and
-  open the empty folder before Copilot runs the clone command.
-- **Path B — Clone directly from a terminal.** This is the faster option if
-  you are comfortable pasting commands: Git creates the named workspace folder
-  for you.
+Open the installed `FrameworkRoot` in VS Code so its skills and instructions are
+available. Keep the app's Git repository separate and explicitly identify it as
+`TargetProjectRoot` before running any wizard command. Do not copy, move, or
+reinterpret existing scenario files as part of setup.
 
-Do not do both paths for the same build. Both produce the same result: one
-authoring workspace containing the full wizard files directly, with no nested
-clone.
-
-First, decide two things (write them down or just keep them in mind):
-
-1. **Where** you want to keep your authoring workspaces on your computer — for
-   example a `Power Platform Projects` folder inside your Documents, like
-   `C:\Users\<you>\Documents\Power Platform Projects`. It doesn't need to
-   exist yet.
-2. **What to name this authoring workspace** — a short name with no spaces,
-   for example `my-first-app-authoring` or `contoso-case-tracker-authoring`.
-   This becomes the folder name for the full local wizard copy.
-
-### Path A — Create the authoring workspace folder first, then ask Copilot to clone
-
-1. In VS Code, choose **File > Open Folder...**.
-2. In the Windows folder picker, browse to your authoring-workspaces location.
-   Click **New folder**, give it your chosen authoring workspace name, then
-   open that new folder and click **Select Folder**.
-3. If VS Code shows **"Do you trust the authors of the files in this
-   folder?"**, click **Trust Folder & Continue**. You created this empty
-   folder yourself.
-4. Open Copilot Chat (`Ctrl+Alt+I`) and paste this request:
-
-   ```text
-   Clone https://github.com/bradlaw76/power-platform-vscode-starter.git
-   into the current empty authoring workspace. First verify that the folder
-   is empty and is not already a Git repository. Do not create a nested
-   folder. Show me the exact command before running it.
-   ```
-
-5. Review Copilot's command. It should use `git clone` with `.` as the final
-   destination, which means "this current empty folder." Approve the command
-   only if it does not create another folder inside your authoring workspace.
-6. When it finishes, the Explorer should refresh to show `README.md`, `docs`,
-   and `scripts` directly inside your authoring workspace. If it does not
-   refresh, choose **Developer: Reload Window** from the Command Palette
-   (`Ctrl+Shift+P`).
-
-> **Checkpoint:** In the Explorer on the left, your authoring workspace name
-> (for example `my-first-app-authoring`) should appear as the top-level folder.
-> Expand it to confirm that the full copied wizard folders and files—such as
-> `.github`, `docs`, `payloads`, `requirements`, `scripts`, `README.md`, and
-> `START HERE.md`—are directly inside it, not inside another folder.
-
-### Path B — Clone directly from a terminal
-
-```powershell
-mkdir "C:\path\to\Power Platform Projects" -Force
-cd "C:\path\to\Power Platform Projects"
-git clone https://github.com/bradlaw76/power-platform-vscode-starter.git ".\contoso-case-tracker-authoring"
-code --new-window ".\contoso-case-tracker-authoring"
-```
-
-Replace both placeholders with your authoring-workspaces location and
-authoring workspace name. This creates the folder and clones the full wizard
-into it in one step; do not create or open that folder first.
-
-If `code` is not recognized after the clone finishes, open VS Code manually,
-choose **File > Open Folder...**, select the new authoring workspace folder,
-and click **Select Folder**.
-
-> **Checkpoint:** In the Explorer on the left, your authoring workspace folder
-> (not its parent folder) is the top-level folder. Expand it to confirm that
-> the full copied wizard folders and files—such as `.github`, `docs`,
-> `payloads`, `requirements`, `scripts`, `README.md`, and `START HERE.md`—are
-> directly inside it, not one level deeper.
-
-## 2. Know what this clone is—and is not
-
-The folder you just created is an **authoring workspace**: a local copy of the
-full reusable wizard. It is where you currently run the guided planning and
-build process. The wizard uses this workspace to keep its reusable capabilities
-and the artifacts it generates for each build organized.
-
-Example current local layout (your folder names will differ):
+Example layout:
 
 ```text
-Power Platform Projects\              # your own parent folder — any name/location
-└── contoso-case-tracker-authoring\  # full local wizard copy used while building
+Program Files/Power Platform Wizard/<framework-commit>/  # installed read-only FrameworkRoot
+Power Platform Projects/my-app/                         # writable TargetProjectRoot
 ```
+
+> **Checkpoint:** Confirm that the framework path is the verified release
+> installation, the application path is a different Git repository, and your
+> current account cannot write to the framework installation.
+
+## 2. Know what the framework installation is—and is not
+
+The installed framework is a read-only dependency containing generic wizard
+scripts, skills, schemas, and templates. Application planning and generated
+artifacts belong only in the separately selected application repository.
 
 ## 3. Install the recommended extensions
 
-When VS Code opens the cloned repository, it may prompt you to install
+When VS Code opens the installed framework, it may prompt you to install
 recommended extensions. Click **Install All**. If you miss the prompt, open
 Extensions (`Ctrl+Shift+X`), search `@recommended`, and install everything
 listed. This is also the time to install GitHub Copilot and GitHub Copilot
@@ -185,7 +123,7 @@ building, then use the matching entry point:
 | --- | --- |
 | A model-driven Power App or Dynamics 365 extension (new or retrofit) | `/power-platform-wizard-init` |
 | Reports (charts, dashboards, FetchXML) for a model-driven app that already exists | `/dataverse-report-wizard` |
-| A Canvas app or something else | Return to **Is this the right guide?** above; do not use this model-driven authoring workspace. |
+| A Canvas app or something else | Return to **Is this the right guide?** above; do not use this model-driven workflow. |
 
 This matters because each app type uses a different wizard, different
 questions, and different scripts — picking the wrong one wastes time or

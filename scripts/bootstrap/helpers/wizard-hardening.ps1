@@ -88,6 +88,9 @@ function Get-WizardScenarioContext {
 
     $repoRootPath = [IO.Path]::GetFullPath($RepoRoot)
     $specsRoot = Join-Path $repoRootPath 'specs'
+    if (-not [string]::IsNullOrWhiteSpace($ScenarioSlug) -and $ScenarioSlug -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+        throw "ScenarioSlug '$ScenarioSlug' must use lowercase letters, numbers, and single hyphens only."
+    }
     $resolvedPayloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
         Join-Path $repoRootPath 'payloads'
     } elseif ([IO.Path]::IsPathRooted($PayloadsFolder)) {
@@ -102,13 +105,6 @@ function Get-WizardScenarioContext {
     if ([string]::IsNullOrWhiteSpace($ScenarioSlug) -and $resolvedPayloadPath.StartsWith($scenarioPathPrefix, [StringComparison]::OrdinalIgnoreCase)) {
         $relativeScenarioPath = $resolvedPayloadPath.Substring($scenarioPathPrefix.Length)
         $ScenarioSlug = ($relativeScenarioPath -split '[\\/]')[0]
-    }
-
-    if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
-        $scenarioDirs = @(Get-ChildItem -Path $specsRoot -Directory -ErrorAction SilentlyContinue)
-        if ($scenarioDirs.Count -eq 1) {
-            $ScenarioSlug = $scenarioDirs[0].Name
-        }
     }
 
     $scenarioFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) { '' } else { Join-Path $specsRoot $ScenarioSlug }
@@ -1144,7 +1140,7 @@ function Get-WizardAppModuleConfig {
         ''
     }
 
-    $navigationGroup = if (-not [string]::IsNullOrWhiteSpace($featureConfig.NavigationGroup)) { $featureConfig.NavigationGroup } else { 'Core Records' }
+    $navigationGroup = $featureConfig.NavigationGroup
 
     $validationErrors = New-Object System.Collections.Generic.List[string]
     if ($featureConfig.AppEnabled) {
@@ -1153,6 +1149,9 @@ function Get-WizardAppModuleConfig {
         }
         if ([string]::IsNullOrWhiteSpace($appUniqueName)) {
             $validationErrors.Add('App module unique name could not be resolved.') | Out-Null
+        }
+        if ([string]::IsNullOrWhiteSpace($navigationGroup)) {
+            $validationErrors.Add('App module navigation group must be explicitly selected in the scenario planning artifacts.') | Out-Null
         }
         if ($expected.Tables.Count -eq 0) {
             $validationErrors.Add('App module wiring requires at least one expected table.') | Out-Null

@@ -20,6 +20,10 @@ function New-TestRepo {
   New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
   Copy-Item -LiteralPath (Join-Path $repoRoot 'specs') -Destination $tempRoot -Recurse -Force
   Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads') -Destination $tempRoot -Recurse -Force
+  $null = & git -C $tempRoot init -b test-reports
+  if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the live-report target test repository.' }
+  $null = & git -C $tempRoot remote add origin 'https://github.com/example/live-report-target.git'
+  if ($LASTEXITCODE -ne 0) { throw 'Could not configure the live-report target test remote.' }
   return $tempRoot
 }
 

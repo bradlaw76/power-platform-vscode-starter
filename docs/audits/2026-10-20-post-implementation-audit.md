@@ -2,7 +2,70 @@
 
 ## Update Log
 
-### LATEST — 2026-10-20 13:34 UTC
+### LATEST — 2026-10-20 14:20 UTC
+
+**Status: Remediation implementation and local quality checks complete; external controls and durable current-HEAD backup remain outstanding.**
+
+- GitHub reports remediation branch HEAD
+  `d0e8b430cd1bc701f70a35fcd3b71621054ec61b`; it matches the local branch.
+  Original `main` baseline remains
+  `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`.
+- Framework source protection and package installation, separately approved
+  maintenance operations, example/scenario isolation, and isolated Dataverse
+  workflow target handling are implemented. Workflow preflight and tests reject
+  missing/ambiguous Git identities and verify pre-generation framework-target
+  failures. Existing FOIA/Contoso files remain intact.
+- Validation passed: standalone CI scripts **27/27**, Pester **90/90** using
+  available Pester 5.9.0, PowerShell parse across repository scripts,
+  PSScriptAnalyzer using available 1.25.0, Markdown lint, contract checks,
+  JSON/schema checks (**84 documents parsed; 60 payloads schema-valid**), and
+  YAML parse for all three workflows.
+- The workflow pins Pester 5.7.1 and PSScriptAnalyzer 1.24.0; those exact module
+  versions were unavailable in this runner. The available newer versions passed.
+- No live Dataverse operations, commits, pushes, merges, or GitHub security
+  setting changes were performed. The framework installer was validated in
+  preflight/WhatIf tests only; OS-level ownership and read-only permissions
+  remain unverified. Ruleset/permission recommendations and durable-bundle
+  retention steps are documented in `docs/skill-distribution.md`.
+- The previously verified recovery bundle covers HEAD
+  `2d0e99428615581741f8c8a396bdceec4afe8b46`, not current HEAD `d0e8b43…`;
+  durable recovery of the current HEAD has not been established. Create and
+  independently verify a current-HEAD bundle, then retain it with its checksum
+  and ref manifest in approved durable storage before treating recovery as
+  complete.
+
+### Previous Update — 2026-10-20 14:15 UTC
+
+**Status: Dataverse workflow isolated; focused scenario and source-protection tests passed; full-suite validation remains.**
+
+- Current working branch: `copilot/extend-use-case-isolation-remediation`
+  at `d0e8b430cd1bc701f70a35fcd3b71621054ec61b`. The baseline remains the
+  previously recorded `origin/main` commit
+  `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`.
+- Updated `.github/workflows/dataverse-integration.yml` to create a unique
+  temporary TargetProjectRoot, copy only the explicitly selected scenario's
+  specs and payloads, initialize a separate target Git repository, and set both
+  `WIZARD_FRAMEWORK_ROOT` and `WIZARD_TARGET_PROJECT_ROOT`. Build payloads,
+  exports, cleanup, and generated evidence now resolve to the target; upload
+  artifacts are placed under runner temporary storage. The exact disposable
+  environment confirmation and secret checks remain in place.
+- Added `scripts/ci/test-dataverse-integration-workflow.ps1` as a
+  non-mutating workflow preflight, including confirmation-gate and path checks.
+- Extended scenario regression checks for distinct sequential scenario roots,
+  generic Demo Builder output without silently copying examples, and explicit
+  availability of the existing FOIA and Contoso scenarios. Example assets were
+  not modified or deleted.
+- Passed: workflow preflight (14 required checks, 5 forbidden-path checks),
+  PowerShell parser for the new preflight, workflow YAML parse,
+  `test-wizard-hardening.ps1`, `test-wizard-modes.ps1`, and
+  `test-framework-source-protection.ps1`.
+- No live Dataverse operation, commit, push, merge, or GitHub security-setting
+  change was performed. Installer OS-level ACL behavior, full CI/PSScriptAnalyzer
+  results, and durable retention of a recovery bundle covering current HEAD
+  remain unverified. Manual ruleset, least-privilege, and durable recovery
+  retention guidance is recorded in `docs/skill-distribution.md`.
+
+### Previous Update — 2026-10-20 13:34 UTC
 
 **Status: OFFLINE RESTORE VERIFIED; durable retention beyond this runner is not verified.**
 

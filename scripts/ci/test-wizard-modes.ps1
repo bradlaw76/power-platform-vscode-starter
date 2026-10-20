@@ -56,6 +56,10 @@ function New-WizardTestWorkspace {
     Copy-Item -LiteralPath (Join-Path $frameworkRoot 'wizard.profile.json') -Destination $workspace
     Copy-Item -LiteralPath (Join-Path $frameworkRoot 'docs/wizard-contract-v1.md') -Destination (Join-Path $workspace 'docs')
     Copy-Item -LiteralPath (Join-Path $frameworkRoot 'docs/onboarding.md') -Destination (Join-Path $workspace 'docs')
+    $null = & git -C $workspace init -b test-mode
+    if ($LASTEXITCODE -ne 0) { throw "Could not initialize target repository for mode fixture '$Name'." }
+    $null = & git -C $workspace remote add origin "https://github.com/example/$Name-mode-target.git"
+    if ($LASTEXITCODE -ne 0) { throw "Could not configure target remote for mode fixture '$Name'." }
     return $workspace
 }
 
@@ -114,6 +118,10 @@ function Assert-Step60ConsumesViewsContract {
 
 try {
     New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
+    $null = & git -C $testRoot init -b test-modes
+    if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the wizard-modes target repository.' }
+    $null = & git -C $testRoot remote add origin 'https://github.com/example/wizard-modes-target.git'
+    if ($LASTEXITCODE -ne 0) { throw 'Could not configure the wizard-modes target remote.' }
     $env:WIZARD_TARGET_PROJECT_ROOT = $testRoot
     $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
     [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
@@ -164,6 +172,9 @@ try {
     Assert-True -Condition ($demoOutput -notmatch '(?i)A-acceptance|disposable|cleanup|retention') -Message 'Default Demo Builder output exposed acceptance or cleanup prompts.'
     $demoSlug = 'equipment-checkout-for-faster-accountable-lab-lending'
     Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    foreach ($exampleSlug in @('federal-foia-management', 'contoso-case-tracker')) {
+        Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $demoWorkspace "payloads/scenarios/$exampleSlug"))) -Message "Generic Demo Builder unexpectedly copied example '$exampleSlug'."
+    }
     $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'

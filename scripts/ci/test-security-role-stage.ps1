@@ -15,6 +15,10 @@ $scenario = 'federal-foia-management'
 $targetRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-security-role-target-$([guid]::NewGuid().ToString('N'))"
 $null = New-Item -ItemType Directory -Path (Join-Path $targetRoot 'specs') -Force
 $null = New-Item -ItemType Directory -Path (Join-Path $targetRoot 'payloads/scenarios') -Force
+& git -C $targetRoot init -b test-security-role | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the security-role test target repository.' }
+& git -C $targetRoot remote add origin "https://github.com/example/security-role-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the security-role test target identity.' }
 Copy-Item -LiteralPath (Join-Path $frameworkRoot "specs/$scenario") -Destination (Join-Path $targetRoot "specs/$scenario") -Recurse -Force
 Copy-Item -LiteralPath (Join-Path $frameworkRoot "payloads/scenarios/$scenario") -Destination (Join-Path $targetRoot "payloads/scenarios/$scenario") -Recurse -Force
 $payloadFolder = Join-Path $targetRoot "payloads/scenarios/$scenario"

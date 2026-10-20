@@ -14,6 +14,10 @@ $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
 $targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('pp-idempotency-target-' + [guid]::NewGuid().ToString('N'))
 $null = New-Item -ItemType Directory -Path $targetRoot -Force
+& git -C $targetRoot init -b test-idempotency | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the idempotency test target repository.' }
+& git -C $targetRoot remote add origin "https://github.com/example/idempotency-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the idempotency test target identity.' }
 $env:WIZARD_TARGET_PROJECT_ROOT = $targetRoot
 $scenario = 'ci-idempotency-export'
 $artifactRoot = Join-Path $targetRoot '.wizard-metrics/artifacts'

@@ -81,6 +81,7 @@ try {
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'commit', '-m', 'test: initialize acceptance fixture')
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'remote', 'add', 'origin', $remoteRoot)
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'push', '-u', 'origin', 'main')
+    Invoke-Git -Arguments @('-C', $workspaceRoot, 'remote', 'set-url', 'origin', 'https://github.com/example/source-control-acceptance.git')
 
     $scriptedAnswers = @(
         'Source Control Acceptance',

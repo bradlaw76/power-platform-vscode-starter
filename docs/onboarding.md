@@ -30,9 +30,11 @@ workloads in this starter.
   does not create Canvas App authoring workspaces.
 - For another workload, review [README.md](../README.md) before continuing.
 
-The full clone created below is a local **authoring workspace** for the
-reusable wizard. Follow the workflow in this repository; the wizard manages
-its reusable capabilities and each build's generated artifacts.
+Application Authoring Mode uses a versioned, read-only framework installation
+and a separate writable application repository. A framework source checkout is
+for explicitly authorized maintenance, not application authoring. See
+[skill-distribution.md](skill-distribution.md) for package verification and
+installation. Do not silently migrate existing scenario files.
 
 ---
 
@@ -72,26 +74,31 @@ Why this matters:
 
 ---
 
-## Step 0: Clone the Repo and Open in VS Code
+## Step 0: Install the Framework and Open the Application Project
 
-If this is your first time with the repository:
+Download the versioned framework ZIP and `.sha256` file from a reviewed GitHub
+release. Verify the archive SHA-256 against the published checksum, extract it
+to a temporary directory, then run its
+`scripts/bootstrap/install-framework.ps1` from an elevated PowerShell session.
+See [skill-distribution.md](skill-distribution.md) for the exact command and
+protected installation locations. Do not use a framework source checkout for
+application authoring.
 
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter
-cd power-platform-vscode-starter
-code .
-```
+Open the installed read-only `FrameworkRoot` in VS Code, and keep the writable
+application repository separate. Resolve and confirm `TargetProjectRoot`
+explicitly before running any wizard command.
 
 Validation checkpoint:
 
-- The folder opens in VS Code.
-- You can see `README.md`, `docs/`, `requirements/`, and `scripts/` in Explorer.
+- The installed framework opens in VS Code and is not writable by the
+  application-authoring account.
+- The application repository is a separate root and Git repository.
 
 ---
 
 ## Step 0A: Install Claude Code Skills (Run Once Per Machine)
 
-If you are using Claude Code (the VS Code CLI or extension), install the wizard skill so it is available in every Claude session on this machine:
+If you are using Claude Code (the VS Code CLI or extension), install the wizard skill from the installed framework so it is available in every Claude session on this machine:
 
 ```powershell
 pwsh ./scripts/bootstrap/01-install-skills.ps1

@@ -70,8 +70,7 @@ NON-NEGOTIABLES
     KPI claims.
 
 .PARAMETER ScenarioSlug
-    Scenario folder under specs/. If omitted and there is exactly one scenario,
-    that scenario is used automatically.
+    Required, explicit scenario folder under specs/.
 
 .PARAMETER ReportMode
     Reporting mode:
@@ -116,7 +115,9 @@ NON-NEGOTIABLES
 #>
 
 param(
-    [string]$ScenarioSlug = "",
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
@@ -133,32 +134,6 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
-
-function Read-RequiredValue {
-    param(
-        [string]$Prompt,
-        [string]$Default = ""
-    )
-
-    while ($true) {
-        $value = if ([string]::IsNullOrWhiteSpace($Default)) {
-            Read-Host $Prompt
-        }
-        else {
-            Read-Host "$Prompt [$Default]"
-        }
-
-        if ([string]::IsNullOrWhiteSpace($value)) {
-            $value = $Default
-        }
-
-        if (-not [string]::IsNullOrWhiteSpace($value)) {
-            return $value.Trim()
-        }
-
-        Write-Host "A value is required." -ForegroundColor Yellow
-    }
-}
 
 function Get-MarkdownSectionValue {
     param(
@@ -434,12 +409,12 @@ function Get-RelationshipMappings {
 
 function Get-PayloadMetadata {
     param(
-        [string]$RepoRoot,
+        [string]$PayloadFolder,
         [System.Collections.Generic.HashSet[string]]$RelevantEntities,
         [string]$PublisherPrefixValue
     )
 
-    $payloadRoot = Join-Path $RepoRoot 'payloads'
+    $payloadRoot = $PayloadFolder
     $result = [ordered]@{
         Tables        = New-Object System.Collections.Generic.List[object]
         Columns       = New-Object System.Collections.Generic.List[object]
@@ -779,8 +754,8 @@ function Resolve-EntityMetadataMap {
             $resolved = [pscustomobject]@{
                 LogicalName          = $logicalName
                 DisplayName          = $logicalName
-                PrimaryIdAttribute   = if ($logicalName -eq 'incident') { 'incidentid' } else { '' }
-                PrimaryNameAttribute = if ($logicalName -eq 'incident') { 'title' } else { '' }
+                PrimaryIdAttribute   = ''
+                PrimaryNameAttribute = ''
                 Fields               = $designFields
                 RowCount             = 0
                 Source               = 'design'
@@ -1544,21 +1519,6 @@ if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl) -and
     if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) { $PublisherPrefix = $global:DV_PUBLISHER_PREFIX }
 }
 
-if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
-    $scenarioFolders = @(Get-ChildItem -Path $specsRoot -Directory -ErrorAction SilentlyContinue | Sort-Object Name)
-    if ($scenarioFolders.Count -eq 1) {
-        $ScenarioSlug = $scenarioFolders[0].Name
-    }
-    elseif ($scenarioFolders.Count -gt 1) {
-        Write-Host 'Available scenarios:' -ForegroundColor Cyan
-        $scenarioFolders | ForEach-Object { Write-Host "  - $($_.Name)" }
-        $ScenarioSlug = Read-RequiredValue 'Scenario folder slug'
-    }
-    else {
-        throw "No scenario folders found under '$specsRoot'."
-    }
-}
-
 if (-not $PreviewReportQueriesOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
 }
@@ -1590,17 +1550,16 @@ if (-not $scenario.IncludeReports) {
 }
 
 if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
-    $publisherPrefixMatch = [regex]::Match($planContent, '(?im)^-\s*Publisher prefix:\s*([a-z0-9_]+)')
-    if ($publisherPrefixMatch.Success) {
-        $PublisherPrefix = $publisherPrefixMatch.Groups[1].Value.Trim()
-    }
+    $identity = Get-WizardSolutionIdentity -AnswersText $answersContent -PlanText $planContent -EnvText (Read-WizardTextFile -Path $envFile)
+    $PublisherPrefix = $identity.PublisherPrefix
 }
 if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
-    $PublisherPrefix = 'wiz'
+    throw 'A publisher prefix is required in the selected scenario plan or environment.'
 }
 
 $relevantEntities = Get-RelevantEntities -Scenario $scenario
-$payloadMetadata = Get-PayloadMetadata -RepoRoot $repoRoot -RelevantEntities $relevantEntities -PublisherPrefixValue $PublisherPrefix
+$scenarioPayloadFolder = Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug"
+$payloadMetadata = Get-PayloadMetadata -PayloadFolder $scenarioPayloadFolder -RelevantEntities $relevantEntities -PublisherPrefixValue $PublisherPrefix
 $snapshot = Get-MetadataSnapshot -Path $MetadataSnapshotPath
 $canUseLiveMetadata = (-not $PreviewReportQueriesOnly) -and $EnableLiveDataverseReports -and $ReportMode -ne 'static'
 

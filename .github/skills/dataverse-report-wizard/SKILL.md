@@ -165,24 +165,24 @@ configuration files behind.
 
 ```json
 {
-  "ReportRequest": "Show open cases grouped by priority for service managers.",
-  "TargetAppUniqueName": "contoso_customer_service",
+  "ReportRequest": "Show open service requests grouped by urgency for support leads.",
+  "TargetAppUniqueName": "sample_service_app",
   "OutputTargets": [
     "fetchxml-preview",
     "native-chart-dashboard"
   ],
-  "DashboardName": "Case Operations",
+  "DashboardName": "Service Request Operations",
   "Charts": [
     {
-      "Name": "Open Cases by Priority",
-      "TableLogicalName": "incident",
-      "CategoryField": "prioritycode",
-      "AggregateField": "incidentid",
+      "Name": "Open Requests by Urgency",
+      "TableLogicalName": "sample_request",
+      "CategoryField": "sample_urgency",
+      "AggregateField": "sample_requestid",
       "Aggregate": "count",
       "ChartType": "column",
       "Filters": [
         {
-          "Field": "statecode",
+          "Field": "sample_status",
           "Operator": "eq",
           "Value": "0"
         }

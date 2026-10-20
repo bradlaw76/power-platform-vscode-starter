@@ -16,6 +16,10 @@ $payloads = Join-Path $repoRoot 'payloads/scenarios/gcc-framework-acceptance'
 $originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
 $targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('pp-app-module-target-' + [guid]::NewGuid().ToString('N'))
 $null = New-Item -ItemType Directory -Path $targetRoot -Force
+$null = & git -C $targetRoot init -b test-app
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the app-module target test repository.' }
+$null = & git -C $targetRoot remote add origin 'https://github.com/example/app-module-target.git'
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the app-module target test remote.' }
 $scenarioRoot = Join-Path $targetRoot 'specs/gcc-framework-acceptance'
 $null = New-Item -ItemType Directory -Path (Split-Path $scenarioRoot -Parent) -Force
 Copy-Item -LiteralPath (Join-Path $repoRoot 'specs/gcc-framework-acceptance') -Destination $scenarioRoot -Recurse -Force
@@ -62,6 +66,13 @@ $requestInvoker = {
 }
 
 try {
+    $missingScenarioOutput = @(& pwsh -NoProfile -NonInteractive -File $scriptPath `
+        -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' `
+        -PublisherPrefix 'ppvs' -PayloadsFolder $payloads -EnableArtifactManifest:$false 2>&1)
+    if ($LASTEXITCODE -eq 0 -or (Test-Path -LiteralPath (Join-Path $targetRoot '.wizard-metrics'))) {
+        throw "App-module stage did not reject missing explicit scenario before output:`n$($missingScenarioOutput -join "`n")"
+    }
+
     & $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
     $firstSummary = Get-Content -LiteralPath (Join-Path $targetRoot '.wizard-metrics/artifacts/app-module/app-module-summary.json') -Raw | ConvertFrom-Json
     & $scriptPath -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnableArtifactManifest $false -RequestInvoker $requestInvoker
@@ -69,6 +80,7 @@ try {
     if ($appState.Count -ne 1 -or $siteMapState.Count -ne 1) { throw 'App/sitemap rerun created duplicates.' }
     if ($firstSummary.appModuleId -cne $secondSummary.appModuleId -or $firstSummary.siteMapId -cne $secondSummary.siteMapId) { throw 'App/sitemap IDs changed on rerun.' }
     if (@($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -in @('appmodules','sitemaps') }).Count -ne 2) { throw 'App/sitemap second run issued a create request.' }
+    if (@($calls | Where-Object { $_.Path -like 'savedqueries?*isdefault eq true*' }).Count -ne 2) { throw 'Non-entry app tables did not resolve their Dataverse default view.' }
     if (@($calls | Where-Object Path -like 'solutioncomponents?*').Count -lt 2) { throw 'App/sitemap updates did not verify target-solution ownership.' }
     $publishCalls = @($calls | Where-Object { $_.Method -eq 'Post' -and $_.Path -eq 'PublishXml' })
     if ($publishCalls.Count -ne 2 -or @($publishCalls | Where-Object { $_.Body.ParameterXml -notmatch '<appmodules><appmodule>11111111-1111-1111-1111-111111111111</appmodule></appmodules>' }).Count -gt 0) { throw 'App publication was not scoped to the stable app ID.' }
