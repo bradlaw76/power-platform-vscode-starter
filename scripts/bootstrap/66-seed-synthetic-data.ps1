@@ -13,7 +13,8 @@ param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL, [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [Parameter(Mandatory)] [string]$ScenarioSlug, [string]$PayloadsFolder = '',
-    [switch]$PreviewOnly, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze
+    [switch]$PreviewOnly, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze,
+    [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -32,13 +33,13 @@ function Get-WizardDataPayload { param([string]$Folder) $files=@(Get-ChildItem -
 function ConvertTo-WizardFilterLiteral { param($Value) if($Value -is [bool]){return $Value.ToString().ToLowerInvariant()}; if($Value -is [int] -or $Value -is [long] -or $Value -is [double]){return "$Value"}; return "'$(ConvertTo-WizardODataLiteral "$Value")'" }
 
 function Invoke-WizardSyntheticDataStage {
-    param([string]$RepoRoot,[string]$ScenarioSlug,[string]$PayloadsFolder,[string]$EnvironmentUrl,[string]$AccessToken,[string]$SolutionUniqueName,[switch]$PreviewOnly,[scriptblock]$RequestInvoker,[switch]$AcknowledgeWriteFreeze)
+    param([string]$RepoRoot,[string]$ScenarioSlug,[string]$PayloadsFolder,[string]$EnvironmentUrl,[string]$AccessToken,[string]$SolutionUniqueName,[switch]$PreviewOnly,[scriptblock]$RequestInvoker,[switch]$AcknowledgeWriteFreeze,[ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000)
     $payload=Get-WizardDataPayload $PayloadsFolder
     Assert-WizardChoiceSeedPayload -Payload $payload -PayloadsFolder $PayloadsFolder
     $choiceContract = Get-WizardChoiceContract $PayloadsFolder
     if (-not $PreviewOnly) {
         Assert-WizardChoiceCutover -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
-            -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+            -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
     }
     $planned=@($payload.Tables|ForEach-Object{$table=$_; @($table.Records|ForEach-Object{[pscustomobject]@{table=$table.TableLogicalName;key=$_.Key;action='planned'}})})
     if($PreviewOnly){$items=$planned}else{
@@ -80,4 +81,4 @@ function Invoke-WizardSyntheticDataStage {
     [ordered]@{scenarioSlug=$ScenarioSlug;preview=[bool]$PreviewOnly;sourceTag=$payload.SourceTag;records=@($items)}|ConvertTo-Json -Depth 10|Set-Content $evidencePath -Encoding UTF8
     return @($items)
 }
-if($env:WIZARD_DATA_SKIP_MAIN-ne'true'){if([string]::IsNullOrWhiteSpace($PayloadsFolder)){$PayloadsFolder=Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug"}; Invoke-WizardSyntheticDataStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze|Out-Null}
+if($env:WIZARD_DATA_SKIP_MAIN-ne'true'){if([string]::IsNullOrWhiteSpace($PayloadsFolder)){$PayloadsFolder=Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug"}; Invoke-WizardSyntheticDataStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows|Out-Null}

@@ -308,12 +308,13 @@ function Invoke-WizardChoiceMigration {
 
 function Assert-WizardChoiceCutover {
     param([string]$PayloadsFolder, [string]$ScenarioSlug, [string]$SolutionUniqueName,
-        [string]$EnvironmentUrl, [string]$AccessToken, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze)
+        [string]$EnvironmentUrl, [string]$AccessToken, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze,
+        [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000)
     if ($null -eq (Get-WizardChoiceContract $PayloadsFolder)) { return }
     Invoke-WizardChoiceMigration -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
         -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken `
         -Mode Validate -RequestInvoker $RequestInvoker `
-        -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze | Out-Null
+        -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -MaxRows $ChoiceMaxRows | Out-Null
 }
 
 function Assert-WizardChoiceSeedPayload {

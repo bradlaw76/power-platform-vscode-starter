@@ -18,6 +18,7 @@ param(
     [string]$PayloadsFolder = '',
     [switch]$PreviewOnly,
     [switch]$AcknowledgeWriteFreeze,
+    [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000,
     [scriptblock]$RequestInvoker
 )
 
@@ -93,12 +94,13 @@ function Invoke-WizardReportingStage {
     param(
         [string]$RepoRoot, [string]$ScenarioSlug, [string]$PayloadsFolder,
         [string]$EnvironmentUrl, [string]$AccessToken, [string]$SolutionUniqueName, [string]$PublisherPrefix,
-        [switch]$PreviewOnly, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze
+        [switch]$PreviewOnly, [scriptblock]$RequestInvoker, [switch]$AcknowledgeWriteFreeze,
+        [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000
     )
     . (Join-Path $PSScriptRoot 'helpers/choice-migration.ps1')
     if (-not $PreviewOnly) {
         Assert-WizardChoiceCutover -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
-            -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+            -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
     }
     $payload = Get-WizardSinglePayload -Folder $PayloadsFolder -Pattern 'reporting-*.json'
     if (-not $payload.Enabled) { return @() }
@@ -244,5 +246,5 @@ function Invoke-WizardReportingStage {
 
 if ($env:WIZARD_REPORTING_SKIP_MAIN -ne 'true') {
     if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) { $PayloadsFolder = Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug" }
-    Invoke-WizardReportingStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze | Out-Null
+    Invoke-WizardReportingStage -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows | Out-Null
 }

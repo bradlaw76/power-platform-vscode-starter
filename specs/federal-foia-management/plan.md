@@ -344,6 +344,12 @@ additive migration exception before experience stages, not an in-place conversio
    validation before mutating surfaces/data; no stale local success flag bypasses it.
    Keep all writers stopped until all surfaces have been validated; independent
    read calls cannot guarantee a stable dataset if concurrent writers are active.
+   Preserve the same explicit row bound through cutover: stage 32 uses
+   `-MaxRows`, while the orchestrator and direct stages 55/60/64/66 accept
+   `-ChoiceMaxRows` (default 10,000, range 1–100,000). For example, a reviewed
+   `-MaxRows 25000` backfill/standalone validation requires
+   `-ChoiceMaxRows 25000` on each cutover command. Stage 90 forwards that bound
+   to every affected child stage, including reruns; it never silently raises it.
 7. Update the existing designer-authored BPFs to the new payload field contract,
    publish those processes, then follow the authoritative experience sequence
    for forms/views, BPF/app linkage, charts/dashboards and optional seed rerun.

@@ -247,6 +247,15 @@ $result = Invoke-WizardChoiceMigration @migrationArgs -Mode Backfill -Apply -App
 Assert ($result.Updated -eq 1) 'Backfill did not resume only the remaining row.'
 $rerun = Invoke-WizardChoiceMigration @migrationArgs -Mode Validate
 Assert ($rerun.Pending -eq 0) 'Backfill not idempotent.'
+$calls.Clear()
+Assert-Throws { Assert-WizardChoiceCutover @migrationArgs -ChoiceMaxRows 1 } 'row bound exceeded'
+Assert-WizardChoiceCutover @migrationArgs -ChoiceMaxRows 25000
+Assert (@($calls | Where-Object { $_.Path -like 'foia_foiarequests?*' -and $_.Path.Contains('$top=25001') }).Count -gt 0) 'Cutover wrapper discarded an explicit bound above 10,000.'
+$calls.Clear()
+Assert-WizardChoiceCutover @migrationArgs
+Assert (@($calls | Where-Object { $_.Path -like 'foia_foiarequests?*' -and $_.Path.Contains('$top=10001') }).Count -gt 0) 'Cutover default bound changed.'
+Assert-Throws { Assert-WizardChoiceCutover @migrationArgs -ChoiceMaxRows 0 } 'ChoiceMaxRows'
+Assert-Throws { Assert-WizardChoiceCutover @migrationArgs -ChoiceMaxRows 100001 } 'ChoiceMaxRows'
 Assert (@($calls | Where-Object Method -eq Delete).Count -eq 0) 'Destructive request attempted.'
 $history = @{ foia_clockeventid='66666666-6666-6666-6666-666666666666'; foia_syntheticsourcetag='federal-foia-synthetic-v1'; '@odata.etag'='W/"1"' }
 foreach ($field in @($contract.Fields | Where-Object Table -eq foia_clockevent)) { $history[$field.Source]=$null; $history[$field.Target]=$null }
@@ -444,6 +453,37 @@ $inventoryGet = {
 }
 $discovered = @(Get-SolutionComponentInventory -InvokeGet $inventoryGet -SolutionId '11111111-1111-1111-1111-111111111111')
 Assert ($discovered.Count -eq 1 -and $discovered[0].Category -eq 'global-choices' -and $discovered[0].Name -eq 'foia_intakechannel') 'Stage 50 lost component type 9.'
+$boundStages = @('55-build-business-process-flows.ps1','60-build-forms-views.ps1','64-build-charts-dashboard.ps1','66-seed-synthetic-data.ps1','90-run-build.ps1')
+foreach ($stageFile in $boundStages) {
+    $stageAst = [Management.Automation.Language.Parser]::ParseFile((Join-Path $root "scripts/bootstrap/$stageFile"), [ref]$null, [ref]$null)
+    $boundParameter = @($stageAst.ParamBlock.Parameters | Where-Object { $_.Name.VariablePath.UserPath -eq 'ChoiceMaxRows' })
+    Assert ($boundParameter.Count -eq 1 -and $boundParameter[0].DefaultValue.Extent.Text -eq '10000') "$stageFile lacks the default Choice bound."
+    $range = @($boundParameter[0].Attributes | Where-Object { $_.TypeName.Name -eq 'ValidateRange' })
+    Assert ($range.Count -eq 1 -and ($range[0].PositionalArguments.Extent.Text -join ',') -eq '1,100000') "$stageFile lost Choice bound range validation."
+    $gateCalls = @($stageAst.FindAll({ param($node) $node -is [Management.Automation.Language.CommandAst] -and $node.GetCommandName() -eq 'Assert-WizardChoiceCutover' }, $true))
+    Assert ($gateCalls.Count -eq 1) "$stageFile must freshly validate cutover."
+    $elements = @($gateCalls[0].CommandElements)
+    $boundIndex = -1
+    for ($i=0; $i -lt $elements.Count; $i++) {
+        if ($elements[$i] -is [Management.Automation.Language.CommandParameterAst] -and $elements[$i].ParameterName -eq 'ChoiceMaxRows') { $boundIndex=$i }
+    }
+    Assert ($boundIndex -ge 0 -and $elements[$boundIndex+1].Extent.Text -ceq '$ChoiceMaxRows') "$stageFile did not forward its explicit bound to the gate."
+    if ($stageFile -eq '90-run-build.ps1') {
+        $propagation = @($stageAst.FindAll({ param($node) $node -is [Management.Automation.Language.AssignmentStatementAst] -and $node.Left.Extent.Text -ceq '$stage.Arguments.ChoiceMaxRows' }, $true))
+        Assert ($propagation.Count -eq 1 -and $propagation[0].Right.Extent.Text -ceq '$ChoiceMaxRows') 'Orchestrator did not forward the bound to affected children/reruns.'
+        $forwardLoop = $stageAst.Find({ param($node) $node -is [Management.Automation.Language.ForEachStatementAst] -and $node.Extent.Text.Contains('$stage.Arguments.ChoiceMaxRows') }, $true)
+        foreach ($child in $boundStages[0..3]) { Assert ($forwardLoop.Extent.Text.Contains($child)) "Orchestrator does not propagate the bound to $child." }
+    }
+}
+$env:WIZARD_REPORTING_SKIP_MAIN = 'true'
+. (Join-Path $root 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug ignored
+Remove-Item Env:WIZARD_REPORTING_SKIP_MAIN
+function Get-WizardSinglePayload { param($Folder,$Pattern) return [pscustomobject]@{Enabled=$false} }
+$calls.Clear()
+Invoke-WizardReportingStage -RepoRoot $root -ScenarioSlug federal-foia-management -PayloadsFolder $folder `
+    -EnvironmentUrl https://offline.invalid -AccessToken offline-placeholder -SolutionUniqueName FederalFOIAManagement `
+    -PublisherPrefix foia -AcknowledgeWriteFreeze -ChoiceMaxRows 25000 -RequestInvoker $invoker | Out-Null
+Assert (@($calls | Where-Object { $_.Path -like 'foia_foiarequests?*' -and $_.Path.Contains('$top=25001') }).Count -gt 0) 'Reporting stage lost the explicit Choice bound.'
 $env:WIZARD_DATA_SKIP_MAIN = 'true'
 . (Join-Path $root 'scripts/bootstrap/66-seed-synthetic-data.ps1') -ScenarioSlug ignored
 Remove-Item Env:WIZARD_DATA_SKIP_MAIN
@@ -487,9 +527,11 @@ try {
     $seedArgs = @{
         RepoRoot=$seedWorkspace; ScenarioSlug='federal-foia-management'; PayloadsFolder=$folder
         EnvironmentUrl='https://offline.invalid'; AccessToken='offline-placeholder'; SolutionUniqueName='FederalFOIAManagement'
-        RequestInvoker=$seedInvoker; AcknowledgeWriteFreeze=$true
+        RequestInvoker=$seedInvoker; AcknowledgeWriteFreeze=$true; ChoiceMaxRows=25000
     }
+    $calls.Clear()
     $oldSeed = @(Invoke-WizardSyntheticDataStage @seedArgs)
+    Assert (@($calls | Where-Object { $_.Path -like 'foia_foiarequests?*' -and $_.Path.Contains('$top=25001') }).Count -gt 0) 'Synthetic-data stage lost the explicit Choice bound.'
     Assert ($oldSeed.Count -eq 1 -and $oldSeed[0].action -eq 'skipped' -and $seedState.Creates -eq 0) 'Existing immutable seed was modified.'
     $immutableSeedFixture.Tables[0].Records[0].Key = 'CI-FUTURE'
     $futureSeed = @(Invoke-WizardSyntheticDataStage @seedArgs)

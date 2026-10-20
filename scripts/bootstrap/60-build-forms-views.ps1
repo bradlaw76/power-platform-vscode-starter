@@ -109,7 +109,8 @@ param(
   [bool]$FailIfUnderpopulatedForms = $true,
   [bool]$FailIfUnderpopulatedViews = $true,
   [switch]$PreviewOnly,
-  [switch]$AcknowledgeWriteFreeze
+  [switch]$AcknowledgeWriteFreeze,
+  [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000
 )
 
 Set-StrictMode -Version Latest
@@ -1649,7 +1650,7 @@ function Invoke-WizardFormsViewsBuild {
   if (-not $PreviewOnly) {
     $choiceSolution = if ($env:DV_SOLUTION_NAME) { $env:DV_SOLUTION_NAME } elseif (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
     Assert-WizardChoiceCutover -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
-      -SolutionUniqueName $choiceSolution -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+      -SolutionUniqueName $choiceSolution -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
   }
   $surfaceContract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext -PayloadsFolder $PayloadsFolder
   $appConfig = $null

@@ -52,6 +52,7 @@ param(
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
     [switch]$AcknowledgeWriteFreeze,
+    [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000,
     [scriptblock]$RequestInvoker
 )
 
@@ -78,7 +79,7 @@ foreach ($planningFile in @('spec.md', 'plan.md', 'tasks.md')) {
 
 if ($Mode -eq 'Apply') {
     Assert-WizardChoiceCutover -PayloadsFolder $paths.PayloadFolder -ScenarioSlug $ScenarioSlug `
-        -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $env:DV_TOKEN -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze
+        -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $env:DV_TOKEN -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
 }
 $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
@@ -134,6 +135,7 @@ $stageDefinitions = @(
 foreach ($stage in $stageDefinitions) {
     if ($stage.Script -in @('55-build-business-process-flows.ps1', '60-build-forms-views.ps1', '64-build-charts-dashboard.ps1', '66-seed-synthetic-data.ps1')) {
         $stage.Arguments.AcknowledgeWriteFreeze = [bool]$AcknowledgeWriteFreeze
+        $stage.Arguments.ChoiceMaxRows = $ChoiceMaxRows
     }
 }
 $runState = $null
