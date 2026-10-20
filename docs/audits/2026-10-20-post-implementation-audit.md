@@ -2,7 +2,94 @@
 
 ## Update Log
 
-### LATEST — 2026-10-20 11:56 UTC
+### LATEST — 2026-10-20 13:34 UTC
+
+**Status: OFFLINE RESTORE VERIFIED; durable retention beyond this runner is not verified.**
+
+#### Current source state
+
+- Repository: `bradlaw76/power-platform-vscode-starter`
+- Branch: `copilot/extend-use-case-isolation-remediation`
+- Current HEAD and upstream: `2d0e99428615581741f8c8a396bdceec4afe8b46`
+- Baseline: `origin/main` at `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`
+- Worktree was clean; no stashes or local uncommitted changes.
+- The earlier restoration failure was caused by the shallow clone omitting
+  ancestor `7cef4f68404156cba52fb8fb72e64bbbc90480a1`, the parent of
+  `bbe117a9bb98ce595be4438ca0f035bc37b58bdb`.
+- `git fetch --unshallow origin '+refs/heads/*:refs/remotes/origin/*' --tags`
+  obtained full history and advertised branches/tags. The active local branch
+  did not move. The checkout is no longer shallow, and the missing ancestor is
+  now available.
+
+#### New full-history backup
+
+- Method: `git bundle create <bundle> --all`; all local/fetched remote-tracking
+  refs and tags are included.
+- Bundle:
+  `/home/runner/backups/power-platform-vscode-starter-recovery-20261020-1330.bundle`
+- Size: **3,876,876 bytes**
+- SHA-256:
+  `249f64a4cb024682a4b0e57c46f00fb6a836afe43ca22140bf147d4a0cb1c8ad`
+- Checksum file:
+  `/home/runner/backups/power-platform-vscode-starter-recovery-20261020-1330.bundle.sha256`
+- Ref/scope manifest:
+  `/home/runner/backups/power-platform-vscode-starter-recovery-20261020-1330.manifest.txt`
+- `git bundle verify` reported the bundle okay and complete, with all 14 refs
+  listed below plus the bundle `HEAD`.
+
+Included refs and object IDs:
+
+| Ref | SHA |
+|---|---|
+| `refs/heads/copilot/extend-use-case-isolation-remediation` | `2d0e99428615581741f8c8a396bdceec4afe8b46` |
+| `refs/remotes/origin/backup/pre-fast-20261015` | `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28` |
+| `refs/remotes/origin/backup/pre-framework-isolation-fixes-20261020` | `64db1e34025cdab8086c88e34668ca9b95d009ac` |
+| `refs/remotes/origin/copilot/add-dynamics-365-app-option` | `991e911c7d18dfbe437ce5a5e984b5a0ba3bd74` |
+| `refs/remotes/origin/copilot/extend-use-case-isolation-remediation` | `2d0e99428615581741f8c8a396bdceec4afe8b46` |
+| `refs/remotes/origin/feature/dataverse-form-formatter-v1` | `17bebe3fb2322c2ad07c05dec8ef0c64dba6df28` |
+| `refs/remotes/origin/feature/fast-accelerator-catalog` | `0d1812b9acea61afa750883422d88807f48b4f1d` |
+| `refs/remotes/origin/feature/federal-foia-demo-security` | `1fd8eeb0a12ba461e49507a66e75fc82ee32fd3b` |
+| `refs/remotes/origin/feature/federal-foia-management` | `5a2a8e57520675c22d8d38a5ae92cab08084de9a` |
+| `refs/remotes/origin/main` | `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95` |
+| `refs/tags/payload-wizard-bundle-20260713` | `0969aa4bebc2b5e526f2bad67aafb44c96506a10` |
+| `refs/tags/pre-fast-20261015` | `7f4e66d83de55431cd90cf3fac0d212d63da2979` |
+| `refs/tags/rollback-before-all-20260713` | `f0bb7749a9b7e7a0e69bf2faf8def326a26a6a43` |
+
+#### Independent offline restoration
+
+A new repository was initialized at
+`/tmp/power-platform-vscode-starter-recovery-20261020-1330-verify`. All refs
+were fetched from the bundle file only, with no remote configured and Git
+protocol access restricted to `file`.
+
+- Bundle checksum recheck: **passed**.
+- Restored refs and exact feature/main/backup SHAs: **passed**.
+- Detached checkout of remediation HEAD `2d0e99428615581741f8c8a396bdceec4afe8b46`:
+  **passed**.
+- Detached checkout of baseline `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`:
+  **passed**.
+- SHA-256 comparisons of source-Git-object content versus restored content:
+  **passed** for the source-protection helper, audit report, FOIA table payload
+  at remediation HEAD, and `README.md` at baseline.
+- `git fsck --full`: **passed**, no output/errors.
+- Restored checkout status: clean detached HEAD.
+
+#### Remaining recovery limitation
+
+The bundle and manifest are outside the working repository under
+`/home/runner/backups`, on the runner root filesystem. The environment does not
+provide evidence that this path persists across runner/session teardown. Thus
+**the backup is independently and offline restorable now, but durable
+long-term retention remains unverified**; copy the bundle, checksum, and
+manifest to organization-approved persistent storage before relying on it for
+future recovery. The previous `/tmp` bundle and verification-clone paths were
+not present when this attempt began; they were not deleted by this attempt.
+
+No wizard/framework code, workflows, GitHub settings, or example files were
+changed. No commit, push, merge, or deployment was performed. The only
+repository edit in this recovery-verification phase is this audit update.
+
+### Previous Update — 2026-10-20 11:56 UTC
 
 **Status: BLOCKED — recovery restore verification failed; implementation has not started.**
 
@@ -12,9 +99,9 @@
   `17f8f9a4610753c622c060a2d41ed42c4d6edac2ce11941757b00a1672c664bc`.
 - Disposable clone verification failed because shallow history is missing
   ancestor `7cef4f68404156cba52fb8fb72e64bbbc90480a1`.
-- The bundle, checksum file, and failed verification clone remain under `/tmp`.
-  Per the approved stop condition, no alternate backup method was attempted and
-  no implementation edits were made.
+- At that time, the disposable clone failed because a shallow-history ancestor
+  was missing. This status was superseded by the full-history recovery recorded
+  above.
 
 ### Previous Update — 2026-10-20 11:11 UTC
 
