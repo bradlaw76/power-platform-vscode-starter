@@ -137,3 +137,97 @@ Once recovery is verified and the correct existing work is located:
 Identify the implementation-bearing workspace/branch and approved recovery
 evidence before resuming implementation. This handoff is the only requested
 repository addition; it does not certify completion of either skill.
+
+## Update log
+
+### 2026-10-21 23:41 UTC — Durable-backup blocker and alternatives review
+
+**Status: BLOCKED for implementation; recovery alternatives await review.**
+This entry records subsequent findings without replacing the earlier snapshot.
+It is a documentation-only update, not authorization to relax recovery gates.
+
+#### Progress since the original handoff
+
+- Full history and all advertised remote branches/tags were fetched in the
+  earlier baseline-correction session; the clone was no longer shallow.
+- The branches share baseline
+  `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`, but have unique commits on both
+  sides. Current-branch Dynamics workload/intake, Choice migration, and handoff
+  work must be preserved alongside remediation isolation and maintenance work.
+- The validated remediation baseline remained
+  `d9a32483ca4607078959b76908019a555f13ce59`, with the successful Wizard Quality
+  evidence linked above. No integration or implementation was performed.
+- The original handoff was published in
+  [commit 7637658](https://github.com/bradlaw76/power-platform-vscode-starter/commit/7637658e1fa8f90ec3e65de7471de248ffc42fae).
+  Its earlier local-only wording describes the original intent, not its later
+  publication status.
+
+#### Recovery verification reported in that session
+
+- Evidence directory: `/tmp/framework-recovery-20261021-5UwtiF`.
+- Bundle: `framework-baseline.bundle`, **3,953,364 bytes**.
+- SHA-256:
+  `37da76e695d7b4cdafd39e44104665aa4c2ae55c87a7632eccaacbe983d24d67`.
+- Companion files: `framework-baseline.bundle.sha256`,
+  `recovery-manifest.txt`, `source-refs.txt`, `restored-refs.txt`, and
+  `verification-results.txt`.
+- Complete-history bundle integrity and SHA-256 recheck: **passed**.
+- Independent file-only restore into `restore.git`: **passed**.
+- All restored refs matched; current/remediation/main tree comparisons and
+  `git fsck --full`: **passed**.
+- The initial restore invocation encountered Git's bare-repository restriction.
+  Explicit `--git-dir` resolved it without changing security settings.
+
+These are recorded results from the earlier session, not new tests executed for
+this documentation update. The temporary evidence file was not present at its
+recorded path when this entry was prepared; the bundle has not been reverified
+now. A path or checksum in this log is not durable backup storage.
+
+#### Exact remaining blocker
+
+The remediation recovery guidance requires a verified bundle, checksum, and ref
+manifest in approved durable, access-controlled storage, with verification after
+retrieval. The successful runner-local restore does not satisfy that retention
+requirement. No durable upload or retrieval verification has been completed.
+
+The user authorized backup storage in principle and asked whether GitHub could
+be used. Repository metadata confirmed this repository is public. Public release
+publication was not authorized. A draft release was discussed, but no draft or
+asset upload occurred; available tools did not provide a direct release-asset
+upload operation. No usable runner-to-user transfer method was established.
+Actions artifacts have finite retention and cannot be represented as permanent
+backups without an explicit retention and retrieval arrangement.
+
+This gate comes from the requested governance/recovery process, not a technical
+Git prerequisite for source edits. The pending work is source-code and skill
+maintenance, not a Dataverse deployment or database migration.
+
+#### Questions for ChatGPT: necessity and proportionate alternatives
+
+1. Is separately retained full-history bundle storage necessary before this
+   non-destructive source-code/skill work, or should it be a later release gate?
+2. Could preserving both remote branches, recording exact baseline SHAs, using
+   reviewed pull requests, and prohibiting destructive Git operations provide
+   sufficient interim recovery? Would a baseline tag add meaningful protection?
+   No tag or protection-setting change has been authorized or performed.
+3. Would a GitHub Actions artifact with explicit retention, verified download,
+   and an owner-held local copy be adequate? What retention and retrieval checks
+   should be required, given that the repository is public?
+4. Is a draft-release backup appropriate for a public repository, considering
+   access permissions, accidental publication, deletion, and recovery needs?
+5. If durable retention can be deferred, what narrowly scoped, explicit
+   exception should the owner approve? It must record the residual risk and
+   must not claim durable backup is complete.
+6. What practical recovery approach distinguishes technical necessities from
+   optional governance controls while preserving unique work on both branches?
+
+#### Approval boundaries and next action
+
+No alternative has been selected or approved as a recovery-policy exception.
+Commit approval and push approval remain separate gates; no merge, deployment,
+public backup release, or security-setting changes are authorized by this entry.
+Skills 1 and 2 remain unimplemented in this checkout; Skill 3 is not started.
+
+**Next action:** obtain independent advice on these alternatives, then have the
+owner explicitly select an accessible durable-storage arrangement or approve a
+bounded recovery-policy exception before implementation resumes.
