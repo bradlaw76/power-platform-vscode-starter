@@ -346,3 +346,97 @@ This document edit does not grant commit or push approval. Keep it uncommitted
 and unpushed until the owner separately approves those actions. Consequently,
 the existing GitHub document link will not show this entry yet; use the local
 text or a pasted excerpt for review in the meantime.
+
+### 2026-10-23 13:39 UTC — Preflight failure and task-launch handoff
+
+**Status: BLOCKED before framework implementation.** The owner requested this
+documentation-only record of the latest findings. Neither the permanent
+governance enhancement nor Skills 1 and 2 have been implemented by this task.
+This entry supersedes earlier branch-status snapshots, not their historical
+evidence.
+
+#### Preflight results
+
+The preceding preflight fetched history for inspection without changing the
+checkout. Local status and HEAD were checked again for this entry.
+
+| Property | Observed result |
+| --- | --- |
+| Operating mode | Framework Administration explicitly confirmed; reuse that confirmation |
+| Repository root | `/home/runner/work/power-platform-vscode-starter/power-platform-vscode-starter` |
+| Remote identity | Runner proxy remote identifies `bradlaw76/power-platform-vscode-starter`; GitHub branch lookup corroborated the repository |
+| Current branch | `copilot/add-dynamics-365-app-option` — incorrect implementation branch |
+| Current HEAD | `f80813654cd5db187e36545f248b52bed28f2bd2` |
+| Upstream | `origin/copilot/add-dynamics-365-app-option` |
+| Default branch | Remote HEAD identifies `main`, at `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95`; not automatically selected as the baseline |
+| Required baseline | `copilot/extend-use-case-isolation-remediation`, still at `d9a32483ca4607078959b76908019a555f13ce59` in the preceding remote check |
+| Maintenance branch | `framework-maintenance/skills-1-2` absent in that remote check |
+| Merge base | `1bb72aacc6bc6abb9eb6aaaf3f492737fc115d95` |
+| Divergence | Current checkout has 7 unique commits; remediation has 12 |
+| Baseline ancestor | Failed: `git merge-base --is-ancestor` returned exit code 1 |
+| Working tree and stashes | Clean before this edit; no stashes reported in the preceding preflight |
+| Existing work | Preserved; no checkout, reset, rebase, cherry-pick, or merge performed |
+| Task scope | Incompatible with required implementation branch; no cloud-task retarget or launch operation provided |
+| Recovery | Task-only durable-storage exception remains approved; durable backup remains unverified |
+
+The remediation SHA matches the previously validated baseline and the historical
+CI evidence above. No new CI run, skill test, or independent baseline
+certification was performed. The failed ancestry check is actual Git evidence,
+not proof that a permanent automated maintenance gate already exists.
+
+#### Permanent governance request awaiting implementation
+
+The owner requested one canonical repository-context and branch-preflight
+contract, referenced by Copilot instructions, the wizard contract, general
+GitHub guidance, and applicable Claude maintenance guidance. It must check
+repository identity, baseline evidence, dedicated maintenance-branch ancestry,
+existing work, task scope, and recovery policy before framework implementation.
+Future tasks must determine their own baseline rather than hard-code this
+task's remediation SHA.
+
+Requested regression coverage includes incorrect repository/branch rejection,
+missing baseline ancestry, preservation of unrelated work, early cloud-scope
+incompatibility reporting, application-authoring exclusion from maintenance
+preflights/backups, and reuse of confirmed operating modes. None of this
+executable enforcement has been added or tested. Normal application authoring
+has not been modified, but its regression behavior has not been tested here.
+
+#### Launch request and exact remaining action
+
+The owner asked this session to execute the correctly based launch plan.
+No branch was created and no replacement task was launched. Git branch
+creation capability must not be confused with permission to operate on another
+task branch or with the ability to launch/retarget a Copilot cloud task.
+No GitHub service failure or mobile UI restriction has been demonstrated.
+
+An authorized operator or appropriately scoped integration must:
+
+1. Verify the remediation tip and create `framework-maintenance/skills-1-2`
+   from `d9a32483ca4607078959b76908019a555f13ce59`; stop for review if that baseline
+   has changed. Preserve both existing branches and all unique commits.
+2. Open [Copilot Agents](https://github.com/copilot/agents), select
+   `bradlaw76/power-platform-vscode-starter`, and select the maintenance branch
+   as the task base. The mobile UI route remains unverified.
+3. Launch with the owner's full **Permanent Framework Governance Enhancement —
+   Repository Context and Branch Preflight** request and the original Skills
+   1–2 instruction. Re-run preflight in that task before implementation.
+4. Implement the canonical governance and executable checks, then only
+   `dataverse-solution-architect` and `power-platform-requirements-analyst` for
+   Copilot and Claude. Preserve wizard behavior, isolation, Spec Kit gates,
+   confirmed mode, and the approved recovery exception. Record executed tests.
+5. Request explicit commit approval and separate push approval. Do not merge,
+   deploy, or begin Skill 3.
+
+For independent review: identify a supported mobile-accessible launch route or
+an authorized helper/integration. Do not prescribe another attempt to implement
+from this checkout, request the backup exception again, or represent the
+governance enhancement as complete.
+
+#### Publication boundary
+
+This new entry is a local documentation edit, not approval to commit or push.
+The working tree was clean when this entry began, so the earlier local-only
+wording is a historical publication snapshot, not evidence of pending edits
+from that earlier session. This entry's publication status must be reported
+separately. No new implementation tests are applicable to this documentation
+record; validation results will be reported with the update.
