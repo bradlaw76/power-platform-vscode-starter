@@ -1,11 +1,31 @@
 # Skill Distribution
 
-The repository ships two aligned skill families:
+The repository ships aligned wizard, reporting and planning skill families:
 
 - GitHub Copilot shared skill: `.github/skills/power-platform-wizard-init/`
 - Claude Code skill: `.claude/skills/power-platform-vscode-wizard/`
 - GitHub Copilot reporting skill: `.github/skills/dataverse-report-wizard/`
 - Claude Code reporting skill: `.claude/skills/dataverse-report-wizard/`
+- Copilot and Claude architecture skill: `dataverse-solution-architect` under each platform's skills folder.
+- Copilot and Claude requirements skill: `power-platform-requirements-analyst` under each platform's skills folder.
+
+The planning skills are instructions only. They use the installed framework's
+`docs/requirements-traceability.md`, `docs/semantic-field-type-standard.md` and
+existing wizard contract; copying their folders alone does not install those
+dependencies. The Claude installer already discovers all skill directories, so
+no installer or execution-stage changes are required. Review destination
+content before running the existing installer, which copies with overwrite.
+Copilot discovers the checked-in `.github/skills/` folders.
+
+Use `/power-platform-requirements-analyst` to refine business requirements and
+`/dataverse-solution-architect` to review architecture without starting a build.
+They reuse the selected mode and scenario plans, then return to the existing
+wizard. See [Requirements traceability](requirements-traceability.md).
+Run `pwsh ./scripts/ci/test-planning-skills.ps1` to check their parity,
+required contracts and semantic-field documentation.
+
+Framework contributors must first complete the exact repository/branch/SHA
+check in [Maintenance preflight](framework-maintenance-preflight.md).
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 

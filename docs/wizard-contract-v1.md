@@ -151,10 +151,12 @@ The wizard framework is a read-only dependency during normal application develop
 
 ### Framework Maintenance Mode
 
+- Framework Administration Mode is the operator-facing name for Framework Maintenance Mode, not an additional wizard mode. Before framework edits, run `scripts/bootstrap/framework-context-preflight.ps1` against the explicitly approved repository root, exact maintenance branch, and full HEAD SHA. A mismatch is a hard stop; never switch branches or change history to make the check pass. See `docs/framework-maintenance-preflight.md`.
 - Framework changes require the separately selected Framework Maintenance Mode; Application Authoring Mode never grants framework-write access.
 - Maintenance operations require a dedicated `framework-maintenance/<task>` branch and distinct explicit approvals for modifying files, committing, and pushing. Approval for one operation does not authorize another.
 - Application build commands and application credentials cannot be reused as implicit framework maintenance authorization.
 - The source-level operation gate is `scripts/bootstrap/framework-maintenance.ps1`; invoke it separately for each operation on the canonical framework repository and exact `framework-maintenance/<task>` branch. `modify` accepts text content only through `-FileUpdates`; `commit` requires an explicit message and exact staged-path match; `push` requires an upstream or remote-tracking `-BaseRef`, exact changed-path match, and verifies the remote head after a non-forced push. Each operation requires its own approval switch and `ShouldProcess` gate.
+- Every operation also requires `-ExpectedHead` and runs the repository-context preflight before mutation. Review the resulting SHA after an approved commit before further operations. Commit, push, and merge approvals remain separate; the maintenance script does not implement merge.
 
 ### Compatibility and Migration
 
@@ -179,6 +181,15 @@ Apply `requirements/GithubInstructions_General.md` throughout each end user's ap
 7. Distinguish modified locally, committed locally, pushed, pull request opened, merged, released, and deployed.
 
 ## Planning Contract
+
+The optional `power-platform-requirements-analyst` and
+`dataverse-solution-architect` skills refine the existing planning contract for
+Copilot and Claude. They preserve mode-specific intake and use only the
+application's approved `specs/<scenario-slug>/` artifacts. Apply
+`docs/requirements-traceability.md` and `docs/semantic-field-type-standard.md`
+for their traceability matrix, architecture and field catalog. These review
+aids neither replace required artifacts nor change the shared runtime gates.
+Planning skills do not authenticate, deploy, or authorize starting Skill 3.
 
 Required artifacts:
 - `spec.md`

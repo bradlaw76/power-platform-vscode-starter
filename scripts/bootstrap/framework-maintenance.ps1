@@ -14,6 +14,9 @@ param(
     [Parameter(Mandatory)]
     [string]$FrameworkRoot,
     [Parameter(Mandatory)]
+    [ValidatePattern('^[a-fA-F0-9]{40}$')]
+    [string]$ExpectedHead,
+    [Parameter(Mandatory)]
     [string[]]$ApprovedPaths,
     [hashtable]$FileUpdates = @{},
     [string]$BaseRef,
@@ -32,6 +35,9 @@ $frameworkRootPath = [IO.Path]::GetFullPath($FrameworkRoot)
 if ($Task -match '(^|/)\.\.?(/|$)') {
     throw 'Framework Maintenance Mode rejects traversal in the task branch name.'
 }
+
+$context = & (Join-Path $PSScriptRoot 'framework-context-preflight.ps1') `
+    -FrameworkRoot $frameworkRootPath -ExpectedBranch "framework-maintenance/$Task" -ExpectedHead $ExpectedHead
 
 $approvalSwitch = @{
     modify = [bool]$ApproveModify
@@ -187,6 +193,7 @@ if ($Operation -eq 'modify') {
     Mode = 'Framework Maintenance'
     FrameworkRoot = $frameworkRootPath
     Branch = $approval.Branch
+    VerifiedHead = $context.Head
     Operation = $Operation
     ApprovedPaths = $approvedSet
     Completed = $operationCompleted

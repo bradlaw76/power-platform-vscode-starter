@@ -12,6 +12,20 @@ This skill starts the repository wizard safely through either chat or terminal, 
 
 This skill does not modify core wizard scripts.
 
+## Optional Planning Specialists
+
+Use `power-platform-requirements-analyst` for requirements traceability and
+Spec Kit refinement, and `dataverse-solution-architect` for architecture and
+the Semantic Field Type Standard. Both are planning-only: reuse completed
+intake, keep the selected mode and consolidated approval, and return to this
+same execution contract. See `docs/requirements-traceability.md`. They do not
+authorize builds, deployment or starting Skill 3.
+
+For explicit framework maintenance, first follow
+`docs/framework-maintenance-preflight.md` to verify the approved repository,
+exact maintenance branch and HEAD SHA. This never grants application-write
+access to the framework or approval to commit, push or merge.
+
 ## Runtime Compatibility Preflight
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.

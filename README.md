@@ -37,6 +37,16 @@ reporting workload reuses this starter's authentication, Dataverse runtime,
 solution, app-module, publishing, schema, and CI capabilities; it is not a
 separate implementation.
 
+Optional planning-only skills for both Copilot and Claude are
+`power-platform-requirements-analyst` (requirements, traceability and Spec Kit)
+and `dataverse-solution-architect` (architecture and semantic field types).
+They refine the existing scenario plans without changing wizard modes or
+authorizing execution. See [planning and traceability](docs/requirements-traceability.md)
+and the [Semantic Field Type Standard](docs/semantic-field-type-standard.md).
+Framework contributors must follow the
+[repository-context and maintenance preflight](docs/framework-maintenance-preflight.md)
+before changing framework files.
+
 ---
 
 ## Start here
