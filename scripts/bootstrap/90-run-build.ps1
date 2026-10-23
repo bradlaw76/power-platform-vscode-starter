@@ -51,6 +51,8 @@ param(
     [string]$PayloadsFolder = '',
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
+    [switch]$AcknowledgeWriteFreeze,
+    [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000,
     [scriptblock]$RequestInvoker
 )
 
@@ -62,6 +64,7 @@ $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
 
 $paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
+. (Join-Path $PSScriptRoot 'helpers/choice-migration.ps1')
 foreach ($requiredPath in @($paths.ScenarioFolder, $paths.PayloadFolder)) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Container)) {
         throw "Required scenario path not found: $requiredPath"
@@ -74,6 +77,10 @@ foreach ($planningFile in @('spec.md', 'plan.md', 'tasks.md')) {
     }
 }
 
+if ($Mode -eq 'Apply') {
+    Assert-WizardChoiceCutover -PayloadsFolder $paths.PayloadFolder -ScenarioSlug $ScenarioSlug `
+        -SolutionUniqueName $SolutionUniqueName -EnvironmentUrl $EnvironmentUrl -AccessToken $env:DV_TOKEN -RequestInvoker $RequestInvoker -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
+}
 $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
@@ -125,6 +132,12 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'post-build'; Script = '80-post-build-analysis.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $paths.PayloadFolder; PreviewOnly = $true } }
 )
 
+foreach ($stage in $stageDefinitions) {
+    if ($stage.Script -in @('55-build-business-process-flows.ps1', '60-build-forms-views.ps1', '64-build-charts-dashboard.ps1', '66-seed-synthetic-data.ps1')) {
+        $stage.Arguments.AcknowledgeWriteFreeze = [bool]$AcknowledgeWriteFreeze
+        $stage.Arguments.ChoiceMaxRows = $ChoiceMaxRows
+    }
+}
 $runState = $null
 if ($Resume -and (Test-Path -LiteralPath $statePath)) {
     $runState = Read-WizardJsonFile -Path $statePath

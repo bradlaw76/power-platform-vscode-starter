@@ -859,7 +859,7 @@ function Get-ScenarioReportDefinitions {
 
     $roles = if (@($Scenario.Roles).Count -gt 0) { $Scenario.Roles } else { @('operators', 'supervisors', 'stakeholders') }
     $primaryLabel = if (-not [string]::IsNullOrWhiteSpace($PrimaryEntity.DisplayName)) { $PrimaryEntity.DisplayName } else { $Scenario.ScenarioName }
-    $standalone = $Scenario.ApplicationProfile -eq 'standalone-model-driven'
+    $standalone = $Scenario.ApplicationProfile -in @('standalone-model-driven', 'new-dynamics-365-app')
 
     $definitions = @(
         [pscustomobject]@{

@@ -275,6 +275,7 @@ function Get-WizardPayloadSummary {
         Relationships = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         ProcessNames = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         SecurityRoleNames = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        GlobalChoices = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         ParseErrors = New-Object System.Collections.Generic.List[string]
     }
 
@@ -383,6 +384,19 @@ function Get-WizardPayloadSummary {
         }
     }
 
+    $choiceContract = $null
+    if (@(Get-WizardJsonFiles -Folder $PayloadsFolder -Filter 'choices-*.json').Count -gt 0) {
+        . (Join-Path $PSScriptRoot 'choice-migration.ps1')
+        $choiceContract = Get-WizardChoiceContract $PayloadsFolder
+    }
+    if ($null -ne $choiceContract) {
+        foreach ($name in $choiceContract.Choices.Keys) { [void]$summary.GlobalChoices.Add($name) }
+        foreach ($field in $choiceContract.Fields) {
+            [void]$summary.ColumnTables.Add($field.Table)
+            [void]$summary.Columns.Add($field.Target)
+            [void]$summary.ColumnReferences.Add("$($field.Table).$($field.Target)")
+        }
+    }
     return [pscustomobject]@{
         Tables               = @($summary.Tables | Sort-Object)
         TableFiles           = @($summary.TableFiles)
@@ -393,6 +407,7 @@ function Get-WizardPayloadSummary {
         Relationships        = @($summary.Relationships | Sort-Object)
         ProcessNames         = @($summary.ProcessNames | Sort-Object)
         SecurityRoleNames    = @($summary.SecurityRoleNames | Sort-Object)
+        GlobalChoices        = @($summary.GlobalChoices | Sort-Object)
         ParseErrors          = @($summary.ParseErrors.ToArray())
     }
 }
@@ -841,6 +856,7 @@ function New-WizardExpectedArtifacts {
         Dashboards = $nativeDashboards
         Charts = $nativeCharts
         SecurityRoles = @($payloadSummary.SecurityRoleNames)
+        GlobalChoices = @($payloadSummary.GlobalChoices)
         Flows = @()
         AppModules = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @($featureConfig.AppUniqueName) } else { @() }
         SiteMaps = if ($featureConfig.AppEnabled -and -not [string]::IsNullOrWhiteSpace($featureConfig.AppUniqueName)) { @("$([regex]::Replace($featureConfig.AppUniqueName.ToLowerInvariant(), '[^a-z0-9]+', '_').Trim('_'))_sitemap") } else { @() }
@@ -869,6 +885,7 @@ function New-WizardContaminationVerdict {
         flow = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         bpf = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         role = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        'global-choice' = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     }
 
     foreach ($name in @(@($ExpectedArtifacts.Tables) + @($ExpectedArtifacts.DependencyTables))) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
@@ -884,6 +901,9 @@ function New-WizardContaminationVerdict {
     foreach ($name in @($ExpectedArtifacts.Flows)) { [void]$expected.flow.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Bpfs)) { [void]$expected.bpf.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.SecurityRoles)) { [void]$expected.role.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @(Get-WizardOptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'GlobalChoices' -Default @())) {
+        [void]$expected['global-choice'].Add(($name ?? '').Trim().ToLowerInvariant())
+    }
 
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
     $expectedItems = New-Object System.Collections.Generic.List[object]
@@ -907,7 +927,7 @@ function New-WizardContaminationVerdict {
 
         $looksWizardManaged = $false
         if (-not [string]::IsNullOrWhiteSpace($prefix)) {
-            if (($kind -eq 'table' -or $kind -eq 'column' -or $kind -eq 'relationship' -or $kind -eq 'appmodule') -and $name -like "$prefix`_*") {
+            if (($kind -in @('table', 'column', 'relationship', 'appmodule', 'global-choice')) -and $name -like "$prefix`_*") {
                 $looksWizardManaged = $true
             }
             if ($kind -eq 'webresource' -and $name -like "$prefix`_reports/*") {
@@ -1158,7 +1178,7 @@ function Get-WizardAppModuleConfig {
             $validationErrors.Add('App module wiring requires at least one expected table.') | Out-Null
         }
         if ($featureConfig.ProfileSectionPresent) {
-            if (@('standalone-model-driven', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -notcontains $featureConfig.ApplicationProfile) {
+            if (@('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -notcontains $featureConfig.ApplicationProfile) {
                 $validationErrors.Add("Unsupported application profile '$($featureConfig.ApplicationProfile)'.") | Out-Null
             }
             if (@('oob-only', 'custom-only', 'hybrid') -notcontains $featureConfig.TableStrategy) {

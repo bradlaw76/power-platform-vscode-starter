@@ -108,7 +108,9 @@ param(
   [string]$FormStrategy = 'auto',
   [bool]$FailIfUnderpopulatedForms = $true,
   [bool]$FailIfUnderpopulatedViews = $true,
-  [switch]$PreviewOnly
+  [switch]$PreviewOnly,
+  [switch]$AcknowledgeWriteFreeze,
+  [ValidateRange(1,100000)][int]$ChoiceMaxRows = 10000
 )
 
 Set-StrictMode -Version Latest
@@ -131,6 +133,10 @@ if (-not (Test-Path $dataverseRuntimeHelper)) {
   throw "Missing helper script: $dataverseRuntimeHelper"
 }
 . $dataverseRuntimeHelper
+. (Join-Path $PSScriptRoot 'helpers/choice-migration.ps1')
+$script:ChoiceContract = $null
+$script:ChoiceAttributeTypes = @{}
+$script:LegacyEvidenceFields = @()
 
 $envFile = Join-Path (Split-Path $PSScriptRoot -Parent | Split-Path -Parent) '.env.ps1'
 
@@ -397,9 +403,20 @@ function Get-PayloadFieldsForTable {
       if ([string]::IsNullOrWhiteSpace($logical)) { continue }
 
       $logical = $logical.ToLowerInvariant()
+      $choiceContract = Get-WizardChoiceContract $Folder
+      $choiceField = @(if ($null -ne $choiceContract) {
+        $choiceContract.Fields | Where-Object { $_.Table -eq $TableLogical -and $_.Source -eq $logical }
+      })
+      if ($choiceField.Count -eq 1 -and $TableLogical -in @('foia_clockevent','foia_auditevent') -and $seen.Add($logical)) {
+        $results.Add([pscustomobject]@{
+          LogicalName=$logical; Label="$($choiceField[0].Label) (Legacy evidence)"; Source='payload'
+        }) | Out-Null
+      }
+      if ($choiceField.Count -eq 1) { $logical = $choiceField[0].Target }
       if (-not $seen.Add($logical)) { continue }
 
       $label = Get-DisplayLabel -DisplayName (Get-PropertyValue -Object $col -Name 'DisplayName') -LogicalName $logical -Prefix $Prefix
+      if ($choiceField.Count -eq 1) { $label = $choiceField[0].Label }
       $results.Add([pscustomobject]@{
         LogicalName = $logical
         Label       = $label
@@ -418,18 +435,26 @@ function Get-TableAttributesMetadata {
   )
 
   $results = New-Object System.Collections.Generic.List[object]
+  $script:LegacyEvidenceFields = @(if ($null -ne $script:ChoiceContract -and $TableLogical -in @('foia_clockevent','foia_auditevent')) {
+    $script:ChoiceContract.Fields | Where-Object Table -eq $TableLogical | ForEach-Object Source
+  })
   $response = Invoke-Dv -Method 'Get' -Path "EntityDefinitions(LogicalName='$TableLogical')/Attributes?`$select=LogicalName,AttributeType,IsPrimaryId,IsPrimaryName,IsValidForForm,IsValidForRead,DisplayName"
   foreach ($attribute in @(Get-PropertyValue -Object $response -Name 'value' -Default @())) {
     $logical = Get-PropertyValue -Object $attribute -Name 'LogicalName'
     if ([string]::IsNullOrWhiteSpace($logical)) { continue }
 
     $logical = $logical.ToLowerInvariant()
+    if ($null -ne $script:ChoiceContract -and
+        @($script:ChoiceContract.Fields | Where-Object { $_.Table -eq $TableLogical -and $_.Source -eq $logical }).Count -gt 0 -and
+        $logical -notin $script:LegacyEvidenceFields) { continue }
     $attributeType = Get-PropertyValue -Object $attribute -Name 'AttributeType' -Default ''
+    $script:ChoiceAttributeTypes[$logical] = $attributeType
     $isPrimaryId = ConvertTo-Boolean -Value (Get-PropertyValue -Object $attribute -Name 'IsPrimaryId')
     $isPrimaryName = ConvertTo-Boolean -Value (Get-PropertyValue -Object $attribute -Name 'IsPrimaryName')
     $isValidForForm = ConvertTo-Boolean -Value (Get-PropertyValue -Object $attribute -Name 'IsValidForForm') -Default $true
     $isValidForRead = ConvertTo-Boolean -Value (Get-PropertyValue -Object $attribute -Name 'IsValidForRead') -Default $true
     $label = Get-DisplayLabel -DisplayName (Get-PropertyValue -Object $attribute -Name 'DisplayName') -LogicalName $logical -Prefix $Prefix
+    if ($logical -in $script:LegacyEvidenceFields) { $label = "$label (Legacy evidence)" }
 
     $results.Add([pscustomobject]@{
       LogicalName    = $logical
@@ -979,9 +1004,9 @@ function New-FieldCellNode {
 
   $control = New-XmlElement -Document $Document -Name 'control' -Attributes @{
     id            = $FieldLogicalName
-    classid       = '{4273EDBD-AC1D-40d3-9FB2-095C621B552D}'
+    classid       = $(if ($script:ChoiceAttributeTypes[$FieldLogicalName] -eq 'Picklist') { '{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}' } else { '{4273EDBD-AC1D-40d3-9FB2-095C621B552D}' })
     datafieldname = $FieldLogicalName
-    disabled      = 'false'
+    disabled      = $(if ($FieldLogicalName -in $script:LegacyEvidenceFields) { 'true' } else { 'false' })
   }
   [void]$cell.AppendChild($control)
 
@@ -1152,13 +1177,30 @@ function Convert-FormXmlToDocument {
 function Merge-FieldsIntoFormXml {
   param(
     [string]$ExistingFormXml,
-    [array]$DesiredFields
+    [array]$DesiredFields,
+    [string[]]$LegacyFields = @(),
+    [string[]]$LegacyEvidenceFields = @()
   )
 
   $document = Convert-FormXmlToDocument -FormXml $ExistingFormXml
   if ($null -eq $document) {
     $document = [xml]'<form />'
   }
+  foreach ($control in @($document.SelectNodes('//control[@datafieldname]'))) {
+    if ($control.GetAttribute('datafieldname') -in $LegacyEvidenceFields) {
+      $control.SetAttribute('disabled', 'true')
+      $field = @($DesiredFields | Where-Object LogicalName -eq $control.GetAttribute('datafieldname'))
+      if ($field.Count -ne 1 -or $control.ParentNode.LocalName -ne 'cell') { throw 'Cannot safely label immutable legacy evidence control.' }
+      Set-LabelNode -Document $document -Parent $control.ParentNode -Text $field[0].Label
+      continue
+    }
+    if ($control.GetAttribute('datafieldname') -in $LegacyFields) {
+      $cell = $control.ParentNode
+      if ($cell.LocalName -ne 'cell') { throw 'Cannot safely remove legacy categorical form control.' }
+      [void]$cell.ParentNode.RemoveChild($cell)
+    }
+  }
+  if ($LegacyFields.Count -gt 0 -or $LegacyEvidenceFields.Count -gt 0) { $ExistingFormXml = $document.OuterXml }
 
   $existingControls = Get-ExistingControlSetFromDocument -Document $document
   $fieldsToAdd = @($DesiredFields | Where-Object { -not $existingControls.Contains($_.LogicalName.ToLowerInvariant()) })
@@ -1604,6 +1646,12 @@ function Invoke-WizardFormsViewsBuild {
   }
 
   $scenarioContext = Get-ScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
+  $script:ChoiceContract = Get-WizardChoiceContract $PayloadsFolder
+  if (-not $PreviewOnly) {
+    $choiceSolution = if ($env:DV_SOLUTION_NAME) { $env:DV_SOLUTION_NAME } elseif (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
+    Assert-WizardChoiceCutover -PayloadsFolder $PayloadsFolder -ScenarioSlug $ScenarioSlug `
+      -SolutionUniqueName $choiceSolution -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -AcknowledgeWriteFreeze:$AcknowledgeWriteFreeze -ChoiceMaxRows $ChoiceMaxRows
+  }
   $surfaceContract = Get-ScenarioSurfaceContract -ScenarioContext $scenarioContext -PayloadsFolder $PayloadsFolder
   $appConfig = $null
   if ($null -ne $scenarioContext -and (Get-Command Get-WizardAppModuleConfig -ErrorAction SilentlyContinue)) {
@@ -1738,7 +1786,8 @@ function Invoke-WizardFormsViewsBuild {
         Write-Host "    Form ($resolvedFormName $(if ($PreviewOnly) { 'planned' } else { 'created' }))" -ForegroundColor Green
         $currentFormXml = $mergeResult.FormXml
       } else {
-        $mergeResult = Merge-FieldsIntoFormXml -ExistingFormXml $targetForm.formxml -DesiredFields $orderedFields
+        $legacyFields = @(if ($null -ne $script:ChoiceContract -and $logical -notin @('foia_clockevent','foia_auditevent')) { $script:ChoiceContract.Fields | Where-Object Table -eq $logical | ForEach-Object Source })
+        $mergeResult = Merge-FieldsIntoFormXml -ExistingFormXml $targetForm.formxml -DesiredFields $orderedFields -LegacyFields $legacyFields -LegacyEvidenceFields $script:LegacyEvidenceFields
         $currentFormXml = $mergeResult.FormXml
         if ($targetForm.formxml -ne $mergeResult.FormXml) {
           $patchBody = @{ formxml = $mergeResult.FormXml } | ConvertTo-Json -Compress

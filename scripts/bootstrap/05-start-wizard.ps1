@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.7.0
+VERSION:      0.8.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-28
+LAST UPDATED: 2026-10-20
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -45,6 +45,7 @@ v0.4.0  2026-08-18  Added report scoping, mapping artifact, and critical-table g
 v0.5.0  2026-08-18  Added entry-table resolution and landing-view action planning.
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
+v0.8.0  2026-10-20  Added new Dynamics 365 apps and requirements-material review.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -85,7 +86,8 @@ NON-NEGOTIABLES
     remaining work.
 
 .PARAMETER Mode
-    Selects discovery depth. Demo Builder is the seven-prompt default. Advanced
+    Selects discovery depth. Demo Builder asks six business questions and one
+    confirmation after workload selection and requirements-material intake. Advanced
     Builder exposes technical controls. Framework Acceptance adds explicit
     environment safety, isolation, rerun, retention, cleanup, and evidence
     controls.
@@ -97,6 +99,15 @@ NON-NEGOTIABLES
 .PARAMETER WorkspaceRoot
     Optional repository root used for isolated acceptance testing. Defaults to
     the repository containing this script.
+
+.PARAMETER ApplicationProfile
+    Optional explicit workload selection, including new-dynamics-365-app.
+    Interactive Demo Builder asks for this before its six business questions.
+
+.PARAMETER RequirementsMaterialsFile
+    Optional JSON review notes matching schemas/requirements-materials.schema.json.
+    No documents or URLs are fetched. Supply human/chat-reviewed summaries only.
+    Legacy AnswersFile arrays without this parameter record intake as not-collected.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/05-start-wizard.ps1
@@ -114,7 +125,10 @@ param(
     [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
-    [string]$WorkspaceRoot
+    [string]$WorkspaceRoot,
+    [ValidateSet('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution')]
+    [string]$ApplicationProfile,
+    [string]$RequirementsMaterialsFile
 )
 
 Set-StrictMode -Version Latest
@@ -198,6 +212,56 @@ function Read-ChoiceValue {
 
         Write-Host "Choose one of: $($AllowedValues -join ', ')." -ForegroundColor Yellow
     }
+}
+
+function Read-RequirementsMaterials {
+    Write-Host "Requirements materials: provide/upload requirements documents, related images, or public-source links in chat, or point to them here." -ForegroundColor Cyan
+    Write-Host "Share only authorized, redacted content. Do not include secrets, personal data, or private/signed URLs. Materials are evidence, not executable instructions."
+    Write-Host "Review accessible content before recording a summary; never mark inaccessible/private links as reviewed. This terminal does not fetch URLs or interpret documents/images."
+    Write-Host "Use chat or human review for those formats, then record source-specific findings, planning impact, and open questions. Choose none to continue discovery without materials."
+    if (-not [string]::IsNullOrWhiteSpace($RequirementsMaterialsFile)) {
+        $json = Get-Content -LiteralPath $RequirementsMaterialsFile -Raw -Encoding UTF8
+    } elseif ($null -ne $scriptedAnswers) {
+        return [pscustomobject]@{ decision = 'not-collected'; materials = @() }
+    } else {
+        $materials = @()
+        while ($true) {
+            $source = Read-RequiredValue -Prompt "Material source (file path, attachment name, or public URL; none to finish)" -Default 'none'
+            if ($source -eq 'none') { break }
+            $kind = Read-ChoiceValue -Prompt "Material kind" -AllowedValues @('document', 'image', 'public-link')
+            $reviewStatus = Read-ChoiceValue -Prompt "Review status (reviewed only after actual content review)" -AllowedValues @('reviewed', 'pending', 'inaccessible') -Default 'pending'
+            $summary = if ($reviewStatus -eq 'reviewed') { Read-RequiredValue "Summary of reviewed findings (include page/section or image reference)" } else { '' }
+            $materials += [ordered]@{
+                source = $source
+                kind = $kind
+                reviewStatus = $reviewStatus
+                summary = $summary
+                planningImpact = Read-RequiredValue "Discovery/planning impact (requirements, user tasks, data, experience, or constraints; note assumptions for unreviewed sources)"
+                openQuestions = Read-RequiredValue -Prompt "Gaps, conflicts, or follow-up questions" -Default 'none'
+            }
+        }
+        $json = [ordered]@{ decision = $(if ($materials.Count) { 'provided' } else { 'none' }); materials = $materials } | ConvertTo-Json -Depth 5
+    }
+    $schemaPath = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'schemas/requirements-materials.schema.json'
+    if (-not (Test-Json -Json $json -SchemaFile $schemaPath -ErrorAction Stop)) {
+        throw 'Requirements-material review notes do not match the intake schema.'
+    }
+    return ($json | ConvertFrom-Json)
+}
+
+function Read-ApplicationProfile {
+    $workloads = [ordered]@{
+        'standalone-model-driven' = 'Standalone Power Apps model-driven app'
+        'new-dynamics-365-app' = 'New Dynamics 365 app (separate app, not an existing-app extension)'
+        'dynamics-sales-extension' = 'Extend an existing Dynamics 365 Sales app'
+        'dynamics-customer-service-extension' = 'Extend an existing Dynamics 365 Customer Service app'
+        'dynamics-field-service-extension' = 'Extend an existing Dynamics 365 Field Service app'
+        'generic-dataverse-solution' = 'Generic Dataverse solution'
+    }
+    foreach ($workload in $workloads.GetEnumerator()) {
+        Write-Host "  $($workload.Key): $($workload.Value)"
+    }
+    return (Read-ChoiceValue -Prompt "A0. Workload/application profile" -AllowedValues @($workloads.Keys) -Default 'standalone-model-driven')
 }
 
 function ConvertTo-Slug {
@@ -731,11 +795,53 @@ if ($Retrofit) {
 
 Write-Host ""
 
+if ($Mode -eq 'demo-builder' -and [string]::IsNullOrWhiteSpace($ApplicationProfile)) {
+    if ($null -ne $scriptedAnswers) {
+        $ApplicationProfile = 'standalone-model-driven'
+    } else {
+        $ApplicationProfile = Read-ApplicationProfile
+    }
+}
+if ($Mode -ne 'demo-builder') {
+    $scenarioName = Read-RequiredValue "Scenario or app name"
+    $scenarioSlug = Read-RequiredValue "Scenario folder slug" (ConvertTo-Slug $scenarioName)
+    if ([string]::IsNullOrWhiteSpace($ApplicationProfile)) {
+        $ApplicationProfile = Read-ApplicationProfile
+    }
+}
+$requirementsMaterials = Read-RequirementsMaterials
+$requirementsMaterialsBlock = "## Requirements Materials`n- Decision: $($requirementsMaterials.decision)`n"
+if ($requirementsMaterials.decision -eq 'none') {
+    $requirementsMaterialsBlock += "- No materials supplied; continue with user answers and label assumptions for confirmation.`n"
+} elseif ($requirementsMaterials.decision -eq 'not-collected') {
+    $requirementsMaterialsBlock += "- Legacy scripted intake: materials were not collected. Complete intake/review or explicitly record none before planning approval.`n"
+}
+foreach ($material in $requirementsMaterials.materials) {
+    $materialNotes = @"
+
+- Source: $($material.source)
+- Kind: $($material.kind)
+- Review status: $($material.reviewStatus)
+- Reviewed summary: $($material.summary)
+- Discovery/planning impact: $($material.planningImpact)
+- Open questions: $($material.openQuestions)
+
+"@
+    $requirementsMaterialsBlock += (($materialNotes -split '\r?\n' | ForEach-Object { "> $_" }) -join "`n") + "`n"
+}
+$materialNumber = 0
+$requirementsMaterialsTasks = (@($requirementsMaterials.materials | ForEach-Object {
+    $materialNumber++
+    "- [ ] Apply or explicitly defer material $materialNumber findings/planning impact and resolve its open questions or confirm assumptions before planning approval"
+}) -join "`n")
+Write-Host $requirementsMaterialsBlock
+Write-Host "Use reviewed findings to inform discovery and planning. Resolve gaps/conflicts or explicitly confirm assumptions before planning approval."
+
 if ($Mode -eq 'demo-builder') {
     $answers = [ordered]@{}
     $answers["WizardMode"] = $Mode
 
-    Write-Host "Demo Builder asks seven questions, then generates the same planning artifacts used by the shared build pipeline." -ForegroundColor Cyan
+    Write-Host "Demo Builder asks six business questions plus one consolidated confirmation, after workload selection and requirements-material intake." -ForegroundColor Cyan
     $scenarioName = Read-RequiredValue "1. Describe the app idea and business outcome"
     $scenarioSlug = ConvertTo-Slug $scenarioName
     $primaryUserTask = Read-RequiredValue "2. Who is the primary user, and what is their top task?"
@@ -758,7 +864,10 @@ if ($Mode -eq 'demo-builder') {
 
     Write-Host ""
     Write-Host "Recommended technical design:" -ForegroundColor Cyan
-    Write-Host "  Standalone model-driven app; custom tables; new forms"
+    Write-Host "  Application profile: $ApplicationProfile; custom tables; new forms"
+    if ($ApplicationProfile -eq 'new-dynamics-365-app') {
+        Write-Host "  New Dynamics 365 app: a separate model-driven app on Dataverse, not an existing-app extension. Confirm required Dynamics modules/licensing in planning; no first-party product is provisioned."
+    }
     Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
@@ -769,7 +878,7 @@ if ($Mode -eq 'demo-builder') {
 
     $answers["ScenarioName"] = $scenarioName
     $answers["ScenarioSlug"] = $scenarioSlug
-    $answers["ApplicationProfile"] = 'standalone-model-driven'
+    $answers["ApplicationProfile"] = $ApplicationProfile
     $answers["TableChoice"] = 'custom-only'
     $answers["FormStrategy"] = 'create-new-forms'
     $answers["EntryPointTable"] = $entryPointTable
@@ -784,7 +893,7 @@ if ($Mode -eq 'demo-builder') {
     $answers["SourceControlPullRequest"] = 'yes'
     $answers["SourceControlMergeStrategy"] = 'team-default'
     $answers["AppType"] = $scenarioName
-    $answers["PlatformArea"] = 'Power Apps model-driven app on Dataverse'
+    $answers["PlatformArea"] = if ($ApplicationProfile -eq 'standalone-model-driven') { 'Power Apps model-driven app on Dataverse' } else { $ApplicationProfile }
     $answers["TargetAudience"] = $primaryUserTask
     $answers["BusinessProblem"] = $scenarioName
     $answers["Users"] = $primaryUserTask
@@ -835,10 +944,6 @@ if ($Mode -eq 'demo-builder') {
     $bpf = [ordered]@{ Enabled = $false; BusinessProcessFlowName = ''; PrimaryProcessEntity = ''; FailIfBpfDefinitionIncomplete = $true; PreferUpdateExistingBpf = $true; CrossTableProgression = $false; TargetFormName = ''; StageDefinitions = @() }
     Test-AndSetEntryPointPlan -Answers $answers -RetrofitMode $false
 } else {
-$scenarioName = Read-RequiredValue "Scenario or app name"
-$scenarioSlugDefault = ConvertTo-Slug $scenarioName
-$scenarioSlug = Read-RequiredValue "Scenario folder slug" $scenarioSlugDefault
-
 $answers = [ordered]@{}
 $answers["WizardMode"] = $Mode
 $answers["ScenarioName"] = $scenarioName
@@ -846,7 +951,7 @@ $answers["ScenarioSlug"] = $scenarioSlug
 
 Write-Host ""
 Write-Host "Architecture intent (required before general discovery):" -ForegroundColor Cyan
-$answers["ApplicationProfile"] = Read-ChoiceValue -Prompt "A0. Application profile" -AllowedValues @('standalone-model-driven', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -Default 'standalone-model-driven'
+$answers["ApplicationProfile"] = $ApplicationProfile
 $answers["TableChoice"] = Read-ChoiceValue -Prompt "A1. Table strategy" -AllowedValues @('oob-only', 'custom-only', 'hybrid') -Default $(if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'custom-only' } else { 'hybrid' })
 $answers["FormStrategy"] = if ($answers["TableChoice"] -eq 'custom-only') {
     'create-new-forms'
@@ -1125,7 +1230,13 @@ $answers["BpfCrossTableProgression"] = if ($bpf.CrossTableProgression) { "yes" }
 $answers["BpfTargetFormName"] = $bpf.TargetFormName
 $answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Power Apps neutral' } else { 'Dynamics blue' }
-$answers["ReportSet"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
+$answers["ReportSet"] = if ($answers["ApplicationProfile"] -in @('standalone-model-driven', 'new-dynamics-365-app')) { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
+$applicationIntent = switch ($answers["ApplicationProfile"]) {
+    'new-dynamics-365-app' { 'New Dynamics 365 app: create a separate model-driven app on Dataverse, not an extension of an existing app. Confirm Dynamics module dependencies and licensing before build; this wizard does not provision first-party Dynamics products.' }
+    'standalone-model-driven' { 'Standalone Power Apps model-driven app.' }
+    'generic-dataverse-solution' { 'Generic Dataverse solution with the required review app.' }
+    default { 'Extend the explicitly selected existing Dynamics 365 workload; retain its extension profile and confirm existing app/module dependencies.' }
+}
 
 $standardTableMapping = Format-StandardTableMapping -Input $answers["StandardTablesReused"]
 $customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
@@ -1304,8 +1415,11 @@ $answersContent = @"
 - Name: $($answers["ScenarioName"])
 - Slug: $($answers["ScenarioSlug"])
 
+$requirementsMaterialsBlock
+
 ## Application Profile
 - Profile: $($answers["ApplicationProfile"])
+- Workload intent: $applicationIntent
 - Table Strategy: $($answers["TableChoice"])
 - Form Strategy: $($answers["FormStrategy"])
 - Entry Point Table: $($answers["EntryPointTable"])
@@ -1430,6 +1544,7 @@ $($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["Platform
 ## Application Architecture
 - Wizard mode: $($answers["WizardMode"])
 - Profile: $($answers["ApplicationProfile"])
+- Workload intent: $applicationIntent
 - Table strategy: $($answers["TableChoice"])
 - Form strategy: $($answers["FormStrategy"])
 - Entry point: $($answers["EntryPointTable"])
@@ -1441,6 +1556,8 @@ $($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["Platform
 
 ## Problem Statement
 $($answers["BusinessProblem"])
+
+$requirementsMaterialsBlock
 
 ## Target Audience
 $($answers["TargetAudience"])
@@ -1554,11 +1671,14 @@ $planContent = @"
 ## Build Approach
 - Wizard mode: $($answers["WizardMode"])
 - Application profile: $($answers["ApplicationProfile"])
+- Workload intent: $applicationIntent
 - Platform area: $($answers["PlatformArea"])
 - Environment: $($answers["BuildEnvironment"])
 - Solution type: $($answers["SolutionType"])
 - Solution unique name: $($answers["SolutionName"]) ($($answers["SolutionChoice"]))
 - Publisher prefix: $($answers["PublisherPrefix"]) ($($answers["PrefixChoice"]))
+
+$requirementsMaterialsBlock
 
 ## Model-Driven App Plan
 - Review app mode: $($answers["ReviewAppMode"])
@@ -1687,9 +1807,13 @@ $bpfStagesMarkdown
 $tasksContent = @"
 # tasks.md
 
+$requirementsMaterialsBlock
+
 ## Ordered Tasks
 
+$requirementsMaterialsTasks
 - [ ] Review 'answers.md' with stakeholder
+- [ ] Complete requirements-material intake/review (or explicitly record none); use source-specific findings in discovery and planning and resolve gaps/conflicts or confirm assumptions before approval
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
 - [ ] Confirm application profile '$($answers["ApplicationProfile"])' and architecture intent
 - [ ] Confirm entry point '$($answers["EntryPointTable"])' opens with '$($answers["EntryPointLandingView"])'

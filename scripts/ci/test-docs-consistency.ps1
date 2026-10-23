@@ -81,9 +81,37 @@ foreach ($contentCheck in @($onboarding, $prompt, $contract)) {
 }
 
 foreach ($contentCheck in @($readme, $onboarding, $prompt, $contract)) {
-  foreach ($requiredProfileText in @('standalone-model-driven', 'dynamics-customer-service-extension', 'entry-point table', 'landing view')) {
+  foreach ($requiredProfileText in @('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-customer-service-extension', 'entry-point table', 'landing view')) {
     if ($contentCheck -notmatch [regex]::Escape($requiredProfileText)) {
       throw "Wizard contract surface is missing application profile guidance: $requiredProfileText"
+    }
+  }
+}
+
+$materialsSurfaces = @(
+  $readme, $onboarding, $prompt, $contract, $initSkill,
+  (Get-Content (Join-Path $repoRoot '.claude/skills/power-platform-vscode-wizard/SKILL.md') -Raw),
+  (Get-Content (Join-Path $repoRoot '.github/copilot-instructions.md') -Raw),
+  (Get-Content (Join-Path $repoRoot 'requirements/how-to-build-dynamics-model-driven-apps-wizard.md') -Raw),
+  (Get-Content (Join-Path $repoRoot 'requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md') -Raw)
+)
+foreach ($content in $materialsSurfaces) {
+  foreach ($requiredText in @('new-dynamics-365-app', 'requirements documents', 'related images', 'public-source links', 'Requirements Materials', 'planning impact', 'inaccessible/private links', 'none', 'assumptions', 'third-party', 'secrets')) {
+    if ($content -notmatch [regex]::Escape($requiredText)) {
+      throw "Wizard surface is missing workload/intake guidance: $requiredText"
+    }
+  }
+}
+if (-not $wizardContract.discovery.requirementsMaterials.requiredBeforeDiscovery -or -not $wizardContract.discovery.requirementsMaterials.allowNone) {
+  throw 'Profile must require requirements-material intake before discovery and allow an explicit none decision.'
+}
+if (-not (Test-Path -LiteralPath (Join-Path $repoRoot $wizardContract.discovery.requirementsMaterials.inputSchema))) {
+  throw 'Profile requirements-material input schema is missing.'
+}
+foreach ($supportedProfile in $wizardContract.applicationProfiles) {
+  foreach ($surface in @($startWizard, (Get-Content (Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Raw))) {
+    if (-not $surface.Contains("'$supportedProfile'")) {
+      throw "Executable wizard surface is missing profile: $supportedProfile"
     }
   }
 }

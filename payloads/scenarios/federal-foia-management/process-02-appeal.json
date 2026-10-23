@@ -47,7 +47,7 @@
       "StageName": "Appeal Decision",
       "RequiredFields": [
         "foia_decision",
-        "foia_outcome"
+        "foia_outcomechoice"
       ],
       "ExitCriteria": "Authorized decision and outcome recorded; FOIA-REV-006.",
       "EntityLogicalName": "foia_appeal",
@@ -57,7 +57,7 @@
       "Order": 5,
       "StageName": "Response",
       "RequiredFields": [
-        "foia_outcome"
+        "foia_outcomechoice"
       ],
       "ExitCriteria": "Approved response issuance recorded; FOIA-CAS-005.",
       "EntityLogicalName": "foia_appeal",
@@ -67,7 +67,7 @@
       "Order": 6,
       "StageName": "Closure",
       "RequiredFields": [
-        "foia_outcome",
+        "foia_outcomechoice",
         "foia_closeddate"
       ],
       "ExitCriteria": "Closure reconciles to Appeal Clock Events; FOIA-RPT-003.",

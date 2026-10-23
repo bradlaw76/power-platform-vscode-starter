@@ -16,7 +16,7 @@ Welcome! This is the fastest path to get going with `power-platform-vscode-start
 This guide creates an authoring workspace for the **model-driven app** and
 **existing-app reporting** workflows in this starter:
 
-- A **model-driven Power App or Dynamics 365 extension**: continue with this
+- A **standalone model-driven Power App, New Dynamics 365 app, or extension of an existing Dynamics 365 app**: continue with this
   guide.
 - **Charts, dashboards, or FetchXML for an existing model-driven app**:
   continue with this guide, then use `/dataverse-report-wizard` in Step 4.

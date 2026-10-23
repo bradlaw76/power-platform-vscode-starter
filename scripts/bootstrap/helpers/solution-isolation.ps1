@@ -300,6 +300,7 @@ function ConvertTo-SolutionInventoryCategory {
         bpf = 'flows'
         role = 'security-roles'
         'security-role' = 'security-roles'
+        'global-choice' = 'global-choices'
     }
 
     $normalized = ("$Kind").Trim().ToLowerInvariant()
@@ -314,7 +315,7 @@ function New-SolutionMembershipReport {
         [hashtable]$ExpectedByCategory,
         [object[]]$CurrentInventory = @(),
         [object[]]$FailedArtifacts = @(),
-        [string[]]$MandatoryCategories = @('tables', 'columns', 'relationships', 'forms', 'views', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'dashboards', 'charts', 'security-roles'),
+        [string[]]$MandatoryCategories = @('tables', 'columns', 'relationships', 'forms', 'views', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'dashboards', 'charts', 'security-roles', 'global-choices'),
         [string[]]$OptionalCategories = @('flows'),
         [switch]$Strict
     )
@@ -502,6 +503,7 @@ function ConvertTo-SolutionExpectedCategoryMap {
         dashboards = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Dashboards'))
         charts = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Charts'))
         'security-roles' = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'SecurityRoles'))
+        'global-choices' = @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'GlobalChoices'))
         flows = @(
             @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Bpfs')) +
             @((Get-OptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'Flows'))

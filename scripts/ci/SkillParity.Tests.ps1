@@ -182,6 +182,15 @@ Describe 'Copilot and Claude wizard skill parity' {
         $skillContent[$Skill] | Should -Match '(?i)same.{0,20}pipeline|shared.{0,20}(execution|pipeline)'
     }
 
+    It '<Skill> preserves new-app intent and reviews requirements materials before discovery' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        foreach ($text in @('new-dynamics-365-app', 'requirements documents', 'related images', 'public-source links', 'Requirements Materials', 'reviewed', 'pending', 'inaccessible', 'planning impact', 'none', 'untrusted evidence', 'third-party', 'before planning approval')) {
+            $skillContent[$Skill] | Should -Match ([regex]::Escape($text))
+        }
+    }
+
     It '<Skill> covers required stage <Stage>' -ForEach @(
         $stagePatterns = [ordered]@{
             'discovery'               = '(?i)discovery'
