@@ -2,6 +2,11 @@
 
 Recorded: 2026-10-21 UTC.
 
+Latest update: 2026-10-23 UTC. See the final update-log entry for the current
+blocker, approved task-only backup exception, and mobile-access alternatives.
+Earlier snapshots and next-action statements below are historical where
+superseded by that entry.
+
 ## Purpose and assessment
 
 Consolidate the previously chat-only findings for independent review.
@@ -231,3 +236,113 @@ Skills 1 and 2 remain unimplemented in this checkout; Skill 3 is not started.
 **Next action:** obtain independent advice on these alternatives, then have the
 owner explicitly select an accessible durable-storage arrangement or approve a
 bounded recovery-policy exception before implementation resumes.
+
+### 2026-10-23 — Correct-baseline task blocker and mobile-access review
+
+**Status: Skills 1 and 2 have not been implemented by this task.**
+The user requests this documentation update so ChatGPT can explain the blocker
+and identify an alternative that does not depend on desktop-only interaction.
+The user reports doing much of this work from mobile; no mobile UI flow has
+been tested in this session.
+
+#### Current evidence and what has not happened
+
+- Read-only local Git inspection for this update confirmed branch
+  `copilot/add-dynamics-365-app-option`, HEAD
+  `8aa1fad640caaea820d7bc2efe9538f37f735dd0`, and an initially clean working tree.
+- The 2026-10-22 remote-branch check observed remediation HEAD
+  `d9a32483ca4607078959b76908019a555f13ce59`. The requested maintenance branch
+  `framework-maintenance/skills-1-2` was absent at that check. Remote branch
+  existence and tips have not been rechecked for this entry.
+- This task has not created the maintenance branch, launched a replacement
+  Copilot cloud task, integrated either branch, or implemented either skill.
+- Earlier replies in this conversation did not update this document. This
+  entry is the requested follow-up, not evidence of implementation completion.
+
+#### Exact blocker and correction to earlier explanations
+
+The requested implementation must start from
+`copilot/extend-use-case-isolation-remediation`, not this task's current branch.
+Unique work on `copilot/add-dynamics-365-app-option` must remain preserved.
+Silently switching baselines or overwriting either branch is not acceptable.
+
+This running task has no provided operation to retarget its cloud-task base or
+launch a new Copilot cloud task. Its permitted working scope is the current
+task branch; that is not evidence that Git cannot create branches.
+The earlier blanket statement that branch creation was unavailable was too
+broad: a GitHub branch-creation tool is available, but it does not launch or
+retarget a cloud task, and does not authorize work on a different branch.
+No GitHub access failure or mobile-platform limitation was demonstrated.
+
+#### Approved exception and residual risks
+
+The owner explicitly approved the task-only exception deferring durable bundle
+storage and stated: **No further backup-exception approval is needed.**
+This supersedes the unapproved-exception wording and backup-related next action
+in the 2026-10-21 entry for this task only. Do not ask for that approval again.
+
+Durable backup storage, retention, and retrieval verification remain
+unestablished. Historical runner-local bundle/restore evidence is not a durable
+backup. Residual risks include loss of ephemeral evidence, branch deletion or
+rewrites, and inability to recover work not retained elsewhere. Preserving
+branches and recording commit IDs reduces some risks but does not replace an
+independently retrievable backup.
+
+#### Requested scope for the correctly based task
+
+Implement and validate only:
+
+1. `dataverse-solution-architect` for Copilot and Claude.
+2. `power-platform-requirements-analyst` for Copilot and Claude.
+
+Verify the remediation baseline and preserve unique work on the Dynamics app
+option branch without overwriting either branch. Preserve wizard behavior,
+source isolation, and Spec Kit planning gates. Keep this handoff updated with
+actual progress and executed test evidence. Require explicit approval before
+committing and separate approval before pushing. Do not merge, deploy, or begin
+Skill 3.
+
+#### Mobile-friendly alternatives for ChatGPT to assess
+
+These are options for review, not actions already performed or verified UI
+instructions:
+
+1. **Mobile browser:** assess whether GitHub's desktop-site view exposes branch
+   creation and the Copilot task repository/base-branch selector. Start from the
+   [remediation branch](https://github.com/bradlaw76/power-platform-vscode-starter/tree/copilot/extend-use-case-isolation-remediation),
+   create the maintenance branch from its verified current tip, then use
+   [Copilot Agents](https://github.com/copilot/agents). Do not assume the native
+   mobile app exposes the same controls.
+2. **Authorized helper:** ask a trusted operator with existing repository access
+   to create the correctly based branch and launch the task using the scope
+   above. Do not share credentials. Require confirmation of the source SHA and
+   selected task base; preserve separate commit/push approvals.
+3. **Tool-enabled new session:** assess whether an authorized GitHub integration
+   supports both branch creation and actual Copilot cloud-task launch with an
+   explicit base branch. Branch creation alone does not complete the handoff.
+   A local subagent is not a replacement cloud task.
+4. **If no launch path is available:** keep implementation paused and obtain a
+   supported launch route. Do not work around the task scope by resetting this
+   branch, merging histories, or starting implementation from the wrong base.
+
+Questions for ChatGPT: Which supported route works from mobile with the owner's
+available access? Can an authorized integration or helper complete the launch
+without desktop interaction? How will it verify the source SHA and chosen task
+base without overwriting existing work? Do not reopen the approved backup
+exception or equate missing UI controls with a demonstrated GitHub restriction.
+
+#### Validation and publication status
+
+This update changes documentation only. Local branch/HEAD and clean-tree
+inspection are not skill tests. Earlier CI links remain historical evidence;
+no new implementation test result or CI success is claimed.
+
+For this entry, `git diff --check` passed and the diff was limited to this
+document. Automated validation was requested: CodeQL skipped the documentation-
+only change; the code-review tool reported an unavailable model and therefore
+does not establish a completed independent review, despite its success label.
+
+This document edit does not grant commit or push approval. Keep it uncommitted
+and unpushed until the owner separately approves those actions. Consequently,
+the existing GitHub document link will not show this entry yet; use the local
+text or a pasted excerpt for review in the meantime.
