@@ -193,14 +193,15 @@ try {
             throw "Framework maintenance approval did not isolate the '$operation' operation."
         }
     }
+    $expectedHead = ((& git -C $frameworkRoot rev-parse HEAD) -join '').Trim()
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md')
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md')
     } 'separate explicit approval'
     if (Test-Path -LiteralPath (Join-Path $frameworkDocs 'new.md')) { throw 'Unapproved framework modification created a file.' }
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -FileUpdates @{ 'docs/new.md' = 'approved'; 'README.md' = 'unapproved' } -ApproveModify
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -FileUpdates @{ 'docs/new.md' = 'approved'; 'README.md' = 'unapproved' } -ApproveModify
     } 'exactly the approved paths'
-    $modifyApproval = & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -FileUpdates @{ 'docs/new.md' = 'approved change' } -ApproveModify
+    $modifyApproval = & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -FileUpdates @{ 'docs/new.md' = 'approved change' } -ApproveModify
     if ($modifyApproval.Mode -ne 'Framework Maintenance' -or -not $modifyApproval.Completed -or
         @($modifyApproval.ApprovedPaths) -notcontains 'docs/new.md' -or
         (Get-Content -LiteralPath (Join-Path $frameworkDocs 'new.md') -Raw).Trim() -cne 'approved change') {
@@ -209,29 +210,30 @@ try {
     $baselineCommit = ((& git -C $frameworkRoot rev-parse HEAD) -join '').Trim()
     Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('add', 'docs/new.md')
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -CommitMessage 'wrong scope' -ApproveCommit
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -CommitMessage 'wrong scope' -ApproveCommit
     } 'exactly match the staged paths'
-    $commitApproval = & $maintenanceScript -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -CommitMessage 'approved change' -ApproveCommit
+    $commitApproval = & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation commit -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -CommitMessage 'approved change' -ApproveCommit
     if ($commitApproval.Operation -ne 'commit' -or -not $commitApproval.Completed) { throw 'Framework Maintenance Mode failed the separate commit approval.' }
+    $expectedHead = ((& git -C $frameworkRoot rev-parse HEAD) -join '').Trim()
     Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('update-ref', 'refs/remotes/origin/main', $baselineCommit)
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -BaseRef origin/main -ApprovePush
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('README.md') -BaseRef origin/main -ApprovePush
     } 'exactly match the commits ahead'
-    $pushApproval = & $maintenanceScript -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -BaseRef origin/main -ApprovePush -WhatIf
+    $pushApproval = & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation push -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md') -BaseRef origin/main -ApprovePush -WhatIf
     if ($pushApproval.Operation -ne 'push' -or $pushApproval.Completed) { throw 'Framework Maintenance Mode did not honor its dry-run push boundary.' }
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('../escape.md') -ApproveModify
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('../escape.md') -ApproveModify
     } 'safe FrameworkRoot-relative approved path'
     $maintenanceLink = Join-Path $frameworkRoot 'outside-link'
     New-Item -ItemType SymbolicLink -Path $maintenanceLink -Target $testRoot | Out-Null
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('outside-link/escape.md') -FileUpdates @{ 'outside-link/escape.md' = 'escape' } -ApproveModify
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('outside-link/escape.md') -FileUpdates @{ 'outside-link/escape.md' = 'escape' } -ApproveModify
     } 'outside framework source'
     $nestedFrameworkRepo = Join-Path $frameworkRoot 'nested-framework'
     New-Item -ItemType Directory -Path $nestedFrameworkRepo -Force | Out-Null
     Invoke-TestGit -WorkingDirectory $nestedFrameworkRepo -Arguments @('init', '-b', 'nested')
     Assert-Throws {
-        & $maintenanceScript -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('nested-framework/escape.md') -FileUpdates @{ 'nested-framework/escape.md' = 'escape' } -ApproveModify
+        & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('nested-framework/escape.md') -FileUpdates @{ 'nested-framework/escape.md' = 'escape' } -ApproveModify
     } 'nested Git repository'
 
     Write-Host 'Framework source protection tests passed.' -ForegroundColor Green
