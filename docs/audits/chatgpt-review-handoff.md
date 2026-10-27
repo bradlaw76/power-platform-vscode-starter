@@ -117,3 +117,37 @@ authorized document copy does not implement that enforcement.
 - Next ChatGPT/agent action: map each finding to existing code and regression
   evidence before proposing changes; append results on the authorized branch
   while preserving history. Obtain separate approval before commit or push.
+
+## 2026-10-27 - Framework maintenance policy implementation
+
+Implemented the authorized policy in `SPEC.md` under Framework Maintenance
+Handoff and Approvals, referenced by Copilot and Claude repository instructions.
+The policy requires dated all-outcomes updates, historical preservation, eleven
+status fields, explicit separate modification/commit/push/merge approvals,
+safe response-only fallback, and accurate publication reporting. It explicitly
+warns about reporting tools that also publish. Static checks do not guarantee
+agent behavior or replace runtime protection.
+
+- Repository: `bradlaw76/power-platform-vscode-starter`.
+- Branch: `copilot/update-framework-skills-handoff`.
+- Starting HEAD: `b3845c86fbf59a89fdcc2bcf0e9fb292c55f6688`.
+  The earlier local copy is now committed at that SHA; the preceding
+  uncommitted statements describe its earlier state.
+- Changed files: `SPEC.md`, `.github/copilot-instructions.md`, new `CLAUDE.md`,
+  new `scripts/ci/test-maintenance-handoff-policy.ps1`, and this handoff.
+- Validation passed: new standalone policy regression, existing documentation
+  consistency and contract integrity checks, PowerShell parsing and
+  PSScriptAnalyzer for the new script, targeted Markdown lint (zero errors),
+  and `git diff --check`.
+- Tests not run: full application/Pester suites and live Dataverse validation;
+  no runtime build behavior changed. No validation failure or skipped test
+  result was observed.
+- Working tree: implementation changes pending publication at the time of this
+  entry. Final commit SHA, secret scan, and security-check results are reported
+  in the task response after execution, not assumed in advance.
+- Recovery actions: none needed; no branch changes or protection bypass.
+- Remaining: the five original audit findings are still unidentified and
+  unverified. This policy work does not remediate them or update PR #4's branch.
+- Next owner action: review this policy and supply the five-finding audit.
+- Next ChatGPT/agent action: verify findings against existing implementation
+  before further remediation; retain separate approval boundaries.
