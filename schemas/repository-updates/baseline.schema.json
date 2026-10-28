@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "status", "reason", "repository", "baselineId", "commitSha", "capturedAtUtc", "contractVersion", "workingTreeDirty", "localChangesSha256"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "status": { "enum": ["verified", "unverified"] },
+    "reason": { "type": "string" },
+    "repository": { "type": "string", "minLength": 1 },
+    "baselineId": { "type": "string", "minLength": 1 },
+    "commitSha": { "type": ["string", "null"], "pattern": "^[a-f0-9]{40}(?:[a-f0-9]{24})?$" },
+    "capturedAtUtc": { "type": "string", "format": "date-time" },
+    "contractVersion": { "type": ["string", "null"] },
+    "scenarioSlug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "runId": { "type": "string", "format": "uuid" },
+    "solutionUniqueName": { "type": "string", "minLength": 1 },
+    "publisherPrefix": { "type": "string", "minLength": 1 },
+    "workingTreeDirty": { "type": ["boolean", "null"] },
+    "localChangesSha256": { "type": ["string", "null"], "pattern": "^[a-f0-9]{64}$" }
+  },
+  "dependencies": {
+    "scenarioSlug": ["runId", "solutionUniqueName", "publisherPrefix"]
+  },
+  "allOf": [
+    { "if": { "properties": { "status": { "const": "verified" } } }, "then": { "properties": { "commitSha": { "type": "string" }, "contractVersion": { "type": "string" }, "workingTreeDirty": { "type": "boolean" }, "localChangesSha256": { "type": "string" } } } }
+  ]
+}

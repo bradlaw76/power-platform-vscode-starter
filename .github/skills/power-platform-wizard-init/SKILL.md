@@ -18,6 +18,38 @@ Skill availability is not runtime installation. A copied `SKILL.md` does not pro
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for installation and provenance checks.
 
+## Repository update advisor
+
+After repository confirmation, run
+`pwsh .\scripts\bootstrap\check-repository-updates.ps1` once for local cached
+advice; terminal intake performs this automatically, so do not duplicate it.
+Network requires explicit `-Fetch` (terminal `-FetchRepositoryUpdates`);
+`-SkipRepositoryUpdateCheck` skips terminal checking. An unavailable check warns,
+not a setup blocker. Cached up-to-date does not prove remote freshness.
+Optional `repo-update-context.json` selections filter capability relevance;
+unknown remains review-needed. Never infer approval or enable modules from advice.
+Stage 90 records `repositoryBaseline` with UTC/full SHA/dirty fingerprint;
+only Apply archives immutable run provenance. Resume preserves original source
+identity. Never auto-pull, merge, tag, push or adopt updates. Follow
+`docs/repository-updates.md`; add no discovery question or build stage.
+
+## Universal semantic field gate
+
+Apply `docs/semantic-field-type-standard.md` to every Dataverse use case,
+industry, mode, greenfield/retrofit and standard/custom/hybrid design,
+independently of FAST. Business meaning selects types, never sample strings.
+Before column generation, complete and explicitly approve
+`specs/<slug>/field-type-decisions.json`, mirror every decision row/ID in
+spec/plan, and run `14-validate-semantic-fields.ps1` Planning. Run Payload
+before builds and Metadata after relationships and before export. Resolve
+categorical candidates as Yes/No, Choice, multi-select Choice, Lookup or a
+separately approved text exception; define stable options, labels, meanings,
+defaults, deterministic mappings and dependent surfaces. Stage 30 blocks
+missing decisions and existing wrong-type fields. Never auto-approve legacy
+plans, conceal drift or implicitly delete/recreate String fields.
+Functional surface validation remains required. In Demo Builder, include the
+inferred design in the existing consolidated confirmation, not a new questionnaire.
+
 ## What This Produces
 
 - A selected start path (chat or terminal)
@@ -128,10 +160,37 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
   approved `fast-based`/`hybrid` decisions regardless of readiness;
   legacy/Fully Custom builds remain unchanged. No
   Dataverse/PAC/network/authentication/install/import/build execution or live
-  platform-provenance verification occurs. See
-  `docs/fast-integration/execution-readiness.md`. FAST-008 trusted collection,
-  independent approver/signature verification, authorization
-  consumption/revalidation, and a separately approved executor remain proposed.
+  collection occurs in readiness itself. See
+  `docs/fast-integration/execution-readiness.md`.
+- FAST-008A adds default-off `trustedEnvironmentVerification` and separate
+  GET-only `invoke-trusted-environment-verification.ps1` collection, reusing the
+  inspector/shared runtime. Mock is default and requires injected test
+  transport; Live rejects it and requires explicit target/solution, existing
+  authentication, external X509 `-SigningCertificate`,
+  `-EnableAuthenticatedVerification -ConfirmReadOnlyScope`. No `.env` fallback,
+  persisted credentials or live GCC access is authorized in this mock-only
+  milestone. RetrieveCurrentOrganization supplies actual EnvironmentId/TenantId;
+  WhoAmI OrganizationId/UserId are distinct, unlike legacy FAST-003 environmentId.
+  Inspect packages/dependencies, concrete tables/columns, managed properties,
+  publishers/membership and effective privileges by name. Unsupported
+  descriptive identities stay unverified/blocked; do not guess forms/apps/
+  integration IDs. Future CREATE ownership is inferred, not observed metadata.
+  RS256 binds exact decision bytes, normalized execution-evidence v1, plan/
+  catalog/dependency/input/package hashes, classifications, identity, mode/expiry.
+  `-EvidenceTrustPolicy Authenticated` is default and requires complete matching
+  signed Live evidence plus independent `-TrustedCertificatePath` (engine
+  `TrustedCertificate`), valid at collection and evaluation; no embedded trust.
+  Only this policy can set `verifiedForHumanReview: true`. Explicit
+  `RecordedTest` permits signed Mock READY_FOR_APPROVAL; explicit `LocalPlanning`
+  preserves raw FAST-007 diagnostics. Both always set
+  `verifiedForHumanReview: false`; all policies keep `executionAuthorized: false`.
+  Forward `-ReadinessEvidenceTrustPolicy` and `-ReadinessTrustedCertificatePath`
+  through the unchanged early-return branch. Signatures prove collector
+  authority, not truth against a compromised signer or deployment approval.
+  See `docs/fast-integration/trusted-environment-verification.md`.
+  Future controlled execution, independent deployment approvals/signatures,
+  scoped authorization/revalidation and a separately approved executor remain
+  proposed and unauthorized; FAST-dependent Apply stays disabled globally.
 - Architecture intent captured directly or confirmed from Demo Builder recommendations includes:
   - OOB extension only, custom tables only, or hybrid?
   - If OOB extension: update forms in place or clone new business forms?
@@ -142,6 +201,9 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Artifact provenance is isolated under `.wizard-metrics/artifacts/manifest/<normalized-scenario-slug>/`. Every stage validates scenario, solution, and publisher identity before manifest access. Never infer provenance from another scenario or silently consume the legacy global manifest. Preview must not create or alter manifest provenance; legacy migration requires the explicit validated helper documented in `docs/wizard-hardening-runbook.md`.
 
 5. Capture task, relationship, report, and demo-data planning at the selected mode's depth
+- At reporting scoping, explain and ask about native dashboards (standard Dataverse charts/dashboard components), custom HTML reports, both, or neither. Demo Builder includes the choice in its existing consolidated confirmation, not an extra business question. Persist separate native/HTML decisions in `Reporting Selection`. Both need complementary purposes.
+- Explain each report's audience, business decision, metrics/calculations, record scope, placement, limitations, and overlap. Derive HTML content from the user's scenario documentation, top tasks, lifecycle, tables, and success criteria. Frontline/agent, supervisor, and leadership are Dynamics-styled patterns, not a mandatory set of three.
+- Before HTML generation, author and explicitly approve scenario `html-reports.json` against `html-reports.schema.json`, exact requirement excerpts in current `spec.md`/`plan.md`, and matching table/title/placement rows in `report-mappings.md`. Generate only defined metrics; no guessed priority, owner, or queue fields. Follow `docs/live-report-web-resources-runbook.md` for query limitations and placement handoff. Never auto-approve legacy HTML or build native payloads after opt-out. The focused Report Wizard remains native-only.
 - Record top user tasks as persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
 - For each relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
 - Generate `report-mappings.md` for every run. If reports are enabled, capture critical/high-frequency tables and one mapping per report with table logical name, surface, form/dashboard/view type, placement, required fields, supported decision, owner, and validation checklist. Block progression when a critical table has no mapping. If reports are disabled, record that explicit decision.

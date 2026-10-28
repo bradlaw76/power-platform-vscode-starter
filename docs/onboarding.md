@@ -58,6 +58,23 @@ If Git, VS Code, or Copilot Chat is not available, follow the manual sequence be
 
 ---
 
+## Repository updates and source baseline
+
+After confirming the repository, chat startup runs
+`pwsh .\scripts\bootstrap\check-repository-updates.ps1`; terminal intake performs
+the same check automatically. It uses cached Git metadata only and adds no
+discovery question. `-Fetch` on the standalone command or
+`-FetchRepositoryUpdates` on intake explicitly permits network access;
+`-SkipRepositoryUpdateCheck` skips terminal checking.
+
+An unavailable check warns rather than blocking discovery. Cached `up-to-date`
+does not prove the remote is current. No pull, merge, tag or adoption occurs.
+Stage 90 records a timestamped full-commit baseline; only Apply archives manifest
+provenance. Optional scenario `repo-update-context.json` selections filter
+recommendations without enabling modules. Follow [repository updates](repository-updates.md)
+for categorization, source fingerprints and resume boundaries. This advisor is
+not a bootstrap build stage; the authoritative sequence below is unchanged.
+
 ## Before You Start: Beginner Concepts
 
 - PAC CLI (`pac`): command-line tool for Power Platform operations.
@@ -207,7 +224,10 @@ What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
-- Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
+- At reporting scoping, choose native dashboards, custom HTML reports, both, or neither. Demo Builder includes this choice in its existing consolidated confirmation (`native/html/both/none`; `yes` keeps the displayed no-report default); detailed modes ask it directly.
+- With accelerator matching explicitly enabled, Demo Builder's same architecture confirmation accepts a reporting suffix, for example `fully-custom+html` or `hybrid+native`. Omitting the suffix keeps reporting off; architecture approval does not approve report definitions.
+- Native dashboards use standard Dataverse chart/dashboard components. HTML reports provide Dynamics-styled, persona-oriented layouts. Explain each proposed audience, decision, metric, scope, placement, limitation, and overlap; recommend both only for distinct tasks.
+- HTML reports require approved scenario `html-reports.json`, matching `report-mappings.md` rows, and exact excerpts from current `spec.md`/`plan.md`. Choose only useful frontline, supervisor, or leadership reports; never generate an automatic fixed trio or undocumented KPIs. See [the HTML reporting runbook](live-report-web-resources-runbook.md).
 - Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
 Validation checkpoint:
@@ -370,7 +390,7 @@ plans remain blocked unless fresh environment, package, snapshot, and
 dependency evidence matches. Fully Custom remains independent. These plans are
 not connected to the authoritative bootstrap sequence or Dataverse execution.
 
-### FAST-007 local execution-readiness preflight (optional)
+### FAST-007 / FAST-008A execution-readiness preflight (optional)
 
 Readiness means checking whether a pinned plan and supplied evidence are ready
 for human review; it is not approval to build. After architecture approval and
@@ -380,7 +400,9 @@ FAST-006 planning, explicitly opt in to the standalone local preflight:
 pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
   -EnableExecutionReadiness `
   -ScenarioSlug <scenario-slug> `
-  -EvidencePath <execution-evidence.json> `
+  -EvidencePath <trusted-environment-verification.json> `
+  -EvidenceTrustPolicy Authenticated `
+  -TrustedCertificatePath <independently-provisioned-public.cer> `
   -EnvironmentUrl <approved-target-url> `
   -EnvironmentId <environment-guid> `
   -TenantId <tenant-guid> `
@@ -395,10 +417,29 @@ fingerprints, and schema-valid external evidence. The independently supplied
 URL/environment ID/tenant ID must match the evidence target exactly after URL
 normalization. Evidence has a hard maximum lifetime of 24 hours.
 
+FAST-008A adds a separate, explicit GET-only collector; it does not add a
+bootstrap stage. `trustedEnvironmentVerification` defaults false. Collection
+defaults Mock and requires injected test transport. Live rejects injected
+transport and requires `-EnableAuthenticatedVerification`,
+`-ConfirmReadOnlyScope`, explicit URL/actual environment ID/tenant ID/solution,
+existing authentication and an operator-provided external X509 signing
+certificate. No `.env` target fallback or credentials are persisted. No live GCC
+access is authorized in this mock-only milestone.
+
+Readiness `Authenticated` is the default: only complete matching signed Live
+evidence validated with an independently supplied trusted certificate can set
+`verifiedForHumanReview: true`. Certificates must be valid at collection and
+evaluation; embedded keys are not trust anchors. Explicit `RecordedTest` accepts
+signed Mock evidence for review diagnostics; explicit `LocalPlanning` preserves
+raw FAST-007 diagnostics. Both always report `verifiedForHumanReview: false`,
+even when `READY_FOR_APPROVAL`; none permits writes.
+
 The optional orchestrator entry uses `90-run-build.ps1
 -ExecutionReadinessOnly -ExecutionEvidencePath <path>` with
 `-ReadinessEnvironmentId <guid> -ReadinessTenantId <guid>` and optional
 `-ReadinessEvaluationTimeUtc <utc-time>`, plus scenario and target URL parameters.
+Forward trust explicitly using `-ReadinessEvidenceTrustPolicy` and
+`-ReadinessTrustedCertificatePath`.
 This branch returns before helpers, stages, and payload requirements; never
 combine it with `-Mode Apply`. It does not add a stage to the normal build
 sequence.
@@ -411,10 +452,16 @@ unlock Apply for a `fast-based` or `hybrid` approved decision. Legacy/Fully
 Custom builds and all modes' default-off behavior are preserved.
 
 No Dataverse, PAC CLI, network, authentication, installation, import, or build
-execution occurs in this preflight. Local evidence is supplied externally;
-platform provenance is not verified. See
-[FAST-007 operations](fast-integration/execution-readiness.md) for the six
-statuses and the separately proposed, unimplemented FAST-008 work.
+execution occurs in this preflight. Signed evidence provenance is validated
+locally; signatures establish collector authority, not deployment approval or
+truth against a compromised signer. See
+[readiness operations](fast-integration/execution-readiness.md) and
+[trusted verification](fast-integration/trusted-environment-verification.md).
+Actual EnvironmentId/TenantId come from RetrieveCurrentOrganization;
+WhoAmI OrganizationId/UserId are separate. Unsupported descriptive components
+remain unverified/blocked; initial concrete support is tables/columns.
+Future controlled execution, deployment approver signatures, scoped
+authorization and revalidation remain proposed and separately unauthorized.
 
 Supported application profiles:
 
@@ -498,6 +545,17 @@ Validation checkpoint:
 
 ## Step 8: Create Spec Kit Artifacts (Required Gate)
 
+The [Semantic Field Type Standard](semantic-field-type-standard.md) is mandatory
+for every Dataverse use case, industry, wizard mode, greenfield/retrofit and
+standard/custom/hybrid design, with or without FAST. Choose types from business
+meaning, never source strings. Complete and explicitly approve the scenario's
+`field-type-decisions.json`, mirror every decision row/ID in spec/plan and
+reference the inventory from tasks. Resolve categorical Choice/Lookup decisions,
+stable numeric options/mappings and separately approved text exceptions before
+generating any column payload. Run `14-validate-semantic-fields.ps1 -ScenarioSlug
+<slug> -Mode Planning` before column generation, then `-Mode Payload` before
+build execution. Terminal intake emits only an unapproved draft.
+
 Create these files before implementation:
 
 - `spec.md`: scenario, requirements, acceptance criteria.
@@ -553,14 +611,18 @@ Commit and push are distinct approvals. Push verification and pull request prepa
 Run each script in sequence. Each one tells you the next step on completion.
 
 ```powershell
+# Mandatory approved semantic inventory and payload conformance, no credentials:
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Payload
 pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
-pwsh ./scripts/bootstrap/30-build-columns.ps1
+pwsh ./scripts/bootstrap/30-build-columns.ps1 -ScenarioSlug <scenario-slug>
 # Optional when choice-presentations-*.json exists; Preview emits the approval hash
 pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 # Apply only with the exact approved SHA-256 hash emitted by Preview
 pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -ApprovedPlanHash <sha256>
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
+# GET-only validation of all fields, including Lookups created by stage 40:
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
@@ -581,6 +643,7 @@ pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -I
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
 # Rerun forms/views, native reporting, app/sitemap, and synthetic data, then rerun the membership gate
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 # End-of-build summary analysis and optional README update/commit prompts
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
@@ -594,6 +657,17 @@ All scripts are idempotent and safe to rerun.
 
 Payload rules for Step 10:
 
+- Contract 2.0.0 intentionally blocks existing scenarios without an approved
+  semantic inventory; there is no legacy bypass. Upgrade planning explicitly.
+- Stage 30 validates existing types before creating any columns, publishes
+  changed tables only and validates deployed attributes. Drift stops execution;
+  never silently rewrite intent or delete/recreate a field. The orchestrator
+  runs Payload validation before any stage and Metadata after relationships and
+  before export, including resumed runs. Preview never queries live metadata.
+- Direct stage 95 also revalidates live semantic metadata before PAC export;
+  a previous report cannot bypass the gate.
+- Validate forms, views, charts, BPFs, automation, integrations and reports
+  functionally; a correct-looking label/control is not type evidence.
 - `table-*.json` must include only true custom entities.
 - Do not place standard entities (like `contact` or `incident`) in `table-*.json`.
 - `columns-*.json` and `relationships-*.json` can reference both standard and custom entities.
@@ -631,7 +705,8 @@ Payload rules for Step 10:
 - Starter forms place the table primary name field first, then payload-defined fields in payload order.
 - Form labels use payload `DisplayName.LocalizedLabels` (1033 first, then first available), with friendly logical-name fallback.
 - Reruns patch existing Starter Main Form XML; non-starter Main forms are preserved.
-- If optional reports are enabled, `70-build-web-resources.ps1` runs the reporting module and upserts 3 Dynamics-blue HTML report web resources into the selected solution.
+- If HTML reports are selected, `70-build-web-resources.ps1` calls stage 65 and upserts only the approved report definitions into the selected solution. Preview validates requirements and writes local HTML/config/query artifacts without upload. Planned app/form placement remains a separately verified handoff.
+- An explicit native-dashboard opt-out blocks conflicting `reporting-*.json` payloads before build or attachment. Legacy native payload behavior is unchanged when no new selection exists; never treat that as approval for new reports. Legacy HTML-enabled scenarios must explicitly create and approve their definitions before generation.
 - The final inventory-only pass writes `.wizard-metrics/artifacts/solution/solution-membership-report.{json,md}`. Do not export unless `ExportAllowed` is true.
 - `80-post-build-analysis.ps1` provides an end-of-build preview summary and asks for explicit confirmation before updating README markers or running any git commit/push action.
 - For preview only, run: `pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly`

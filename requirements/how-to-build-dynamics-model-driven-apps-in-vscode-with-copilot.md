@@ -10,7 +10,35 @@ Companion wizard:
   guided, question-by-question process that walks users from principles and
   Spec Kit setup through design, build, validation, and handoff.
 
+### Reporting selection
+
+At report scoping, ask whether to include native dashboards (standard Dataverse
+chart/dashboard components), custom HTML reports, both, or neither. Demo Builder
+includes the choice in its existing consolidated confirmation, not another
+mandatory business question. Explain audience, decision, metrics, record scope,
+placement, limitations, and overlap; use both only for complementary tasks.
+HTML reports must follow the end user's scenario spec/plan and report mappings,
+not a fixed set of generic KPIs. Review and explicitly approve
+`html-reports.json` with current requirement excerpts before generation.
+Frontline/agent, supervisor, and leadership are selectable layout patterns;
+generate only approved reports. See
+[the reporting runbook](../docs/live-report-web-resources-runbook.md) for
+supported queries, approval, legacy migration, and placement verification.
+
 ## 0. How to Use This Guide
+
+### Repository updates and traceability
+
+After repository confirmation, use `check-repository-updates.ps1` for cached
+local update advice; only explicit `-Fetch` permits network. Terminal startup
+does the local check automatically, with `-FetchRepositoryUpdates` and
+`-SkipRepositoryUpdateCheck` controls. Review changed-path categories and preserve
+unknown relevance. Optional `repo-update-context.json` selections filter advice,
+not approvals or module activation. Stage 90 records timestamp/full-commit/
+dirty-fingerprint baselines; only Apply archives immutable run provenance.
+Resume preserves the original identity. Never auto-pull, tag, adopt updates
+or bypass planning/deployment gates. See [repository updates](../docs/repository-updates.md);
+the authoritative onboarding build order is unchanged.
 
 - Use Sections 1-6 for initial architecture and app setup.
 - Use Sections 7-11 for implementation, security, ALM, and testing.
@@ -23,6 +51,15 @@ Required process gate:
 
 - Spec Kit planning is mandatory before implementation.
 - Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
+- The [Semantic Field Type Standard](../docs/semantic-field-type-standard.md)
+  applies to every Dataverse use case, industry, mode, retrofit and table strategy,
+  independently of FAST. Complete/approve `field-type-decisions.json` and matching
+  spec/plan rows before columns; select types by meaning, not sample strings.
+  Resolve Choice/Lookup, stable options/mappings and separately approved
+  categorical text exceptions. Run `14-validate-semantic-fields.ps1` Planning
+  before generation, Payload before build and Metadata after relationships and
+  before export. Drift stops execution; no legacy bypass, inferred approval or
+  implicit destructive migration. Functional surface tests remain required.
 
 ### 0A. Beginner first-run flow (clone to demo)
 
@@ -884,7 +921,7 @@ a reviewable dry run only: it cannot authorize execution or connect to
 Dataverse/build stages. Preserve managed ownership and keep Fully Custom free
 of accelerator dependencies.
 
-### Local execution readiness (FAST-007)
+### Execution readiness and trusted verification (FAST-007 / FAST-008A)
 
 After approval and dry-run planning, explicitly opt in with
 `scripts/accelerators/invoke-execution-readiness.ps1
@@ -896,7 +933,16 @@ scenario's approved decision and build-plan manifest, file SHA-256, canonical
 decision/plan IDs, and input fingerprints. Externally supplied local evidence
 must satisfy `execution-evidence.schema.json`, match the complete independently
 supplied target triple exactly (URL normalized), and have a hard maximum
-lifetime of 24 hours.
+lifetime of 24 hours. FAST-008A now requires signed
+`trusted-environment-verification.schema.json` envelopes for default
+`-EvidenceTrustPolicy Authenticated`, with normalized execution-evidence v1.
+Supply `-TrustedCertificatePath` independently (public X509 certificate);
+never trust an embedded key. The certificate must be valid at collection
+and evaluation. Only complete matching signed Live evidence can establish
+`verifiedForHumanReview: true`. Explicit `RecordedTest` permits signed Mock
+evidence to reach READY_FOR_APPROVAL; explicit `LocalPlanning` preserves raw
+FAST-007 diagnostics. Both always report `verifiedForHumanReview: false`;
+all policies preserve `executionAuthorized: false`.
 
 The schema-valid `execution-readiness.json` reports `READY_FOR_APPROVAL`,
 `BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`, `BLOCKED_COMPATIBILITY`,
@@ -907,13 +953,31 @@ never generate or consume approval or authorization records.
 
 The orchestrator's `-ExecutionReadinessOnly -ExecutionEvidencePath` path
 requires `-ReadinessEnvironmentId -ReadinessTenantId`, accepts optional
-`-ReadinessEvaluationTimeUtc`, and returns before helpers/stages/payload
+`-ReadinessEvaluationTimeUtc`, forwards `-ReadinessEvidenceTrustPolicy` and
+`-ReadinessTrustedCertificatePath`, and returns before helpers/stages/payload
 requirements. Combining it with Apply is forbidden. Approved
 `fast-based`/`hybrid` decisions block normal Apply regardless of readiness;
 legacy/Fully Custom normal builds and all modes' default-off behavior remain
 unchanged. No Dataverse/PAC/network/authentication/install/import/build
-execution or live platform-provenance verification occurs. See
+execution occurs in readiness itself. See
 [FAST-007 operations](../docs/fast-integration/execution-readiness.md).
-FAST-008 trusted evidence collection, independent approver/signature
-verification, authorization consumption/revalidation, and a separately approved
-executor remain proposed, not implemented.
+
+FAST-008A's separately opted-in GET-only collector reuses the inspector/shared
+Dataverse runtime. `trustedEnvironmentVerification` defaults false. Collection
+defaults Mock with injected test transport; Live rejects injected transport and
+requires explicit target/solution, read-only confirmation, existing credentials,
+and an external X509 signing certificate. There is no `.env` target fallback or
+credential persistence; no live GCC query is authorized by this mock-only
+milestone. RetrieveCurrentOrganization supplies actual EnvironmentId/TenantId;
+WhoAmI OrganizationId/UserId are distinct, unlike legacy FAST-003 environmentId.
+Reuse package/dependency checks, managed properties, publisher/membership and
+effective privileges by name. Initial concrete support is tables/columns;
+unsupported descriptive identities remain unverified/blocked. Future CREATE
+ownership is inferred, not observed. RS256 binds decision bytes, plan/catalog/
+dependency/input/package hashes, actual identity, collection mode and expiry.
+Signatures prove collector authority, not truth against a compromised signer
+or deployment approval. See
+[trusted verification](../docs/fast-integration/trusted-environment-verification.md).
+Future controlled execution, independent deployment approver/signature checks,
+scoped authorization consumption/revalidation and a separately approved
+executor remain proposed and unauthorized.

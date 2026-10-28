@@ -2,6 +2,17 @@
 
 ## Scope
 
+### Contract 2.2.0: repository update advisor
+
+Distribute the aligned catalog, schemas, helper, command and startup/orchestrator
+hooks described in [repository updates](docs/repository-updates.md).
+Existing scenarios need no update context unless they want relevance filtering.
+No automatic pull or migration occurs. Existing run states without a source
+baseline cannot be resumed; start a fresh run after review. Git-less runs remain
+explicitly unverified. Preview never creates manifest provenance, and Apply
+records are immutable. Contract 2.1.0 reporting and 2.0.0 semantic-field gates
+remain unchanged.
+
 This guide covers migration to the contract-driven wizard baseline introduced in v1.0.0.
 
 ## Breaking Changes

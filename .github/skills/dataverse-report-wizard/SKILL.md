@@ -37,6 +37,17 @@ instructions, skills, scripts, specs, or payloads without explicit review and
 approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for
 installation and provenance checks.
 
+## Repository update advice
+
+When checking reporting updates, use the installed
+`scripts/bootstrap/check-repository-updates.ps1` command with the scenario slug.
+It reads cached metadata only unless `-Fetch` is explicitly authorized.
+Optional `repo-update-context.json` selections identify `native-reports`
+relevance; unknown remains review-needed. Never infer payload or deployment
+approval from advice. Direct report-only runs do not automatically check for
+updates or create stage-90 `repositoryBaseline` archives. See
+`docs/repository-updates.md`; do not restart full app intake for this check.
+
 ## Safety Contract
 
 - Default to `simulate` when the user has not chosen a mode.

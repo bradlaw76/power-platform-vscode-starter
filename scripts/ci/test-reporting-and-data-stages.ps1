@@ -57,6 +57,20 @@ if (@($transportCalls | Where-Object { $_.Method -eq 'Post' -and $_.Path -in @('
 $beforePreview = $transportCalls.Count
 Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -PreviewOnly | Out-Null
 if ($transportCalls.Count -ne $beforePreview) { throw 'Reporting preview invoked transport.' }
+$selectionFolder = Join-Path $testRepoRoot 'specs\gcc-framework-acceptance'
+New-Item -ItemType Directory -Path $selectionFolder -Force | Out-Null
+$selectionPath = Join-Path $selectionFolder 'answers.md'
+Set-Content -LiteralPath $selectionPath -Value "## Reporting Selection`n- Native dashboards: no`n- HTML reports: yes"
+$beforeDeclined = $transportCalls.Count
+$declined = $false
+try {
+    Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -RequestInvoker $reportInvoker | Out-Null
+} catch {
+    if ($_.Exception.Message -notmatch 'Native dashboards were declined') { throw }
+    $declined = $true
+}
+if (-not $declined -or $transportCalls.Count -ne $beforeDeclined) { throw 'Declined native reporting must fail before transport.' }
+Set-Content -LiteralPath $selectionPath -Value "## Reporting Selection`n- Native dashboards: yes`n- HTML reports: no"
 $charts.Add([pscustomobject]@{ savedqueryvisualizationid='collision'; name=$charts[0].name; primaryentitytypecode=$charts[0].primaryentitytypecode; description=$charts[0].description })
 try { Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'ppvs' -RequestInvoker $reportInvoker | Out-Null; throw 'Expected reporting collision failure.' } catch { if ($_.Exception.Message -notmatch 'collision') { throw } }
 

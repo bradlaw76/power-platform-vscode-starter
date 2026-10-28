@@ -16,6 +16,23 @@ The check requires Git, VS Code, PowerShell 7 or later, Azure CLI, and Power Pla
 
 ## Plan a new scenario
 
+### Check your starter copy
+
+Model-driven terminal intake automatically checks cached upstream metadata;
+chat startup uses the same local-only command:
+
+```powershell
+pwsh .\scripts\bootstrap\check-repository-updates.ps1
+```
+
+Add `-Fetch` only to explicitly refresh upstream metadata. No changes are
+automatically adopted. Cached `up-to-date` is not proof of remote freshness.
+See [repository updates](repository-updates.md) for capability categories and
+optional `repo-update-context.json` selections. They filter advice, not module
+activation or deployment approval.
+
+### Complete discovery
+
 In Copilot Chat, enter:
 
 ```text
@@ -31,6 +48,12 @@ pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode Pr
 ```
 
 Preview must complete before authentication. It plans mutating stages and runs only supported read-only/local validation paths.
+
+The orchestrator records the full commit, UTC capture time and local-change
+fingerprint in `repositoryBaseline`. Only Apply archives immutable per-run
+records; Preview writes no manifest provenance. Keep the baseline ID with your
+build handoff. A fingerprint is not a backup of uncommitted changes, and resume
+cannot silently relabel earlier work after verified source changes.
 
 ## Build in your environment
 

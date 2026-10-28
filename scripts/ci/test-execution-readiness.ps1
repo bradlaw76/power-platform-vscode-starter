@@ -14,7 +14,7 @@ No live services, package installation, authorization issuance or build stages.
 =============================================================================
 #>
 [CmdletBinding()]
-param([string]$SampleOutputFolder = '')
+param([string]$SampleOutputFolder = '', [switch]$DefineFixturesOnly)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -182,7 +182,7 @@ function Invoke-FixtureReadiness {
         $Fixture.evidence.planSha256 = Get-BuildPlanningFileHash $Fixture.planPath
     }
     Write-FixtureJson $Fixture.evidencePath $Fixture.evidence
-    return Get-ExecutionReadiness -WorkspaceRoot $Fixture.root -ScenarioSlug $Fixture.slug -EvidencePath $Fixture.evidencePath `
+    return Get-ExecutionReadiness -EvidenceTrustPolicy LocalPlanning -WorkspaceRoot $Fixture.root -ScenarioSlug $Fixture.slug -EvidencePath $Fixture.evidencePath `
         -EnvironmentUrl 'https://synthetic.example.test' -EnvironmentId $environmentId -TenantId $tenantId -EvaluationTimeUtc $clock
 }
 
@@ -192,6 +192,8 @@ function Save-SyntheticReport {
         Write-FixtureJson (Join-Path $SampleOutputFolder "$Name\execution-readiness.json") $Report
     }
 }
+
+if ($DefineFixturesOnly) { return }
 
 try {
     foreach ($slug in @('equipment-maintenance', 'event-registration', 'employee-onboarding')) {
@@ -299,21 +301,21 @@ try {
 
     $missing = New-ReadinessFixture 'missing-evidence'
     Remove-Item -LiteralPath $missing.evidencePath
-    $missingReport = Get-ExecutionReadiness -WorkspaceRoot $missing.root -ScenarioSlug $missing.slug -EvidencePath $missing.evidencePath `
+    $missingReport = Get-ExecutionReadiness -EvidenceTrustPolicy LocalPlanning -WorkspaceRoot $missing.root -ScenarioSlug $missing.slug -EvidencePath $missing.evidencePath `
         -EnvironmentUrl 'https://synthetic.example.test' -EnvironmentId $environmentId -TenantId $tenantId -EvaluationTimeUtc $clock
     Assert-Readiness ($missingReport.status -eq 'BLOCKED_EVIDENCE' -and $null -eq $missingReport.evidenceSha256) 'Missing evidence did not produce a blocked report with an absent digest.'
     Set-Content -LiteralPath $missing.evidencePath -Value '{invalid'
-    $invalidReport = Get-ExecutionReadiness -WorkspaceRoot $missing.root -ScenarioSlug $missing.slug -EvidencePath $missing.evidencePath `
+    $invalidReport = Get-ExecutionReadiness -EvidenceTrustPolicy LocalPlanning -WorkspaceRoot $missing.root -ScenarioSlug $missing.slug -EvidencePath $missing.evidencePath `
         -EnvironmentUrl 'https://synthetic.example.test' -EnvironmentId $environmentId -TenantId $tenantId -EvaluationTimeUtc $clock
     Assert-Readiness ($invalidReport.status -eq 'BLOCKED_EVIDENCE') 'Malformed evidence did not fail closed.'
     $expired = New-ReadinessFixture 'expired-clock'
-    $pastExpiry = Get-ExecutionReadiness -WorkspaceRoot $expired.root -ScenarioSlug $expired.slug -EvidencePath $expired.evidencePath `
+    $pastExpiry = Get-ExecutionReadiness -EvidenceTrustPolicy LocalPlanning -WorkspaceRoot $expired.root -ScenarioSlug $expired.slug -EvidencePath $expired.evidencePath `
         -EnvironmentUrl 'https://synthetic.example.test' -EnvironmentId $environmentId -TenantId $tenantId -EvaluationTimeUtc $clock.AddHours(2)
     Assert-Readiness ($pastExpiry.status -eq 'BLOCKED_EVIDENCE') 'Advancing the evaluation clock did not revoke readiness.'
     $fixture = New-ReadinessFixture 'hook-ready'
     $copyScripts = Join-Path $fixture.root 'scripts\accelerators'
     New-Item -ItemType Directory -Path $copyScripts -Force | Out-Null
-    foreach ($name in @('accelerator-catalog.ps1', 'build-planning-adapter.ps1', 'execution-readiness.ps1', 'invoke-execution-readiness.ps1')) {
+    foreach ($name in @('accelerator-catalog.ps1', 'build-planning-adapter.ps1', 'execution-readiness.ps1', 'verification-provenance.ps1', 'environment-compatibility.ps1', 'invoke-execution-readiness.ps1')) {
         Copy-Item -LiteralPath (Join-Path $repoRoot "scripts\accelerators\$name") -Destination $copyScripts
     }
     Copy-Item -LiteralPath (Join-Path $repoRoot 'schemas') -Destination $fixture.root -Recurse
@@ -322,7 +324,7 @@ try {
     Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts\bootstrap\90-run-build.ps1') -Destination $bootstrap
     $hook = & (Join-Path $bootstrap '90-run-build.ps1') -ScenarioSlug $fixture.slug -ExecutionReadinessOnly `
         -ExecutionEvidencePath $fixture.evidencePath -EnvironmentUrl 'https://synthetic.example.test' `
-        -ReadinessEnvironmentId $environmentId -ReadinessTenantId $tenantId -ReadinessEvaluationTimeUtc $clock
+        -ReadinessEnvironmentId $environmentId -ReadinessTenantId $tenantId -ReadinessEvaluationTimeUtc $clock -ReadinessEvidenceTrustPolicy LocalPlanning
     Assert-Readiness ($hook.status -eq 'READY_FOR_APPROVAL' -and -not $hook.executionAuthorized) 'Ready preflight did not remain nonexecuting.'
     Assert-Readiness (-not (Test-Path (Join-Path $fixture.root '.wizard-metrics'))) 'Preflight initialized build state.'
     Assert-Readiness (-not (Test-Path (Join-Path $fixture.root 'payloads'))) 'Preflight required or generated payloads.'

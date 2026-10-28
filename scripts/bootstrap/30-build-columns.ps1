@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Build Columns
 FILE:         scripts/bootstrap/30-build-columns.ps1
-VERSION:      0.1.0
+VERSION:      1.0.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-10-19
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API
 
 -----------------------------------------------------------------------------
@@ -17,8 +17,8 @@ the scenario mapping and payload definitions.
 ARCHITECTURE
 -----------------------------------------------------------------------------
 - Role:            bootstrap step
-- Inputs:          column payloads and approved entity mapping
-- Outputs:         created columns and build artifacts
+- Inputs:          column payloads and approved semantic field inventory
+- Outputs:         verified columns/IDs, scoped publication and build artifacts
 - Dependencies:    Dataverse Web API, planning files, repo helpers
 - Side Effects:    creates Dataverse metadata and local telemetry/artifacts
 
@@ -32,11 +32,13 @@ PREREQUISITES
 TEST CASES
 -----------------------------------------------------------------------------
 ✔ Approved custom fields are created on the intended tables.
-✔ Reused standard fields are not recreated as custom metadata.
+✔ Existing wrong-type fields stop before any column creation.
+✔ Only a genuine 404 permits creation; other metadata read failures propagate.
 
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v1.0.0  2026-10-19  Enforced semantic planning, metadata drift and scoped publish.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
 -----------------------------------------------------------------------------
@@ -51,7 +53,7 @@ NON-NEGOTIABLES
 <#
 .SYNOPSIS
     Adds columns to existing Dataverse tables from columns-*.json payload files.
-    Safe to rerun — skips columns that already exist on the table.
+    Safe to rerun: verifies existing metadata against approved semantic decisions.
 
 .PARAMETER EnvironmentUrl  Defaults to $env:DV_ENVIRONMENT_URL (set by 10-auth-connect.ps1).
 .PARAMETER AccessToken     Defaults to $env:DV_TOKEN.
@@ -64,13 +66,28 @@ NON-NEGOTIABLES
 param(
     [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
     [string]$AccessToken    = $env:DV_TOKEN,
-    [string]$PayloadsFolder = ""
+    [string]$PayloadsFolder = "",
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
+    [scriptblock]$RequestInvoker
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers\dataverse-runtime.ps1')
+. (Join-Path $PSScriptRoot 'helpers\semantic-fields.ps1')
+if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
+    if (-not [string]::IsNullOrWhiteSpace($PayloadsFolder) -and
+        (Split-Path (Split-Path $PayloadsFolder -Parent) -Leaf) -eq 'scenarios') {
+        $ScenarioSlug = Split-Path $PayloadsFolder -Leaf
+    } else { throw 'Stage 30 requires ScenarioSlug or an unambiguous scenario payload folder.' }
+}
+$paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
+$PayloadsFolder = $paths.PayloadFolder
+$semanticPlan = Read-WizardSemanticPlan -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug
+$approvedColumns = Assert-WizardSemanticPayloads -Plan $semanticPlan -PayloadsFolder $PayloadsFolder -PassThru
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -87,7 +104,7 @@ if ((Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile; $EnvironmentUrl = $global:DV_ENVIRONMENT_URL; $AccessToken = $global:DV_TOKEN
 }
 $scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction SilentlyContinue) {
-    Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug '' -PayloadsFolder $PayloadsFolder
+    Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
 } else { $null }
 $solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } else { '' }
 $publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } else { '' }
@@ -108,16 +125,9 @@ if (-not (Test-Path $PayloadsFolder)) {
 }
 
 function Invoke-Dv([string]$Method, [string]$Path, [string]$Body = "") {
-    $h = @{ "Authorization"="Bearer $AccessToken"; "Content-Type"="application/json";
-            "OData-Version"="4.0"; "OData-MaxVersion"="4.0"; "Accept"="application/json" }
-    $uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$Path"
-    if ($Body) { return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h -Body $Body }
-    return Invoke-RestMethod -Method $Method -Uri $uri -Headers $h
-}
-
-function Test-ColumnExists([string]$Table, [string]$Column) {
-    try { Invoke-Dv "Get" "EntityDefinitions(LogicalName='$Table')/Attributes(LogicalName='$Column')?`$select=LogicalName" | Out-Null; return $true }
-    catch { return $false }
+    $arguments = @{ Method = $Method; Path = $Path; EnvironmentUrl = $EnvironmentUrl; AccessToken = $AccessToken; RequestInvoker = $RequestInvoker }
+    if ($Body) { $arguments.Body = $Body }
+    Invoke-WizardDataverseRequest @arguments
 }
 
 Write-Host ""
@@ -125,76 +135,53 @@ Write-Host "=== Build Columns ===" -ForegroundColor Cyan
 Write-Host "  Environment: $EnvironmentUrl"
 Write-Host ""
 
-$payloads = @(Get-ChildItem -Path $PayloadsFolder -Filter "columns-*.json" -ErrorAction SilentlyContinue)
-if ($payloads.Count -eq 0) {
-    Write-Host "No columns-*.json found in: $PayloadsFolder" -ForegroundColor Yellow
-    if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
-        Complete-WizardStepTelemetry -Message "No column payloads found."
-    }
-    exit 0
-}
-
 $created = 0; $skipped = 0; $failed = 0
-
-foreach ($file in $payloads) {
-    $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
-    $tableName = $doc.TableLogicalName
-    if ([string]::IsNullOrWhiteSpace($tableName)) {
-        Write-Host "  SKIP $($file.Name) — missing TableLogicalName property" -ForegroundColor Yellow
-        if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name $file.Name -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'missing table logical name'; payload = $file.Name } | Out-Null
-        }
-        $skipped++; continue
+$creationFailure = $null
+$createdFields = [Collections.Generic.List[object]]::new()
+$readMetadata = { param($path) Invoke-Dv 'Get' $path }
+$missing = [Collections.Generic.List[object]]::new()
+$changedTables = [Collections.Generic.HashSet[string]]::new()
+$stageFields = @($semanticPlan.fields | Where-Object { $_.disposition -ne 'create-relationship' })
+foreach ($field in $stageFields) {
+    $live = Get-WizardSemanticLiveAttribute -Field $field -ReadMetadata $readMetadata -AllowMissing:($field.disposition -eq 'create-column')
+    if ($null -eq $live) { $missing.Add($field); continue }
+    Assert-WizardSemanticLiveField -Field $field -Live $live -ReadMetadata $readMetadata -PayloadsFolder $PayloadsFolder -AllowBasePresentation
+    $skipped++
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$($field.table).$($field.field)" -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ metadataId = $live.MetadataId; reason = 'existing metadata matches approved semantic decision' } | Out-Null
+}
+foreach ($field in $missing) {
+    if ($field.Contains('choice') -and $field.choice.scope -eq 'global') {
+        $set = Invoke-Dv 'Get' "GlobalOptionSetDefinitions(Name='$($field.choice.name)')"
+        $set = $set | ConvertTo-Json -Depth 50 | ConvertFrom-Json -AsHashtable
+        Assert-SemanticValue @{
+            IsGlobal = $true
+            Name = $field.choice.name
+            Options = @($field.choice.options | ForEach-Object { @{ Value = $_.value; Label = $_.labels } })
+        } $set "$($field.table).$($field.field).GlobalOptionSet"
     }
-    $tableName = $tableName.Trim()
-
-    Write-Host "  Table: $tableName" -ForegroundColor Cyan
-    foreach ($col in $doc.Columns) {
-        $schema  = $col.SchemaName
-        $logical = $col.LogicalName
-        if ([string]::IsNullOrWhiteSpace($logical) -and -not [string]::IsNullOrWhiteSpace($schema)) {
-            $logical = $schema
-        }
-
-        if ([string]::IsNullOrWhiteSpace($logical)) {
-            Write-Host "    SKIP (missing SchemaName/LogicalName)" -ForegroundColor Yellow
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.[unknown]" -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'missing logical name'; payload = $file.Name } | Out-Null
-            }
-            $skipped++
-            continue
-        }
-
-            $logical = $logical.Trim()
-        Write-Host "    $logical " -NoNewline
-
-        if (Test-ColumnExists $tableName $logical) {
-            Write-Host "(exists — skipped)" -ForegroundColor DarkGray
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'skipped' -Step '30-build-columns.ps1' -Details @{ reason = 'already exists'; payload = $file.Name } | Out-Null
-            }
-            $skipped++; continue
-        }
-
-        try {
-            if ([string]::IsNullOrWhiteSpace($col.LogicalName)) {
-                $col.LogicalName = $logical
-            }
-            $body = $col | ConvertTo-Json -Depth 20 -Compress
-            Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
-            Write-Host "(created)" -ForegroundColor Green
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'created' -Step '30-build-columns.ps1' -Details @{ payload = $file.Name } | Out-Null
-            }
-            $created++
-        } catch {
-            Write-Host "(FAILED: $($_.Exception.Message))" -ForegroundColor Red
-            if (Get-Command Add-WizardArtifactManifestItem -ErrorAction SilentlyContinue) {
-                Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$tableName.$logical" -Status 'failed' -Step '30-build-columns.ps1' -Details @{ payload = $file.Name; error = $_.Exception.Message } | Out-Null
-            }
-            $failed++
-        }
+}
+foreach ($field in $missing) {
+    try {
+        $body = $approvedColumns["$($field.table).$($field.field)"] | ConvertTo-Json -Depth 40 -Compress
+        Invoke-Dv 'Post' "EntityDefinitions(LogicalName='$($field.table)')/Attributes" $body | Out-Null
+        $changedTables.Add($field.table) | Out-Null
+        $createdFields.Add($field)
+        $created++
+    } catch {
+        Register-WizardStepFailure -Message "Column creation failed: $($field.table).$($field.field)."
+        Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$($field.table).$($field.field)" -Status 'failed' -Step '30-build-columns.ps1' -Details @{ error = $_.Exception.Message } | Out-Null
+        $failed++
+        $creationFailure = $_
+        break
     }
+}
+if ($changedTables.Count -gt 0) {
+    Publish-WizardCustomizations -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -ParameterXml (New-WizardEntityPublishXml -EntityLogicalNames @($changedTables)) -RequestInvoker $RequestInvoker | Out-Null
+}
+foreach ($field in $createdFields) {
+    $live = Get-WizardSemanticLiveAttribute -Field $field -ReadMetadata $readMetadata
+    Assert-WizardSemanticLiveField -Field $field -Live $live -ReadMetadata $readMetadata
+    Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$($field.table).$($field.field)" -Status 'created' -Step '30-build-columns.ps1' -Details @{ metadataId = $live.MetadataId; semanticDecision = $field.decisionId; validated = $true } | Out-Null
 }
 
 Write-Host ""
@@ -203,11 +190,10 @@ if ($failed -gt 0) {
     if (Get-Command Register-WizardStepFailure -ErrorAction SilentlyContinue) {
         Register-WizardStepFailure -Message "Column build failed for one or more payloads."
     }
-    exit 1
+    throw $creationFailure
 }
 Write-Host ""
 Write-Host "Next step: pwsh ./scripts/bootstrap/40-build-relationships.ps1"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Column build completed."
 }
-

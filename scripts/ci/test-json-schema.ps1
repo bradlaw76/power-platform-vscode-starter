@@ -52,6 +52,8 @@ $schemaByFamily = [ordered]@{
     'form-layouts'  = Join-Path $schemaRoot 'form-layouts.schema.json'
     'grid-controls' = Join-Path $schemaRoot 'grid-controls.schema.json'
     'choice-presentations' = Join-Path $schemaRoot 'choice-presentations.schema.json'
+    'field-type-decisions' = Join-Path $schemaRoot 'field-type-decisions.schema.json'
+    'html-reports'  = Join-Path $schemaRoot 'html-reports.schema.json'
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
@@ -87,6 +89,8 @@ foreach ($file in $jsonFiles) {
         Join-Path $acceleratorSchemaRoot 'package-input-manifest.schema.json'
     } elseif ($relativePath -match '^specs[\\/][^\\/]+[\\/]accelerator[\\/]build-plan[\\/]build-plan-manifest\.json$') {
         Join-Path $acceleratorSchemaRoot 'build-plan.schema.json'
+    } elseif ($file.Name -ceq 'trusted-environment-verification.json') {
+        Join-Path $acceleratorSchemaRoot 'trusted-environment-verification.schema.json'
     } elseif ($file.Name -ceq 'execution-readiness.json') {
         Join-Path $acceleratorSchemaRoot 'execution-readiness.schema.json'
     } elseif ($file.Name -ceq 'execution-evidence.json') {
@@ -97,6 +101,21 @@ foreach ($file in $jsonFiles) {
         Join-Path $acceleratorSchemaRoot 'build-plan-projection.schema.json'
     } else {
         $null
+    }
+    $repositoryUpdateSchema = if ($file.Name -ceq 'repository-updates.json') { 'catalog' }
+        elseif ($file.Name -in @('repo-update-context.json', 'repo-update-context.example.json')) { 'context' }
+        elseif ($file.Name -ceq 'repository-baseline.json') { 'baseline' }
+        elseif ($file.Name -ceq 'repository-update-report.json') { 'report' } else { $null }
+    if ($null -ne $repositoryUpdateSchema) {
+        $schema = Join-Path $repoRoot "schemas\repository-updates\$repositoryUpdateSchema.schema.json"
+        try {
+            if (-not (Test-Json -Json $json -SchemaFile $schema -ErrorAction Stop)) {
+                $failures.Add("Repository update schema validation failed for $relativePath.") | Out-Null
+            } else { $validatedPayloadCount++ }
+        } catch {
+            $failures.Add("Repository update schema validation failed for ${relativePath}: $($_.Exception.Message)") | Out-Null
+        }
+        continue
     }
     if ($null -ne $acceleratorSchemaPath) {
         try {
@@ -113,7 +132,11 @@ foreach ($file in $jsonFiles) {
 
     $isScenarioFormLayout = $file.Name -ceq 'form-layouts.json' -and
         $relativePath -match '^specs[\\/][^\\/]+[\\/]form-layouts\.json$'
-    if ($isScenarioFormLayout) {
+    if ($file.Name -in @('html-reports.json', 'html-reports.example.json')) {
+        $family = 'html-reports'
+    } elseif ($file.Name -in @('field-type-decisions.json', 'field-type-decisions.example.json')) {
+        $family = 'field-type-decisions'
+    } elseif ($isScenarioFormLayout) {
         $family = 'form-layouts'
     } elseif ($file.Name -ceq 'grid-controls.json' -and
         $relativePath -match '^specs[\\/][^\\/]+[\\/]grid-controls\.json$') {

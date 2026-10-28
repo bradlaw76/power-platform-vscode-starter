@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Signed GET-only Dataverse Verification v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "artifactType", "payload", "signature"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "artifactType": {"const": "trusted-environment-verification"},
+    "payload": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["collectorVersion", "collectionMode", "decisionSha256", "catalogSnapshotId", "dependencyManifestSha256", "inputFingerprints", "selectedPackages", "authenticatedIdentity", "complete", "checks", "evidence"],
+      "properties": {
+        "collectorVersion": {"const": "1.0"},
+        "collectionMode": {"enum": ["Live", "Mock"]},
+        "decisionSha256": {"$ref": "#/$defs/hash"},
+        "catalogSnapshotId": {"type": "string"},
+        "dependencyManifestSha256": {"$ref": "#/$defs/hash"},
+        "inputFingerprints": {"type": "object", "minProperties": 1, "additionalProperties": {"$ref": "#/$defs/hash"}},
+        "selectedPackages": {"type": "array", "items": {"type": "object"}},
+        "authenticatedIdentity": {
+          "type": "object", "additionalProperties": false,
+          "required": ["organizationId", "principalId", "aadObjectId"],
+          "properties": {
+            "organizationId": {"type": "string", "format": "uuid"},
+            "principalId": {"type": "string", "format": "uuid"},
+            "aadObjectId": {"type": ["string", "null"], "format": "uuid"}
+          }
+        },
+        "complete": {"type": "boolean"},
+        "checks": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["id", "target", "state", "satisfied", "requiredForReadiness", "blockingStatus", "message"],
+            "properties": {
+              "id": {"type": "string", "minLength": 1},
+              "target": {"type": "string"},
+              "state": {"enum": ["verified", "inaccessible", "unavailable", "unsupported", "inferred"]},
+              "satisfied": {"type": "boolean"},
+              "requiredForReadiness": {"type": "boolean"},
+              "blockingStatus": {"enum": ["BLOCKED_EVIDENCE", "BLOCKED_PREREQUISITES", "BLOCKED_COMPATIBILITY", "BLOCKED_SECURITY", "BLOCKED_DECISION_CHANGE"]},
+              "message": {"type": "string", "minLength": 1}
+            }
+          }
+        },
+        "evidence": {"type": "object"}
+      }
+    },
+    "signature": {
+      "type": "object", "additionalProperties": false,
+      "required": ["algorithm", "certificateSha256", "value"],
+      "properties": {
+        "algorithm": {"const": "RS256"},
+        "certificateSha256": {"$ref": "#/$defs/hash"},
+        "value": {"type": "string", "minLength": 344, "pattern": "^[A-Za-z0-9+/]+={0,2}$"}
+      }
+    }
+  },
+  "$defs": {"hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"}}
+}

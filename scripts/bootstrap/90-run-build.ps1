@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Orchestrated Wizard Build
 FILE:         scripts/bootstrap/90-run-build.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-24
+LAST UPDATED: 2026-10-27
 ENVIRONMENT:  PowerShell 7 | Power Platform Bootstrap Runtime
 
 -----------------------------------------------------------------------------
@@ -18,9 +18,9 @@ ARCHITECTURE
 -----------------------------------------------------------------------------
 - Role:            top-level bootstrap orchestrator
 - Inputs:          scenario planning, payloads, environment context
-- Outputs:         run state and summary artifacts
+- Outputs:         run state, summary and immutable Apply source baseline
 - Dependencies:    individual bootstrap stage scripts
-- Side Effects:    none in Preview mode; Dataverse mutations in Apply mode
+- Side Effects:    diagnostic outputs in Preview; provenance and Dataverse in Apply
 
 -----------------------------------------------------------------------------
 TEST CASES
@@ -56,6 +56,8 @@ param(
     [string]$ExecutionEvidencePath = '',
     [guid]$ReadinessEnvironmentId,
     [guid]$ReadinessTenantId,
+    [ValidateSet('Authenticated', 'RecordedTest', 'LocalPlanning')] [string]$ReadinessEvidenceTrustPolicy = 'Authenticated',
+    [string]$ReadinessTrustedCertificatePath = '',
     [DateTimeOffset]$ReadinessEvaluationTimeUtc = [DateTimeOffset]::UtcNow,
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
@@ -75,7 +77,8 @@ if ($ExecutionReadinessOnly) {
     & (Join-Path $repoRoot 'scripts\accelerators\invoke-execution-readiness.ps1') `
         -EnableExecutionReadiness -ScenarioSlug $ScenarioSlug -EvidencePath $ExecutionEvidencePath `
         -EnvironmentUrl $EnvironmentUrl -EnvironmentId $ReadinessEnvironmentId -TenantId $ReadinessTenantId `
-        -EvaluationTimeUtc $ReadinessEvaluationTimeUtc
+        -EvaluationTimeUtc $ReadinessEvaluationTimeUtc -EvidenceTrustPolicy $ReadinessEvidenceTrustPolicy `
+        -TrustedCertificatePath $ReadinessTrustedCertificatePath
     return
 }
 $architectureDecisionPath = Join-Path $repoRoot "specs\$ScenarioSlug\accelerator\accelerator-decision.json"
@@ -94,6 +97,8 @@ if ($Mode -eq 'Apply' -and (Test-Path -LiteralPath $architectureDecisionPath -Pa
 }
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
+. (Join-Path $PSScriptRoot 'helpers/reporting-plan.ps1')
+. (Join-Path $PSScriptRoot 'helpers/repository-updates.ps1')
 
 $paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
 foreach ($requiredPath in @($paths.ScenarioFolder, $paths.PayloadFolder)) {
@@ -107,12 +112,26 @@ foreach ($planningFile in @('spec.md', 'plan.md', 'tasks.md')) {
         throw "Planning gate failed. Missing scenario artifact: $planningPath"
     }
 }
+& (Join-Path $PSScriptRoot '14-validate-semantic-fields.ps1') -ScenarioSlug $ScenarioSlug -Mode Payload -PayloadsFolder $paths.PayloadFolder
 
 $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
-$reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b'
 $hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
+$reportingSelection = Assert-WizardNativeReportingChoice -ScenarioFolder $paths.ScenarioFolder -HasPayload $hasReportingPayload
+$reportsEnabled = $reportingSelection.HtmlEnabled
+if ($reportingSelection.Explicit -and ($reportingSelection.NativeEnabled -or $reportsEnabled)) {
+    $mappingsPath = Join-Path $paths.ScenarioFolder 'report-mappings.md'
+    if (-not (Test-Path -LiteralPath $mappingsPath) -or (Get-Content -LiteralPath $mappingsPath -Raw) -match '(?im)^- Status:\s*pending-review\s*$') {
+        throw 'Reporting mappings require review before building. Complete report-mappings.md against the approved scenario requirements.'
+    }
+}
+if ($reportingSelection.Explicit -and $reportingSelection.NativeEnabled -and -not $hasReportingPayload) {
+    throw 'Native dashboards were selected, but an approved reporting-*.json payload is missing. Complete reporting planning before building.'
+}
+if ($reportsEnabled) {
+    Read-WizardHtmlReportPlan -RepoRoot $repoRoot -ScenarioFolder $paths.ScenarioFolder | Out-Null
+}
 $hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasChoicePresentation = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'choice-presentations-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
 $formLayoutPath = Join-Path $paths.ScenarioFolder 'form-layouts.json'
@@ -134,15 +153,20 @@ $scope = [ordered]@{
     solutionUniqueName = if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) { '[not configured]' } else { $SolutionUniqueName }
     publisherPrefix = if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) { '[not configured]' } else { $PublisherPrefix.ToLowerInvariant() }
 }
-$scopeHashSource = "$($scope.scenarioSlug)|$($scope.payloadFolder)|$($scope.environmentUrl)|$($scope.solutionUniqueName)|$($scope.publisherPrefix)"
+$semanticInputs = @(
+    Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object { $_.Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md', 'html-reports.json', 'field-type-decisions.json') }
+    Get-ChildItem -LiteralPath $paths.PayloadFolder -File -Filter '*.json'
+) | Sort-Object FullName | ForEach-Object { "$($_.Name):$((Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash)" }
+$scopeHashSource = "$($scope.scenarioSlug)|$($scope.payloadFolder)|$($scope.environmentUrl)|$($scope.solutionUniqueName)|$($scope.publisherPrefix)|$($semanticInputs -join '|')"
 $scopeHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($scopeHashSource))).ToLowerInvariant()
 
 $stageDefinitions = @(
     [pscustomobject]@{ Name = 'validate'; Script = '15-dry-validate.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadsFolder = $paths.PayloadFolder; PublisherPrefixOverride = $PublisherPrefix; PreviewOnly = $true } }
     [pscustomobject]@{ Name = 'tables'; Script = '20-build-tables.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
-    [pscustomobject]@{ Name = 'columns'; Script = '30-build-columns.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
+    [pscustomobject]@{ Name = 'columns'; Script = '30-build-columns.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'choice-presentations'; Script = '35-style-choice-options.ps1'; Optional = $true; Enabled = $hasChoicePresentation; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; ApprovedPlanHash = $ApprovedChoicePresentationPlanHash; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'relationships'; Script = '40-build-relationships.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
+    [pscustomobject]@{ Name = 'semantic-metadata'; Script = '14-validate-semantic-fields.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = 'Metadata'; PayloadsFolder = $paths.PayloadFolder; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; FailIfSolutionHasForeignTables = [bool]$StrictSolutionIsolation } }
     [pscustomobject]@{ Name = 'business-process-flow'; Script = '55-build-business-process-flows.ps1'; Optional = $true; Enabled = $hasBpfPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'forms-views'; Script = '60-build-forms-views.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
@@ -163,16 +187,21 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'rerun-synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
-    [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'semantic-metadata-final'; Script = '14-validate-semantic-fields.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = 'Metadata'; PayloadsFolder = $paths.PayloadFolder; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
+    [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PayloadsFolder = $paths.PayloadFolder; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'post-build'; Script = '80-post-build-analysis.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $paths.PayloadFolder; PreviewOnly = $true } }
 )
 
 $runState = $null
+$sourceBaseline = Get-WizardRepositoryBaseline -RepoRoot $repoRoot
+if ($sourceBaseline.status -ne 'verified') { Write-Warning $sourceBaseline.reason }
 if ($Resume -and (Test-Path -LiteralPath $statePath)) {
     $runState = Read-WizardJsonFile -Path $statePath
     if ($runState.scopeHash -ne $scopeHash) {
         throw 'Resume state belongs to a different scenario, environment, solution, publisher, or payload folder.'
     }
+    $previousBaseline = if ($null -ne $runState.PSObject.Properties['repositoryBaseline']) { $runState.repositoryBaseline } else { $null }
+    Assert-WizardRepositoryResumeBaseline -Previous $previousBaseline -Current $sourceBaseline
 }
 if ($null -eq $runState) {
     $runState = [pscustomobject]@{
@@ -180,6 +209,7 @@ if ($null -eq $runState) {
         scopeHash = $scopeHash
         mode = $Mode
         startedAtUtc = [DateTime]::UtcNow.ToString('o')
+        repositoryBaseline = $sourceBaseline
         stages = @()
     }
 }
@@ -200,12 +230,14 @@ if ($Mode -eq 'Apply') {
             throw 'Apply mode requires an explicit authenticated environment, solution, publisher prefix, and DV_TOKEN. Run 10-auth-connect.ps1 first.'
         }
     }
+    $null = Save-WizardRepositoryBaseline -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -RunId $runState.runId `
+        -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Baseline $runState.repositoryBaseline
 }
 
 $results = [System.Collections.Generic.List[object]]::new()
 foreach ($stage in $stageDefinitions) {
     $existing = @($runState.stages | Where-Object { $_.name -eq $stage.Name -and $_.status -eq 'completed' })
-    if ($Resume -and $existing.Count -gt 0) {
+    if ($Resume -and $existing.Count -gt 0 -and $stage.Name -notin @('columns', 'semantic-metadata', 'semantic-metadata-final')) {
         $results.Add($existing[0]) | Out-Null
         Write-Host "RESUME: $($stage.Name) already completed." -ForegroundColor DarkGray
         continue
@@ -269,6 +301,7 @@ foreach ($stage in $stageDefinitions) {
 $failed = @($results | Where-Object status -eq 'failed')
 $summary = [ordered]@{
     runId = $runState.runId
+    repositoryBaseline = $runState.repositoryBaseline
     mode = $Mode
     status = if ($failed.Count -eq 0) { if ($Mode -eq 'Preview') { 'preview-complete' } else { 'completed' } } else { 'failed' }
     startedAtUtc = $runState.startedAtUtc
@@ -282,6 +315,10 @@ $markdown = @(
     '# Wizard Build Summary',
     '',
     "- Run ID: $($summary.runId)",
+    "- Repository baseline: $($summary.repositoryBaseline.baselineId)",
+    "- Source identity: $($summary.repositoryBaseline.status)",
+    "- Commit: $($summary.repositoryBaseline.commitSha)",
+    "- Locally modified: $($summary.repositoryBaseline.workingTreeDirty)",
     "- Mode: $Mode",
     "- Status: $($summary.status)",
     "- Scenario: $ScenarioSlug",

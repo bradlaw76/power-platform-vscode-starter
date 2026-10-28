@@ -376,6 +376,7 @@
           <li><a href="../README.md">Project README</a></li>
           <li><a href="onboarding.md">Authoritative onboarding sequence</a></li>
           <li><a href="wizard-contract-v1.md">Wizard contract</a></li>
+          <li><a href="repository-updates.md">Repository updates and timestamped work baselines</a></li>
           <li><a href="../wizard.profile.json">Wizard profile</a></li>
           <li><a href="../.github/skills/power-platform-wizard-init/SKILL.md">Shared Copilot skill definition</a></li>
           <li><a href="../.github/skills/power-platform-wizard-init/references/progress-monitoring.md">Skill progress-monitoring reference</a></li>
@@ -392,6 +393,13 @@
 
     <section class="card walkthrough">
       <h2>Full Walkthrough</h2>
+      <p>Model-driven startup includes a local-only comparison with cached upstream metadata.
+        Run <span class="mono">pwsh .\scripts\bootstrap\check-repository-updates.ps1</span>
+        to check manually; add <span class="mono">-Fetch</span> only for an explicitly authorized refresh.
+        Cached up-to-date does not prove remote freshness, and advice never adopts changes or approves deployment.
+        Stage 90 records a full-commit, UTC and dirty-source baseline; only Apply archives immutable run records.
+        See <a href="repository-updates.md">the update advisor guide</a> for scenario relevance and resume limits.
+        This advisor is not a new numbered build stage.</p>
 
       <details class="step" open>
         <summary>

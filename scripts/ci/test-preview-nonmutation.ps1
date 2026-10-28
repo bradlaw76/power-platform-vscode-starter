@@ -64,9 +64,18 @@ function Get-ManifestProvenanceSnapshot {
     })
 }
 
+$gitRoot = $repoRoot
+$fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) "semantic-preview-$([guid]::NewGuid().ToString('N'))"
+. (Join-Path $repoRoot 'scripts\ci\helpers\semantic-preview-fixtures.ps1')
+$telemetryBefore = $env:WIZARD_METRICS_OPTOUT
+try {
+$env:WIZARD_METRICS_OPTOUT = '1'
+New-SemanticPreviewWorkspace -SourceRoot $repoRoot -TargetRoot $fixtureRoot -ScenarioSlugs @('contoso-case-tracker', 'gcc-framework-acceptance')
+$repoRoot = $fixtureRoot
+$orchestrator = Join-Path $repoRoot 'scripts\bootstrap\90-run-build.ps1'
 $tokenBefore = $env:DV_TOKEN
-$before = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
-$manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
+$before = Get-GitPreviewSnapshot -RepositoryRoot $gitRoot
+$manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $gitRoot)
 & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview
 if ($LASTEXITCODE -ne 0) {
     throw "Orchestrated preview failed with exit code $LASTEXITCODE."
@@ -81,7 +90,7 @@ try {
     [ordered]@{
         version = '1.0'
         TableLogicalName = 'ppvs_checkoutrequest'
-        ColumnLogicalName = 'ppvs_requeststatus'
+        ColumnLogicalName = 'ppvs_lifecyclestage'
         Ownership = 'wizard-owned-unmanaged-local-choice'
         Options = @([ordered]@{ Value = 100000000; Label = 'Requested'; ColorToken = 'pastel-blue'; Icon = 'info' })
     } | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath $choicePresentationPath -Encoding UTF8
@@ -145,8 +154,8 @@ try {
     $env:DV_SOLUTION_NAME = $solutionBefore
     $env:DV_PUBLISHER_PREFIX = $prefixBefore
 }
-$after = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
-$manifestAfter = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
+$after = Get-GitPreviewSnapshot -RepositoryRoot $gitRoot
+$manifestAfter = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $gitRoot)
 
 if ($before.Head -ne $after.Head -or $before.Branch -ne $after.Branch -or $before.IndexHash -ne $after.IndexHash) {
     throw 'Preview changed Git HEAD, branch, or index.'
@@ -162,3 +171,7 @@ if (@(Compare-Object $manifestBefore $manifestAfter).Count -ne 0) {
 }
 
 Write-Host 'Preview non-mutation checks passed.' -ForegroundColor Green
+} finally {
+    $env:WIZARD_METRICS_OPTOUT = $telemetryBefore
+    if (Test-Path -LiteralPath $fixtureRoot) { Remove-Item -LiteralPath $fixtureRoot -Recurse -Force }
+}

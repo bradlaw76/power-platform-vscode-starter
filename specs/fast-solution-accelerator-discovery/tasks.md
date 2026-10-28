@@ -244,3 +244,31 @@ approver/signature verification, authorization consumption/revalidation, and a
 separately approved executor remain proposed, not approved. These validation
 results do not establish live readiness or authorize execution; no approval
 or authorization records are generated or consumed.
+
+## Milestone supersession: FAST-008A (2026-10-19)
+
+The proposed-only collection stop above is superseded solely for
+[FAST-008A tasks](../fast-008a-trusted-environment-verification/tasks.md) and
+[ADR 0011](adrs/0011-trusted-environment-verification.md): GET-only authenticated
+identity/package/concrete metadata verification, RS256 provenance with
+independent X509 trust and fail-closed readiness-policy integration.
+The FAST-008A task list and evidence, not historical FAST-007 counts, own
+implementation and mock-validation completion. This appended scope statement
+claims no new test passes or live GCC access.
+
+- Document collector target/authentication/read-only confirmation and Mock/Live
+  isolation; never persist credentials or trust embedded signing keys.
+- Document actual environment/tenant versus organization/user identity,
+  unsupported/descriptive component blockers and inferred future ownership.
+- Keep Authenticated default; RecordedTest and LocalPlanning are explicit
+  diagnostics with `verifiedForHumanReview: false`; all policies retain
+  `executionAuthorized: false`.
+- Preserve early-return preflight, default-off modes, normal Fully Custom
+  behavior and globally disabled FAST-dependent Apply.
+- Track the isolated quality-runner parser/result propagation and timer-prompt
+  assertion corrections in FAST-008A evidence. OneDrive cleanup contention is
+  a separate limitation, not authorization for unrelated refactoring.
+
+Stop at human-review handoff. Future controlled execution, independent
+deployment approvals/signatures, scoped authorization consumption/revalidation
+and an executor remain proposed and require separate authorization.

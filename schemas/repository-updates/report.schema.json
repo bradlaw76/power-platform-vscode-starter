@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "checkedAtUtc", "status", "reason", "freshness", "remote", "branch", "comparisonBaseSha", "upstreamSha", "baseline", "changedFiles", "recommendations"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "checkedAtUtc": { "type": "string", "format": "date-time" },
+    "status": { "enum": ["up-to-date", "updates-available", "local-ahead", "diverged", "unrelated-history", "unable-to-check"] },
+    "reason": { "type": "string" },
+    "freshness": { "enum": ["cached-not-network-verified", "fetched", "fetch-failed"] },
+    "remote": { "type": "string" },
+    "branch": { "type": "string" },
+    "comparisonBaseSha": { "type": ["string", "null"] },
+    "upstreamSha": { "type": ["string", "null"] },
+    "baseline": { "type": "object" },
+    "changedFiles": { "type": "array", "items": { "type": "string" } },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["capabilityId", "title", "category", "relevance", "action", "reason", "paths"],
+        "properties": {
+          "capabilityId": { "type": "string" },
+          "title": { "type": "string" },
+          "category": { "type": "string" },
+          "relevance": { "enum": ["applicable", "not-selected", "unknown"] },
+          "action": { "enum": ["review-required", "recommended-review", "optional-review", "informational", "not-applicable", "review-needed"] },
+          "reason": { "type": "string" },
+          "paths": { "type": "array", "minItems": 1, "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

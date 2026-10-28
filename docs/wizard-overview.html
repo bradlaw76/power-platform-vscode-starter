@@ -612,6 +612,14 @@
   <!-- SECTION 1: Quick Overview -->
   <section>
     <h2><span class="section-num">1</span> What It Does — At a Glance</h2>
+    <div class="copilot-note">
+      <strong>Know your source baseline:</strong> Model-driven startup checks cached upstream metadata locally.
+      <code>check-repository-updates.ps1 -Fetch</code> explicitly refreshes it; no updates are automatically adopted.
+      Cached <code>up-to-date</code> is not proof of remote freshness. Stage 90 records the full commit,
+      UTC capture time and dirty-source fingerprint; only Apply archives immutable per-run records.
+      Optional scenario selections filter advice without enabling modules. See
+      <a href="repository-updates.md">repository updates and work baselines</a>.
+    </div>
     <div class="overview-grid">
       <div class="overview-item">
         <div class="oi-num">00</div>

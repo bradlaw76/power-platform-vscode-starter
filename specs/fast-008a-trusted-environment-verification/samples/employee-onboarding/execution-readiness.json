@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "1.1",
+  "scenarioSlug": "employee-onboarding",
+  "status": "READY_FOR_APPROVAL",
+  "eligibleForHumanApproval": true,
+  "executionAuthorized": false,
+  "evidenceTrust": "recorded-test",
+  "verifiedForHumanReview": false,
+  "evaluatedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+  "decisionId": "sha256:f500314732274e245bc8895b5b2ccab9cb2b9560b418bb209201356d2d83a54b",
+  "planId": "sha256:968d9b59f60c52042871f5b5531b57a4a28a7c89428ee8af6725c79b8c17de6e",
+  "planSha256": "783477215872870a4d3bc07dea574e54d927145a9b1145aae1df93e03eb1f6f1",
+  "decisionSha256": "a6c9deaa39a697fd57eb55b054e9d4cb2686fab090b6b68316bde7fb925b11ce",
+  "evidenceSha256": "04779bb67c8d1f5cd1c668b21978b2ce328829d87e5c492aa6c9bd845356e2f2",
+  "scopeSha256": "e88c234204033c390eba4fdaf19d86a60297215a577f9f9ffdc03da1a71352b1",
+  "environment": {
+    "environmentId": "11111111-1111-4111-8111-111111111111",
+    "tenantId": "22222222-2222-4222-8222-222222222222",
+    "url": "https://synthetic.example.test"
+  },
+  "authorizedOperationCategories": [],
+  "findings": [],
+  "blockedOperations": [],
+  "dependencyOrder": [
+    "FAST006-CREATE-9BC0F9ABA74F"
+  ],
+  "packageDependencyOrder": [],
+  "componentOwnership": [
+    {
+      "taskId": "FAST006-CREATE-9BC0F9ABA74F",
+      "componentKind": "table",
+      "componentIdentity": "tst_record",
+      "action": "CREATE",
+      "ownership": "solution-owned",
+      "managed": false,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-CREATE-9BC0F9ABA74F",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": false,
+          "allowedActions": [
+            "CREATE"
+          ]
+        }
+      ]
+    }
+  ],
+  "securityRequirements": [
+    {
+      "taskId": "FAST006-CREATE-9BC0F9ABA74F",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-9BC0F9ABA74F",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-CREATE-9BC0F9ABA74F",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    }
+  ],
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-001",
+      "taskIds": [
+        "FAST006-CREATE-9BC0F9ABA74F"
+      ],
+      "acceptanceCriteria": [
+        "Users can complete the primary task."
+      ],
+      "decisionId": "sha256:f500314732274e245bc8895b5b2ccab9cb2b9560b418bb209201356d2d83a54b"
+    }
+  ]
+}

@@ -5,7 +5,9 @@
   "additionalProperties": false,
   "required": ["schemaVersion", "scenarioSlug", "status", "eligibleForHumanApproval", "executionAuthorized", "evaluatedAtUtc", "decisionId", "planId", "planSha256", "decisionSha256", "evidenceSha256", "scopeSha256", "environment", "authorizedOperationCategories", "findings", "blockedOperations", "dependencyOrder", "packageDependencyOrder", "componentOwnership", "securityRequirements", "acceptanceTraceability"],
   "properties": {
-    "schemaVersion": {"const": "1.0"},
+    "schemaVersion": {"enum": ["1.0", "1.1"]},
+    "evidenceTrust": {"enum": ["authenticated", "recorded-test", "local-planning", "unverified"]},
+    "verifiedForHumanReview": {"type": "boolean"},
     "scenarioSlug": {"type": "string", "minLength": 1},
     "status": {"enum": ["READY_FOR_APPROVAL", "BLOCKED_PREREQUISITES", "BLOCKED_EVIDENCE", "BLOCKED_COMPATIBILITY", "BLOCKED_SECURITY", "BLOCKED_DECISION_CHANGE"]},
     "eligibleForHumanApproval": {"type": "boolean"},
@@ -83,6 +85,10 @@
     }
   },
   "allOf": [
+    {"if": {"properties": {"schemaVersion": {"const": "1.1"}}},
+     "then": {"required": ["evidenceTrust", "verifiedForHumanReview"]}},
+    {"if": {"required": ["verifiedForHumanReview"], "properties": {"verifiedForHumanReview": {"const": true}}},
+     "then": {"properties": {"evidenceTrust": {"const": "authenticated"}, "eligibleForHumanApproval": {"const": true}}}},
     {"if": {"properties": {"status": {"const": "READY_FOR_APPROVAL"}}},
      "then": {"properties": {"eligibleForHumanApproval": {"const": true}, "findings": {"maxItems": 0}, "blockedOperations": {"maxItems": 0}}},
      "else": {"properties": {"eligibleForHumanApproval": {"const": false}, "findings": {"minItems": 1}}}}

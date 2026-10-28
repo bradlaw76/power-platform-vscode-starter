@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.9.0
+VERSION:      0.10.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-28
+LAST UPDATED: 2026-10-27
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -47,6 +47,7 @@ v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 v0.8.0  2026-10-15  Added default-off accelerator architecture recommendations.
 v0.9.0  2026-10-16  Added startup preference and FAST-005A acceptance corrections.
+v0.10.0 2026-10-27  Added local-first startup update advice and opt-in fetch.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -100,6 +101,13 @@ NON-NEGOTIABLES
     Optional repository root used for isolated acceptance testing. Defaults to
     the repository containing this script.
 
+.PARAMETER FetchRepositoryUpdates
+    Explicitly fetch the configured upstream into an isolated update-check ref.
+    The default startup comparison uses cached local Git metadata only.
+
+.PARAMETER SkipRepositoryUpdateCheck
+    Skip the startup advisor. Cannot be combined with FetchRepositoryUpdates.
+
 .EXAMPLE
     pwsh ./scripts/bootstrap/05-start-wizard.ps1
 
@@ -117,6 +125,8 @@ param(
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
     [string]$WorkspaceRoot,
+    [switch]$FetchRepositoryUpdates,
+    [switch]$SkipRepositoryUpdateCheck,
     [switch]$EnableAcceleratorRecommendations,
     [ValidateSet('', 'evaluate', 'fully-custom', 'prefer-fast')]
     [string]$AcceleratorPreference = '',
@@ -139,6 +149,18 @@ $repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
     $implementationRoot
 } else {
     [System.IO.Path]::GetFullPath($WorkspaceRoot)
+}
+if ($FetchRepositoryUpdates -and $SkipRepositoryUpdateCheck) {
+    throw 'FetchRepositoryUpdates cannot be combined with SkipRepositoryUpdateCheck.'
+}
+if (-not $SkipRepositoryUpdateCheck) {
+    . (Join-Path $PSScriptRoot 'helpers\repository-updates.ps1')
+    try {
+        $updateReport = Get-WizardRepositoryUpdateReport -RepoRoot $repoRoot -Fetch:$FetchRepositoryUpdates
+        Show-WizardRepositoryUpdateReport $updateReport
+    } catch {
+        Write-Warning "Repository update advisor unavailable: $($_.Exception.Message)"
+    }
 }
 $acceleratorIntegrationPath = Join-Path $PSScriptRoot '..\accelerators\wizard-accelerator-integration.ps1'
 . $acceleratorIntegrationPath
@@ -866,7 +888,11 @@ if ($Mode -eq 'demo-builder') {
     $answers["StandardFieldsReused"] = 'none'
     $answers["CustomFieldsToAdd"] = 'to be refined during planning'
     $answers["RelationshipsToCreate"] = if ($customTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
+    $reportingChoice = 'none'
+    Write-Host "  Reporting choices: native = standard Dataverse charts/dashboard; html = tailored frontline, supervisor, or leadership reports; both = complementary surfaces; none = forms/views only."
+    Write-Host "  Choose native/html/both/none in the consolidated confirmation. HTML content must be defined from this scenario's requirements, not a fixed set of generic KPIs."
     $answers["IncludeHtmlReports"] = 'no'
+    $answers["IncludeNativeDashboards"] = 'no'
     $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointPluralDisplayName | $successAndData"
     $answers["UserTaskOwnership"] = "$experienceAndLifecycle | app owner | $successAndData"
     $answers["RelationshipRequirements"] = if ($customTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
@@ -1039,9 +1065,13 @@ if ($Retrofit) {
     $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Custom fields still to add (table.field list; enter 'none' if all done)" "none"
     $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Relationships still to create (referencing -> referenced; enter 'none' if all done)" "none"
     if ($reportsModuleEnabled) {
-        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional operational HTML report web resources? (yes/no)" "no"
+        Write-Host "Native: standard Dataverse charts/dashboard. HTML: Dynamics-styled frontline, supervisor, or leadership reports derived from your requirements. Both must serve distinct tasks; none keeps forms/views only."
+        $reportingChoice = Read-ChoiceValue -Prompt "E-reporting. Include native dashboards, custom HTML reports, both, or neither? (native/html/both/none)" -AllowedValues @('native', 'html', 'both', 'none', 'yes', 'no') -Default 'none'
+        $answers["IncludeHtmlReports"] = if ($reportingChoice -in @('html', 'both', 'yes')) { 'yes' } else { 'no' }
+        $answers["IncludeNativeDashboards"] = if ($reportingChoice -in @('native', 'both')) { 'yes' } else { 'no' }
     } else {
         $answers["IncludeHtmlReports"] = "no"
+        $answers["IncludeNativeDashboards"] = "no"
     }
     if ($bpfModuleEnabled) {
         $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
@@ -1055,9 +1085,13 @@ if ($Retrofit) {
     $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Explicit mapping - custom fields to add (table.field list; enter 'none' if none)" "none"
     $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Explicit mapping - relationships to create (referencing -> referenced; enter 'none' if none)" "none"
     if ($reportsModuleEnabled) {
-        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional operational HTML report web resources? (yes/no)" "no"
+        Write-Host "Native: standard Dataverse charts/dashboard. HTML: Dynamics-styled frontline, supervisor, or leadership reports derived from your requirements. Both must serve distinct tasks; none keeps forms/views only."
+        $reportingChoice = Read-ChoiceValue -Prompt "E-reporting. Include native dashboards, custom HTML reports, both, or neither? (native/html/both/none)" -AllowedValues @('native', 'html', 'both', 'none', 'yes', 'no') -Default 'none'
+        $answers["IncludeHtmlReports"] = if ($reportingChoice -in @('html', 'both', 'yes')) { 'yes' } else { 'no' }
+        $answers["IncludeNativeDashboards"] = if ($reportingChoice -in @('native', 'both')) { 'yes' } else { 'no' }
     } else {
         $answers["IncludeHtmlReports"] = "no"
+        $answers["IncludeNativeDashboards"] = "no"
     }
     if ($bpfModuleEnabled) {
         $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
@@ -1078,7 +1112,7 @@ if ($answers["RelationshipsToCreate"].Trim().ToLowerInvariant() -ne "none") {
 }
 
 $reportMappingRows = @()
-if ($answers["IncludeHtmlReports"] -match '^(?i:y|yes|true|1)$') {
+if ($answers["IncludeHtmlReports"] -eq 'yes' -or $answers["IncludeNativeDashboards"] -eq 'yes') {
     Write-Host ""
     Write-Host "Report scoping (required before implementation when reports are enabled)." -ForegroundColor Cyan
     $answers["CriticalReportTables"] = Read-RequiredValue "E-reporting. Critical or high-frequency table logical names (comma-separated)"
@@ -1191,7 +1225,7 @@ $answers["BpfCrossTableProgression"] = if ($bpf.CrossTableProgression) { "yes" }
 $answers["BpfTargetFormName"] = $bpf.TargetFormName
 $answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Power Apps neutral' } else { 'Dynamics blue' }
-$answers["ReportSet"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
+$answers["ReportSet"] = 'Only requirement-backed frontline, supervisor, or leadership reports approved in html-reports.json'
 
 $answers["AcceleratorPreference"] = $selectedAcceleratorPreference
 $answers["AcceleratorMatchingRequested"] = if ($acceleratorMatchingRequested) { 'yes' } else { 'no' }
@@ -1271,20 +1305,34 @@ if ($acceleratorMatchingRequested) {
         -Mode $Mode `
         -Preference $selectedAcceleratorPreference
     $availableArchitectureOptions = @($acceleratorEvaluation.options | ForEach-Object { "$($_.optionId)" })
-    $selectedArchitecture = if ([string]::IsNullOrWhiteSpace($AcceleratorArchitectureChoice)) {
+    $confirmationOptions = @($availableArchitectureOptions)
+    if ($Mode -eq 'demo-builder') {
+        foreach ($architectureOption in $availableArchitectureOptions) {
+            foreach ($reportOption in @('native', 'html', 'both', 'none')) {
+                $confirmationOptions += "$architectureOption+$reportOption"
+            }
+        }
+    }
+    $architectureConfirmation = if ([string]::IsNullOrWhiteSpace($AcceleratorArchitectureChoice)) {
         Read-ChoiceValue `
             -Prompt $(if ($Mode -eq 'demo-builder') {
-                '7. Select and approve the consolidated architecture'
+                '7. Select and approve the consolidated architecture; optionally append +native/+html/+both/+none for reporting'
             } else {
                 'A-accelerator. Select and approve the architecture'
             }) `
-            -AllowedValues $availableArchitectureOptions `
+            -AllowedValues $confirmationOptions `
             -Default "$($acceleratorEvaluation.recommendedOption)"
     } else {
         if ($availableArchitectureOptions -notcontains $AcceleratorArchitectureChoice) {
             throw "Architecture option '$AcceleratorArchitectureChoice' is unavailable. Choose one of: $($availableArchitectureOptions -join ', ')."
         }
         $AcceleratorArchitectureChoice
+    }
+    $confirmationParts = @($architectureConfirmation -split '\+', 2)
+    $selectedArchitecture = $confirmationParts[0]
+    if ($confirmationParts.Count -eq 2) {
+        $answers["IncludeHtmlReports"] = if ($confirmationParts[1] -in @('html', 'both')) { 'yes' } else { 'no' }
+        $answers["IncludeNativeDashboards"] = if ($confirmationParts[1] -in @('native', 'both')) { 'yes' } else { 'no' }
     }
     $acceleratorDecision = New-WizardAcceleratorDecision `
         -Evaluation $acceleratorEvaluation `
@@ -1305,10 +1353,20 @@ if ($acceleratorMatchingRequested) {
     $acceleratorPlanBlock = "$acceleratorPreferencePlanBlock`n$($acceleratorProjection.Plan)"
     $acceleratorTasksBlock = "$acceleratorPreferenceTasksBlock`n$($acceleratorProjection.Tasks)"
 } elseif ($Mode -eq 'demo-builder') {
-    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
-    if ($recommendationConfirmation -ne 'yes') {
+    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept recommendations and choose reporting (yes/none/native/html/both; no cancels)?" -AllowedValues @('yes', 'no', 'none', 'native', 'html', 'both') -Default 'yes'
+    if ($recommendationConfirmation -eq 'no') {
         throw "Demo Builder recommendations were not approved. Rerun with -Mode advanced-builder to control the technical design."
     }
+    if ($recommendationConfirmation -ne 'yes') {
+        $reportingChoice = $recommendationConfirmation
+        $answers["IncludeHtmlReports"] = if ($reportingChoice -in @('html', 'both')) { 'yes' } else { 'no' }
+        $answers["IncludeNativeDashboards"] = if ($reportingChoice -in @('native', 'both')) { 'yes' } else { 'no' }
+    }
+}
+if ($Mode -eq 'demo-builder' -and ($answers["IncludeHtmlReports"] -eq 'yes' -or $answers["IncludeNativeDashboards"] -eq 'yes')) {
+    $answers["CriticalReportTables"] = $answers["EntryPointTable"]
+    $answers["ReportScopingStatus"] = 'pending-review'
+    $answers["ReportMappings"] = 'pending: derive report audiences, fields, calculations, and placements from the approved user tasks and success criteria'
 }
 
 # Write planning values to .env.ps1 so 10-auth-connect.ps1 can use them as defaults.
@@ -1437,14 +1495,25 @@ $demoDataPlanObject = if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$'
     $null
 }
 $demoDataPlanJson = if ($null -ne $demoDataPlanObject) { $demoDataPlanObject | ConvertTo-Json -Depth 5 } else { "" }
-$reportMappingTable = if ($reportMappingRows.Count -gt 0) { Format-ReportMappingTable -Rows $reportMappingRows } else { '_No report surfaces selected. Reports were explicitly disabled during intake._' }
+$reportingSelectionBlock = @"
+## Reporting Selection
+- Native dashboards: $($answers["IncludeNativeDashboards"])
+- HTML reports: $($answers["IncludeHtmlReports"])
+- Native dashboards use standard Dataverse chart/dashboard components; HTML reports provide tailored persona-oriented layouts.
+- Generate both only for distinct approved tasks. Neither is mandatory.
+- HTML definitions: html-reports.json; require explicit approval, requirement excerpts from spec.md/plan.md, and matching report-mappings.md rows.
+- Explain each report's audience, decision, metrics, data scope, placement, limitations, and overlap before approval.
+"@
+$reportMappingTable = if ($reportMappingRows.Count -gt 0) { Format-ReportMappingTable -Rows $reportMappingRows } elseif ($answers["ReportScopingStatus"] -eq 'pending-review') { '_Reporting selected; mapping approval is pending. Do not generate reporting payloads or HTML sources yet._' } else { '_No report surfaces selected. Reports were explicitly disabled during intake._' }
 $reportMappingsContent = @"
 # Report Mappings
 
 ## Scope Decision
 - Status: $($answers["ReportScopingStatus"])
 - Critical or high-frequency tables: $($answers["CriticalReportTables"])
-- Reports enabled: $($answers["IncludeHtmlReports"])
+- Reports enabled: $(if ($answers["IncludeHtmlReports"] -eq 'yes' -or $answers["IncludeNativeDashboards"] -eq 'yes') { 'yes' } else { 'no' })
+
+$reportingSelectionBlock
 
 ## Report Mapping Table
 $reportMappingTable
@@ -1704,6 +1773,14 @@ $($answers["RelationshipRequirements"])
 - Do not include standard tables in table-creation payloads.
 - Reuse out-of-box fields unless a true custom field is required.
 
+### Semantic Field Decisions (Required for Every Use Case)
+- Complete field-type-decisions.json before generating any columns payload.
+- Follow docs/semantic-field-type-standard.md regardless of industry, wizard mode, table strategy or accelerator choice.
+- Include every planned field exactly once, including reused and primary fields; mirror each FIELD decision ID and its decision row in this spec and plan.
+- Resolve business meaning, bounded vocabulary, Choice versus Lookup, type settings, stable options, mappings and dependent surfaces.
+- Categorical text needs separate explicit approval and documented consequences in both spec and plan.
+- The generated semantic inventory is an unapproved draft, not permission to build.
+
 ## Optional Report Web Resources
 - Enabled: $($answers["IncludeHtmlReports"])
 - Report set: $($answers["ReportSet"])
@@ -1888,6 +1965,13 @@ $relationshipList
 ### Payload Readiness Rule
 - Payload generation is blocked until this mapping is complete and approved.
 
+### Semantic Field Architecture
+- Complete and approve field-type-decisions.json under docs/semantic-field-type-standard.md.
+- Record each FIELD decision ID and decision row here and in spec.md before column generation.
+- Run stage 14 Planning before generation, Payload before build, and Metadata after relationships and before export.
+- Stop on metadata drift; plan remediation without changing approved intent or deleting existing columns.
+- Verify forms, views, charts, BPFs, automation, integrations and reports against the approved vocabulary.
+
 ## Optional Business Process Flow Plan
 - Enabled: $($answers["EnableBusinessProcessFlow"])
 - Build order dependency: run `55-build-business-process-flows.ps1` after `50-add-to-solution.ps1` and before `60-build-forms-views.ps1`.
@@ -1910,7 +1994,7 @@ $bpfStagesMarkdown
 - Verify solution export/unpack succeeds.
 - Verify git changes are reviewable.
 - Verify import into target environment succeeds.
-- If reports are enabled, verify three HTML web resources are created and visible in solution.
+- If HTML reports are enabled, approve html-reports.json against spec.md, plan.md, and report-mappings.md; verify only the approved report definitions are created and visible in solution.
 - If BPF is enabled, verify the BPF build report matches the created Dataverse process metadata and the process is added only to the selected solution.
 "@
 
@@ -1929,6 +2013,10 @@ $acceleratorTasksBlock
 - [ ] Confirm form strategy '$($answers["FormStrategy"])' for all existing tables
 - [ ] Finalize 'spec.md'
 - [ ] Finalize 'plan.md'
+- [ ] Complete field-type-decisions.json for every planned field and record each FIELD decision in spec/plan
+- [ ] Approve semantic types, Choice inventories/mappings and any separately approved categorical text exceptions
+- [ ] Pass 14-validate-semantic-fields.ps1 Planning before column generation and Payload before build
+- [ ] Validate live types after stage 30, Lookup relationships after 40, and all metadata before export; complete functional surface checks
 - [ ] Review source-control standards in 'requirements/GithubInstructions_General.md'
 - [ ] Confirm repository, remote, current/default branch, working-tree state, recent history, and applicable validation commands
 - [ ] Create or switch to scenario branch '$($answers["SourceControlBranch"])' before implementation; do not absorb unrelated working-tree changes
@@ -1965,7 +2053,8 @@ $acceleratorTasksBlock
 - [ ] Build starter forms/views with '60-build-forms-views.ps1'
 - [ ] If Power Apps grid is enabled, review `grid-controls.json`, run stage 61 Preview, complete the classic solution explorer all-views maker handoff, configure inline editing explicitly, and pass stage 61 Verify against exported metadata before app assembly
 - [ ] Create or update the review app with '62-build-app-module.ps1' and validate its entry table and landing view
-- [ ] If reports are enabled, run '70-build-web-resources.ps1'
+- [ ] If native dashboards are selected, approve reporting-*.json and run '64-build-charts-dashboard.ps1' before app assembly
+- [ ] If HTML reports are selected, review and explicitly approve html-reports.json, then run '70-build-web-resources.ps1'; verify data and planned placement
 - [ ] At each approved checkpoint, inspect `git status` and `git diff`, run applicable validation, stage explicit files, and use a typed imperative commit message
 - [ ] Export and unpack solution
 - [ ] Create the final implementation commit after reviewing staged files and validation evidence
@@ -1974,10 +2063,24 @@ $acceleratorTasksBlock
 - [ ] Update 'docs/build-log.md'
 "@
 
+foreach ($contentName in @('answersContent', 'specContent', 'planContent', 'tasksContent')) {
+    $contentValue = Get-Variable -Name $contentName -ValueOnly
+    Set-Variable -Name $contentName -Value "$contentValue`n`n$reportingSelectionBlock`n"
+}
 Set-Content -Path $answersPath -Value (Remove-MarkdownTrailingWhitespace -Value $answersContent) -Encoding UTF8
 Set-Content -Path $specPath -Value (Remove-MarkdownTrailingWhitespace -Value $specContent) -Encoding UTF8
 Set-Content -Path $planPath -Value (Remove-MarkdownTrailingWhitespace -Value $planContent) -Encoding UTF8
 Set-Content -Path $tasksPath -Value (Remove-MarkdownTrailingWhitespace -Value $tasksContent) -Encoding UTF8
+$semanticDraftPath = Join-Path $scenarioFolder 'field-type-decisions.json'
+if (-not (Test-Path -LiteralPath $semanticDraftPath)) {
+    [ordered]@{
+        schemaVersion = '1.0'
+        scenarioSlug = $scenarioSlug
+        approval = @{ approved = $false; approvedBy = ''; approvedAtUtc = '' }
+        fields = @()
+        surfaces = @{}
+    } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $semanticDraftPath -Encoding UTF8
+}
 Set-Content -Path $reportMappingsPath -Value (Remove-MarkdownTrailingWhitespace -Value $reportMappingsContent) -Encoding UTF8
 Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
 if ($null -ne $gridControlsObject) {

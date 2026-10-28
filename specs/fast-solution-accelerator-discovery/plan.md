@@ -402,3 +402,27 @@ Stop after FAST-007 review handoff. FAST-008 is proposed only: trusted evidence
 collection, independent approver/signature verification, authorization
 consumption/revalidation, and a separately approved executor design require
 further authorization.
+
+## Milestone supersession: FAST-008A (2026-10-19)
+
+The earlier proposed-only trusted-collection plan is superseded within the
+bounded [FAST-008A plan](../fast-008a-trusted-environment-verification/plan.md).
+Reuse the inspector/shared Dataverse runtime and FAST-006/007 planning/readiness
+contracts; add GET-only collection, external X509 RS256 signing and independent
+public-certificate validation. Bind exact decision bytes, plan ID/SHA,
+catalog/dependency/input/package hashes, actual authenticated identity,
+classified observations, collection mode and expiry. Require certificate
+validity at collection and evaluation; never trust an embedded key.
+
+Collection defaults Mock with injected test transport. Live rejects injected
+transport and requires explicit target/read-only scope, existing credentials
+and an operator-provided signing certificate, with no `.env` fallback or
+persisted credentials. Authenticated is the default readiness policy; explicit
+RecordedTest and LocalPlanning retain diagnostics without verified review
+eligibility or writes. Preserve early-return preflight, global FAST-dependent
+Apply block, normal Fully Custom behavior and default-off settings in all modes.
+See [ADR 0011](adrs/0011-trusted-environment-verification.md) and
+[trusted verification operations](../../docs/fast-integration/trusted-environment-verification.md).
+Validation is mock-only; parent milestone evidence records actual results.
+Future controlled execution, deployment approvals/signatures, scope checks
+and revalidation require separate authorization; stop at human review.

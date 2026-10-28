@@ -38,6 +38,14 @@ Out of scope:
 3. The repo must keep build steps source-controlled, repeatable, and practical for first-time builders.
 4. The repo must explain Power Platform concepts in beginner-safe language when they first appear.
 5. The repo must provide validation checkpoints and tests for workflow and contract changes.
+6. Every Dataverse use case must follow the [Semantic Field Type Standard](docs/semantic-field-type-standard.md):
+   approved field decisions precede payload generation, payload mismatches block
+   builds, live metadata drift blocks dependent execution, and normal generation
+   never implicitly performs destructive type migrations.
+7. Repository update advice must be local-first, preserve unknown relevance,
+   and never automatically adopt changes. Orchestrated runs must preserve their
+   exact source baseline and explicitly disclose locally modified/unverified
+   source identity. See [the approved enhancement spec](specs/repository-update-advisor/spec.md).
 
 ## Success Criteria
 

@@ -25,6 +25,7 @@ The repository provides:
 
 - [How it works](#how-it-works)
 - [Full app-builder compatibility](#full-app-builder-compatibility)
+- [Repository updates and source traceability](#repository-updates-and-source-traceability)
 - [Before you begin](#before-you-begin)
 - [Clone and open the repository](#clone-and-open-the-repository)
 - [Install prerequisites](#install-prerequisites)
@@ -107,6 +108,28 @@ $env:WIZARD_METRICS_OPTOUT = '1'
 The report wizard described in the rest of this guide is the focused path when
 the app and tables already exist and only native reporting artifacts are
 needed.
+
+## Repository updates and source traceability
+
+You can check the starter's reporting-related changes without restarting app
+intake or contacting Dataverse:
+
+```powershell
+pwsh .\scripts\bootstrap\check-repository-updates.ps1 -ScenarioSlug <scenario-slug>
+```
+
+This reads cached upstream metadata unless you explicitly add `-Fetch`.
+Optionally record `native-reports` in scenario `repo-update-context.json` after
+the reporting choice is confirmed. Unknown relevance remains review-needed;
+an update recommendation never approves a reporting payload or deployment.
+See [repository updates](repository-updates.md).
+
+The report-only wizard does not automatically run this advisor or create an
+orchestrated run baseline. Full builds through stage 90 include
+`repositoryBaseline` in their summaries, and only Apply archives immutable source
+records. For direct report-only work, retain the advisor's resolved commit and
+dirty-source diagnostics with your reviewed mappings and validation evidence;
+do not describe them as an immutable stage-90 baseline or live verification.
 
 ## Before you begin
 

@@ -49,6 +49,48 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    It '<Skill> preserves local-first update advice and immutable source baselines' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        foreach ($pattern in @('check-repository-updates.ps1', '-Fetch', '-FetchRepositoryUpdates',
+            '-SkipRepositoryUpdateCheck', 'repo-update-context.json', 'review-needed',
+            'repositoryBaseline', 'only Apply', 'Resume preserves', 'Never auto-pull')) {
+            $skillContent[$Skill] | Should -Match ([regex]::Escape($pattern))
+        }
+    }
+    It '<Skill> separates native and requirement-backed HTML reporting choices' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        foreach ($pattern in @('native dashboards', 'both', 'neither', 'Reporting Selection', 'html-reports.json', 'html-reports.schema.json', 'requirement excerpts', 'report-mappings.md', 'not a mandatory', 'placement handoff')) {
+            $skillContent[$Skill] | Should -Match ([regex]::Escape($pattern))
+        }
+    }
+    It '<Skill> requires universal semantic field planning and live validation' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match 'semantic-field-type-standard.md'
+        $skillContent[$Skill] | Should -Match 'field-type-decisions.json'
+        $skillContent[$Skill] | Should -Match '14-validate-semantic-fields.ps1'
+        $skillContent[$Skill] | Should -Match '(?i)every Dataverse use case'
+        $skillContent[$Skill] | Should -Match '(?i)separately approved'
+        $skillContent[$Skill] | Should -Match '(?i)before export'
+        $skillContent[$Skill] | Should -Match '(?i)never auto-approve'
+    }
+
+    It '<Skill> preserves explicit FAST-008A read-only evidence and trust' -ForEach @(
+        @{ Skill = 'Copilot' }
+        @{ Skill = 'Claude' }
+    ) {
+        $skillContent[$Skill] | Should -Match 'EnableAuthenticatedVerification'
+        $skillContent[$Skill] | Should -Match 'ConfirmReadOnlyScope'
+        $skillContent[$Skill] | Should -Match 'TrustedCertificatePath'
+        $skillContent[$Skill] | Should -Match 'verifiedForHumanReview'
+        $skillContent[$Skill] | Should -Match '(?i)GET-only'
+    }
+
     It '<Skill> preserves FAST-007 nonexecuting readiness' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }

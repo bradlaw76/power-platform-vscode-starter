@@ -465,3 +465,27 @@ behavior only, not live readiness or authorization.
 Stop after FAST-007 review. FAST-008 trusted evidence collection, independent
 approver/signature verification, authorization consumption/revalidation, and a
 separately approved executor are proposed only.
+
+## Milestone supersession: FAST-008A (2026-10-19)
+
+The historical FAST-007 stop and proposed-only trusted-collection wording above
+is superseded only by the separately scoped
+[FAST-008A specification](../fast-008a-trusted-environment-verification/spec.md)
+and [ADR 0011](adrs/0011-trusted-environment-verification.md).
+FAST-008A adds authenticated GET-only observations and RS256-signed envelopes
+with independently provisioned X509 trust. Actual EnvironmentId/TenantId come
+from RetrieveCurrentOrganization; WhoAmI OrganizationId/UserId are distinct.
+Legacy FAST-003 identity semantics remain legacy-only. Concrete table/column,
+package/dependency, managed-property, publisher/membership and effective
+privilege-name checks do not make unsupported descriptive identities verified.
+Future CREATE ownership is inferred, not observed metadata.
+
+Default Authenticated readiness requires complete matching signed Live evidence.
+Explicit RecordedTest permits signed Mock diagnostics and LocalPlanning raw
+FAST-007 diagnostics; both always set `verifiedForHumanReview: false`.
+All policies preserve `executionAuthorized: false`; FAST-dependent Apply stays
+disabled globally and ordinary Fully Custom builds remain unchanged.
+Implementation/validation is mock-only; no live GCC access, test pass or live
+readiness is claimed by this supersession. Future controlled execution,
+deployment approvals/signatures, scoped authorization/revalidation and a
+separately approved executor remain proposed and unauthorized.

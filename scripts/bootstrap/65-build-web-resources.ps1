@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Build Web Resources
 FILE:         scripts/bootstrap/65-build-web-resources.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-10-23
 ENVIRONMENT:  PowerShell 7 | Dataverse Web Resources | HTML Report Generation
 
 -----------------------------------------------------------------------------
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.0  2026-10-23  Require approved, documented scenario report definitions.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
 -----------------------------------------------------------------------------
@@ -628,6 +629,9 @@ function Get-RelevantEntities {
     param([pscustomobject]$Scenario)
 
     $set = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+    if ($Scenario.PSObject.Properties['ReportDefinitions']) {
+        foreach ($report in $Scenario.ReportDefinitions) { [void]$set.Add($report.TableLogicalName) }
+    }
     foreach ($displayName in @($Scenario.RequiredEntityDisplayNames)) {
         $logical = ConvertToLogicalName ($Scenario.EntityMap[$displayName])
         if (-not [string]::IsNullOrWhiteSpace($logical)) {
@@ -711,10 +715,11 @@ function Get-LiveEntityMetadata {
     param([string]$LogicalName)
 
     $safeName = ConvertTo-ODataSafeString $LogicalName
-    $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$safeName')?`$select=LogicalName,PrimaryIdAttribute,PrimaryNameAttribute"
+    $entity = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$safeName')?`$select=LogicalName,EntitySetName,PrimaryIdAttribute,PrimaryNameAttribute"
     $attributeResponse = Invoke-Dv "Get" "EntityDefinitions(LogicalName='$safeName')/Attributes?`$select=LogicalName"
     $fields = @($attributeResponse.value | ForEach-Object { ConvertToLogicalName "$($_.LogicalName)" } | Where-Object { $_ })
-    $countResponse = Invoke-Dv "Get" "$LogicalName?`$top=1&`$select=$($entity.PrimaryIdAttribute)"
+    if ([string]::IsNullOrWhiteSpace($entity.EntitySetName)) { throw "Entity set name was not returned for '$LogicalName'." }
+    $countResponse = Invoke-Dv "Get" "$($entity.EntitySetName)?`$top=1&`$select=$($entity.PrimaryIdAttribute)"
     $rowCount = if (@($countResponse.value).Count -gt 0) { 1 } else { 0 }
 
     return [pscustomobject]@{
@@ -857,59 +862,21 @@ function Get-ScenarioReportDefinitions {
         [pscustomobject]$PrimaryEntity
     )
 
-    $roles = if (@($Scenario.Roles).Count -gt 0) { $Scenario.Roles } else { @('operators', 'supervisors', 'stakeholders') }
-    $primaryLabel = if (-not [string]::IsNullOrWhiteSpace($PrimaryEntity.DisplayName)) { $PrimaryEntity.DisplayName } else { $Scenario.ScenarioName }
-    $standalone = $Scenario.ApplicationProfile -eq 'standalone-model-driven'
-
-    $definitions = @(
+    return @($Scenario.ReportDefinitions | ForEach-Object {
         [pscustomobject]@{
-            Key      = 'agent'
-            Title    = if ($standalone) { "$($Scenario.ScenarioName) - Operational Workspace" } else { "$($Scenario.ScenarioName) - Agent Operations Report" }
-            Subtitle = "Live $primaryLabel workload and queue signals for $($roles[0])."
-            Audience = if ($roles.Count -gt 0) { $roles[0] } else { 'frontline users' }
-            Purpose  = "Tracks frontline activity for the scenario problem statement: $($Scenario.ProblemStatement)"
-            Focus    = @('counts', 'priority', 'recent-records')
-            IconKind = 'agent'
-        },
-        [pscustomobject]@{
-            Key      = 'supervisor'
-            Title    = if ($standalone) { "$($Scenario.ScenarioName) - Team Workload" } else { "$($Scenario.ScenarioName) - Supervisor Oversight Report" }
-            Subtitle = if ($standalone) { 'Live backlog, ownership, and work distribution for team leads.' } else { 'Live backlog, ownership, and escalation visibility for operational leads.' }
-            Audience = if ($roles.Count -gt 1) { $roles[1] } else { 'supervisors' }
-            Purpose  = "Monitors queue health, owner distribution, and work-in-flight for $primaryLabel records."
-            Focus    = @('counts', 'status', 'owner', 'age')
-            IconKind = 'supervisor'
-        },
-        [pscustomobject]@{
-            Key      = 'executive-kpi'
-            Title    = if ($standalone) { "$($Scenario.ScenarioName) - Management KPI" } else { "$($Scenario.ScenarioName) - Executive Scenario KPI Report" }
-            Subtitle = 'Scenario-specific KPI summary tied to actual Dataverse records and success criteria.'
-            Audience = if ($roles.Count -gt 2) { $roles[2] } else { 'decision makers' }
-            Purpose  = 'Summarizes operational progress against the scenario design and success signals.'
-            Focus    = @('counts', 'status', 'priority')
-            IconKind = 'executive'
+            Key = $_.Key
+            Title = $_.Title
+            Subtitle = $_.Purpose
+            Audience = $_.Audience
+            Purpose = $_.Purpose
+            Level = $_.Level
+            Placement = $_.Placement
+            TableLogicalName = $_.TableLogicalName
+            Requirements = $_.Requirements
+            Metrics = $_.Metrics
+            IconKind = switch ($_.Level) { 'frontline' { 'agent' } 'supervisor' { 'supervisor' } default { 'executive' } }
         }
-    )
-
-    $selected = @($Scenario.SelectedReports | ForEach-Object { $_.Trim().ToLowerInvariant() } | Where-Object { $_ })
-    if ($selected.Count -eq 0 -or $selected -contains 'all') {
-        return $definitions
-    }
-
-    $filtered = @($definitions | Where-Object {
-        $selected -contains $_.Key -or
-        $selected -contains $_.Title.ToLowerInvariant() -or
-        $selected -contains ($_.Key -replace '-', ' ') -or
-        ($_.Key -eq 'agent' -and $selected -contains 'operational workspace') -or
-        ($_.Key -eq 'supervisor' -and $selected -contains 'team workload') -or
-        ($_.Key -eq 'executive-kpi' -and $selected -contains 'management kpi')
     })
-
-    if ($filtered.Count -eq 0) {
-        return $definitions
-    }
-
-    return $filtered
 }
 
 function Get-MetricCandidates {
@@ -919,82 +886,17 @@ function Get-MetricCandidates {
         [pscustomobject]$PrimaryEntity
     )
 
-    $entityLogicalName = $PrimaryEntity.LogicalName
-    $entityDisplayName = $PrimaryEntity.DisplayName
-    $scenarioProfile = $Scenario.ReportProfile
-    $candidates = New-Object System.Collections.Generic.List[object]
-
-    $candidates.Add([pscustomobject]@{
-        Key               = 'total-records'
-        Title             = "Total $entityDisplayName Records"
-        Kind              = 'aggregate-count'
-        EntityLogicalName = $entityLogicalName
-        RequiredFields    = @('__primaryid__')
-        Optional          = $false
-        Reason            = 'Core operational record count is always relevant when a primary scenario entity exists.'
+    return @($Report.Metrics | ForEach-Object {
+        [pscustomobject]@{
+            Key = $_.Key
+            Title = $_.Title
+            Kind = $_.Kind
+            EntityLogicalName = $Report.TableLogicalName
+            RequiredFields = @($_.RequiredFields)
+            Optional = $false
+            Reason = $Report.Purpose
+        }
     })
-
-    if ($Report.Focus -contains 'status' -or $scenarioProfile -in @('intake-case', 'workflow-review', 'evidence-review')) {
-        $candidates.Add([pscustomobject]@{
-            Key               = 'status-breakdown'
-            Title             = "$entityDisplayName by Status"
-            Kind              = 'aggregate-group'
-            EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryid__', 'statuscode|statecode')
-            Optional          = $false
-            Reason            = 'Status is part of the scenario success and queue visibility requirements.'
-        })
-    }
-
-    if ($Report.Focus -contains 'priority' -or $scenarioProfile -eq 'intake-case') {
-        $candidates.Add([pscustomobject]@{
-            Key               = 'priority-breakdown'
-            Title             = "$entityDisplayName by Priority"
-            Kind              = 'aggregate-group'
-            EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryid__', 'prioritycode|cct_priority|priorityid|*_priority')
-            Optional          = $false
-            Reason            = 'Priority visibility is explicitly referenced in case-style scenario artifacts.'
-        })
-    }
-
-    if ($Report.Focus -contains 'owner') {
-        $candidates.Add([pscustomobject]@{
-            Key               = 'owner-breakdown'
-            Title             = "$entityDisplayName by Owner"
-            Kind              = 'aggregate-group'
-            EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryid__', 'ownerid|*_agent|assignedto|owner')
-            Optional          = $false
-            Reason            = 'Operational ownership is needed for supervisor oversight.'
-        })
-    }
-
-    if ($Report.Focus -contains 'recent-records') {
-        $candidates.Add([pscustomobject]@{
-            Key               = 'recent-records'
-            Title             = "Recent $entityDisplayName Records"
-            Kind              = 'list'
-            EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryname__', 'createdon|modifiedon')
-            Optional          = $false
-            Reason            = 'Recent record flow gives operators a grounded live activity view.'
-        })
-    }
-
-    if ($Report.Focus -contains 'age' -or $scenarioProfile -in @('intake-case', 'workflow-review')) {
-        $candidates.Add([pscustomobject]@{
-            Key               = 'queue-age'
-            Title             = "Aged $entityDisplayName Queue"
-            Kind              = 'list'
-            EntityLogicalName = $entityLogicalName
-            RequiredFields    = @('__primaryname__', 'createdon', 'statuscode|statecode')
-            Optional          = $true
-            Reason            = 'Queue age is relevant when the scenario mentions backlog, review, or intake flow.'
-        })
-    }
-
-    return $candidates.ToArray()
 }
 
 function Resolve-MetricCandidate {
@@ -1576,6 +1478,9 @@ $specContent = Get-Content -Path $specPath -Raw -Encoding UTF8
 $planContent = if (Test-Path $planPath) { Get-Content -Path $planPath -Raw -Encoding UTF8 } else { '' }
 
 $scenario = Get-ScenarioDefinition -ScenarioSlugValue $ScenarioSlug -AnswersContent $answersContent -SpecContent $specContent -PlanContent $planContent
+. (Join-Path $PSScriptRoot 'helpers\reporting-plan.ps1')
+$reportingSelection = Get-WizardReportingSelection -ScenarioFolder $scenarioFolder
+$scenario.IncludeReports = $reportingSelection.HtmlEnabled
 if (-not $scenario.IncludeReports) {
     Write-Host ''
     Write-Host '=== Build Report Web Resources ===' -ForegroundColor Cyan
@@ -1596,6 +1501,8 @@ if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
     $PublisherPrefix = 'wiz'
 }
 
+$htmlPlan = Read-WizardHtmlReportPlan -RepoRoot $repoRoot -ScenarioFolder $scenarioFolder -AllowedTables @($scenario.EntityMap.Values)
+$scenario | Add-Member -NotePropertyName ReportDefinitions -NotePropertyValue @($htmlPlan.Reports)
 $relevantEntities = Get-RelevantEntities -Scenario $scenario
 $payloadMetadata = Get-PayloadMetadata -RepoRoot $repoRoot -RelevantEntities $relevantEntities -PublisherPrefixValue $PublisherPrefix
 $snapshot = Get-MetadataSnapshot -Path $MetadataSnapshotPath
@@ -1675,7 +1582,7 @@ foreach ($report in $reportDefinitions) {
     }
 
     $reportEntities = New-Object System.Collections.Generic.List[object]
-    foreach ($displayName in @($scenario.RequiredEntityDisplayNames)) {
+    foreach ($displayName in @($scenario.EntityMap.Keys | Where-Object { $scenario.EntityMap[$_] -eq $report.TableLogicalName })) {
         $logicalName = ConvertToLogicalName ($scenario.EntityMap[$displayName])
         if ([string]::IsNullOrWhiteSpace($logicalName)) {
             continue
@@ -1694,7 +1601,8 @@ foreach ($report in $reportDefinitions) {
         }
     }
 
-    $seedDataDetected = ($null -ne $primaryMetadata -and $primaryMetadata.RowCount -gt 0)
+    $reportMetadata = $entityMetadataMap[$report.TableLogicalName]
+    $seedDataDetected = ($null -ne $reportMetadata -and $reportMetadata.RowCount -gt 0)
     $seedDataStatus = if ($seedDataDetected) {
         'detected'
     }
@@ -1725,6 +1633,10 @@ foreach ($report in $reportDefinitions) {
             subtitle                   = $report.Subtitle
             purpose                    = $report.Purpose
             audience                   = $report.Audience
+            level                      = $report.Level
+            placement                  = $report.Placement
+            requirements               = @($report.Requirements)
+            tableLogicalName           = $report.TableLogicalName
             mode                       = $ReportMode
             enableLiveDataverseReports = [bool]$EnableLiveDataverseReports
             previewOnly                = [bool]$PreviewReportQueriesOnly

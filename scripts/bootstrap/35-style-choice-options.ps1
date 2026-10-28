@@ -64,27 +64,7 @@ foreach ($helper in @($hardeningHelper, $runtimeHelper, $telemetryHelper)) {
     if (Test-Path -LiteralPath $helper -PathType Leaf) { . $helper }
 }
 
-$script:ChoicePalette = [ordered]@{
-    'pastel-apricot'  = '#FFD1A3'
-    'pastel-blue'     = '#B9DDF5'
-    'pastel-gray'     = '#D9E1E8'
-    'pastel-lavender' = '#D8C4F1'
-    'pastel-mint'     = '#C8E6C9'
-    'pastel-peach'    = '#FAD7A0'
-    'pastel-rose'     = '#F5BEC8'
-    'pastel-yellow'   = '#F7E7A9'
-}
-$script:ChoiceIcons = [ordered]@{
-    'none'             = ''
-    'circle-filled'    = '●'
-    'diamond-filled'   = '◆'
-    'diamond-outline'  = '◇'
-    'info'             = 'ℹ'
-    'square-filled'    = '■'
-    'triangle-filled'  = '▲'
-    'triangle-outline' = '△'
-    'warning'          = '⚠'
-}
+. (Join-Path $PSScriptRoot 'helpers\choice-presentation-tokens.ps1')
 
 function Get-ChoicePresentationProperty {
     param($Object, [string]$Name, $Default = $null)

@@ -168,6 +168,35 @@ try {
     Assert-Step60ConsumesViewsContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -ExpectedDisposition 'adopt-generated-active'
     Assert-True -Condition (Test-Path -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/grid-controls.json")) -Message 'Demo Builder did not infer a grid contract for the high-frequency operational view.'
 
+    . (Join-Path $repoRoot 'scripts\bootstrap\helpers\reporting-plan.ps1')
+    foreach ($choice in @('none', 'native', 'html', 'both')) {
+        $reportWorkspace = New-WizardTestWorkspace -Name "reporting-$choice"
+        $reportOutput = Invoke-WizardFixture -Workspace $reportWorkspace -Mode '' -Answers @(
+            'Reporting Selection Fixture', 'Coordinator | track requests', 'Request',
+            'Review and update requests', 'Records are visible; no sample data',
+            'Development; unmanaged solution', $choice
+        )
+        Assert-True -Condition ($reportOutput -match 'Reporting choices: native') -Message 'Reporting benefits and alternatives must be explained before confirmation.'
+        $reportScenario = Join-Path $reportWorkspace 'specs\reporting-selection-fixture'
+        $selection = Get-WizardReportingSelection -ScenarioFolder $reportScenario
+        Assert-True -Condition $selection.Explicit -Message 'New intake must record explicit reporting decisions.'
+        Assert-True -Condition ($selection.NativeEnabled -eq ($choice -in @('native', 'both'))) -Message "Wrong native selection for '$choice'."
+        Assert-True -Condition ($selection.HtmlEnabled -eq ($choice -in @('html', 'both'))) -Message "Wrong HTML selection for '$choice'."
+        foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md')) {
+            $reportContent = Get-Content -LiteralPath (Join-Path $reportScenario $artifact) -Raw
+            Assert-True -Condition ($reportContent -match '## Reporting Selection') -Message "$artifact must preserve independent reporting choices."
+        }
+        if ($choice -ne 'none') {
+            Assert-True -Condition ((Get-Content -LiteralPath (Join-Path $reportScenario 'report-mappings.md') -Raw) -match 'pending-review') -Message 'Demo reporting scope must not be auto-approved.'
+        }
+        if (-not $selection.NativeEnabled) {
+            $rejected = $false
+            try { Assert-WizardNativeReportingChoice -ScenarioFolder $reportScenario -HasPayload $true | Out-Null }
+            catch { if ($_.Exception.Message -notmatch 'Native dashboards were declined') { throw }; $rejected = $true }
+            Assert-True -Condition $rejected -Message 'Native opt-out must block conflicting payloads.'
+        }
+    }
+
     $acceptanceWorkspace = New-WizardTestWorkspace -Name 'acceptance'
     $acceptanceOutput = Invoke-WizardFixture -Workspace $acceptanceWorkspace -Mode 'framework-acceptance' -Answers @(
         'Framework Mode Acceptance',
@@ -239,6 +268,20 @@ try {
     $distinctOutput = Invoke-WizardFixture -Workspace $distinctWorkspace -Mode 'advanced-builder' -Answers $distinctAnswers
     Assert-True -Condition ($distinctOutput -match 'Mode: advanced-builder') -Message 'Distinct-view fixture did not run Advanced Builder.'
     Assert-ArtifactContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -Mode 'advanced-builder'
+    $nativeWorkspace = New-WizardTestWorkspace -Name 'native-reporting-advanced'
+    $nativeAnswers = @($distinctAnswers)
+    $tasksIndex = [array]::IndexOf($nativeAnswers, 'Coordinator | find asset | daily | dbv_labasset/Available Lab Assets | available assets are visible')
+    if ($tasksIndex -lt 2) { throw 'Advanced reporting fixture is missing its task anchor.' }
+    $nativeAnswers[$tasksIndex - 2] = 'native'
+    $nativeAnswers = @($nativeAnswers[0..($tasksIndex + 1)]) + @(
+        'dbv_labasset',
+        'dbv_labasset | Asset Availability | dashboard | Review app | dbv_name | Find available assets | Lab supervisors | Counts reconcile'
+    ) + @($nativeAnswers[($tasksIndex + 2)..($nativeAnswers.Count - 1)])
+    Invoke-WizardFixture -Workspace $nativeWorkspace -Mode 'advanced-builder' -Answers $nativeAnswers | Out-Null
+    $nativeSelection = Get-WizardReportingSelection -ScenarioFolder (Join-Path $nativeWorkspace 'specs\distinct-business-view')
+    Assert-True -Condition ($nativeSelection.NativeEnabled -and -not $nativeSelection.HtmlEnabled) -Message 'Detailed intake must support native reporting independently of HTML.'
+    $nativeMappings = Get-Content -LiteralPath (Join-Path $nativeWorkspace 'specs\distinct-business-view\report-mappings.md') -Raw
+    Assert-True -Condition ($nativeMappings -match 'Asset Availability' -and $nativeMappings -match '- Reports enabled: yes') -Message 'Native-only reporting must collect report mappings.'
     $distinctViews = Get-Content -LiteralPath (Join-Path $distinctWorkspace 'specs/distinct-business-view/views.json') -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'

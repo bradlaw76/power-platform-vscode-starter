@@ -20,6 +20,29 @@ Never run Dataverse integration tests against production. Use only an authorized
 
 ## Pull requests
 
+### Maintain update advice and source traceability
+
+When adding or changing a wizard capability, update
+[`repository-updates.json`](repository-updates.json) with matching path rules
+and review guidance. Use the existing categories; do not label path changes as
+verified fixes or guaranteed breaking changes. Keep unknown relevance visible
+and preserve explicit scenario opt-outs.
+
+Follow the [enhancement maintenance checklist](README.md#required-checklist-for-future-enhancements)
+and [update advisor guide](docs/repository-updates.md). Keep startup local-only,
+require explicit fetch, and never automatically pull or enable a capability.
+Apply run source records are immutable and scenario/solution/publisher/run-bound;
+Preview must not write manifest provenance. Preserve these boundaries when
+changing orchestration or resume.
+
+Run `pwsh .\scripts\ci\test-repository-updates.ps1` for advisor changes and the
+existing related contract/parity/Preview tests. Use the complete
+`pwsh .\run-quality.ps1` before publishing a combined integration bundle.
+Keep local update reports, baseline archives, credentials and generated build
+outputs out of commits unless sanitized fixtures are intentionally approved.
+
+### Describe the change
+
 Describe the requirement, implementation, tests, Dataverse behavior that remains unverified, security impact, and documentation changes. Keep generated reports and raw solution exports out of the pull request unless they are sanitized, stable fixtures intentionally required by a test.
 
 ## Licensing

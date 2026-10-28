@@ -19,7 +19,7 @@ if ($gridControl -match '(?i)(PATCH|POST|DELETE).+customcontroldefaultconfigs') 
   throw 'Power Apps grid stage contains unsupported internal metadata mutation.'
 }
 
-foreach ($required in @('How long should the demo be, in minutes?', '$durationMinutes -lt 1', 'Duration minutes: $durationMinutes', 'Duration: $durationMinutes minutes')) {
+foreach ($required in @('How long should the demo timer run, in minutes?', '$durationMinutes -lt 1', 'Duration minutes: $durationMinutes', 'Duration: $durationMinutes minutes')) {
   if ($demoScriptWizard -notmatch [regex]::Escape($required)) {
     throw "Demo script wizard duration intake appears incomplete: missing $required."
   }

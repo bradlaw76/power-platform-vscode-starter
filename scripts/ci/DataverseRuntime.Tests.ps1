@@ -30,6 +30,18 @@ Describe 'Invoke-WizardDataverseRequest' {
         $result.UserId | Should -Be '00000000-0000-0000-0000-000000000001'
     }
 
+    It 'does not classify status-looking identifiers as HTTP responses' {
+        { Invoke-WizardDataverseRequest -Method Get -Path "EntityDefinitions(LogicalName='sample_404')" -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -RequestInvoker {
+                throw 'Connection reset reading sample_404'
+            } } | Should -Throw '*HTTP 0*'
+        try { throw "Dataverse request failed (Get sample_404, HTTP 403): forbidden" } catch {
+            Get-WizardHttpStatusCode $_ | Should -Be 403
+        }
+        try { throw 'Dataverse request failed (Get sample_404, HTTP 0): connection failure, HTTP 404): diagnostic text' } catch {
+            Get-WizardHttpStatusCode $_ | Should -Be 0
+        }
+    }
+
     It 'does not call transport for a preview mutation' {
         $global:wizardTestTransportCalls = 0
         $result = Invoke-WizardDataverseRequest -Method Post -Path 'accounts' -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -Body @{} -PreviewOnly -RequestInvoker {
@@ -38,6 +50,13 @@ Describe 'Invoke-WizardDataverseRequest' {
         }
         $result.Mutated | Should -BeFalse
         $global:wizardTestTransportCalls | Should -Be 0
+    }
+
+    It 'rejects native HTTP redirects when explicitly requested by metadata verification' {
+        Mock Invoke-RestMethod { [pscustomobject]@{ ok = $true } }
+        $result = Invoke-WizardDataverseRequest -Method Get -Path WhoAmI -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'synthetic-token' -RejectRedirects
+        $result.ok | Should -BeTrue
+        Should -Invoke Invoke-RestMethod -Times 1 -Exactly -ParameterFilter { $MaximumRedirection -eq 0 }
     }
 
     It 'refreshes once after 401 and retries with the new token' {

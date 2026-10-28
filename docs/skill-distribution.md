@@ -11,7 +11,29 @@ The repository ships three aligned skill families:
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 
+Contract 2.1.0 reporting additionally requires
+`scripts/bootstrap/helpers/reporting-plan.ps1`,
+`schemas/payloads/html-reports.schema.json`, its unapproved example, and matching
+intake, orchestration, stage-64/65, and app-assembly gates. Distribute aligned
+Copilot/Claude instructions explaining native/HTML/both/neither selection and
+requirement-backed `html-reports.json`. Never copy report approvals or silently
+upgrade legacy HTML scenarios. Follow
+[the reporting runbook](live-report-web-resources-runbook.md).
+
 ## Install options
+
+Contract 2.2.0 adds the local-first repository update advisor. Distribute
+`repository-updates.json`, `schemas/repository-updates/`,
+`schemas/examples/repo-update-context.example.json`,
+`scripts/bootstrap/check-repository-updates.ps1`,
+`scripts/bootstrap/helpers/repository-updates.ps1`, the updated intake/
+orchestrator and [repository update guide](repository-updates.md) together.
+Preserve the stable repository identity and explicit remote/branch configuration;
+a copied skill is not an installed update service. Chat runs the standalone
+local check after repository confirmation; terminal does it automatically.
+Network fetch needs explicit opt-in, recommendations never enable capabilities,
+and only Apply writes immutable run provenance. Never copy another scenario's
+selections or historical baseline as approval for new work.
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:
 
@@ -27,6 +49,24 @@ For another compatible repository, copy the complete Copilot skill folder only a
 - every stage and helper named by the profile
 - `schemas/payloads/`
 - scenario-scoped `specs/` and `payloads/scenarios/` conventions
+
+Contract 2.0.0 additionally requires the universal semantic gate for every
+Dataverse use case (not an optional FAST capability):
+
+- `docs/semantic-field-type-standard.md`
+- `scripts/bootstrap/14-validate-semantic-fields.ps1`
+- `scripts/bootstrap/helpers/semantic-fields.ps1`
+- `scripts/bootstrap/helpers/choice-presentation-tokens.ps1`
+- `schemas/payloads/field-type-decisions.schema.json`
+- `schemas/examples/field-type-decisions.example.json`
+- `scripts/ci/test-semantic-fields.ps1`
+- matching stage-30, direct stage-95, orchestrator and terminal planning hooks
+
+Existing scenarios need explicitly approved `field-type-decisions.json` and
+aligned spec/plan/tasks before column generation or execution. Do not infer or
+copy example approvals. Planning/Payload are credential-free; live Metadata
+checks follow relationships and precede export. No legacy bypass or implicit
+destructive retrofit is available. Distribute both skills with this requirement.
 
 The optional accelerator recommendation integration additionally requires
 compatible versions of:
@@ -53,10 +93,36 @@ The optional FAST-007 local execution-readiness route also requires:
 - `scripts/ci/test-execution-readiness.ps1`
 - the compatible `90-run-build.ps1 -ExecutionReadinessOnly` early-return hook
 
+FAST-008A additionally requires compatible contract v1.16.0 artifacts:
+
+- `scripts/accelerators/verification-provenance.ps1`
+- `scripts/accelerators/trusted-environment-verification.ps1`
+- `scripts/accelerators/invoke-trusted-environment-verification.ps1`
+- the reused `dataverse-environment-inspector.ps1` and shared `dataverse-runtime`
+- `schemas/accelerators/trusted-environment-verification.schema.json`
+- `docs/fast-integration/trusted-environment-verification.md`
+- readiness CLI `-EvidenceTrustPolicy` / `-TrustedCertificatePath` and engine
+  `TrustedCertificate`, plus orchestrator `-ReadinessEvidenceTrustPolicy` /
+  `-ReadinessTrustedCertificatePath` forwarding
+
 This route remains default-off and requires independent environment and tenant
 identifiers plus local prerequisite evidence. It emits human-review readiness,
 not approval or authorization. The authorization schema has no issuer or
 consumer. FAST-dependent Apply remains disabled, including after a ready result.
+
+`trustedEnvironmentVerification` defaults false. Authenticated readiness now
+requires complete matching signed Live evidence and an independently
+provisioned public X509 certificate valid at collection/evaluation. Never
+package private keys/credentials or trust evidence-embedded keys.
+Explicit RecordedTest (signed Mock) and LocalPlanning (raw FAST-007 diagnostics)
+always report `verifiedForHumanReview: false`, even if READY_FOR_APPROVAL.
+All policies retain `executionAuthorized: false`. Collection defaults Mock;
+Live rejects injected transport, requires explicit target/read-only scope,
+existing authentication and an external signing certificate. No `.env`
+fallback or live GCC access is part of this mock-only milestone.
+Distribute the paired Copilot/Claude safety guidance together; signatures prove
+collector authority, not deployment approval or truth against a compromised
+signer. Future controlled execution requires separate authorization.
 
 The reporting skill additionally requires compatible versions of:
 

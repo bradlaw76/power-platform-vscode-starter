@@ -15,6 +15,25 @@ No network, build stages, authorization issuance, or platform mutations.
 #>
 
 . (Join-Path $PSScriptRoot 'build-planning-adapter.ps1')
+. (Join-Path $PSScriptRoot 'verification-provenance.ps1')
+. (Join-Path $PSScriptRoot 'environment-compatibility.ps1')
+
+function Get-ExecutionPlanningPaths {
+    param([string]$WorkspaceRoot, [string]$ScenarioSlug)
+    $scenario = Join-Path $WorkspaceRoot "specs\$ScenarioSlug"
+    $accelerator = Join-Path $scenario 'accelerator'
+    return [ordered]@{
+        decision = Join-Path $accelerator 'accelerator-decision.json'
+        analysisManifest = Join-Path $accelerator 'accelerator-analysis-manifest.json'
+        coverage = Join-Path $accelerator 'requirements-coverage-matrix.json'
+        componentDelta = Join-Path $accelerator 'component-delta-analysis.json'
+        schemaPlan = Join-Path $accelerator 'schema-reuse-extension-plan.json'
+        dependencies = Join-Path $accelerator 'dependency-manifest.json'
+        environment = Join-Path $accelerator 'environment-readiness-reference.json'
+        traceability = Join-Path $accelerator 'acceptance-traceability.json'
+        spec = Join-Path $scenario 'spec.md'
+    }
+}
 
 function Get-ExecutionPlanIdentity {
     param([Parameter(Mandatory)] [object]$Plan)
@@ -70,6 +89,8 @@ function Get-ExecutionReadiness {
         [Parameter(Mandatory)] [ValidatePattern('^https://[A-Za-z0-9.-]+(?::443)?/?$')] [string]$EnvironmentUrl,
         [Parameter(Mandatory)] [guid]$EnvironmentId,
         [Parameter(Mandatory)] [guid]$TenantId,
+        [ValidateSet('Authenticated', 'RecordedTest', 'LocalPlanning')] [string]$EvidenceTrustPolicy = 'Authenticated',
+        [Security.Cryptography.X509Certificates.X509Certificate2]$TrustedCertificate,
         [DateTimeOffset]$EvaluationTimeUtc = [DateTimeOffset]::UtcNow
     )
 
@@ -82,9 +103,21 @@ function Get-ExecutionReadiness {
     $planArtifact = Read-ExecutionArtifact -Path $planPath
     $evidenceArtifact = Read-ExecutionArtifact -Path $evidenceFile
     $decision = $decisionArtifact.value; $plan = $planArtifact.value; $evidence = $evidenceArtifact.value
+    $envelope = $null
+    $evidenceTrust = 'unverified'
+    $provenance = $null
+    if ($evidenceArtifact.valid -and
+        (Get-BuildPlanningValue -InputObject $evidence -Name 'artifactType' -DefaultValue '') -ceq 'trusted-environment-verification') {
+        $envelope = $evidence
+        $provenance = Test-EnvironmentVerificationProvenance -Envelope $envelope -TrustedCertificate $TrustedCertificate `
+            -EvidenceTrustPolicy $EvidenceTrustPolicy -EvaluationTimeUtc $EvaluationTimeUtc
+        if (Test-ExecutionSchema -Value $envelope -SchemaName 'trusted-environment-verification') { $evidence = $envelope.payload.evidence }
+        $evidenceTrust = $provenance.classification
+    } elseif ($EvidenceTrustPolicy -eq 'LocalPlanning') { $evidenceTrust = 'local-planning' }
     $planHash = $planArtifact.sha256; $decisionHash = $decisionArtifact.sha256; $evidenceHash = $evidenceArtifact.sha256
     $findings = [Collections.Generic.List[object]]::new()
     $securityRequirements = [Collections.Generic.List[object]]::new()
+    $verificationPackages = [Collections.Generic.List[object]]::new()
     $actualFingerprints = [ordered]@{}
     $dependencyOrder = @()
     $packageDependencyOrder = @()
@@ -100,6 +133,16 @@ function Get-ExecutionReadiness {
     foreach ($artifact in @($decisionArtifact, $planArtifact, $evidenceArtifact)) {
         if (-not $artifact.valid) {
             Add-ReadinessFinding BLOCKED_EVIDENCE ARTIFACT_UNAVAILABLE $artifact.error 'Restore the exact approved local input and rerun preflight.'
+        }
+        if ($null -ne $provenance -and -not $provenance.valid) {
+            Add-ReadinessFinding BLOCKED_EVIDENCE VERIFICATION_PROVENANCE $provenance.message 'Collect complete signed evidence and configure an independently trusted certificate.'
+        } elseif ($null -eq $envelope -and $EvidenceTrustPolicy -ne 'LocalPlanning') {
+            Add-ReadinessFinding BLOCKED_EVIDENCE SIGNED_EVIDENCE_REQUIRED 'Unsigned local assertions are not authenticated environment verification.' 'Run the explicitly enabled GET-only verifier; use LocalPlanning only for unverified diagnostics.'
+        }
+        if ($null -ne $provenance -and $provenance.valid) {
+            foreach ($check in @($envelope.payload.checks | Where-Object { $_.requiredForReadiness -and -not $_.satisfied })) {
+                Add-ReadinessFinding $check.blockingStatus "VERIFICATION_$($check.id)" $check.message 'Resolve the verified prerequisite or restriction and collect fresh evidence.'
+            }
         }
     }
     $decisionValid = Test-ExecutionSchema -Value $decision -SchemaName 'architecture-decision'
@@ -158,17 +201,7 @@ function Get-ExecutionReadiness {
             Add-ReadinessFinding BLOCKED_EVIDENCE EVIDENCE_FRESHNESS 'Evidence is future-dated, expired, or exceeds the 24-hour maximum lifetime.' 'Collect fresh target-specific evidence with an expiry no more than 24 hours after observation.'
         }
 
-        $knownPaths = [ordered]@{
-            decision = $decisionPath
-            analysisManifest = Join-Path $accelerator 'accelerator-analysis-manifest.json'
-            coverage = Join-Path $accelerator 'requirements-coverage-matrix.json'
-            componentDelta = Join-Path $accelerator 'component-delta-analysis.json'
-            schemaPlan = Join-Path $accelerator 'schema-reuse-extension-plan.json'
-            dependencies = Join-Path $accelerator 'dependency-manifest.json'
-            environment = Join-Path $accelerator 'environment-readiness-reference.json'
-            traceability = Join-Path $accelerator 'acceptance-traceability.json'
-            spec = Join-Path $scenario 'spec.md'
-        }
+        $knownPaths = Get-ExecutionPlanningPaths -WorkspaceRoot $WorkspaceRoot -ScenarioSlug $ScenarioSlug
         $inputPaths = @{}
         foreach ($key in @($knownPaths.Keys) + @($plan.inputFingerprints.PSObject.Properties.Name) | Sort-Object -Unique) {
             $entries = @($evidence.inputArtifacts | Where-Object key -CEQ $key)
@@ -361,6 +394,7 @@ function Get-ExecutionReadiness {
                             Add-ReadinessFinding BLOCKED_EVIDENCE PACKAGE_METADATA 'Package metadata is malformed.' 'Restore package-verified metadata.'
                             continue
                         }
+                        $verificationPackages.Add($metadata) | Out-Null
                         if ($metadata.moduleId -cne $selected.moduleId -or $metadata.packageId -cne $selected.packageId -or
                             $metadata.sha256 -cne $selected.sha256 -or $entry.sha256 -cne $selected.sha256 -or
                             $metadata.solution.version -cne $selected.version -or $entry.version -cne $selected.version -or
@@ -411,6 +445,23 @@ function Get-ExecutionReadiness {
         }
     }
 
+    if ($null -ne $envelope -and $null -ne $provenance -and $provenance.valid -and $decisionValid -and $planValid) {
+        if ($envelope.payload.decisionSha256 -cne $decisionHash -or
+            $envelope.payload.catalogSnapshotId -cne $decision.catalogSnapshotId -or
+            $envelope.payload.dependencyManifestSha256 -cne (Get-BuildPlanningValue -InputObject $plan.inputFingerprints -Name 'dependencies') -or
+            (ConvertTo-AcceleratorCanonicalJson -InputObject $envelope.payload.selectedPackages) -cne
+                (ConvertTo-AcceleratorCanonicalJson -InputObject $decision.selectedPackages) -or
+            (ConvertTo-AcceleratorCanonicalJson -InputObject $envelope.payload.inputFingerprints) -cne
+                (ConvertTo-AcceleratorCanonicalJson -InputObject $actualFingerprints) -or
+            $envelope.payload.authenticatedIdentity.principalId -cne $evidence.security.principalId) {
+            Add-ReadinessFinding BLOCKED_DECISION_CHANGE VERIFICATION_BINDING 'Signed verification no longer matches the exact planning, packages, catalog, dependencies or authenticated principal.' 'Recollect evidence for the current approved artifacts and environment.'
+        }
+    }
+    if ($null -ne $envelope -and $planValid -and $evidenceValid -and
+        (Test-ExecutionSchema -Value $envelope -SchemaName 'trusted-environment-verification') -and
+        -not (Test-VerificationCheckScope -Envelope $envelope -Plan $plan -PackageMetadata $verificationPackages.ToArray())) {
+        Add-ReadinessFinding BLOCKED_EVIDENCE VERIFICATION_SCOPE 'Signed observations omit, duplicate or downgrade checks required by the exact operation scope.' 'Recollect every required identity, component, ownership and effective privilege observation.'
+    }
     $sortedFindings = @($findings | Sort-Object status, code, taskId, message -Unique)
     $status = 'READY_FOR_APPROVAL'
     foreach ($candidate in @('BLOCKED_DECISION_CHANGE', 'BLOCKED_EVIDENCE', 'BLOCKED_COMPATIBILITY', 'BLOCKED_SECURITY', 'BLOCKED_PREREQUISITES')) {
@@ -419,11 +470,13 @@ function Get-ExecutionReadiness {
     $target = [ordered]@{ environmentId = $EnvironmentId.ToString(); tenantId = $TenantId.ToString(); url = $EnvironmentUrl.TrimEnd('/').ToLowerInvariant() }
     $scope = [ordered]@{
         decisionSha256 = $decisionHash; planSha256 = $planHash; evidenceSha256 = $evidenceHash
-        environment = $target; inputFingerprints = $actualFingerprints
+        environment = $target; inputFingerprints = $actualFingerprints; evidenceTrustPolicy = $EvidenceTrustPolicy
     }
     $report = [pscustomobject][ordered]@{
-        schemaVersion = '1.0'; scenarioSlug = $ScenarioSlug; status = $status
+        schemaVersion = '1.1'; scenarioSlug = $ScenarioSlug; status = $status
         eligibleForHumanApproval = $status -eq 'READY_FOR_APPROVAL'; executionAuthorized = $false
+        evidenceTrust = $evidenceTrust
+        verifiedForHumanReview = $status -eq 'READY_FOR_APPROVAL' -and $evidenceTrust -eq 'authenticated'
         evaluatedAtUtc = $EvaluationTimeUtc.ToUniversalTime().ToString('o')
         decisionId = "$(Get-BuildPlanningValue -InputObject $decision -Name 'decisionId' -DefaultValue '')"
         planId = "$(Get-BuildPlanningValue -InputObject $plan -Name 'planId' -DefaultValue '')"

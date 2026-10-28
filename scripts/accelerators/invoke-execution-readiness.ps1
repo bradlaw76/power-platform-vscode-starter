@@ -23,6 +23,8 @@ param(
     [Parameter(Mandatory)] [guid]$TenantId,
     [string]$WorkspaceRoot = '',
     [string]$OutputFolder = '',
+    [ValidateSet('Authenticated', 'RecordedTest', 'LocalPlanning')] [string]$EvidenceTrustPolicy = 'Authenticated',
+    [string]$TrustedCertificatePath = '',
     [DateTimeOffset]$EvaluationTimeUtc = [DateTimeOffset]::UtcNow
 )
 
@@ -34,8 +36,14 @@ if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) { $WorkspaceRoot = $adapterRoo
 $WorkspaceRoot = [IO.Path]::GetFullPath($WorkspaceRoot)
 if ([string]::IsNullOrWhiteSpace($OutputFolder)) { $OutputFolder = "specs\$ScenarioSlug\accelerator\readiness" }
 $reportPath = Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path (Join-Path $OutputFolder 'execution-readiness.json')
-$report = Get-ExecutionReadiness -WorkspaceRoot $WorkspaceRoot -ScenarioSlug $ScenarioSlug -EvidencePath $EvidencePath `
-    -EnvironmentUrl $EnvironmentUrl -EnvironmentId $EnvironmentId -TenantId $TenantId -EvaluationTimeUtc $EvaluationTimeUtc
+$trustedCertificate = if (-not [string]::IsNullOrWhiteSpace($TrustedCertificatePath)) {
+    [Security.Cryptography.X509Certificates.X509Certificate2]::new([IO.Path]::GetFullPath($TrustedCertificatePath))
+} else { $null }
+try {
+    $report = Get-ExecutionReadiness -WorkspaceRoot $WorkspaceRoot -ScenarioSlug $ScenarioSlug -EvidencePath $EvidencePath `
+        -EnvironmentUrl $EnvironmentUrl -EnvironmentId $EnvironmentId -TenantId $TenantId -EvaluationTimeUtc $EvaluationTimeUtc `
+        -EvidenceTrustPolicy $EvidenceTrustPolicy -TrustedCertificate $trustedCertificate
+} finally { if ($null -ne $trustedCertificate) { $trustedCertificate.Dispose() } }
 foreach ($inputPath in @($EvidencePath, "specs\$ScenarioSlug\accelerator\accelerator-decision.json",
     "specs\$ScenarioSlug\accelerator\build-plan\build-plan-manifest.json")) {
     if ($reportPath -ieq (Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path $inputPath)) {
@@ -43,10 +51,25 @@ foreach ($inputPath in @($EvidencePath, "specs\$ScenarioSlug\accelerator\acceler
     }
 }
 $evidenceArtifact = Read-ExecutionArtifact -Path (Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path $EvidencePath)
+if ($evidenceArtifact.valid -and (Test-ExecutionSchema -Value $evidenceArtifact.value -SchemaName 'trusted-environment-verification')) {
+    $evidenceArtifact.value = $evidenceArtifact.value.payload.evidence
+}
 if ($evidenceArtifact.valid -and (Test-ExecutionSchema -Value $evidenceArtifact.value -SchemaName 'execution-evidence')) {
     foreach ($input in $evidenceArtifact.value.inputArtifacts) {
         if ($reportPath -ieq (Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path $input.path)) {
             throw 'Readiness output cannot overwrite a pinned planning input.'
+        }
+        if ($input.key -ceq 'packageManifest') {
+            $manifestPath = Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path $input.path
+            $manifestArtifact = Read-ExecutionArtifact -Path $manifestPath
+            if ($manifestArtifact.valid -and (Test-ExecutionSchema $manifestArtifact.value 'package-input-manifest')) {
+                foreach ($entry in $manifestArtifact.value.packages) {
+                    $metadataPath = if ([IO.Path]::IsPathRooted($entry.path)) { $entry.path } else { Join-Path (Split-Path $manifestPath -Parent) $entry.path }
+                    if ($reportPath -ieq (Resolve-ExecutionInputPath -WorkspaceRoot $WorkspaceRoot -Path $metadataPath)) {
+                        throw 'Readiness output cannot overwrite pinned package metadata.'
+                    }
+                }
+            }
         }
     }
 }

@@ -9,6 +9,27 @@ Act as the guided wizard for this repository.
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- After repository confirmation, run
+  `pwsh .\scripts\bootstrap\check-repository-updates.ps1` for cached local advice
+  unless already checked in this startup. Terminal intake checks automatically.
+  Network requires explicit `-Fetch` (terminal `-FetchRepositoryUpdates`);
+  `-SkipRepositoryUpdateCheck` skips terminal checking. Unavailable checks warn;
+  cached up-to-date is not proof of freshness. Optional `repo-update-context.json`
+  selections filter advice, never enable modules; unknown relevance stays
+  review-needed. Stage 90 records `repositoryBaseline`; only Apply archives
+  immutable run provenance and resume preserves original identity. Never
+  auto-pull, merge, tag, push or adopt updates. See `docs/repository-updates.md`;
+  add no discovery question or build stage.
+- Apply `docs/semantic-field-type-standard.md` to every Dataverse use case,
+  industry, mode and table strategy, with or without FAST. Select types by
+  meaning, not sample strings. Complete/approve `field-type-decisions.json` and
+  matching spec/plan decision rows before generating columns. Run
+  `14-validate-semantic-fields.ps1` Planning before generation, Payload before
+  build, and Metadata after relationships and before export. Resolve categorical
+  Choice/Lookup decisions, stable values/mappings and separately approved text
+  exceptions. Stop on drift; never silently approve legacy scenarios or migrate
+  String to Choice. Verify all dependent surfaces functionally. Preserve Demo
+  Builder's existing six-question/consolidated-confirmation flow.
 - When setup has not already been completed, use the headings `Initial setup`, `Before discovery`, `What will change`, and `First decision` in the first response.
 - Under those headings, explain that after confirmation you will inspect the target repository without modifying tracked project files, run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`, explain any missing requirements, and only then begin discovery.
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
@@ -51,12 +72,38 @@ Use this behavior:
   requirements; never combine it with Apply. Normal Apply blocks approved
   `fast-based`/`hybrid` decisions regardless of readiness; legacy/Fully Custom
   builds and default-off behavior in all modes remain unchanged. No
-  Dataverse/PAC/network/authentication/install/import/build execution or live
-  platform-provenance check is permitted. Use
-  [the operational guide](../../docs/fast-integration/execution-readiness.md);
-  FAST-008 trusted collection, independent approver/signature verification,
-  authorization consumption/revalidation, and separately approved execution
-  remain proposed only.
+  Dataverse/PAC/network/authentication/install/import/build execution occurs
+  in readiness itself. Use
+  [the operational guide](../../docs/fast-integration/execution-readiness.md).
+- FAST-008A adds default-off `trustedEnvironmentVerification` and separate
+  GET-only `invoke-trusted-environment-verification.ps1` collection, reusing the
+  inspector/shared runtime. Mock is default and requires injected test
+  transport; Live rejects it and requires explicit target/solution, existing
+  authentication, external X509 `-SigningCertificate`,
+  `-EnableAuthenticatedVerification -ConfirmReadOnlyScope`. No `.env` fallback,
+  persisted credentials or live GCC access is authorized in this mock-only
+  milestone. RetrieveCurrentOrganization supplies actual EnvironmentId/TenantId;
+  WhoAmI OrganizationId/UserId are distinct, unlike legacy FAST-003 environmentId.
+  Inspect packages/dependencies, concrete tables/columns, managed properties,
+  publishers/membership and effective privileges by name. Unsupported
+  descriptive identities stay unverified/blocked; do not guess forms/apps/
+  integration IDs. Future CREATE ownership is inferred, not observed metadata.
+  RS256 binds exact decision bytes, normalized execution-evidence v1, plan/
+  catalog/dependency/input/package hashes, classifications, identity, mode/expiry.
+  `-EvidenceTrustPolicy Authenticated` is default and requires complete matching
+  signed Live evidence plus independent `-TrustedCertificatePath` (engine
+  `TrustedCertificate`), valid at collection and evaluation; no embedded trust.
+  Only this policy can set `verifiedForHumanReview: true`. Explicit
+  `RecordedTest` permits signed Mock READY_FOR_APPROVAL; explicit `LocalPlanning`
+  preserves raw FAST-007 diagnostics. Both always set
+  `verifiedForHumanReview: false`; all policies keep `executionAuthorized: false`.
+  Forward `-ReadinessEvidenceTrustPolicy` and `-ReadinessTrustedCertificatePath`
+  through the unchanged early-return branch. Signatures prove collector
+  authority, not truth against a compromised signer or deployment approval.
+  Follow [trusted verification](../../docs/fast-integration/trusted-environment-verification.md).
+  Future controlled execution, independent deployment approvals/signatures,
+  scoped authorization/revalidation and a separately approved executor remain
+  proposed and unauthorized; FAST-dependent Apply stays disabled globally.
 - Explain beginner terms briefly when they first appear.
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
@@ -104,6 +151,9 @@ Required output behavior:
 - If Task activities are requested, ask for eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never apply tasks to every record unless the user explicitly selects all.
 - Persist approved seed decisions to `demo-data-plan.json` and scenario-owned `data-*.json` payloads. Create records only through the approved `66-seed-synthetic-data.ps1` stage, using stable natural keys and the approved source tag.
 - After planning, run a **report scoping step** based on created or planned tables (see Section 4A of how-to-build-dynamics-model-driven-apps-wizard.md).
+- Explain and ask about native dashboards (standard Dataverse chart/dashboard components), custom HTML reports, both, or neither. Demo Builder folds this choice into its existing consolidated confirmation; do not add a business question. Capture independent native/HTML decisions in `Reporting Selection`. Use both only for complementary purposes.
+- Explain each report's audience, decision, metrics/calculations, record scope, placement, limitations, and overlap. HTML must reflect the end user's scenario documentation, top tasks, lifecycle, data, and success criteria. Frontline/agent, supervisor, and leadership are optional Dynamics-styled patterns, not a compulsory trio.
+- Before HTML generation, author and explicitly approve `html-reports.json` against `html-reports.schema.json`, exact requirement excerpts in current `spec.md`/`plan.md`, and matching `report-mappings.md` table/title/placement rows. No guessed priority, ownership, queue fields, or unsupported calculations. Follow `docs/live-report-web-resources-runbook.md`; verify placement separately. Do not auto-approve legacy definitions or build native payloads after opt-out.
 - Ask the user to identify which tables need reports and what report type each table needs (form web resource, dashboard KPI, or queue/view summary).
 - Generate a Report Mapping Table artifact (`report-mappings.md`) and convert it into implementation and validation tasks in `tasks.md`.
 - **Blocker rule**: If a table is marked critical in workflow but has no report decision, flag this and stop progression until resolved.
@@ -111,5 +161,5 @@ Required output behavior:
 - Do not tell the user to run build scripts until planning **and report scoping** are complete.
 - After planning and report scoping are approved, guide them through the exact bootstrap sequence.
 - Build steps include scripts `00-prereq-check.ps1`, `10-auth-connect.ps1`, `15-dry-validate.ps1`, `20-build-tables.ps1`, `30-build-columns.ps1`, optional `35-style-choice-options.ps1`, `40-build-relationships.ps1`, `50-add-to-solution.ps1`, `55-build-business-process-flows.ps1`, `60-build-forms-views.ps1`, optional `61-configure-power-apps-grid.ps1`, `64-build-charts-dashboard.ps1`, `62-build-app-module.ps1`, optional `63-format-forms.ps1`, and `66-seed-synthetic-data.ps1` in order when their scenario contracts enable them. Stage 35 applies approved pastel Choice colors and inline label icons. Stage 61 is a maker handoff plus exported-metadata verification gate. Stage 63 is a hash-approved second-pass formatter. Script 55 safely skips when BPF is not enabled or when the scenario does not justify it. Script 62 safely skips when app module wiring is not enabled for the scenario. The orchestrator captures a first-run baseline, repeats the experience and data stages, runs `85-verify-idempotency.ps1`, performs final solution membership, and then runs `95-export-unmanaged-solution.ps1` to export and inspect an unmanaged package locally without importing it. If HTML reporting is enabled in profile + planning, include script 70 (`70-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 62.
-- Script 70 is the optional reporting module entrypoint and calls script 65 to generate three Dynamics-blue HTML reports from scenario design files and add them to the solution.
+- Script 70 is the optional HTML reporting entrypoint and calls script 65 to generate only approved requirement-backed definitions and add them to the solution.
 - For `standalone-model-driven`, use neutral Operational Workspace, Team Workload, and Management KPI display titles. Keep report generation data-driven and scenario-specific.

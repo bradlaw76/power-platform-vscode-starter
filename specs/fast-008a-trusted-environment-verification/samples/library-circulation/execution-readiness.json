@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.1",
+  "scenarioSlug": "library-circulation",
+  "status": "READY_FOR_APPROVAL",
+  "eligibleForHumanApproval": true,
+  "executionAuthorized": false,
+  "evidenceTrust": "recorded-test",
+  "verifiedForHumanReview": false,
+  "evaluatedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+  "decisionId": "sha256:25285de37f941532b0f7781a2eb69d716584940ace0e7c89b6618eb4c0320d70",
+  "planId": "sha256:59fb2a3a8e9c71edb74e07c1b5f20774e4f26c84ebfefdc6f8ca2df8dd72b4b9",
+  "planSha256": "315d1b7631e905161e25a8242aafdf8dd92f5aa9a5a245586d7fd29d9c1e24f4",
+  "decisionSha256": "9378bbaf87043ad0c01e5c429a35cfcc9469a9535b3f22840e3810324acb8101",
+  "evidenceSha256": "6b2d54b2e9ca2e367cbb81ab546f609fc4e10032fb6abaf1624d294d907a213d",
+  "scopeSha256": "3e1c9e7de3c91b64f19fad9b292ee996bf9d5b33a507e6bf357d8dbadd820d2f",
+  "environment": {
+    "environmentId": "11111111-1111-4111-8111-111111111111",
+    "tenantId": "22222222-2222-4222-8222-222222222222",
+    "url": "https://synthetic.example.test"
+  },
+  "authorizedOperationCategories": [],
+  "findings": [],
+  "blockedOperations": [],
+  "dependencyOrder": [
+    "FAST006-REUSE-17EC3D0EE53B"
+  ],
+  "packageDependencyOrder": [
+    "synthetic_records"
+  ],
+  "componentOwnership": [
+    {
+      "taskId": "FAST006-REUSE-17EC3D0EE53B",
+      "componentKind": "table",
+      "componentIdentity": "tst_record",
+      "action": "REUSE",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-REUSE-17EC3D0EE53B",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": true,
+          "ownership": "accelerator-managed",
+          "managed": true,
+          "customizable": true,
+          "allowedActions": [
+            "REUSE"
+          ]
+        }
+      ]
+    }
+  ],
+  "securityRequirements": [
+    {
+      "taskId": "FAST006-REUSE-17EC3D0EE53B",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    }
+  ],
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-001",
+      "taskIds": [
+        "FAST006-REUSE-17EC3D0EE53B"
+      ],
+      "acceptanceCriteria": [
+        "Users can complete the primary task."
+      ],
+      "decisionId": "sha256:25285de37f941532b0f7781a2eb69d716584940ace0e7c89b6618eb4c0320d70"
+    }
+  ]
+}

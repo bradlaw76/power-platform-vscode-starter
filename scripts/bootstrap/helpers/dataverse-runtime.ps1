@@ -94,7 +94,10 @@ function Get-WizardHttpStatusCode {
     if ($null -ne $statusProperty -and $null -ne $statusProperty.Value) {
         return [int]$statusProperty.Value
     }
-    if ($ErrorRecord.Exception.Message -match '(?<!\d)(?<status>401|403|404|409|429|5\d\d)(?!\d)') {
+    if ($ErrorRecord.Exception.Message -match '^HTTP\s+(?<status>\d{3})\b') {
+        return [int]$Matches.status
+    }
+    if ($ErrorRecord.Exception.Message -match '^Dataverse request failed \((?:Get|Post|Patch|Put|Delete) .*?, HTTP (?<status>\d+)\):') {
         return [int]$Matches.status
     }
     return 0
@@ -151,6 +154,7 @@ function Invoke-WizardDataverseRequest {
         [switch]$PreviewOnly,
         [int]$MaxAttempts = 5,
         [ValidateRange(1, 300)] [int]$TimeoutSec = 30,
+        [switch]$RejectRedirects,
         [scriptblock]$TokenProvider,
         [scriptblock]$RequestInvoker,
         [scriptblock]$SleepAction
@@ -199,6 +203,7 @@ function Invoke-WizardDataverseRequest {
                     Headers = $transportHeaders
                     TimeoutSec = $request.TimeoutSec
                 }
+                if ($RejectRedirects) { $parameters.MaximumRedirection = 0 }
                 if ($null -ne $request.Body) {
                     $parameters.Body = $request.Body
                     $parameters.ContentType = 'application/json'

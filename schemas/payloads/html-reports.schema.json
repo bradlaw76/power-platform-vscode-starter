@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Approved scenario HTML reports",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["Version", "Approved", "Reports"],
+  "properties": {
+    "Version": { "const": "1.0" },
+    "Approved": { "type": "boolean" },
+    "Reports": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["Key", "Level", "Title", "Audience", "Purpose", "Placement", "TableLogicalName", "Requirements", "Metrics"],
+        "properties": {
+          "Key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+          "Level": { "enum": ["frontline", "supervisor", "leadership"] },
+          "Title": { "type": "string", "minLength": 1 },
+          "Audience": { "type": "string", "minLength": 1 },
+          "Purpose": { "type": "string", "minLength": 1 },
+          "Placement": { "type": "string", "minLength": 1 },
+          "TableLogicalName": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+          "Requirements": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["Document", "Excerpt"],
+              "properties": {
+                "Document": { "enum": ["spec.md", "plan.md"] },
+                "Excerpt": { "type": "string", "minLength": 12, "pattern": "\\S" }
+              }
+            }
+          },
+          "Metrics": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["Key", "Title", "Kind", "RequiredFields"],
+              "properties": {
+                "Key": { "type": "string", "pattern": "^[a-z][a-z0-9-]*$" },
+                "Title": { "type": "string", "minLength": 1 },
+                "Kind": { "enum": ["aggregate-count", "aggregate-group", "list"] },
+                "RequiredFields": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 2,
+                  "uniqueItems": true,
+                  "items": { "type": "string", "pattern": "^(__primaryid__|__primaryname__|[a-z][a-z0-9_]*)$" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

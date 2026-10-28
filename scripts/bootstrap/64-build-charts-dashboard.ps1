@@ -48,6 +48,8 @@ function Invoke-WizardReportingStage {
         [string]$EnvironmentUrl, [string]$AccessToken, [string]$SolutionUniqueName, [string]$PublisherPrefix,
         [switch]$PreviewOnly, [scriptblock]$RequestInvoker
     )
+    . (Join-Path $PSScriptRoot 'helpers\reporting-plan.ps1')
+    Assert-WizardNativeReportingChoice -ScenarioFolder (Join-Path $RepoRoot "specs\$ScenarioSlug") -HasPayload $true | Out-Null
     $payload = Get-WizardSinglePayload -Folder $PayloadsFolder -Pattern 'reporting-*.json'
     $marker = "Wizard scenario=$ScenarioSlug; stage=64-build-charts-dashboard.ps1"
     $evidenceItems = [Collections.Generic.List[object]]::new()

@@ -1,0 +1,217 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "trusted-environment-verification",
+  "payload": {
+    "collectorVersion": "1.0",
+    "collectionMode": "Mock",
+    "decisionSha256": "1a4f4252488424a73254b8f67d3d98bf5a6a09bf79063172024fa3db7c320d7f",
+    "catalogSnapshotId": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "dependencyManifestSha256": "f48b1526618a8ad2179a270793fda359a6088af5f77af6ed06bcef7d455a3605",
+    "inputFingerprints": {
+      "analysisManifest": "7d3a4aef9429eba5560c2a7c343118fea06c1bc7e43edb95b06b2b2a111ab377",
+      "componentDelta": "8bedd7ff8c0392f2483c9a7c31386618837e8ce825bcf4c07a662fabd79a11c4",
+      "coverage": "76ef485bfe8d2fa7bdc2f0dd00272ad250a94fb149686fc6a07c48f9dcf7a4f5",
+      "decision": "1a4f4252488424a73254b8f67d3d98bf5a6a09bf79063172024fa3db7c320d7f",
+      "dependencies": "f48b1526618a8ad2179a270793fda359a6088af5f77af6ed06bcef7d455a3605",
+      "environment": "68a877f3202bd3c11d96466654954c58f67e2a8635ebe6f5e8a3908dceeaf7d7",
+      "schemaPlan": "0a232eb78604190f578e7fea6ef46bc643b0183a2bd99b32c0878321182bca06",
+      "spec": "9bbc74327be55574e713d091346af9372e28628621336f41ae2e7ce1f47580e6",
+      "traceability": "a0846e8a37b6cab17d465fbc604d0b6e734539b1417e042e911b8fb3f4a7271f"
+    },
+    "selectedPackages": [],
+    "authenticatedIdentity": {
+      "organizationId": "99999999-9999-4999-8999-999999999999",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "aadObjectId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+    },
+    "complete": true,
+    "checks": [
+      {
+        "id": "authenticated-connection",
+        "target": "https://synthetic.example.test",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_EVIDENCE",
+        "message": "WhoAmI authentication must succeed without using a stored environment target."
+      },
+      {
+        "id": "authenticated-context-stable",
+        "target": "33333333-3333-4333-8333-333333333333",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal and organization must remain stable through collection and token refresh."
+      },
+      {
+        "id": "component-cardinality",
+        "target": "FAST006-CREATE-726FF028B339",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "Metadata must return zero or one exact logical-name match, never an ambiguous or substituted component."
+      },
+      {
+        "id": "environment-identity",
+        "target": "https://synthetic.example.test",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_DECISION_CHANGE",
+        "message": "Server-reported environment, tenant and organization must match the explicit target and WhoAmI context."
+      },
+      {
+        "id": "extension-publisher",
+        "target": "extension_solution",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "The selected extension solution must be unmanaged and have the exact planned publisher identity/prefix."
+      },
+      {
+        "id": "privilege",
+        "target": "prvCreateEntity",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "privilege",
+        "target": "prvPublishCustomization",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "privilege",
+        "target": "prvReadPublisher",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "privilege",
+        "target": "prvReadSolution",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "privilege",
+        "target": "prvWriteEntity",
+        "state": "verified",
+        "satisfied": false,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "privilege",
+        "target": "prvWriteSolution",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal requires the named effective Global privilege; successful reads do not imply write permissions."
+      },
+      {
+        "id": "prospective-owner",
+        "target": "FAST006-CREATE-726FF028B339",
+        "state": "inferred",
+        "satisfied": true,
+        "requiredForReadiness": false,
+        "blockingStatus": "BLOCKED_EVIDENCE",
+        "message": "The component is absent; future ownership is planned from the verified extension publisher, not observed component ownership."
+      }
+    ],
+    "evidence": {
+      "schemaVersion": "1.0",
+      "decisionId": "sha256:5c6dc47c7f0fa6a74c5ccd055cc9edeab379a1a08f1574f57c2f44358cbc6519",
+      "planId": "sha256:2fc8c5959e56e09374f0f25c87b1d56f061663c5ea1e07b3f6a79d7ac2c8e22e",
+      "planSha256": "5fbe209e8fa179c0b0388bc2e4722dde5e669b985e07ec9441a38c758ccbc860",
+      "environment": {
+        "environmentId": "11111111-1111-4111-8111-111111111111",
+        "tenantId": "22222222-2222-4222-8222-222222222222",
+        "url": "https://synthetic.example.test"
+      },
+      "observedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+      "expiresAtUtc": "2026-10-19T12:15:00.0000000+00:00",
+      "inputArtifacts": [
+        {
+          "key": "analysisManifest",
+          "path": "specs/missing-permissions/accelerator/accelerator-analysis-manifest.json"
+        },
+        {
+          "key": "componentDelta",
+          "path": "specs/missing-permissions/accelerator/component-delta-analysis.json"
+        },
+        {
+          "key": "coverage",
+          "path": "specs/missing-permissions/accelerator/requirements-coverage-matrix.json"
+        },
+        {
+          "key": "decision",
+          "path": "specs/missing-permissions/accelerator/accelerator-decision.json"
+        },
+        {
+          "key": "dependencies",
+          "path": "specs/missing-permissions/accelerator/dependency-manifest.json"
+        },
+        {
+          "key": "environment",
+          "path": "specs/missing-permissions/accelerator/environment-readiness-reference.json"
+        },
+        {
+          "key": "schemaPlan",
+          "path": "specs/missing-permissions/accelerator/schema-reuse-extension-plan.json"
+        },
+        {
+          "key": "spec",
+          "path": "specs/missing-permissions/spec.md"
+        },
+        {
+          "key": "traceability",
+          "path": "specs/missing-permissions/accelerator/acceptance-traceability.json"
+        }
+      ],
+      "packages": [],
+      "components": [
+        {
+          "taskId": "FAST006-CREATE-726FF028B339",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": false,
+          "ownership": "solution-owned",
+          "managed": false,
+          "customizable": false,
+          "allowedActions": [
+            "CREATE"
+          ]
+        }
+      ],
+      "security": {
+        "principalId": "33333333-3333-4333-8333-333333333333",
+        "grantedPermissions": [
+          "read-metadata",
+          "write-solution"
+        ]
+      }
+    }
+  },
+  "signature": {
+    "algorithm": "RS256",
+    "certificateSha256": "655f507d1baa753ff9e0521f52c994d3ca6faa3d9f30469ac5b6e055e10b0680",
+    "value": "k9BDYBknaklhO2Ga3yLQLq4NwVxH8KpAUsXFi6nFkhf+rC3qe0xCyc/SNcZObn+IZTza7AC/tXxRe5PU1O48SCug45Zgle9nYGL3u8vIOond+l9NuawJe6CudqlJw9sfJIQ28enrYRCxPt6171V90h0IDkW6J71ZxrdbkozlMzXOD3DCFfqE8qI9zS01WWZlQebfa6dnaY96DdK2w4EAaq2K2bn6m7GtKoVPA3jhFGVSNjKvZt+iBjJl2T3U3JgzEJXtd7olKPaFuzfM5kdqplaRwFJsRTI9KtMXK/fnC+r7BtSmD3v8DeU/4c9DRyRbhMvbEgYsqZRh2refGFrotg=="
+  }
+}

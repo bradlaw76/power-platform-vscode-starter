@@ -1,0 +1,104 @@
+{
+  "schemaVersion": "1.1",
+  "scenarioSlug": "managed-restrictions",
+  "status": "BLOCKED_COMPATIBILITY",
+  "eligibleForHumanApproval": false,
+  "executionAuthorized": false,
+  "evidenceTrust": "recorded-test",
+  "verifiedForHumanReview": false,
+  "evaluatedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+  "decisionId": "sha256:6c82f3715b6996a785f3ef4ae58a9e59a72a2a52c0b2b24598a1512094062f33",
+  "planId": "sha256:12cb5c06db86c4095282ab5c2af1d2fd0af03eba90b10fb91a9f1fb920fce93b",
+  "planSha256": "58f69c94e90ad3e9071da6e691aa1ec9d9eecc4e96a148c8c2f42d09fd56b6c8",
+  "decisionSha256": "993be2184c743d54feaf672e166152421ea5e72c64ab78b46b118299eec4ffdb",
+  "evidenceSha256": "e50950d8ae8ef076208593bcebdd164f89aa2123ffdf51f3eaf1d9b77f3e5f7a",
+  "scopeSha256": "6416816b123d09dff58698853cfdc002dfd4378b463fcf89e17f9ca6e6cc6e99",
+  "environment": {
+    "environmentId": "11111111-1111-4111-8111-111111111111",
+    "tenantId": "22222222-2222-4222-8222-222222222222",
+    "url": "https://synthetic.example.test"
+  },
+  "authorizedOperationCategories": [],
+  "findings": [
+    {
+      "status": "BLOCKED_COMPATIBILITY",
+      "code": "OPERATION_RESTRICTED",
+      "taskId": "FAST006-EXTEND-09F30F118E5A",
+      "message": "Unsupported, conflicting, destructive or restricted operation 'EXTEND' on 'tst_record'.",
+      "remediation": "Use verified separate extensions; never overwrite managed definitions or infer customization rights."
+    },
+    {
+      "status": "BLOCKED_COMPATIBILITY",
+      "code": "VERIFICATION_customization",
+      "taskId": "",
+      "message": "Separate extensions require supported customizable metadata and table attribute-creation rights.",
+      "remediation": "Resolve the verified prerequisite or restriction and collect fresh evidence."
+    }
+  ],
+  "blockedOperations": [
+    "FAST006-EXTEND-09F30F118E5A"
+  ],
+  "dependencyOrder": [
+    "FAST006-EXTEND-09F30F118E5A"
+  ],
+  "packageDependencyOrder": [
+    "synthetic_records"
+  ],
+  "componentOwnership": [
+    {
+      "taskId": "FAST006-EXTEND-09F30F118E5A",
+      "componentKind": "table",
+      "componentIdentity": "tst_record",
+      "action": "EXTEND",
+      "ownership": "accelerator-managed",
+      "managed": true,
+      "directModificationAllowed": false,
+      "evidence": [
+        {
+          "taskId": "FAST006-EXTEND-09F30F118E5A",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": true,
+          "ownership": "accelerator-managed",
+          "managed": true,
+          "customizable": false,
+          "allowedActions": [
+            "REUSE"
+          ]
+        }
+      ]
+    }
+  ],
+  "securityRequirements": [
+    {
+      "taskId": "FAST006-EXTEND-09F30F118E5A",
+      "permission": "customize",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-EXTEND-09F30F118E5A",
+      "permission": "read-metadata",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    },
+    {
+      "taskId": "FAST006-EXTEND-09F30F118E5A",
+      "permission": "write-solution",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "satisfied": true
+    }
+  ],
+  "acceptanceTraceability": [
+    {
+      "requirementId": "REQ-001",
+      "taskIds": [
+        "FAST006-EXTEND-09F30F118E5A"
+      ],
+      "acceptanceCriteria": [
+        "Users can complete the primary task."
+      ],
+      "decisionId": "sha256:6c82f3715b6996a785f3ef4ae58a9e59a72a2a52c0b2b24598a1512094062f33"
+    }
+  ]
+}

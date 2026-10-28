@@ -1,4 +1,4 @@
-# FAST-007: Local Execution Readiness
+# FAST-007 / FAST-008A: Execution Readiness
 
 ## Purpose and safety boundary
 
@@ -16,8 +16,10 @@ not a new platform build stage.
 
 There are no Dataverse, PAC CLI, network, authentication, installation, import,
 or build operations in readiness. Evidence is supplied externally as local
-files. The engine does not authenticate to an environment or verify live
-platform provenance. Hash integrity is not evidence-source authenticity.
+files. The engine does not authenticate to an environment itself. FAST-008A validates
+signed collector provenance using an independently supplied trusted certificate;
+hash integrity alone is not evidence-source authenticity. See
+[trusted environment verification](trusted-environment-verification.md).
 
 ## Inputs and integrity checks
 
@@ -32,9 +34,10 @@ The engine reads:
   architecture decision, not a CLI architecture override.
 - `specs/<scenario-slug>/accelerator/build-plan/build-plan-manifest.json`: the
   pinned plan manifest and its referenced local artifacts.
-- The external local evidence manifest selected by `-EvidencePath`, validated
-  against
-  [`execution-evidence.schema.json`](../../schemas/accelerators/execution-evidence.schema.json).
+- The evidence selected by `-EvidencePath`: by default a signed
+  `trusted-environment-verification.json` envelope, containing normalized
+  [`execution-evidence.schema.json`](../../schemas/accelerators/execution-evidence.schema.json)
+  v1 evidence. Raw FAST-007 evidence requires explicit `LocalPlanning` opt-in.
 - The referenced local inputs needed to verify SHA-256 file integrity,
   canonical decision/plan IDs, and input fingerprints.
 
@@ -49,6 +52,22 @@ cannot extend that limit. Evaluate timestamps and freshness against the
 evaluation clock, and resolve missing, invalid, expired, or inconsistent
 evidence rather than changing the clock to hide a blocker.
 
+## Evidence trust policy
+
+`-EvidenceTrustPolicy Authenticated` is the default. Only complete, fresh,
+matching signed Live evidence with an independently provisioned trusted X509
+certificate can produce `verifiedForHumanReview: true`. Pass the public
+certificate using `-TrustedCertificatePath`; never trust an embedded key.
+Certificates must be valid at collection and evaluation.
+
+Explicit `RecordedTest` permits signed Mock evidence to reach
+`READY_FOR_APPROVAL`, but `verifiedForHumanReview` is always false.
+Explicit `LocalPlanning` preserves raw FAST-007 local diagnostics, also with
+`verifiedForHumanReview: false`. Neither opt-in permits writes.
+Every policy preserves `executionAuthorized: false`. Collection signatures
+prove collector authority, not truth against a compromised signer or deployment
+approval. FAST-008A implementation uses mocks only; no live GCC access is claimed.
+
 ## Standalone local command
 
 From the repository root:
@@ -57,7 +76,9 @@ From the repository root:
 pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
   -EnableExecutionReadiness `
   -ScenarioSlug <scenario-slug> `
-  -EvidencePath <execution-evidence.json> `
+  -EvidencePath <trusted-environment-verification.json> `
+  -EvidenceTrustPolicy Authenticated `
+  -TrustedCertificatePath <independently-provisioned-public.cer> `
   -EnvironmentUrl <approved-target-url> `
   -EnvironmentId <environment-guid> `
   -TenantId <tenant-guid> `
@@ -68,7 +89,9 @@ pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
 | --- | --- |
 | `-EnableExecutionReadiness` | Explicit opt-in; FAST's normal default-off behavior is unchanged |
 | `-ScenarioSlug` | Scenario containing the approved decision and build-plan manifest |
-| `-EvidencePath` | Externally supplied local execution-evidence manifest |
+| `-EvidencePath` | Signed verification envelope by default; raw evidence only with LocalPlanning |
+| `-EvidenceTrustPolicy` | Authenticated (default), RecordedTest, or LocalPlanning |
+| `-TrustedCertificatePath` | Independently provisioned public trust certificate for signed evidence |
 | `-EnvironmentUrl` | Independently supplied expected target URL |
 | `-EnvironmentId` | Independently supplied expected environment GUID |
 | `-TenantId` | Independently supplied expected tenant GUID |
@@ -96,7 +119,9 @@ requiring payloads, or executing stages:
 pwsh .\scripts\bootstrap\90-run-build.ps1 `
   -ScenarioSlug <scenario-slug> `
   -ExecutionReadinessOnly `
-  -ExecutionEvidencePath <execution-evidence.json> `
+  -ExecutionEvidencePath <trusted-environment-verification.json> `
+  -ReadinessEvidenceTrustPolicy Authenticated `
+  -ReadinessTrustedCertificatePath <independently-provisioned-public.cer> `
   -EnvironmentUrl <approved-target-url> `
   -ReadinessEnvironmentId <environment-guid> `
   -ReadinessTenantId <tenant-guid>
@@ -122,7 +147,7 @@ as permission to proceed.
 
 | Status | Operator interpretation |
 | --- | --- |
-| `READY_FOR_APPROVAL` | Local checks support human review only; no execution authorization |
+| `READY_FOR_APPROVAL` | Human review only; inspect trust policy and verifiedForHumanReview separately; no execution authorization |
 | `BLOCKED_PREREQUISITES` | Required planning or prerequisite conditions are not satisfied |
 | `BLOCKED_EVIDENCE` | Required evidence or its integrity/freshness/binding is not acceptable |
 | `BLOCKED_COMPATIBILITY` | Compatibility requirements are not satisfied by the supplied evidence |
@@ -159,15 +184,18 @@ Synthetic samples are maintained under
 They demonstrate local behavior only. This guide claims no test passes,
 successful live readiness, platform compatibility, or execution approval.
 
-## Stop condition and proposed FAST-008
+## Stop condition and FAST-008A supersession
 
 The authorized FAST-007 local scope supersedes historical FAST-005B/FAST-006
-stop conditions only for this readiness implementation. Stop after FAST-007
-review handoff. [ADR 0010](../../specs/fast-solution-accelerator-discovery/adrs/0010-local-execution-readiness.md)
+stop conditions only for this readiness implementation. Stop after human-review handoff. [ADR 0010](../../specs/fast-solution-accelerator-discovery/adrs/0010-local-execution-readiness.md)
 records the boundary.
 
-FAST-008 remains **proposed, not implemented**: trusted evidence collection,
-independent approver/signature verification, authorization consumption and
-revalidation, and a separately approved executor design require separate
-authorization. Neither the future schema nor a ready report supplies those
-capabilities.
+FAST-008A now adds GET-only trusted collection and RS256 provenance validation
+within the [trusted verification contract](trusted-environment-verification.md)
+and [ADR 0011](../../specs/fast-solution-accelerator-discovery/adrs/0011-trusted-environment-verification.md).
+This supersedes the earlier proposed-only collection boundary, not execution.
+A future controlled execution phase remains proposed and unauthorized:
+independent deployment approver/signature checks, scoped authorization
+consumption and revalidation, and a separately approved executor require
+separate authorization. Neither the future schema nor a ready report supplies
+those capabilities.

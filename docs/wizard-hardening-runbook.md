@@ -18,11 +18,27 @@
 
 ## Manifest Usage
 
-- Each apply run updates only `.wizard-metrics/artifacts/manifest/<normalized-scenario-slug>/generated-artifact-manifest.json`.
+- Component stages update only the scenario-scoped `.wizard-metrics/artifacts/manifest/<normalized-scenario-slug>/generated-artifact-manifest.json`; orchestrated Apply also archives a separate per-run source record as described below.
 - Use the manifest to see which tables, columns, relationships, forms, views, BPFs, app components, and app modules were `created`, `updated`, `skipped`, or `failed`.
 - The markdown companion file is in the same scenario-specific folder.
 - Every manifest open validates the normalized scenario slug, solution unique name, and publisher prefix against the active stage. Any mismatch is a hard stop.
 - Preview may write disposable reports and run summaries, but it must not create or alter manifest provenance.
+
+### Immutable run source records
+
+Stage 90 records `repositoryBaseline` in run state and JSON/Markdown summaries.
+Only Apply archives
+`.wizard-metrics/artifacts/manifest/<slug>/runs/<run-id>/repository-baseline.json`,
+binding the source identity to scenario, solution, publisher and run. Existing
+records cannot be replaced with different content. These records complement,
+not replace, the component inventory manifest.
+
+Preview never creates these manifest records. Resume retains the original
+baseline and rejects changed verified source identity. Legacy state without a
+baseline requires a new run; Git-less workspaces remain explicitly unverified.
+See [repository updates](repository-updates.md) for cached-check freshness,
+local-change fingerprints and why these diagnostics are neither backups nor
+signed deployment authorization.
 
 ### Explicit Legacy Migration
 

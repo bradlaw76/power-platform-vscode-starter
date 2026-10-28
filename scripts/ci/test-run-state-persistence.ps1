@@ -38,8 +38,17 @@ function Get-GitStateSnapshot {
     return "$head|$index|$worktree"
 }
 
-$trackedBefore = @(Get-TrackedFileSnapshot -RepositoryRoot $repoRoot)
-$gitBefore = Get-GitStateSnapshot -RepositoryRoot $repoRoot
+$gitRoot = $repoRoot
+$fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) "semantic-run-state-$([guid]::NewGuid().ToString('N'))"
+. (Join-Path $repoRoot 'scripts\ci\helpers\semantic-preview-fixtures.ps1')
+$telemetryBefore = $env:WIZARD_METRICS_OPTOUT
+try {
+$env:WIZARD_METRICS_OPTOUT = '1'
+New-SemanticPreviewWorkspace -SourceRoot $repoRoot -TargetRoot $fixtureRoot -ScenarioSlugs @('gcc-framework-acceptance')
+$repoRoot = $fixtureRoot
+$orchestrator = Join-Path $repoRoot 'scripts\bootstrap\90-run-build.ps1'
+$trackedBefore = @(Get-TrackedFileSnapshot -RepositoryRoot $gitRoot)
+$gitBefore = Get-GitStateSnapshot -RepositoryRoot $gitRoot
 $transportCallCount = 0
 $tokenBefore = $env:DV_TOKEN
 $tokenSentinel = 'run-state-secret-sentinel'
@@ -55,6 +64,12 @@ for ($run = 1; $run -le 2; $run++) {
     $summaryPath = Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json'
     $summary = Read-WizardJsonFile -Path $summaryPath
     if ($summary.status -ne 'preview-complete') { throw "Framework Acceptance preview $run did not complete." }
+    if ($summary.repositoryBaseline.status -ne 'unverified' -or
+        [string]::IsNullOrWhiteSpace($summary.repositoryBaseline.reason)) {
+        throw 'Git-less preview must disclose unverified source identity.'
+    }
+    $baselineArchive = Join-Path $repoRoot ".wizard-metrics\artifacts\manifest\gcc-framework-acceptance\runs"
+    if (Test-Path -LiteralPath $baselineArchive) { throw 'Preview wrote repository baseline manifest provenance.' }
     foreach ($stageName in @('native-reporting', 'idempotency-baseline', 'idempotency-verification')) {
         $stage = @($summary.stages | Where-Object name -eq $stageName)
         if ($stage.Count -ne 1 -or $stage[0].status -ne 'completed') { throw "Framework Acceptance preview $run did not complete '$stageName'." }
@@ -68,9 +83,43 @@ for ($run = 1; $run -le 2; $run++) {
 }
 $env:DV_TOKEN = $tokenBefore
 
+$reportAnswersPath = Join-Path $repoRoot 'specs\gcc-framework-acceptance\answers.md'
+$originalReportAnswers = Get-Content -LiteralPath $reportAnswersPath -Raw
+Set-Content -LiteralPath $reportAnswersPath -Value "$originalReportAnswers`n## Reporting Selection`n- Native dashboards: no`n- HTML reports: no"
+$declinedNative = $false
+try {
+    & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -RequestInvoker $transport
+} catch {
+    if ($_.Exception.Message -notmatch 'Native dashboards were declined') { throw }
+    $declinedNative = $true
+}
+if (-not $declinedNative) { throw 'Orchestrator accepted a native payload after opt-out.' }
+$declinedAttachment = $false
+try {
+    & (Join-Path $repoRoot 'scripts\bootstrap\62-build-app-module.ps1') -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder (Join-Path $repoRoot 'payloads\scenarios\gcc-framework-acceptance') -PreviewOnly $true -RequestInvoker $transport
+} catch {
+    if ($_.Exception.Message -notmatch 'Native dashboards were declined') { throw }
+    $declinedAttachment = $true
+}
+if (-not $declinedAttachment) { throw 'App assembly accepted native components after opt-out.' }
+Set-Content -LiteralPath $reportAnswersPath -Value "$originalReportAnswers`n## Reporting Selection`n- Native dashboards: yes`n- HTML reports: no"
+& $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -RequestInvoker $transport
+$nativeOnlySummary = Read-WizardJsonFile -Path $summaryPath
+$htmlStage = @($nativeOnlySummary.stages | Where-Object name -eq 'web-resources')
+if ($htmlStage.Count -ne 1 -or $htmlStage[0].status -ne 'skipped') { throw 'Native-only reporting must not enable the HTML stage through unrelated planning text.' }
+Set-Content -LiteralPath $reportAnswersPath -Value "$originalReportAnswers`n## Reporting Selection`n- Native dashboards: yes`n- HTML reports: yes"
+$missingHtmlPlan = $false
+try {
+    & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -RequestInvoker $transport
+} catch {
+    if ($_.Exception.Message -notmatch 'HTML reporting requires reviewed html-reports.json') { throw }
+    $missingHtmlPlan = $true
+}
+if (-not $missingHtmlPlan) { throw 'HTML selection without approved definitions must fail before stages execute.' }
+
 if ($transportCallCount -ne 0) { throw "Framework Acceptance previews invoked Dataverse transport $transportCallCount time(s)." }
-$trackedAfter = @(Get-TrackedFileSnapshot -RepositoryRoot $repoRoot)
-$gitAfter = Get-GitStateSnapshot -RepositoryRoot $repoRoot
+$trackedAfter = @(Get-TrackedFileSnapshot -RepositoryRoot $gitRoot)
+$gitAfter = Get-GitStateSnapshot -RepositoryRoot $gitRoot
 if (@(Compare-Object $trackedBefore $trackedAfter).Count -ne 0) { throw 'Framework Acceptance previews changed checked-in file content.' }
 if ($gitBefore -cne $gitAfter) { throw 'Framework Acceptance previews changed Git HEAD, index, or worktree state.' }
 
@@ -95,3 +144,7 @@ try {
 }
 
 Write-Host 'Run-state persistence checks passed.' -ForegroundColor Green
+} finally {
+    $env:WIZARD_METRICS_OPTOUT = $telemetryBefore
+    if (Test-Path -LiteralPath $fixtureRoot) { Remove-Item -LiteralPath $fixtureRoot -Recurse -Force }
+}

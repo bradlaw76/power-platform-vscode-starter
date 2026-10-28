@@ -1,6 +1,28 @@
 {
   "profileVersion": "1.5",
-  "contractVersion": "1.15.0",
+  "contractVersion": "2.2.0",
+  "repositoryUpdates": {
+    "enabled": true,
+    "command": "scripts/bootstrap/check-repository-updates.ps1",
+    "service": "scripts/bootstrap/helpers/repository-updates.ps1",
+    "catalog": "repository-updates.json",
+    "schemas": [
+      "schemas/repository-updates/catalog.schema.json",
+      "schemas/repository-updates/context.schema.json",
+      "schemas/repository-updates/baseline.schema.json",
+      "schemas/repository-updates/report.schema.json"
+    ],
+    "executionOrder": "pre-intake-advisor; per-run source capture before stages",
+    "networkByDefault": false,
+    "fetchSwitch": "FetchRepositoryUpdates",
+    "skipSwitch": "SkipRepositoryUpdateCheck",
+    "preview": "local comparison and diagnostic run outputs; no manifest provenance",
+    "apply": "immutable scenario/run baseline; no automatic adoption",
+    "rerun": "new runs get new baselines; resume preserves and checks original source identity",
+    "approval": "explicit Fetch only; adoption and deployment approvals are separate",
+    "dataverseConnected": false,
+    "automaticAdoption": false
+  },
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",
@@ -126,6 +148,24 @@
       "choice-presentations": true
     }
   },
+  "semanticFieldTypes": {
+    "mandatory": true,
+    "providerNeutral": true,
+    "allWizardModes": true,
+    "contract": "specs/<scenario-slug>/field-type-decisions.json",
+    "schema": "schemas/payloads/field-type-decisions.schema.json",
+    "standard": "docs/semantic-field-type-standard.md",
+    "script": "14-validate-semantic-fields.ps1",
+    "helper": "scripts/bootstrap/helpers/semantic-fields.ps1",
+    "beforeColumnGeneration": "Planning",
+    "beforeBuild": "Payload",
+    "afterColumns": "stage-30-live-attribute-validation",
+    "afterRelationships": "Metadata",
+    "beforeExport": "Metadata",
+    "previewUsesCredentials": false,
+    "legacyBypass": false,
+    "destructiveRetrofitConnected": false
+  },
   "acceleratorRecommendations": {
     "enabled": false,
     "environmentFlag": "FAST_ENABLED",
@@ -176,6 +216,23 @@
     "dataverseConnected": false,
     "issuesAuthorization": false
   },
+  "trustedEnvironmentVerification": {
+    "enabled": false,
+    "explicitSwitch": "EnableAuthenticatedVerification",
+    "scopeConfirmation": "ConfirmReadOnlyScope",
+    "service": "scripts/accelerators/trusted-environment-verification.ps1",
+    "command": "scripts/accelerators/invoke-trusted-environment-verification.ps1",
+    "provenanceService": "scripts/accelerators/verification-provenance.ps1",
+    "schema": "schemas/accelerators/trusted-environment-verification.schema.json",
+    "reusedInspector": "scripts/accelerators/dataverse-environment-inspector.ps1",
+    "defaultTrustPolicy": "Authenticated",
+    "maximumEvidenceLifetimeSeconds": 3600,
+    "requiresIndependentCertificateTrust": true,
+    "getOnly": true,
+    "usesStoredEnvironmentTarget": false,
+    "buildExecutionConnected": false,
+    "issuesAuthorization": false
+  },
   "sourceControl": {
     "enabled": true,
     "branchPattern": "feature/<scenario-slug>",
@@ -204,6 +261,7 @@
     "coreModules": [
       "00-prereq-check.ps1",
       "10-auth-connect.ps1",
+      "14-validate-semantic-fields.ps1",
       "15-dry-validate.ps1",
       "20-build-tables.ps1",
       "30-build-columns.ps1",
@@ -227,7 +285,14 @@
     "optionalModules": {
       "web-resources": {
         "enabled": true,
-        "script": "65-build-web-resources.ps1"
+        "script": "65-build-web-resources.ps1",
+        "contract": "specs/<scenario-slug>/html-reports.json",
+        "schema": "schemas/payloads/html-reports.schema.json",
+        "requiresApprovedDefinitions": true,
+        "requiresRequirementExcerpts": true,
+        "preview": "local query and HTML preview; no upload",
+        "apply": "upsert approved report web resources; verify planned placement separately",
+        "rerun": "stable scenario and report keys; no automatic deletion"
       },
       "form-formatting": {
         "enabled": true,

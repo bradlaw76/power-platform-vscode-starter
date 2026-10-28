@@ -1,6 +1,9 @@
+Set-StrictMode -Version Latest
+$ErrorActionPreference = 'Stop'
 $env:WIZARD_METRICS_OPTOUT = "1"
 Write-Host "--- STAGE 1: Markdown lint ---"
 npx --yes markdownlint-cli2@0.18.1 "**/*.md"
+$markdownSuccess = $LASTEXITCODE -eq 0
 
 Write-Host "`n--- STAGE 2: Parse all PowerShell files ---"
 $errors = [System.Collections.Generic.List[string]]::new()
@@ -65,16 +68,23 @@ foreach ($script in $scripts) {
 Write-Host "`n--- STAGE 7: Run Pester 5.7.1 suites ---"
 Import-Module Pester -RequiredVersion 5.7.1 -Force
 $pesterResult = Invoke-Pester -Path ./scripts/ci -Output Detailed -PassThru
-$pesterSuccess = ($pesterResult.FailedCount -eq 0)
+$pesterSuccess = ($pesterResult.Result -eq 'Passed')
 
 Write-Host "`n=== SUMMARY ==="
-Write-Host "1. Markdown lint: Pass"
+Write-Host "1. Markdown lint: $(if ($markdownSuccess) { 'Pass' } else { 'Fail' })"
 Write-Host "2. Parse PowerShell files: $(if ($parseSuccess) { 'Pass' } else { 'Fail' })"
 Write-Host "3. PSScriptAnalyzer: $(if ($pssaSuccess) { 'Pass' } else { 'Fail' })"
 Write-Host "4. JSON validation: $(if ($jsonSuccess) { 'Pass' } else { 'Fail' })"
 Write-Host "5. Contract integrity: $(if ($contractSuccess) { 'Pass' } else { 'Fail' })"
 Write-Host "6. Standalone checks:"
 $standaloneResults.Keys | ForEach-Object {
-    Write-Host "   - $_: $(if ($standaloneResults[$_]) { 'Pass' } else { 'Fail' })"
+    Write-Host "   - ${_}: $(if ($standaloneResults[$_]) { 'Pass' } else { 'Fail' })"
 }
 Write-Host "7. Pester 5.7.1 suites: $(if ($pesterSuccess) { 'Pass' } else { 'Fail' }) (Passed: $($pesterResult.PassedCount), Failed: $($pesterResult.FailedCount))"
+if ($null -ne $jsonError) { Write-Host "JSON validation error: $jsonError" }
+if ($null -ne $contractError) { Write-Host "Contract validation error: $contractError" }
+if (-not ($markdownSuccess -and $parseSuccess -and $pssaSuccess -and $jsonSuccess -and
+    $contractSuccess -and $pesterSuccess) -or @($standaloneResults.Values | Where-Object { -not $_ }).Count -gt 0) {
+    exit 1
+}
+exit 0

@@ -1,7 +1,48 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.15.0
+Version: 2.2.0
+
+## Repository update advisor and source baseline
+
+Terminal intake automatically checks cached upstream metadata before discovery.
+Chat entry points use the same `check-repository-updates.ps1` command.
+Network is off by default; `-Fetch` on the standalone command or
+`-FetchRepositoryUpdates` on intake explicitly permits a bounded Git fetch.
+`-SkipRepositoryUpdateCheck` skips the terminal advisor. This is not a build
+stage and does not change the authoritative stage order or approval gates.
+
+The catalog categorizes changed paths, not presumed bug fixes. Explicit scenario
+`repo-update-context.json` selections distinguish relevant, not-selected and
+unknown capabilities; unknown relevance requires review. Fetch errors are
+explicit; cached results never claim current remote freshness.
+
+Every orchestrated run includes `repositoryBaseline` in state/summary. Apply
+archives an immutable record under
+`.wizard-metrics/artifacts/manifest/<slug>/runs/<run-id>/repository-baseline.json`.
+Preview writes no manifest provenance. Resume preserves the original baseline
+and rejects changed verified source identity. Legacy state without a baseline
+requires a new run; Git-less workspaces remain explicitly unverified, including
+on resume. These diagnostics are not signed attestations or authorization.
+See [repository updates](repository-updates.md).
+
+## Universal semantic field contract (mandatory)
+
+The [Semantic Field Type Standard](semantic-field-type-standard.md) applies to
+every Dataverse use case, industry, wizard mode, greenfield/retrofit and
+standard/custom/hybrid design, independently of FAST. Require an explicitly
+approved `field-type-decisions.json` with complete spec/plan decision rows before
+column generation. `14-validate-semantic-fields.ps1` Planning gates generation;
+Payload gates every orchestrated build and direct stage 30; Metadata gates all
+fields after relationships and before export. Stage 30 checks live attribute
+types/settings instead of blindly skipping existing columns, publishes changed
+tables only and verifies new attributes. Preview is credential-free and does not
+run live metadata gates. Resume rechecks semantic metadata and binds planning and
+payload content. Existing scenarios require explicit planning upgrades: no legacy
+bypass or inferred approval. Separate functional surface validation and separate
+destructive retrofit planning/approval remain mandatory.
+Direct stage 95 also invokes fresh live semantic validation before PAC export;
+only Preview suppresses the live check.
 
 FAST-006 registers a default-off provider-neutral dry-run planning contract.
 It requires an approved scenario-local architecture artifact, emits
@@ -13,6 +54,11 @@ FAST-007 adds a default-off local-only execution-readiness contract and an
 early-return orchestrator preflight, not execution authorization. Its detailed
 operational contract is in
 [`fast-integration/execution-readiness.md`](fast-integration/execution-readiness.md).
+
+FAST-008A adds default-off `trustedEnvironmentVerification`, GET-only collection
+and independently pinned RS256 certificate provenance. Its scope is mock-only
+implementation/validation, not deployment approval or live GCC access. See
+[`fast-integration/trusted-environment-verification.md`](fast-integration/trusted-environment-verification.md).
 
 ## Purpose
 
@@ -121,6 +167,15 @@ binding ambiguity.
   its full target triple to independently supplied URL/environment ID/tenant
   ID (URL normalized). Enforce a hard evidence lifetime maximum of 24 hours
   against the explicit evaluation clock.
+- `EvidenceTrustPolicy` is `Authenticated` by default: require a complete,
+  matching signed Live `trusted-environment-verification.schema.json` envelope.
+  The engine receives an independently supplied `TrustedCertificate` X509
+  object; CLI uses `-TrustedCertificatePath` (public certificate). Never trust
+  embedded keys. Certificate validity is required at collection and evaluation.
+  Only this policy can produce `verifiedForHumanReview: true`.
+  Explicit `RecordedTest` permits signed Mock evidence to reach
+  `READY_FOR_APPROVAL`; explicit `LocalPlanning` retains raw FAST-007 local
+  diagnostics. Both always set `verifiedForHumanReview: false`.
 - Emit `execution-readiness.json` under `execution-readiness.schema.json` with
   one of `READY_FOR_APPROVAL`, `BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`,
   `BLOCKED_COMPATIBILITY`, `BLOCKED_SECURITY`, or `BLOCKED_DECISION_CHANGE`.
@@ -134,14 +189,44 @@ binding ambiguity.
   `-ReadinessTenantId`, and optional `-ReadinessEvaluationTimeUtc`. It returns
   before helper loading, stage execution, and payload requirements.
   `-Mode Apply` combined with readiness-only preflight is forbidden.
+- Forward `-ReadinessEvidenceTrustPolicy` and
+  `-ReadinessTrustedCertificatePath` through that same early-return path.
 - Normal Apply rejects an approved decision whose `selectedOption` is
   `fast-based` or `hybrid`, regardless of any readiness report. Legacy and
   Fully Custom normal builds remain unchanged; FAST remains default-off in
   all three modes.
-- No Dataverse/PAC/network/authentication/install/import/build operations or
-  live platform-provenance verification occur. FAST-008 trusted collection,
-  independent approver/signature verification, authorization consumption and
-  revalidation, and a separately approved executor remain proposed only.
+- Readiness itself performs no Dataverse/PAC/network/authentication/install/
+  import/build operations. Future controlled execution, independent deployment
+  approver/signature checks, scoped authorization consumption/revalidation and
+  a separately approved executor remain proposed and unauthorized.
+
+## Trusted Environment Verification Contract (FAST-008A)
+
+- Reuse `dataverse-environment-inspector.ps1` and shared `dataverse-runtime`;
+  `trusted-environment-verification.ps1` and its `invoke-` CLI collect GET-only
+  observations. `verification-provenance.ps1` handles RSA/SHA-256 signatures.
+- Require `-EnableAuthenticatedVerification`, `-ScenarioSlug`, explicit
+  `-EnvironmentUrl -EnvironmentId -TenantId -SolutionUniqueName`,
+  external X509 `-SigningCertificate`, `-WorkspaceRoot`, and `-OutputFolder`;
+  optional `-PackageManifestPath` and `-EvidenceTimeToLive` refine scope.
+  `-CollectionMode` defaults Mock and requires injected `RequestInvoker`.
+  Live rejects injected transport and requires `-ConfirmReadOnlyScope` and an
+  existing TokenProvider or reused Azure CLI session. No `.env` fallback,
+  stored URL selection, persisted credentials or generated production key.
+- Verify actual EnvironmentId/TenantId from RetrieveCurrentOrganization and
+  OrganizationId/UserId from WhoAmI. FAST-003 legacy `environmentId` retains its
+  historical organization-ID meaning only; new `actualEnvironmentId` is enforced.
+- Inspect selected packages/dependencies, concrete tables/columns, managed
+  properties, publishers/solution membership and effective privileges by name.
+  Unsupported/descriptive FAST-006 identities remain unverified/blocked:
+  never guess forms/apps/integration IDs. Future CREATE ownership is
+  prospective/inferred, not observed metadata.
+- The envelope binds normalized execution-evidence v1, exact decision bytes,
+  plan ID/SHA, catalogSnapshotID, dependency hash, input/package metadata hashes,
+  classifications, collection mode, actual identity and collection/expiry times.
+  Independently provision certificate trust. Signatures prove collector
+  authority, not truth against a compromised signer or deployment authorization.
+  Every readiness policy preserves `executionAuthorized: false`.
 
 ## Architecture Intent Contract
 
@@ -213,7 +298,27 @@ Architecture intake questions (12–18):
 - `business-process-flow`: staged lifecycle intake, process root, stage definitions, and BPF execution preferences
 - `table-strategy`: standard vs custom table strategy and explicit mapping
 - `solution-identity`: new/existing solution and publisher prefix
-- `reporting`: explicit report decision, critical/high-frequency table scope, report type and placement, required fields, supported business decision, owner, and validation checklist
+- `reporting`: separate native dashboards and HTML report decisions (`native`, `html`, `both`, or `none`), critical/high-frequency table scope, report type and placement, required fields, supported business decision, owner, and validation checklist
+
+Reporting selection is captured in the `Reporting Selection` section of
+scenario answers, spec, plan, tasks, and mappings. Demo Builder folds the choice
+into its existing consolidated confirmation; detailed modes ask at report
+scoping. Explain audience, decision, metrics, scope, placement, limitations,
+and overlap. Native charts/dashboard use standard platform components and are
+optional independently of HTML. An explicit native opt-out blocks conflicting
+native payloads in orchestration, direct stage 64, and app assembly.
+Legacy scenarios without a selection retain their native payload behavior;
+this does not approve new or changed reporting.
+
+HTML generation requires approved `html-reports.json`, validated against
+`html-reports.schema.json`, matching table/title/placement mappings, and exact
+requirement excerpts from the current spec/plan. Generate only its selected
+frontline, supervisor, or leadership reports and explicit metrics. No generic
+three-report or guessed-field fallback is permitted. Preview validates and
+writes local HTML/config/query artifacts without upload; Apply upserts stable
+scenario/report-key web resources. Planned placement remains a separately
+verified handoff; selecting HTML alone does not insert a form tab or sitemap
+entry. Missing or unapproved definitions also block legacy HTML generation.
 - `retrofit`: current-state and remaining-work intake for in-progress projects
 - `source-control`: target-repository preflight, scenario branch, work-item traceability, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy
 - `user-tasks`: persona, task, frequency, entry table/view, expected outcome, owner, and done definition

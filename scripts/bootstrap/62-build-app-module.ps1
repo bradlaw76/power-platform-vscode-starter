@@ -357,6 +357,10 @@ function Get-AppReportPaths {
 }
 
 $appConfig = Get-WizardAppModuleConfig -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+$reportingContext = Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug $appConfig.ScenarioSlug -PayloadsFolder $PayloadsFolder
+$reportingPayloads = @(Get-ChildItem -LiteralPath $reportingContext.PayloadsFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue)
+. (Join-Path $PSScriptRoot 'helpers\reporting-plan.ps1')
+Assert-WizardNativeReportingChoice -ScenarioFolder $reportingContext.ScenarioFolder -HasPayload ($reportingPayloads.Count -gt 0) | Out-Null
 $paths = Get-AppReportPaths
 
 if ($EnableArtifactManifest -and -not $PreviewOnly) {
@@ -552,7 +556,6 @@ foreach ($bpfName in @($appConfig.Bpfs)) {
     } catch {}
 }
 
-$reportingPayloads = @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue)
 if ($reportingPayloads.Count -gt 1) {
     $localValidationIssues.Add("Expected at most one reporting payload; found $($reportingPayloads.Count).") | Out-Null
 } elseif ($reportingPayloads.Count -eq 1) {

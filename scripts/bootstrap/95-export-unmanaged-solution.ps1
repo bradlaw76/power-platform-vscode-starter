@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Export Unmanaged Solution
 FILE:         scripts/bootstrap/95-export-unmanaged-solution.ps1
-VERSION:      0.1.0
+VERSION:      1.0.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-31
+LAST UPDATED: 2026-10-19
 ENVIRONMENT:  PowerShell 7 | PAC CLI | Local inspection
 =============================================================================
 #>
@@ -13,8 +13,12 @@ param(
     [Parameter(Mandatory)] [string]$ScenarioSlug,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$OutputFolder = '',
+    [string]$EnvironmentUrl = $env:DV_ENVIRONMENT_URL,
+    [string]$AccessToken = $env:DV_TOKEN,
+    [string]$PayloadsFolder = '',
     [switch]$PreviewOnly,
-    [scriptblock]$PacInvoker
+    [scriptblock]$PacInvoker,
+    [scriptblock]$RequestInvoker
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -38,6 +42,7 @@ if ($PreviewOnly) {
 if (-not (Test-Path -LiteralPath $membershipPath -PathType Leaf)) { throw 'Final solution membership report is missing; export is blocked.' }
 $membership = Get-Content -LiteralPath $membershipPath -Raw -Encoding UTF8 | ConvertFrom-Json
 if (-not $membership.ExportAllowed -or @($membership.Items | Where-Object State -in @('Missing','Failed','Unauthorized')).Count -gt 0) { throw 'Final solution membership did not pass; export is blocked.' }
+& (Join-Path $PSScriptRoot '14-validate-semantic-fields.ps1') -ScenarioSlug $ScenarioSlug -Mode Metadata -PayloadsFolder $PayloadsFolder -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker
 if ($null -eq $PacInvoker) { $PacInvoker = { param([string[]]$Arguments) & pac @Arguments; if ($LASTEXITCODE -ne 0) { throw "pac exited with code $LASTEXITCODE." } } }
 New-Item -ItemType Directory -Path $OutputFolder -Force | Out-Null
 Remove-Item -LiteralPath $zipPath,$unpackPath -Recurse -Force -ErrorAction SilentlyContinue

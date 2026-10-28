@@ -63,6 +63,29 @@ function Test-RequiredPath {
     }
 }
 
+if (-not $wizardProfile.repositoryUpdates.enabled -or
+    $wizardProfile.repositoryUpdates.networkByDefault -or
+    $wizardProfile.repositoryUpdates.automaticAdoption -or
+    $wizardProfile.repositoryUpdates.dataverseConnected) {
+    Add-ContractFailure 'Repository update advisor must be local-first, advisory and disconnected from Dataverse.'
+}
+foreach ($path in @($wizardProfile.repositoryUpdates.command, $wizardProfile.repositoryUpdates.service,
+    $wizardProfile.repositoryUpdates.catalog) + @($wizardProfile.repositoryUpdates.schemas)) {
+    Test-RequiredPath -RelativePath $path -Description 'Repository update advisor runtime'
+}
+
+if (-not $wizardProfile.semanticFieldTypes.mandatory -or
+    -not $wizardProfile.semanticFieldTypes.providerNeutral -or
+    -not $wizardProfile.semanticFieldTypes.allWizardModes -or
+    $wizardProfile.semanticFieldTypes.legacyBypass -or
+    $wizardProfile.semanticFieldTypes.destructiveRetrofitConnected -or
+    $wizardProfile.semanticFieldTypes.previewUsesCredentials) {
+    Add-ContractFailure 'Semantic field types must be universal, mandatory, fail-closed and non-destructive.'
+}
+foreach ($path in @($wizardProfile.semanticFieldTypes.schema, $wizardProfile.semanticFieldTypes.standard, $wizardProfile.semanticFieldTypes.helper)) {
+    Test-RequiredPath -RelativePath $path -Description 'Semantic field contract'
+}
+
 if ($wizardProfile.discovery.defaultMode -ne 'demo-builder') {
     Add-ContractFailure 'wizard.profile.json must default to demo-builder.'
 }
@@ -134,6 +157,22 @@ foreach ($readinessPath in @(
 )) {
     Test-RequiredPath -RelativePath $readinessPath -Description 'Execution readiness runtime'
 }
+
+if ([bool]$wizardProfile.trustedEnvironmentVerification.enabled -or
+    -not [bool]$wizardProfile.trustedEnvironmentVerification.getOnly -or
+    -not [bool]$wizardProfile.trustedEnvironmentVerification.requiresIndependentCertificateTrust -or
+    [bool]$wizardProfile.trustedEnvironmentVerification.usesStoredEnvironmentTarget -or
+    [bool]$wizardProfile.trustedEnvironmentVerification.buildExecutionConnected -or
+    [bool]$wizardProfile.trustedEnvironmentVerification.issuesAuthorization -or
+    $wizardProfile.trustedEnvironmentVerification.defaultTrustPolicy -cne 'Authenticated' -or
+    $wizardProfile.trustedEnvironmentVerification.maximumEvidenceLifetimeSeconds -ne 3600) {
+    Add-ContractFailure 'Trusted verification must remain explicit, GET-only, externally trusted, short-lived and disconnected from execution/authorization.'
+}
+foreach ($verificationPath in @(
+    $wizardProfile.trustedEnvironmentVerification.service, $wizardProfile.trustedEnvironmentVerification.command,
+    $wizardProfile.trustedEnvironmentVerification.provenanceService, $wizardProfile.trustedEnvironmentVerification.schema,
+    $wizardProfile.trustedEnvironmentVerification.reusedInspector
+)) { Test-RequiredPath -RelativePath $verificationPath -Description 'Trusted verification runtime' }
 
 $wizardScriptPath = Join-Path $bootstrapFolder '05-start-wizard.ps1'
 $wizardScriptText = Get-Content -LiteralPath $wizardScriptPath -Raw

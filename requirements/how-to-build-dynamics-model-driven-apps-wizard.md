@@ -6,6 +6,18 @@ Audience: Teams that want a guided, question-first process from idea to release
 
 ## 0. How This Wizard Works
 
+### Repository updates and traceability
+
+Use the [repository update advisor](../docs/repository-updates.md) after repo
+confirmation. `check-repository-updates.ps1` is local-only unless `-Fetch` is
+explicit; terminal intake checks automatically and supports
+`-FetchRepositoryUpdates` / `-SkipRepositoryUpdateCheck`. Keep unknown scenario
+relevance as review-needed; optional `repo-update-context.json` selections only
+filter advice. Do not pull, enable modules, tag or deploy automatically.
+Stage 90 captures full-commit/timestamp/dirty-fingerprint source identity in
+run summaries and immutable Apply run records; Preview writes no manifest
+provenance. Preserve original baselines on resume. This is not a build stage.
+
 This document is designed as a facilitation wizard.
 
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
@@ -22,6 +34,15 @@ Wizard outcome:
 
 Mandatory rule:
 - Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+- Apply the [Semantic Field Type Standard](../docs/semantic-field-type-standard.md)
+  to every Dataverse use case, industry, mode and table strategy, including
+  retrofit and Fully Custom. Business meaning selects type, never sample strings.
+  Complete/approve `field-type-decisions.json` and matching spec/plan rows before
+  columns; resolve Choice/Lookup decisions, stable values/mappings and separately
+  approved categorical text exceptions. Run stage 14 Planning before generation,
+  Payload before build and Metadata after relationships and before export.
+  Stop on drift; no legacy bypass or implicit String-to-Choice migration.
+  Complete functional forms/views/charts/BPF/automation/integration/report checks.
 
 ### 0A. End-to-end flow this wizard supports
 
@@ -307,6 +328,13 @@ Mode-specific input:
 - Ask which existing tables require new report surfaces.
 
 Wizard questions:
+First explain native dashboards (standard Dataverse charts/dashboard
+components) versus custom HTML reports, then ask for native, HTML, both, or
+neither. Both must serve distinct tasks. In Demo Builder, fold this choice into
+the existing consolidated recommendation instead of adding a business question.
+Explain each report's audience, decision, metrics, scope, placement, limitations,
+and overlap before approval.
+
 1. Which tables in your solution require report surfaces for supervisors, analysts, or executives?
 2. For each selected table, what report type is needed:
    - **Case form web resource** (embedded iframe on record form)
@@ -325,6 +353,7 @@ Wizard questions:
 Build decisions:
 - Report Mapping Table (artifact): `report-mappings.md` with one row per report, including logical name, report type, target placement, required fields, and owner.
 - Report Build Tasks (artifact): `tasks.md` entries for payload creation, HTML source, web resource build, placement verification, and data rendering validation.
+- HTML definitions (artifact): explicitly approved `html-reports.json`, schema-valid, with exact excerpts from current scenario `spec.md`/`plan.md` and matching `report-mappings.md` table/title/placement rows. Frontline/agent, supervisor, and leadership are optional patterns, not a compulsory trio. Generate only explicit documented metrics; never infer unrelated priority/owner/queue fields. See [the reporting runbook](../docs/live-report-web-resources-runbook.md) for supported query shapes and placement handoff.
 - Blocker rule: If a table is marked as critical and has no approved report decision, wizard flags this and blocks progression until resolved.
 
 Exit criteria:
@@ -654,7 +683,7 @@ Managed accelerator components are referenced rather than recreated or
 modified, unsupported extensions are deferred, and Fully Custom plans require
 no FAST package or environment evidence.
 
-### Local execution readiness (FAST-007)
+### Execution readiness and trusted verification (FAST-007 / FAST-008A)
 
 FAST-007 is separately authorized, default-off, and local-only. The standalone
 `scripts/accelerators/invoke-execution-readiness.ps1` requires
@@ -666,6 +695,17 @@ and input fingerprints. External evidence must satisfy
 `execution-evidence.schema.json`, match the independently supplied full target
 identity (URL normalized), and have a maximum lifetime of 24 hours.
 
+FAST-008A changes default eligibility to `-EvidenceTrustPolicy Authenticated`:
+require a complete matching signed Live envelope under
+`trusted-environment-verification.schema.json`, containing execution-evidence
+v1. Independently supply `-TrustedCertificatePath` (public X509 certificate);
+never trust embedded keys. Certificate validity is required at collection and
+evaluation. Only this policy can establish `verifiedForHumanReview: true`.
+Explicit `RecordedTest` permits signed Mock evidence to reach
+READY_FOR_APPROVAL; explicit `LocalPlanning` preserves raw FAST-007 diagnostics.
+Both always report `verifiedForHumanReview: false`. All policies retain
+`executionAuthorized: false`; no diagnostic opt-in permits writes.
+
 `execution-readiness.json` satisfies `execution-readiness.schema.json` with six
 statuses: `READY_FOR_APPROVAL`, `BLOCKED_PREREQUISITES`, `BLOCKED_EVIDENCE`,
 `BLOCKED_COMPATIBILITY`, `BLOCKED_SECURITY`, and `BLOCKED_DECISION_CHANGE`.
@@ -676,12 +716,31 @@ record is generated or consumed.
 
 Orchestrator `-ExecutionReadinessOnly -ExecutionEvidencePath` with
 `-ReadinessEnvironmentId -ReadinessTenantId` and optional
-`-ReadinessEvaluationTimeUtc` returns before helpers/stages/payload
+`-ReadinessEvaluationTimeUtc`, plus forwarded
+`-ReadinessEvidenceTrustPolicy` / `-ReadinessTrustedCertificatePath`, returns before helpers/stages/payload
 requirements and cannot be combined with Apply. Normal Apply always blocks
 approved `fast-based`/`hybrid` decisions regardless of readiness. Legacy/Fully
-Custom builds and default-off behavior in all modes are unchanged. No live
-authentication/provenance check or Dataverse/PAC/network/install/import/build
-operation occurs. See [the operational guide](../docs/fast-integration/execution-readiness.md).
-FAST-008 trusted collection, independent approver/signature verification,
-authorization consumption/revalidation, and a separately approved executor
-remain proposed only.
+Custom builds and default-off behavior in all modes are unchanged.
+Readiness itself performs no Dataverse/PAC/network/install/import/build
+operation. See [the operational guide](../docs/fast-integration/execution-readiness.md).
+
+FAST-008A adds separately opted-in GET-only collection reusing the inspector
+and shared Dataverse runtime; `trustedEnvironmentVerification` defaults false.
+Mock is the collection default and requires injected test transport; Live
+rejects it and requires an explicit target/solution, read-only confirmation,
+existing authentication and an operator-provided external X509 signing
+certificate. No `.env` target fallback, credential persistence or live GCC
+access is authorized in this mock-only milestone. RetrieveCurrentOrganization
+supplies actual EnvironmentId/TenantId; WhoAmI OrganizationId/UserId are
+distinct. FAST-003's legacy environmentId meaning is not new identity proof.
+Inspect selected packages/dependencies, concrete tables/columns, managed
+properties, publishers/membership and effective privileges by name.
+Unsupported descriptive identities stay unverified/blocked; future CREATE
+ownership is prospective/inferred, not observed. RS256 binds decision bytes,
+plan/catalog/dependency/input/package hashes, actual identity, mode and expiry.
+Signatures prove collector authority, not truth against a compromised signer
+or deployment approval. See
+[trusted verification](../docs/fast-integration/trusted-environment-verification.md).
+Future controlled execution, independent deployment approver/signature checks,
+scoped authorization consumption/revalidation and a separately approved
+executor remain proposed and unauthorized.

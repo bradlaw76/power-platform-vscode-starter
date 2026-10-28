@@ -25,6 +25,13 @@ $relationshipsIndex = $orchestrator.IndexOf("Name = 'relationships'")
 $gridIndex = $orchestrator.IndexOf("Name = 'grid-control'")
 $reportingIndex = $orchestrator.IndexOf("Name = 'native-reporting'")
 $appIndex = $orchestrator.IndexOf("Name = 'app-module'")
+$semanticIndex = $orchestrator.IndexOf("Name = 'semantic-metadata'")
+$semanticFinalIndex = $orchestrator.IndexOf("Name = 'semantic-metadata-final'")
+$exportIndex = $orchestrator.IndexOf("Name = 'unmanaged-export'")
+if ($semanticIndex -le $relationshipsIndex -or $semanticIndex -ge $formsIndex -or
+    $semanticFinalIndex -le $formsIndex -or $semanticFinalIndex -ge $exportIndex) {
+  throw 'Semantic live metadata gates must follow relationships and precede experience/export.'
+}
 if ($formsIndex -lt 0 -or $gridIndex -le $formsIndex -or $gridIndex -ge $reportingIndex -or $gridIndex -ge $appIndex) {
   throw 'Optional stage 61 must run after forms/views and before native reporting/app assembly.'
 }

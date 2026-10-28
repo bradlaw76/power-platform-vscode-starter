@@ -185,6 +185,11 @@ Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard
 
 All three paths converge on the same sequence:
 
+Startup includes a cached, local-only repository update advisory. Network fetch
+requires explicit `-FetchRepositoryUpdates` opt-in; use
+`-SkipRepositoryUpdateCheck` to skip it. No updates are automatically adopted. Stage 90 records
+the exact source baseline for each run without changing this build sequence.
+
 ```text
 Discovery -> Spec Kit -> Demo script -> Dataverse schema -> App experience -> Solution export -> Git -> Import
 ```
@@ -206,21 +211,48 @@ Disclosed local usage metrics are available for wizard runs. Bootstrap scripts l
 
 ## Enhancement registry and maintenance policy
 
-The following optional enhancements extend the baseline wizard without making a
-valid app depend on them:
+The semantic field gate is mandatory; the other enhancements below remain
+optional and do not become prerequisites for an otherwise valid app.
 
 | Enhancement | Contract | Runtime position | Approval and verification |
 | --- | --- | --- | --- |
+| **Repository update advisor and work baseline** | [`repository-updates.json`](repository-updates.json), [`schemas/repository-updates/`](schemas/repository-updates/), optional scenario `repo-update-context.json` | Local-only startup check; per-run source capture in stage 90, not a new build stage | Explicit opt-in fetch, no automatic adoption; categorized path evidence with unknown relevance preserved; immutable Apply run baselines; [guide](docs/repository-updates.md) |
+| **Semantic field types (mandatory, every use case)** | [`field-type-decisions.schema.json`](schemas/payloads/field-type-decisions.schema.json), scenario `field-type-decisions.json`, [standard](docs/semantic-field-type-standard.md) | [`14-validate-semantic-fields.ps1`](scripts/bootstrap/14-validate-semantic-fields.ps1) Planning before column generation; Payload before build; live checks in stage 30, after relationships and before export | Explicit complete planning/Choice/mapping/exception approval; credential-free Preview; drift blocks dependent execution; no legacy bypass or implicit destructive migration |
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
 | **Power Apps grid for all views** | `specs/<slug>/grid-controls.json` plus `grid-controls.schema.json` | Stage 61, after forms/views and before reporting/app assembly | Maker handoff followed by unmanaged-export verification of `Microsoft.PowerApps.PowerAppsOneGrid` and requested properties |
 | **Second-pass form formatting** | `specs/<slug>/form-layouts.json` plus `form-layouts.schema.json` | Stage 63, after app assembly | Credential-free preview and SHA-256 approval; applies only to active, customizable, wizard-owned custom Main forms, then publishes and verifies readback |
-| **FAST Solution Accelerator Discovery, Build Planning, and Execution Readiness** *(default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), and [`execution-readiness.md`](docs/fast-integration/execution-readiness.md) | Optional stage-05 recommendations, standalone FAST-006 dry-run planner, and FAST-007 local-only readiness preflight; no execution stage | Approved decision and pinned plan/evidence/inputs/target; six fail-closed readiness statuses; `executionAuthorized: false` always; no import, authorization, or platform modification |
+| **Requirements-backed reporting choices** | `Reporting Selection` in scenario planning; `reporting-*.json` for native dashboards; `html-reports.json` plus `html-reports.schema.json` for HTML | Optional native stage 64 before app assembly; HTML stage 65/70 afterward | Choose native, HTML, both, or neither; HTML needs approved definitions, matching mappings and current spec/plan excerpts; stable-key reruns; local Preview without upload |
+| **FAST Solution Accelerator Discovery, Build Planning, and Trusted Readiness** *(default off)* | [`accelerator.providers.json`](accelerator.providers.json), [`schemas/accelerators/`](schemas/accelerators/), [`execution-readiness.md`](docs/fast-integration/execution-readiness.md), and [`trusted-environment-verification.md`](docs/fast-integration/trusted-environment-verification.md) | Optional stage-05 recommendations, FAST-006 dry-run planner, FAST-007 early-return preflight, FAST-008A GET-only signed collection; no execution stage | Independently pinned X509 trust, actual authenticated environment/tenant identity, decision/plan/catalog/dependency/input/package bindings; Authenticated default, explicit RecordedTest/LocalPlanning diagnostics; `executionAuthorized: false` always |
+
+For the integrated FAST-008A, semantic-field, reporting and repository update
+advisor change set, use the
+[ChatGPT review guide](docs/fast-reporting-review-guide.md) for verified baseline
+backups, implementation references, validation status, limits, and a review prompt.
 
 Choice presentation supports controlled pastel colors and optional inline label
 icons such as `▲`, `◆`, `⚠`, and `ℹ`. The icon is part of the Choice label,
 matching the Power Apps maker experience. Set `optionSetColors: true` in the
 matching grid contract when the pastel backgrounds must also appear in table
 views.
+
+At reporting scoping, the wizard explains and asks about native dashboards
+(standard Dataverse charts/dashboard components) separately from custom HTML
+reports. Demo Builder includes the choice in its existing consolidated
+confirmation: `native`, `html`, `both`, or `none`; `yes` keeps the displayed
+no-report default. Detailed modes ask the reporting question directly.
+Both reporting sets are optional, and both together need distinct business
+purposes rather than duplicate KPIs.
+
+HTML reports keep Dynamics-style visual consistency but derive their titles,
+audiences, decisions, tables, metrics, and placements from the user's own
+scenario documentation. Frontline, supervisor, and leadership are available
+patterns, not a mandatory set of three. Follow the
+[HTML reporting runbook](docs/live-report-web-resources-runbook.md) and adapt the
+[unapproved example definition](schemas/examples/html-reports.example.json).
+Stage 65 generates exactly the approved definitions, not guessed priority,
+ownership, or queue metrics. App placement is still a separately verified
+handoff, not automatic form-tab or sitemap insertion. Existing HTML-enabled
+scenarios must explicitly author and approve this contract before generation.
 
 FAST recommendations remain unavailable during the default wizard run. FAST-000 baseline
 evidence is recorded in
@@ -287,13 +319,17 @@ architecture override. It writes deterministic artifacts under
 and never calls Dataverse or a bootstrap build stage. Fully Custom plans do not
 require a package manifest or environment evidence.
 
-FAST-007 evaluates externally supplied local evidence, not live platform state:
+FAST-007 evaluates evidence locally; FAST-008A adds separately opted-in GET-only
+collection. Authenticated readiness now requires a complete signed Live envelope
+and an independently provisioned trusted public certificate:
 
 ```powershell
 pwsh .\scripts\accelerators\invoke-execution-readiness.ps1 `
   -EnableExecutionReadiness `
   -ScenarioSlug <scenario-slug> `
-  -EvidencePath <execution-evidence.json> `
+  -EvidencePath <trusted-environment-verification.json> `
+  -EvidenceTrustPolicy Authenticated `
+  -TrustedCertificatePath <independently-provisioned-public.cer> `
   -EnvironmentUrl <approved-target-url> `
   -EnvironmentId <environment-guid> `
   -TenantId <tenant-guid> `
@@ -312,7 +348,19 @@ It returns before helpers, stages, or payload requirements. Combining
 approved `fast-based` or `hybrid` decision regardless of readiness; legacy and
 Fully Custom builds are unchanged. FAST remains off by default in every mode.
 See the [operational guide](docs/fast-integration/execution-readiness.md) for
-statuses, evidence lifetime, target binding, and the proposed FAST-008 boundary.
+statuses, evidence lifetime, target binding, and
+[FAST-008A trusted verification](docs/fast-integration/trusted-environment-verification.md).
+Raw FAST-007 evidence is diagnostic-only with explicit
+`-EvidenceTrustPolicy LocalPlanning`. Signed Mock evidence requires explicit
+`RecordedTest`; neither policy can set `verifiedForHumanReview` true.
+All policies keep `executionAuthorized: false`. The orchestrator forwards
+`-ReadinessEvidenceTrustPolicy` and `-ReadinessTrustedCertificatePath` through
+its unchanged early-return branch. Collection defaults Mock, requires injected
+test transport in Mock, and rejects injected transport in Live. Live requires
+explicit read-only scope, target, existing authentication and an operator-owned
+signing certificate; no `.env` target fallback, persisted credentials or live
+GCC access is part of this milestone. Signatures prove collector authority,
+not deployment authorization or truth against a compromised signer.
 
 ```powershell
 # Explicit local analysis; no wizard stage invokes this command.
@@ -337,6 +385,9 @@ pwsh ./scripts/accelerators/invoke-fast-environment-preflight.ps1 `
 When adding or materially changing a wizard enhancement, update every applicable
 surface in the same change:
 
+Maintain `repository-updates.json` capability/path rules when adding an
+enhancement so update advice does not silently omit the new surface.
+
 1. Update the authoritative sequence and behavior in `docs/onboarding.md`.
 2. Update this enhancement registry, build sequence, script reference, and repo
    tree in `README.md`.
@@ -358,7 +409,7 @@ surface in the same change:
    set and `git diff --check`. Record any intentional unsupported boundary.
 9. Keep `docs/onboarding.md` authoritative. If another document conflicts with
    it, fix that document rather than creating another sequence.
-10. For local readiness changes, maintain the FAST operational guide and ADR,
+10. For readiness changes, maintain both FAST operational guides and ADR,
     distinguish synthetic evidence from live verification, and document both
     the preflight early-return path and the unconditional FAST-dependent Apply
     block. A readiness result must never be described as execution approval.
@@ -658,20 +709,24 @@ Forms and labels rules:
 Run build scripts in order:
 
 ```powershell
+# Before generating any columns: complete/approve field-type-decisions.json and
+# run stage 14 -Mode Planning. After generating the approved payloads:
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Payload
 pwsh ./scripts/bootstrap/15-dry-validate.ps1
 pwsh ./scripts/bootstrap/20-build-tables.ps1
-pwsh ./scripts/bootstrap/30-build-columns.ps1
+pwsh ./scripts/bootstrap/30-build-columns.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 # Apply only with the exact approved SHA-256 hash emitted by Preview
 pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -ApprovedPlanHash <sha256>
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
-pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
 # After the maker completes and publishes the table-level all-views setup:
 pwsh ./scripts/bootstrap/61-configure-power-apps-grid.ps1 -ScenarioSlug <scenario-slug> -Mode Verify
+pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional when specs/<scenario-slug>/form-layouts.json exists; run Preview first
 pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
@@ -685,6 +740,7 @@ pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -I
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
 # Rerun idempotent experience/data stages and the final membership gate
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 # End-of-build analysis
 pwsh ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug <scenario-slug>
@@ -732,7 +788,7 @@ Solution isolation behavior:
 
 Optional report web resources:
 
-- `05-start-wizard.ps1` captures a yes/no decision for optional reporting module scope (when enabled in `wizard.profile.json`).
+- `05-start-wizard.ps1` captures native/HTML/both/neither reporting scope (when enabled in `wizard.profile.json`), separately from the review of each report's content.
 - `70-build-web-resources.ps1` is the canonical optional module entrypoint.
 - `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
 - The script upserts Dataverse HTML web resources and adds them to the selected solution.
@@ -952,8 +1008,14 @@ Release and rollback references for this update bundle:
 
 ## Script reference
 
+The advisor runtime consists of `repository-updates.json`,
+`schemas/repository-updates/`, `scripts/bootstrap/check-repository-updates.ps1`
+and `scripts/bootstrap/helpers/repository-updates.ps1`. The scenario design and
+tasks are under `specs/repository-update-advisor/`.
+
 | Script | Purpose | Changes environment? | Safe to rerun? |
 | --- | --- | --- | --- |
+| `check-repository-updates.ps1` | Categorize upstream changes; local by default, explicit `-Fetch`; [usage](docs/repository-updates.md) | No Dataverse; opt-in Git fetch only | Yes; never applies updates |
 | `00-prereq-check.ps1` | Verify all required tools are installed | No | Yes |
 | `01-install-skills.ps1` | Copy Claude Code skills to `~/.claude/skills/` | Local only | Yes |
 | `05-start-wizard.ps1` | Run discovery questions, scaffold Spec Kit files | No | Yes (prompts before overwrite) |
@@ -961,9 +1023,10 @@ Release and rollback references for this update bundle:
 | `07-demo-dry-run.ps1` | Rehearse a generated demo script and capture notes in `demo-dry-run.md` | No | Yes (prompts before overwrite) |
 | `08-report-wizard.ps1` | Design and preview native Dataverse reporting for an existing model-driven app; deploy only with explicit approval | Only with `-Deploy` | Yes (`-Force` is required to replace generated local artifacts) |
 | `10-auth-connect.ps1` | Sign in, create PAC auth profile, save `.env.ps1` | Local only | Yes |
+| `14-validate-semantic-fields.ps1` | Mandatory Planning/Payload semantic gates and GET-only live Metadata validation; all industries/use cases and wizard modes | No | Yes; legacy scenarios require explicit planning upgrades |
 | `15-dry-validate.ps1` | Validate planning artifacts, payload prerequisites, optional report/BPF/app inputs, and emit contract artifacts before mutation | No | Yes |
 | `20-build-tables.ps1` | Create Dataverse tables from `payloads/table-*.json` | Yes | Yes |
-| `30-build-columns.ps1` | Add columns from `payloads/columns-*.json` | Yes | Yes |
+| `30-build-columns.ps1` | Require approved semantic decisions, preflight existing types, create approved columns, scoped publish and metadata readback | Yes | Yes; drift blocks rather than skips |
 | `35-style-choice-options.ps1` | Preview or apply hash-approved pastel colors and inline icon prefixes from `choice-presentations-*.json` | Apply only | Yes |
 | `40-build-relationships.ps1` | Create lookups from `payloads/relationships-*.json` | Yes | Yes |
 | `50-add-to-solution.ps1` | Add payload entities; in `-InventoryOnly` mode, read all-category membership, preserve IDs, and enforce the export gate without Dataverse mutation | Yes, except inventory-only mode | Yes |
@@ -973,12 +1036,15 @@ Release and rollback references for this update bundle:
 | `62-build-app-module.ps1` | Create or update the scenario-aware model-driven app shell, attach intended components, and validate the resulting app | Yes | Yes |
 | `63-format-forms.ps1` | Preview or apply an approved, hash-bound `form-layouts.json` layout to eligible wizard-owned custom Main forms after app assembly | Apply only | Yes |
 | `70-build-web-resources.ps1` | Canonical optional reporting module entrypoint (wrapper) | Yes | Yes |
-| `65-build-web-resources.ps1` | Generate optional scenario-driven HTML report web resources (agent, supervisor, executive KPI) and add them to solution | Yes | Yes |
+| `65-build-web-resources.ps1` | Generate optional HTML report web resources from approved scenario definitions and requirement excerpts; add them to solution | Yes | Yes |
 | `80-post-build-analysis.ps1` | Generate post-build summary, optional README marker update, and optional guarded git commit/push prompts | No (unless user approves git actions) | Yes |
 | `81-build-progress-matrix.ps1` | Summarize disclosed wizard telemetry into a per-run step matrix | No | Yes |
 | `82-build-progress-report.ps1` | Generate a local HTML dashboard from wizard telemetry analytics | No | Yes |
-| `execution-readiness.ps1` / `invoke-execution-readiness.ps1` | Local FAST-007 engine / CLI; evaluate pinned decision, plan, evidence, inputs, and explicit target identity; never authorize execution | No | Yes, with an explicit evaluation clock |
+| `execution-readiness.ps1` / `invoke-execution-readiness.ps1` | FAST-007/008A local engine / CLI; Authenticated default requires signed Live evidence and independent certificate; explicit RecordedTest/LocalPlanning never claim verified live review | No | Yes, with an explicit evaluation clock |
+| `verification-provenance.ps1` | RS256 envelope signing/validation with external X509 signing certificate and independently pinned public trust; no embedded-key trust | No | Yes, for identical signed content |
+| `trusted-environment-verification.ps1` / `invoke-trusted-environment-verification.ps1` | Explicit GET-only collector / CLI; reuse inspector and shared runtime, bind actual environment/tenant/principal and planning artifacts; Mock default, Live separately confirmed | No (GET-only) | Fresh evidence requires reevaluation; never authorizes execution |
 | `90-run-build.ps1 -ExecutionReadinessOnly` | Early-return local readiness preflight; rejects `-Mode Apply`; normal Apply blocks FAST-dependent decisions independently | No in readiness-only mode | Yes, with an explicit evaluation clock |
+| `95-export-unmanaged-solution.ps1` | Require final membership plus fresh live semantic validation, then unmanaged export/unpack and package inspection; never import | Export only | Yes; Preview never authenticates |
 
 ---
 
@@ -1002,12 +1068,16 @@ power-platform-vscode-starter/
     extensions.json           -- Recommended extensions (installs on first open)
   .gitignore                  -- Protects .env.ps1 and .wizard-metrics/ from accidental commits
   accelerator.providers.json  -- Default-off accelerator provider registry
+  repository-updates.json     -- Stable starter identity, upstream target and capability path catalog
   docs/
     onboarding.md             -- Step-by-step setup guide for new builders
+    semantic-field-type-standard.md -- Mandatory use-case-neutral planning and type validation
     build-log.md              -- Log template for recording each build run
     wizard-contract-v1.md     -- Canonical workflow contract (discovery/planning/execution)
+    repository-updates.md     -- Local-first update checks, scenario relevance and source baselines
     fast-integration/
-      execution-readiness.md  -- Local-only FAST-007 readiness operations and safety boundary
+      execution-readiness.md  -- FAST-007/008A readiness policies and safety boundary
+      trusted-environment-verification.md -- GET-only collection, signed provenance and independent certificate trust
       instructions/
         FAST_Solution_Builder_Implementation_Instructions.md -- Reviewed FAST enhancement implementation directive
   payloads/                   -- Add table-*.json, columns-*.json, relationships-*.json here
@@ -1015,6 +1085,9 @@ power-platform-vscode-starter/
     how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md  -- Full implementation playbook
     how-to-build-dynamics-model-driven-apps-wizard.md                  -- Guided wizard and Spec Kit steps
   schemas/
+    repository-updates/       -- Catalog, scenario context, baseline and advisory report schemas
+    payloads/field-type-decisions.schema.json -- Mandatory semantic inventory schema
+    examples/field-type-decisions.example.json -- Synthetic example, not deployment approval
     accelerators/             -- FAST registry, analysis, decision, package, environment/execution evidence, readiness, and future authorization contracts
   scripts/
     accelerators/
@@ -1027,9 +1100,14 @@ power-platform-vscode-starter/
       invoke-accelerator-requirements-analysis.ps1 -- Explicit standalone local analysis
       execution-readiness.ps1 -- Local-only FAST-007 integrity, evidence, and target evaluation
       invoke-execution-readiness.ps1 -- Explicit standalone readiness CLI; never authorizes execution
+      verification-provenance.ps1 -- RS256 signing and independent certificate validation
+      trusted-environment-verification.ps1 -- GET-only identity, package and concrete metadata collector
+      invoke-trusted-environment-verification.ps1 -- Explicit collector CLI; Mock default, no implicit target
       invoke-fast-environment-preflight.ps1 -- Explicit standalone live preflight
       sync-fast-catalog.ps1   -- Explicit standalone catalog synchronization
     ci/
+      test-repository-updates.ps1 -- Offline Git histories, relevance, fingerprints and immutable baselines
+      test-semantic-fields.ps1  -- Domain-neutral planning, metadata drift and mocked build gates
       test-docs-consistency.ps1  -- Guardrail: docs/prompt question-contract consistency
       test-fast-catalog.ps1      -- FAST discovery, snapshots, diff, and offline fallback
       test-fast-package-indexing.ps1 -- Offline managed solution metadata indexing
@@ -1041,17 +1119,23 @@ power-platform-vscode-starter/
       test-script-order.ps1      -- Guardrail: docs/prompt script-order consistency
       test-script-smoke.ps1      -- Guardrail: reliability smoke checks (relationships/add-to-solution/view layout)
   specs/
+    repository-update-advisor/ -- Approved advisor design, implementation plan and tasks
+    semantic-field-types/    -- Universal semantic gate specification, plan and tasks
     fast-solution-accelerator-discovery/ -- FAST Spec Kit, ADRs, contracts, and package evidence
     fast-007-execution-readiness/ -- Authorized local readiness planning and synthetic evidence
+    fast-008a-trusted-environment-verification/ -- Signed read-only verification planning and mock-only validation
   scripts/
     bootstrap/
+      check-repository-updates.ps1 -- Local-first advisory CLI with explicit fetch
+      helpers/repository-updates.ps1 -- Shared comparison, categorization and run provenance
       00-prereq-check.ps1          -- Verify tools are installed (no changes made)
       01-install-skills.ps1        -- Copy Claude Code skills to ~/.claude/skills/
       05-start-wizard.ps1          -- Discovery questions -> Spec Kit starter files
       10-auth-connect.ps1          -- Sign in, configure PAC auth, save session
+      14-validate-semantic-fields.ps1 -- Planning/Payload gates and GET-only Metadata checks
       15-dry-validate.ps1         -- Validate planning artifacts and payload prerequisites before mutation
       20-build-tables.ps1          -- Create tables from payloads/table-*.json
-      30-build-columns.ps1         -- Add columns from payloads/columns-*.json
+      30-build-columns.ps1         -- Create approved columns, verify types and publish scoped changes
       35-style-choice-options.ps1  -- Apply approved pastel colors and inline icon label prefixes
       40-build-relationships.ps1   -- Create lookups from payloads/relationships-*.json
       50-add-to-solution.ps1       -- Add payload-referenced entities to target solution

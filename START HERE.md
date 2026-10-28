@@ -221,6 +221,26 @@ existing-app reporting, use the direct report wizard command documented in
 
 ## 5. Let Copilot guide setup (when available)
 
+### Know whether your wizard copy has updates
+
+After confirming the repository, the model-driven wizard checks cached Git
+metadata for updates. Terminal intake does this automatically; chat uses the
+same local-only advisor. It does not pull changes or modify your app.
+
+```powershell
+pwsh .\scripts\bootstrap\check-repository-updates.ps1
+```
+
+Cached `up-to-date` does not prove the remote is current. Use `-Fetch` only when
+you explicitly want to contact the configured upstream. Recommendations explain
+affected capabilities; unknown relevance remains review-needed. A timestamped
+source baseline records the full commit and local-change fingerprint for
+orchestrated builds, not a Git tag or deployment approval. See
+[repository updates and work baselines](docs/repository-updates.md) for scenario
+selections, offline behavior and immutable Apply records.
+
+### Continue setup
+
 Before asking anything about your app, Copilot will:
 
 1. **Confirm it's working in the repository you intended** — so it doesn't

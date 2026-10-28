@@ -1,0 +1,6 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "contoso-case-tracker",
+  "enabledCapabilities": ["html-reports", "grid-controls"],
+  "disabledCapabilities": ["native-reports", "fast"]
+}

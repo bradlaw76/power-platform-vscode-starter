@@ -15,6 +15,39 @@ This repository is registered with the SpeckKit registry using raw registry URLs
 - When SpeckKit guidance and repo-local workflow guidance overlap, prefer the repo-local process in `docs/onboarding.md`, `README.md`, and `requirements/`.
 
 ## Primary Workflow
+
+### Repository updates and work baselines
+
+After repository confirmation, use
+`pwsh .\scripts\bootstrap\check-repository-updates.ps1` for cached local advice.
+Terminal intake checks automatically; do not duplicate it. Network fetch needs
+explicit `-Fetch` (terminal `-FetchRepositoryUpdates`); terminal
+`-SkipRepositoryUpdateCheck` skips it. Warn on unavailable checks; cached
+up-to-date is not proof of remote freshness. Optional `repo-update-context.json`
+selections only filter advice; keep unknown relevance as review-needed.
+Never auto-pull, merge, tag, enable modules or adopt updates. Stage 90 preserves
+`repositoryBaseline` in summaries and immutable Apply run records; Preview
+writes no manifest provenance. Resume preserves original source identity.
+Follow `docs/repository-updates.md`; add no discovery question or build stage.
+
+### Semantic fields
+
+Apply [Semantic Field Type Standard](../docs/semantic-field-type-standard.md)
+to every Dataverse use case, industry, wizard mode, greenfield/retrofit and
+standard/custom/hybrid design, independently of FAST. Business meaning, not
+source string representation, determines type. Before any column payload,
+complete and explicitly approve `specs/<slug>/field-type-decisions.json`, mirror
+each decision in spec/plan, and pass `14-validate-semantic-fields.ps1` Planning.
+Pass Payload before build. Resolve categorical candidates as Yes/No, Choice,
+multi-select Choice, Lookup or separately approved text exceptions; define stable
+numeric options, meanings, defaults, mappings and all dependent surfaces.
+Stage 30 blocks incomplete/mismatched design and existing wrong-type columns;
+Metadata gates after relationships and before export query actual types.
+Never auto-approve legacy plans, rewrite intent to hide drift, or delete/recreate
+a String field during normal column generation. Functional surface tests remain
+required. Demo Builder infers recommendations inside its existing confirmation,
+not an extra mandatory questionnaire.
+
 This repository is a guided Power Platform and Dynamics 365 wizard for VS Code.
 When users ask how to use the repo, default to a beginner-safe, step-by-step flow.
 Always require planning before build implementation:
@@ -68,11 +101,38 @@ requirements. Never combine preflight with Apply. Approved `fast-based` and
 `hybrid` decisions block normal Apply regardless of readiness; legacy/Fully
 Custom builds are unchanged. FAST stays default-off in every mode. Readiness
 never performs Dataverse/PAC/network/authentication/install/import/build work
-or verifies live platform provenance. Follow
-`docs/fast-integration/execution-readiness.md`; FAST-008 trusted evidence,
-independent approver/signature verification, authorization
-consumption/revalidation, and a separately approved executor are proposed,
-not implemented.
+itself. Follow `docs/fast-integration/execution-readiness.md`.
+
+FAST-008A adds default-off `trustedEnvironmentVerification` and separate GET-only
+collection via `invoke-trusted-environment-verification.ps1`, reusing the
+inspector/shared Dataverse runtime. Collection defaults Mock (injected test
+transport required); Live rejects injected transport and requires explicit
+`-EnableAuthenticatedVerification -ConfirmReadOnlyScope`, target URL/actual
+environment ID/tenant ID/solution, existing authentication and external X509
+`-SigningCertificate`. No `.env` fallback, stored target selection, persisted
+credentials or live GCC access is authorized in this mock-only milestone.
+RetrieveCurrentOrganization supplies actual EnvironmentId/TenantId; WhoAmI
+OrganizationId/UserId are distinct; legacy FAST-003 environmentId is not proof.
+Inspect packages/dependencies, concrete tables/columns, managed properties,
+publishers/membership and effective privileges by name. Unsupported descriptive
+identities remain unverified/blocked; never guess forms/apps/integration IDs.
+Future CREATE ownership is prospective/inferred, not observed metadata.
+RS256 binds normalized execution-evidence v1, exact decision bytes, plan/catalog/
+dependency/input/package hashes, classified checks, actual identity, mode/expiry.
+Readiness `-EvidenceTrustPolicy Authenticated` is default and requires complete
+matching signed Live evidence with independently supplied
+`-TrustedCertificatePath` (engine `TrustedCertificate`); no embedded-key trust.
+Certificate validity is required at collection and evaluation. Only this policy
+can set `verifiedForHumanReview: true`. Explicit `RecordedTest` permits signed
+Mock READY_FOR_APPROVAL; explicit `LocalPlanning` preserves raw FAST-007
+diagnostics. Both always set `verifiedForHumanReview: false`; all policies keep
+`executionAuthorized: false`. Forward `-ReadinessEvidenceTrustPolicy` and
+`-ReadinessTrustedCertificatePath` through the unchanged early-return preflight.
+Signatures prove collector authority, not deployment approval or truth against
+a compromised signer. See `docs/fast-integration/trusted-environment-verification.md`.
+Future controlled execution, independent deployment approver/signature checks,
+scoped authorization/revalidation and a separately approved executor remain
+proposed and unauthorized; FAST-dependent Apply stays disabled globally.
 
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
@@ -86,6 +146,27 @@ When demo data is requested, never seed standard reused tables implicitly. If Da
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.
 
 ## Wizard Behavior
+
+### Reporting choices and documentary grounding
+
+At reporting scoping, explain and ask whether to include native dashboards
+(standard Dataverse charts/dashboard components), custom HTML reports, both,
+or neither. In Demo Builder, fold this choice into the existing consolidated
+confirmation, not an additional business question. Explain each proposed
+report's audience, decision, metrics/calculations, record scope, placement,
+limitations, and overlap. Recommend both only for complementary tasks.
+Capture native and HTML decisions independently in `Reporting Selection`.
+
+HTML reports must reflect the end user's current scenario spec/plan, user
+tasks, lifecycle, data, and success criteria. Frontline/agent, supervisor, and
+leadership are reusable Dynamics-styled patterns, not a mandatory trio.
+Before generation, author and explicitly approve scenario `html-reports.json`
+against its schema, exact requirement excerpts from `spec.md`/`plan.md`, and
+matching `report-mappings.md` rows. Never invent generic priority, ownership,
+queue metrics, filtered counts, or unsupported calculations. Follow
+`docs/live-report-web-resources-runbook.md`; placement is a separately verified
+handoff. Do not auto-approve legacy definitions or build native payloads after
+an explicit opt-out. The focused existing-app Report Wizard remains native-only.
 When helping in chat:
 - Act like a facilitator, not just a command generator.
 - Ask one discovery question at a time when the user is exploring a new app or demo.

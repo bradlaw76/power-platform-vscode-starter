@@ -15,7 +15,37 @@ Skill availability is not runtime installation. A copied `SKILL.md` does not pro
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use `docs/skill-distribution.md` for installation and provenance checks.
 
+## Repository update advisor
+
+After repository confirmation, run
+`pwsh .\scripts\bootstrap\check-repository-updates.ps1` once for local cached
+advice; terminal intake performs this automatically, so do not duplicate it.
+Network requires explicit `-Fetch` (terminal `-FetchRepositoryUpdates`);
+`-SkipRepositoryUpdateCheck` skips terminal checking. An unavailable check warns,
+not a setup blocker. Cached up-to-date does not prove remote freshness.
+Optional `repo-update-context.json` selections filter capability relevance;
+unknown remains review-needed. Never infer approval or enable modules from advice.
+Stage 90 records `repositoryBaseline` with UTC/full SHA/dirty fingerprint;
+only Apply archives immutable run provenance. Resume preserves original source
+identity. Never auto-pull, merge, tag, push or adopt updates. Follow
+`docs/repository-updates.md`; add no discovery question or build stage.
+
 ## Mandatory Rule
+
+Apply `docs/semantic-field-type-standard.md` to every Dataverse use case,
+industry, mode, greenfield/retrofit and standard/custom/hybrid design,
+independently of FAST. Select types by business meaning, never sample strings.
+Complete and explicitly approve `specs/<slug>/field-type-decisions.json` and
+matching spec/plan rows/IDs before column generation. Run
+`14-validate-semantic-fields.ps1` Planning before generation, Payload before
+builds and Metadata after relationships and before export. Resolve categorical
+candidates as Yes/No, Choice, multi-select Choice, Lookup or separately approved
+text exceptions. Define stable values, labels, meanings, defaults, deterministic
+mappings and dependent surfaces. Stage 30 blocks missing decisions and existing
+wrong-type fields. Never auto-approve legacy plans, hide drift or implicitly
+delete/recreate a String column. Complete functional surface validation separately.
+Demo Builder includes this design in its existing consolidated confirmation,
+not an extra mandatory questionnaire.
 
 > Do not build tables, forms, views, flows, or solution artifacts until Spec Kit is complete.
 
@@ -95,11 +125,39 @@ Orchestrator `-ExecutionReadinessOnly -ExecutionEvidencePath` also requires
 requirements. Never combine it with Apply. Normal Apply rejects approved
 `fast-based`/`hybrid` decisions regardless of readiness; legacy/Fully Custom
 builds remain unchanged. No Dataverse/PAC/network/authentication/install/import/
-build execution or live platform-provenance verification occurs. Follow
-`docs/fast-integration/execution-readiness.md`; FAST-008 trusted collection,
-independent approver/signature verification, authorization
-consumption/revalidation, and a separately approved executor remain proposed,
-not implemented.
+build execution occurs in readiness itself. Follow
+`docs/fast-integration/execution-readiness.md`.
+
+FAST-008A adds default-off `trustedEnvironmentVerification` and separate GET-only
+collection via `invoke-trusted-environment-verification.ps1`, reusing the
+inspector/shared Dataverse runtime. Collection defaults Mock (injected test
+transport required); Live rejects injected transport and requires explicit
+`-EnableAuthenticatedVerification -ConfirmReadOnlyScope`, target URL/actual
+environment ID/tenant ID/solution, existing authentication and external X509
+`-SigningCertificate`. No `.env` fallback, stored target selection, persisted
+credentials or live GCC access is authorized in this mock-only milestone.
+RetrieveCurrentOrganization supplies actual EnvironmentId/TenantId; WhoAmI
+OrganizationId/UserId are distinct; legacy FAST-003 environmentId is not proof.
+Inspect packages/dependencies, concrete tables/columns, managed properties,
+publishers/membership and effective privileges by name. Unsupported descriptive
+identities remain unverified/blocked; never guess forms/apps/integration IDs.
+Future CREATE ownership is prospective/inferred, not observed metadata.
+RS256 binds normalized execution-evidence v1, exact decision bytes, plan/catalog/
+dependency/input/package hashes, classified checks, actual identity, mode/expiry.
+Readiness `-EvidenceTrustPolicy Authenticated` is default and requires complete
+matching signed Live evidence with independently supplied
+`-TrustedCertificatePath` (engine `TrustedCertificate`); no embedded-key trust.
+Certificate validity is required at collection and evaluation. Only this policy
+can set `verifiedForHumanReview: true`. Explicit `RecordedTest` permits signed
+Mock READY_FOR_APPROVAL; explicit `LocalPlanning` preserves raw FAST-007
+diagnostics. Both always set `verifiedForHumanReview: false`; all policies keep
+`executionAuthorized: false`. Forward `-ReadinessEvidenceTrustPolicy` and
+`-ReadinessTrustedCertificatePath` through the unchanged early-return preflight.
+Signatures prove collector authority, not deployment approval or truth against
+a compromised signer. See `docs/fast-integration/trusted-environment-verification.md`.
+Future controlled execution, independent deployment approver/signature checks,
+scoped authorization/revalidation and a separately approved executor remain
+proposed and unauthorized; FAST-dependent Apply stays disabled globally.
 
 Demo Builder may infer a modern table-level Power Apps grid for high-frequency
 operational views inside its consolidated recommendation; do not add a seventh
@@ -133,9 +191,28 @@ In Advanced Builder and Framework Acceptance, ask and capture all base discovery
 16. Standard fields to reuse
 17. Custom fields to add
 18. Relationships to create
-19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
+19. Include native dashboards (standard Dataverse charts/dashboard components), custom HTML reports, both, or neither?
 
-If question 19 is yes, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. If question 19 is no, preserve that explicit no-report decision in `report-mappings.md`.
+If either reporting option is selected, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. Otherwise preserve the explicit no-report decision.
+
+Explain native dashboards versus HTML and ask this at reporting scoping.
+Demo Builder includes native/HTML/both/neither in its existing consolidated
+confirmation, not an additional business question. Capture native/HTML
+decisions separately in `Reporting Selection`; use both only for complementary
+tasks. Explain each report's audience, decision, metrics/calculations, record
+scope, placement, limitations, and overlap.
+
+HTML reports must follow the end user's scenario documentation, top tasks,
+lifecycle, data, and success criteria. Frontline/agent, supervisor, and
+leadership are reusable Dynamics-styled patterns, not a mandatory trio.
+Before generation author and explicitly approve `html-reports.json` against
+`html-reports.schema.json`, exact current `spec.md`/`plan.md` requirement excerpts,
+and matching `report-mappings.md` table/title/placement rows. Generate only
+documented metrics; no guessed priority, ownership, queue fields, or unsupported
+calculations. Follow `docs/live-report-web-resources-runbook.md` for supported
+queries and separately verified placement handoff. Never auto-approve legacy
+HTML definitions or build native payloads after opt-out. The focused Report
+Wizard remains native-only.
 
 After entity mapping in the detailed modes, also capture:
 - Validate the primary entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Give every planned view an explicit `views.json` disposition. For a uniquely planned new custom table, use `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and `create-custom` for a distinct business view. Use `explicit-decision-required` for standard, hybrid-standard, shared, preexisting, retrofit, or ambiguous tables; never infer adoption for them. Planning intent does not replace step 60's current-run creation and exact generated metadata proof. Require explicit-decision resolution and authenticated saved-query resolution before app assembly.
@@ -174,11 +251,13 @@ Follow this exact sequence — do not skip validation checkpoints:
 ## Build Scripts (Run in Order)
 
 ```powershell
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Payload
 pwsh ./scripts/bootstrap/20-build-tables.ps1
-pwsh ./scripts/bootstrap/30-build-columns.ps1
+pwsh ./scripts/bootstrap/30-build-columns.ps1 -ScenarioSlug <scenario-slug>
 # Optional when choice-presentations-*.json exists; Preview emits the approval hash
 pwsh ./scripts/bootstrap/35-style-choice-options.ps1 -ScenarioSlug <scenario-slug> -PreviewOnly
 pwsh ./scripts/bootstrap/40-build-relationships.ps1
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1
 pwsh ./scripts/bootstrap/55-build-business-process-flows.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/60-build-forms-views.ps1
@@ -189,13 +268,14 @@ pwsh ./scripts/bootstrap/64-build-charts-dashboard.ps1 -ScenarioSlug <scenario-s
 pwsh ./scripts/bootstrap/62-build-app-module.ps1 -ScenarioSlug <scenario-slug>
 # Optional when specs/<scenario-slug>/form-layouts.json exists; Preview emits the approval hash
 pwsh ./scripts/bootstrap/63-format-forms.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
-# Run only if Q19 answer was yes
+# Run only if HTML reports were selected and definitions approved
 pwsh ./scripts/bootstrap/65-build-web-resources.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate
 pwsh ./scripts/bootstrap/66-seed-synthetic-data.ps1 -ScenarioSlug <scenario-slug>
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase CaptureBaseline
 # Rerun idempotent experience/data stages and the final membership gate
 pwsh ./scripts/bootstrap/85-verify-idempotency.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+pwsh ./scripts/bootstrap/14-validate-semantic-fields.ps1 -ScenarioSlug <scenario-slug> -Mode Metadata
 pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name>
 ```
 
@@ -230,7 +310,9 @@ only and is not installed by this repository.
 
 Native charts/dashboard and HTML web resources are separate capabilities. Framework Acceptance uses scenario-owned reporting/data payloads, a controlled second pass proving stable IDs and zero duplicates, and unmanaged export plus local unpack/inspection. Never import the Framework Acceptance export.
 
-Script 65 generates 3 Dynamics-blue HTML reports (agent performance, supervisor oversight, executive KPI) from scenario design files and adds them to the solution as web resources. It skips silently when reports are disabled.
+Script 65 generates only approved requirement-backed HTML definitions and adds
+them to the solution as web resources. It reports a skip when HTML is disabled.
+Missing/unapproved definitions or stale requirement excerpts fail explicitly.
 
 Form-building instruction for agents:
 

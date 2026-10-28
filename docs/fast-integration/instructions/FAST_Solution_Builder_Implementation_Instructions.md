@@ -1,7 +1,7 @@
 # FAST Integration — Implementation Instructions for the Existing Solution Builder / Wizard
 
 > [!IMPORTANT]
-> **Repository status:** FAST-000 through FAST-005B are complete and accepted. FAST-006 provides provider-neutral, industry-agnostic, dry-run-only build planning. FAST-007 is separately authorized for local-only execution readiness, superseding historical stop conditions only within that scope; it is not a FAST-006 continuation into execution. See the [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), [FAST-006 evidence](../../../specs/fast-solution-accelerator-discovery/evidence/fast-006-build-planning.md), [ADR 0010](../../../specs/fast-solution-accelerator-discovery/adrs/0010-local-execution-readiness.md), and [FAST-007 operational guide](../execution-readiness.md). `READY_FOR_APPROVAL` is human review only and `executionAuthorized` is always false. No approval/authorization records or live platform-provenance verification are included; FAST-dependent Apply remains blocked regardless of readiness. Managed accelerator definitions, legacy/Fully Custom normal builds, and all modes' default-off behavior are preserved. No Dataverse/PAC/network/authentication/install/import/build execution occurs in readiness. FAST-008 trusted collection, independent approver/signature verification, authorization consumption/revalidation, and a separately approved executor remain proposed only. This status claims no test pass or live readiness. The authoritative sequence remains [`docs/onboarding.md`](../../onboarding.md).
+> **Repository status:** FAST-000 through FAST-005B are complete and accepted. FAST-006 remains dry-run-only planning; FAST-007 remains human-review readiness. FAST-008A adds GET-only trusted environment verification and RS256 provenance with independently supplied X509 trust, superseding earlier proposed-only collection wording only within this scope. See [Spec Kit artifacts](../../../specs/fast-solution-accelerator-discovery/), [ADR 0011](../../../specs/fast-solution-accelerator-discovery/adrs/0011-trusted-environment-verification.md), [readiness operations](../execution-readiness.md) and [trusted verification](../trusted-environment-verification.md). Authenticated is the default readiness policy and requires complete matching signed Live evidence; explicit RecordedTest/LocalPlanning diagnostics always report `verifiedForHumanReview: false`. All policies retain `executionAuthorized: false`; FAST-dependent Apply remains disabled globally. Collection defaults Mock; Live requires explicit target/read-only confirmation, existing authentication and an external signing certificate, with no injected transport, `.env` fallback or persisted credentials. Actual environment/tenant identity is distinct from organization ID. Unsupported descriptive components stay unverified/blocked; future CREATE ownership is inferred, not observed. This milestone uses mocks only: no live GCC access, test pass, or live readiness is claimed here. Future controlled execution, independent deployment approvals/signatures, scoped authorization/revalidation and a separately approved executor remain proposed and unauthorized. Normal Fully Custom builds and default-off behavior in all modes are unchanged. The authoritative sequence remains [`docs/onboarding.md`](../../onboarding.md).
 
 **Instruction ID:** FAST-IMPLEMENTATION-001  
 **Intended executor:** GitHub Copilot Agent in Visual Studio Code, working in the existing wizard repository  
@@ -11,6 +11,21 @@
 > **EXECUTION RULE:** Begin with **Phase 0 — Git baseline and recovery**. Do not crawl, refactor, install, deploy, or edit application code until the baseline is safely preserved. Work incrementally, report evidence after each phase, and do not advance past explicit approval gates.
 
 ## Executive objective
+
+### Universal semantic field gate (not FAST-specific)
+
+Apply the repository's [Semantic Field Type Standard](../../semantic-field-type-standard.md)
+to every Dataverse use case, industry, wizard mode, greenfield/retrofit and
+standard/custom/hybrid design, including Fully Custom and disabled/unavailable
+accelerators. Select types by business meaning, never source strings.
+Require approved scenario `field-type-decisions.json` and aligned spec/plan/tasks
+before column generation; stage 14 Planning/Payload gates and live stage-30,
+post-relationship and pre-export metadata checks are mandatory. Resolve stable
+Choice vocabularies, Lookup targets and deterministic mappings; categorical text
+requires separate explicit approval. Drift stops dependent execution. Do not
+infer legacy approval, modify managed ownership, or perform String-to-Choice
+delete/recreate as a normal build side effect. Functional surface validation
+and any destructive migration approval remain separate.
 
 Extend the existing Solution Builder / Wizard with a dynamic, explainable **Solution Accelerator Discovery Engine**, with Microsoft **FAST (App & AI Starter Templates)** as its first provider. After normal user requirements discovery and **before architecture finalization**, the wizard shall automatically evaluate reusable FAST modules, their use cases, data models, and dependencies; show a concise recommendation only when useful; and generate a requirements-by-requirements gap analysis. The user remains free to accept a FAST foundation, select a hybrid approach, or choose a completely custom solution.
 
@@ -287,7 +302,8 @@ Produce narrowly scoped PRs with explicit stop/go reviews:
 | FAST-005 | Mode UX and generator wiring | Feature-flagged behavior, no added mandatory questions |
 | FAST-006 | Provider-neutral dry-run build planning | Approved-artifact validation, managed ownership, deterministic plans, blocked GCC and Fully Custom evidence |
 | FAST-007 | Local-only execution readiness (authorized) | Pinned decision/plan/evidence/inputs/target, six statuses, `executionAuthorized: false`, early-return preflight, unconditional FAST-dependent Apply block; no execution |
-| FAST-008 | Trusted evidence and execution design (proposed only) | Trusted collection, independent approver/signature verification, authorization consumption/revalidation, and a separately approved executor; not implemented |
+| FAST-008A | Trusted environment verification (mock-only implementation scope) | GET-only actual identity/package/concrete metadata checks, RS256 provenance with independent X509 trust, Authenticated/RecordedTest/LocalPlanning readiness policies; no execution authorization |
+| Future controlled execution | Proposed only; not authorized | Independent deployment approver/signature verification, scoped authorization consumption, scope checks/revalidation and a separately approved executor; no approval supplied by FAST-008A |
 
 **Do not ship all six engineering phases in one giant PR.** Each PR must contain changed-file inventory, motivation, tests that actually ran (with command/output), failures/skips, screenshots only where UI changes are relevant, risks, dependency/source versions and exact rollback steps.
 

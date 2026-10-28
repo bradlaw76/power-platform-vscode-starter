@@ -15,6 +15,18 @@ $bpfRunbook = Get-Content (Join-Path $repoRoot 'docs/bpf-operator-runbook.md') -
 $skillDistribution = Get-Content (Join-Path $repoRoot 'docs/skill-distribution.md') -Raw
 $sourceControlStandardsPath = Join-Path $repoRoot 'requirements/GithubInstructions_General.md'
 
+foreach ($surface in @($readme, $onboarding, $prompt, $contract, $initSkill, $copilotInstructions, $skillDistribution)) {
+  foreach ($requiredReportingText in @('html-reports.json', 'native', 'HTML')) {
+    if (-not $surface.Contains($requiredReportingText)) { throw "Missing reporting choice/requirements guidance: $requiredReportingText" }
+  }
+}
+
+foreach ($surface in @($readme, $onboarding, $prompt, $contract, $initSkill, $copilotInstructions)) {
+  foreach ($requiredSemanticText in @('semantic-field-type-standard.md', 'field-type-decisions', '14-validate-semantic-fields.ps1')) {
+    if (-not $surface.Contains($requiredSemanticText)) { throw "Missing universal semantic guidance: $requiredSemanticText" }
+  }
+}
+
 $requiredQuestions = [int]$wizardContract.discovery.coreQuestions
 
 if ($requiredQuestions -ne 11) {
@@ -39,6 +51,14 @@ if ($prompt -notmatch 'Advanced Builder Question Set \(11 core\)') {
 
 if ($wizardContract.discovery.defaultMode -ne 'demo-builder') {
   throw 'Profile must default to demo-builder.'
+}
+
+foreach ($contentCheck in @($readme, $onboarding, $prompt, $contract, $initSkill, $copilotInstructions)) {
+  foreach ($pattern in @('repo-update-context.json', 'FetchRepositoryUpdates', 'repository-updates')) {
+    if ($contentCheck -notmatch [regex]::Escape($pattern)) {
+      throw "Wizard surface is missing repository update guidance: $pattern"
+    }
+  }
 }
 
 $wizardModes = @($wizardContract.discovery.modes.PSObject.Properties.Name)

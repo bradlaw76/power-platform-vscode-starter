@@ -88,11 +88,101 @@ function Assert-FastDataverseEnvironmentUrl {
     return $uri.GetLeftPart([UriPartial]::Authority).TrimEnd('/')
 }
 
+function Invoke-FastDataverseGet {
+    [CmdletBinding()]
+    param(
+        [Parameter(Mandatory)] [string]$EnvironmentUrl,
+        [Parameter(Mandatory)] [string]$Path,
+        [Parameter(Mandatory)] [string]$AccessToken,
+        [switch]$RequireComplete,
+        [ValidateRange(1, 50)] [int]$MaximumPages = 10,
+        [ValidateRange(1, 50000)] [int]$MaximumRecords = 10000,
+        [int]$RequestTimeoutSec = 30,
+        [int]$MaxAttempts = 4,
+        [scriptblock]$TokenProvider,
+        [scriptblock]$RequestInvoker,
+        [scriptblock]$SleepAction
+    )
+
+    $origin = Assert-FastDataverseEnvironmentUrl -EnvironmentUrl $EnvironmentUrl
+    $currentPath = $Path
+    $initialUri = [Uri]"$origin/api/data/v9.2/$Path"
+    $initialQuery = @($initialUri.Query.TrimStart('?').Split('&', [StringSplitOptions]::RemoveEmptyEntries) |
+        ForEach-Object { [Net.WebUtility]::UrlDecode($_) } | Where-Object { $_ -notmatch '^\$skiptoken=' } | Sort-Object)
+    $seen = [Collections.Generic.HashSet[string]]::new([StringComparer]::Ordinal)
+    $records = [Collections.Generic.List[object]]::new()
+    for ($page = 0; $page -lt $MaximumPages; $page++) {
+        if ($currentPath -notmatch '^(?i)(WhoAmI(?:\(\))?$|RetrieveVersion\(\)$|RetrieveCurrentOrganization\(|EntityDefinitions[?(]|RelationshipDefinitions[?(]|GlobalOptionSetDefinitions[?(]|solutions[?(]|solutioncomponents[?(]|systemforms[?(]|savedqueries[?(]|webresourceset[?(]|customcontrols[?(]|settingdefinitions[?(]|systemusers[?(])' -or
+            $currentPath -match '[\r\n#]' -or -not $seen.Add($currentPath)) {
+            throw 'Read-only inspection rejected an unsupported path or pagination cycle.'
+        }
+        $response = Invoke-WizardDataverseRequest -Method Get -Path $currentPath -EnvironmentUrl $origin `
+            -AccessToken $AccessToken -RejectRedirects -TimeoutSec $RequestTimeoutSec -MaxAttempts $MaxAttempts `
+            -TokenProvider $TokenProvider -RequestInvoker $RequestInvoker -SleepAction $SleepAction
+        $hasValue = $null -ne $response -and
+            (($response -is [Collections.IDictionary] -and $response.Contains('value')) -or
+             $null -ne $response.PSObject.Properties['value'])
+        if ($hasValue) {
+            if ($response -is [Collections.IDictionary]) { $rawValue = $response['value'] }
+            else { $rawValue = $response.PSObject.Properties['value'].Value }
+            if ($rawValue -isnot [Collections.IList]) { throw 'Read-only inspection received a non-array collection; evidence is incomplete.' }
+        }
+        $value = @(Get-FastObjectPropertyValue -InputObject $response -Name 'value')
+        $next = "$(Get-FastObjectPropertyValue -InputObject $response -Name '@odata.nextLink' -DefaultValue '')"
+        if (-not $hasValue) {
+            if ($RequireComplete -and $currentPath -match '^(?i)(EntityDefinitions\?|.+/Attributes\?|RelationshipDefinitions\?|GlobalOptionSetDefinitions\?|solutions\?|solutioncomponents\?|systemforms\?|savedqueries\?|webresourceset\?|customcontrols\?|settingdefinitions\?|systemusers\?)') {
+                throw 'Read-only inspection received an incomplete collection response.'
+            }
+            if ($page -gt 0 -or -not [string]::IsNullOrWhiteSpace($next)) {
+                throw 'Read-only inspection received malformed pagination.'
+            }
+            return $response
+        }
+        foreach ($record in @($value)) { $records.Add($record) | Out-Null }
+        if ($records.Count -gt $MaximumRecords) { throw 'Read-only inspection exceeded its record bound; evidence is incomplete.' }
+        if ([string]::IsNullOrWhiteSpace($next)) { return [pscustomobject]@{ value = @($records.ToArray()) } }
+        $nextUri = $null
+        if (-not [Uri]::TryCreate($next, [UriKind]::Absolute, [ref]$nextUri) -or
+            $nextUri.GetLeftPart([UriPartial]::Authority) -ine $origin -or
+            -not [string]::IsNullOrEmpty($nextUri.UserInfo) -or -not [string]::IsNullOrEmpty($nextUri.Fragment) -or
+            -not $nextUri.AbsolutePath.StartsWith('/api/data/v9.2/', [StringComparison]::Ordinal)) {
+            throw 'Read-only inspection rejected cross-origin or invalid pagination.'
+        }
+        $nextQuery = @($nextUri.Query.TrimStart('?').Split('&', [StringSplitOptions]::RemoveEmptyEntries) |
+            ForEach-Object { [Net.WebUtility]::UrlDecode($_) } | Where-Object { $_ -notmatch '^\$skiptoken=' } | Sort-Object)
+        if ($nextUri.AbsolutePath -cne $initialUri.AbsolutePath -or ($nextQuery -join '&') -cne ($initialQuery -join '&')) {
+            throw 'Read-only inspection rejected pagination outside the original query scope.'
+        }
+        $currentPath = $nextUri.PathAndQuery.Substring('/api/data/v9.2/'.Length)
+    }
+    throw 'Read-only inspection exceeded its page bound; evidence is incomplete.'
+}
+
+function Get-FastPlannedComponentQuery {
+    param([Parameter(Mandatory)] [object]$Task)
+
+    $identity = "$($Task.componentIdentity)"
+    if ($Task.componentKind -eq 'table' -and $identity -cmatch '^[a-z][a-z0-9_]*$') {
+        return [pscustomobject]@{
+            Path = "EntityDefinitions?`$select=MetadataId,LogicalName,SchemaName,IsManaged,IsCustomizable,CanCreateAttributes&`$filter=LogicalName eq '$identity'"
+            ComponentType = 1; LogicalName = $identity
+        }
+    }
+    if ($Task.componentKind -eq 'column' -and $identity -cmatch '^(?<table>[a-z][a-z0-9_]*)\.(?<column>[a-z][a-z0-9_]*)$') {
+        $table = $Matches.table; $column = $Matches.column
+        return [pscustomobject]@{
+            Path = "EntityDefinitions(LogicalName='$table')/Attributes?`$select=MetadataId,LogicalName,SchemaName,IsManaged,IsCustomizable&`$filter=LogicalName eq '$column'"
+            ComponentType = 2; LogicalName = $column; ParentLogicalName = $table
+        }
+    }
+    return $null
+}
+
 function Get-FastEnvironmentInspectionCacheKey {
     param(
         [Parameter(Mandatory)] [string]$EnvironmentUrl,
         [Parameter(Mandatory)] [string]$CatalogSnapshotId,
-        [Parameter(Mandatory)] [object[]]$SelectedPackages
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]]$SelectedPackages
     )
 
     $packageKeys = @($SelectedPackages | ForEach-Object {
@@ -192,7 +282,7 @@ function Split-FastCollection {
 }
 
 function Get-FastRequiredSolutionNames {
-    param([Parameter(Mandatory)] [object[]]$SelectedPackages)
+    param([Parameter(Mandatory)] [AllowEmptyCollection()] [object[]]$SelectedPackages)
 
     $names = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($package in @($SelectedPackages)) {
@@ -346,7 +436,9 @@ function Invoke-FastDataverseEnvironmentInspection {
         [Parameter(Mandatory)] [string]$EnvironmentUrl,
         [Parameter(Mandatory)] [string]$AccessToken,
         [Parameter(Mandatory)] [string]$CatalogSnapshotId,
-        [Parameter(Mandatory)] [object[]]$SelectedPackages,
+        [Parameter(Mandatory)] [AllowEmptyCollection()] [object[]]$SelectedPackages,
+        [switch]$ProviderNeutral,
+        [switch]$StrictReadOnlyVerification,
         [string]$TenantId = '',
         [string]$CacheRoot = '',
         [timespan]$CacheTimeToLive = ([TimeSpan]::FromMinutes(15)),
@@ -359,7 +451,7 @@ function Invoke-FastDataverseEnvironmentInspection {
         [datetime]$NowUtc = [DateTime]::UtcNow
     )
 
-    if ($SelectedPackages.Count -eq 0) {
+    if ($SelectedPackages.Count -eq 0 -and -not $ProviderNeutral) {
         throw 'At least one selected package is required for live FAST environment inspection.'
     }
     if ([string]::IsNullOrWhiteSpace($AccessToken)) {
@@ -389,13 +481,13 @@ function Invoke-FastDataverseEnvironmentInspection {
     $invokeGet = {
         param([string]$Path, [string]$Capability)
         $requestLog.Add([pscustomobject]@{ Method = 'Get'; Path = $Path; Capability = $Capability }) | Out-Null
-        $response = Invoke-WizardDataverseRequest `
-            -Method Get `
+        $response = Invoke-FastDataverseGet `
             -Path $Path `
             -EnvironmentUrl $normalizedUrl `
             -AccessToken $AccessToken `
             -MaxAttempts $MaxAttempts `
-            -TimeoutSec $RequestTimeoutSec `
+            -RequestTimeoutSec $RequestTimeoutSec `
+            -RequireComplete:$StrictReadOnlyVerification `
             -TokenProvider $TokenProvider `
             -RequestInvoker $RequestInvoker `
             -SleepAction $SleepAction
@@ -428,14 +520,25 @@ function Invoke-FastDataverseEnvironmentInspection {
     $installedSolutions = @()
     try {
         $requiredSolutionNames = @(Get-FastRequiredSolutionNames -SelectedPackages $SelectedPackages)
-        $solutionFilters = @("startswith(uniquename,'appbase_')")
+        $solutionFilters = @(if (-not $ProviderNeutral) { "startswith(uniquename,'appbase_')" })
         $solutionFilters += @($requiredSolutionNames | ForEach-Object {
             "uniquename eq '$(ConvertTo-WizardODataLiteral $_)'"
         })
         $solutionPath = "solutions?`$select=solutionid,uniquename,friendlyname,version,ismanaged,_publisherid_value&`$expand=publisherid(`$select=publisherid,uniquename,customizationprefix)&`$filter=$($solutionFilters -join ' or ')"
-        $solutionResponse = & $invokeGet $solutionPath 'read-solutions'
+        $solutionResponse = if ($solutionFilters.Count -gt 0) { & $invokeGet $solutionPath 'read-solutions' } else { [pscustomobject]@{ value = @() } }
         $installedSolutions = @((Get-FastObjectPropertyValue -InputObject $solutionResponse -Name 'value' -DefaultValue @()) | ForEach-Object {
             $publisher = Get-FastObjectPropertyValue -InputObject $_ -Name 'publisherid'
+            if ($StrictReadOnlyVerification) {
+                $solutionId = [guid]::Empty; $publisherId = [guid]::Empty
+                if ((Get-FastObjectPropertyValue $_ 'ismanaged') -isnot [bool] -or
+                    -not [guid]::TryParse("$(Get-FastObjectPropertyValue $_ 'solutionid')", [ref]$solutionId) -or $solutionId -eq [guid]::Empty -or
+                    -not [guid]::TryParse("$(Get-FastObjectPropertyValue $_ '_publisherid_value')", [ref]$publisherId) -or $publisherId -eq [guid]::Empty -or
+                    "$(Get-FastObjectPropertyValue $publisher 'publisherid')" -ine $publisherId.ToString() -or
+                    [string]::IsNullOrWhiteSpace("$(Get-FastObjectPropertyValue $publisher 'uniquename')") -or
+                    [string]::IsNullOrWhiteSpace("$(Get-FastObjectPropertyValue $publisher 'customizationprefix')")) {
+                    throw 'Installed solution ownership or managed metadata is incomplete.'
+                }
+            }
             [pscustomobject][ordered]@{
                 solutionId = "$(Get-FastObjectPropertyValue -InputObject $_ -Name 'solutionid' -DefaultValue '')"
                 uniqueName = "$(Get-FastObjectPropertyValue -InputObject $_ -Name 'uniquename' -DefaultValue '')"
@@ -466,7 +569,7 @@ function Invoke-FastDataverseEnvironmentInspection {
             }
         })
     })
-    $uniqueTableNames = @($tableRequirements.logicalName | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
+    $uniqueTableNames = @($tableRequirements | ForEach-Object logicalName | Where-Object { -not [string]::IsNullOrWhiteSpace($_) } | Sort-Object -Unique)
     $foundTables = [Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
     foreach ($tableChunk in @(Split-FastCollection -InputObject $uniqueTableNames -Size 20)) {
         $filter = @($tableChunk | ForEach-Object {
@@ -609,6 +712,8 @@ function Invoke-FastDataverseEnvironmentInspection {
     $evidence = [pscustomobject][ordered]@{
         accessState = if ($permissionLimitations.Count -gt 0) { 'insufficient-permissions' } else { 'connected' }
         connected = $true
+        principalId = "$(Get-FastObjectPropertyValue -InputObject $identity -Name 'UserId' -DefaultValue '')"
+        organizationId = "$(Get-FastObjectPropertyValue -InputObject $identity -Name 'OrganizationId' -DefaultValue '')"
         environmentId = $environmentId
         environmentUrl = $normalizedUrl
         tenantId = $TenantId

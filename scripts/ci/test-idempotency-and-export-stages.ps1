@@ -11,6 +11,17 @@ ENVIRONMENT:  PowerShell 7 | Credential-free CI
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$fixtureRoot = Join-Path ([IO.Path]::GetTempPath()) "semantic-export-$([guid]::NewGuid().ToString('N'))"
+. (Join-Path $repoRoot 'scripts\ci\helpers\semantic-preview-fixtures.ps1')
+try {
+New-SemanticPreviewWorkspace -SourceRoot $repoRoot -TargetRoot $fixtureRoot -ScenarioSlugs @()
+$repoRoot = $fixtureRoot
+$semanticGateStub = @'
+param([string]$Mode)
+if ($Mode -ne 'Metadata') { throw 'Export must request live Metadata validation.' }
+Add-Content -LiteralPath (Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'semantic-export-checks.log') -Value $Mode
+'@
+Set-Content -LiteralPath (Join-Path $repoRoot 'scripts\bootstrap\14-validate-semantic-fields.ps1') -Value $semanticGateStub
 $scenario = 'ci-idempotency-export'
 $artifactRoot = Join-Path $repoRoot '.wizard-metrics/artifacts'
 $testPaths = @(
@@ -75,8 +86,12 @@ try {
     try { & (Join-Path $repoRoot 'scripts/bootstrap/95-export-unmanaged-solution.ps1') -ScenarioSlug $scenario -SolutionUniqueName UnitSolution -OutputFolder $outputFolder -PacInvoker $pacInvoker; throw 'Expected unrelated-component failure.' } catch { if ($_.Exception.Message -notmatch 'unrelated component') { throw } }
     $source = Get-Content -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/95-export-unmanaged-solution.ps1') -Raw
     if ($source -match '(?i)solution[''"\s,]+import') { throw 'Export stage contains a solution import command.' }
+    if (@(Get-Content -LiteralPath (Join-Path $repoRoot 'semantic-export-checks.log')).Count -ne 3) { throw 'Every direct export must invoke the semantic Metadata gate before PAC.' }
 } finally {
     Remove-Item -LiteralPath (Join-Path $artifactRoot "manifest/$scenario") -Recurse -Force -ErrorAction SilentlyContinue
     Remove-Item -LiteralPath $reportingPath,$dataPath,(Join-Path $artifactRoot "contamination/$scenario"),(Join-Path $artifactRoot "idempotency/$scenario"),(Join-Path $artifactRoot "export/$scenario.json"),(Join-Path $repoRoot ".wizard-metrics/exports/$scenario") -Recurse -Force -ErrorAction SilentlyContinue
 }
 Write-Host 'Idempotency and export stage tests passed.' -ForegroundColor Green
+} finally {
+    if (Test-Path -LiteralPath $fixtureRoot) { Remove-Item -LiteralPath $fixtureRoot -Recurse -Force }
+}

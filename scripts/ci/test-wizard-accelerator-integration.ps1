@@ -257,6 +257,23 @@ try {
     $demoPreference = Get-Content -LiteralPath (Join-Path $demoWorkspace 'specs/fraud-investigation-management/accelerator/accelerator-preference.json') -Raw | ConvertFrom-Json
     Assert-True ($demoPreference.preference -eq 'evaluate' -and -not $demoPreference.finalArchitectureSelected) 'Demo preference was not persisted separately from architecture approval.'
 
+    $reportingWorkspace = New-AcceleratorWizardWorkspace -Name 'demo-reporting-enabled'
+    $reportingDemo = Invoke-AcceleratorWizardFixture `
+        -Workspace $reportingWorkspace `
+        -Answers ($demoAnswers + @('fully-custom+both')) `
+        -Mode 'demo-builder' -Enable `
+        -CatalogPath $catalogPath `
+        -PackageManifestPath $packageManifestPath `
+        -EnvironmentPath $environmentPath
+    Assert-True ($reportingDemo.ExitCode -eq 0) "Combined architecture/reporting confirmation failed: $($reportingDemo.Output)"
+    $reportingScenario = Join-Path $reportingWorkspace 'specs/fraud-investigation-management'
+    $reportingAnswers = Get-Content -LiteralPath (Join-Path $reportingScenario 'answers.md') -Raw
+    Assert-True ($reportingAnswers -match '- Native dashboards: yes' -and $reportingAnswers -match '- HTML reports: yes') 'Accelerator-enabled Demo Builder lost reporting choices.'
+    $reportingMappings = Get-Content -LiteralPath (Join-Path $reportingScenario 'report-mappings.md') -Raw
+    Assert-True ($reportingMappings -match '- Status: pending-review') 'Architecture approval must not auto-approve report definitions.'
+    $reportingDecision = Get-Content -LiteralPath (Join-Path $reportingScenario 'accelerator/accelerator-decision.json') -Raw | ConvertFrom-Json
+    Assert-True ($reportingDecision.selectedOption -eq 'fully-custom') 'Reporting selection changed the architecture identity.'
+
     $advancedWorkspace = New-AcceleratorWizardWorkspace -Name 'advanced-enabled'
     $advanced = Invoke-AcceleratorWizardFixture `
         -Workspace $advancedWorkspace `

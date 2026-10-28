@@ -1,0 +1,230 @@
+{
+  "schemaVersion": "1.0",
+  "artifactType": "trusted-environment-verification",
+  "payload": {
+    "collectorVersion": "1.0",
+    "collectionMode": "Mock",
+    "decisionSha256": "9378bbaf87043ad0c01e5c429a35cfcc9469a9535b3f22840e3810324acb8101",
+    "catalogSnapshotId": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+    "dependencyManifestSha256": "f48b1526618a8ad2179a270793fda359a6088af5f77af6ed06bcef7d455a3605",
+    "inputFingerprints": {
+      "analysisManifest": "7d3a4aef9429eba5560c2a7c343118fea06c1bc7e43edb95b06b2b2a111ab377",
+      "componentDelta": "8bedd7ff8c0392f2483c9a7c31386618837e8ce825bcf4c07a662fabd79a11c4",
+      "coverage": "a1ab500e681486f5240a6ff9fc9694c3a9ee7408f4b4bdcf28af0f25e78ffdff",
+      "decision": "9378bbaf87043ad0c01e5c429a35cfcc9469a9535b3f22840e3810324acb8101",
+      "dependencies": "f48b1526618a8ad2179a270793fda359a6088af5f77af6ed06bcef7d455a3605",
+      "environment": "68a877f3202bd3c11d96466654954c58f67e2a8635ebe6f5e8a3908dceeaf7d7",
+      "packageManifest": "b30e9a772397474d5d1b9cc8b0ce2c553d28d04e126177331eaf251dd17d1e09",
+      "schemaPlan": "0a232eb78604190f578e7fea6ef46bc643b0183a2bd99b32c0878321182bca06",
+      "spec": "9095739f338d19a947454b7837c311120c71243b0cf2397063d2635806758191",
+      "traceability": "a0846e8a37b6cab17d465fbc604d0b6e734539b1417e042e911b8fb3f4a7271f",
+      "package:synthetic-records": "65e1329dcfa1771c55b104f6e64af1629c4aa4a1af55a2b645850bf732aac321"
+    },
+    "selectedPackages": [
+      {
+        "moduleId": "synthetic-records",
+        "packageId": "synthetic-records-v1",
+        "version": "1.0.0.0",
+        "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+      }
+    ],
+    "authenticatedIdentity": {
+      "organizationId": "99999999-9999-4999-8999-999999999999",
+      "principalId": "33333333-3333-4333-8333-333333333333",
+      "aadObjectId": "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa"
+    },
+    "complete": true,
+    "checks": [
+      {
+        "id": "authenticated-connection",
+        "target": "https://synthetic.example.test",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_EVIDENCE",
+        "message": "WhoAmI authentication must succeed without using a stored environment target."
+      },
+      {
+        "id": "authenticated-context-stable",
+        "target": "33333333-3333-4333-8333-333333333333",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_SECURITY",
+        "message": "The authenticated principal and organization must remain stable through collection and token refresh."
+      },
+      {
+        "id": "component-cardinality",
+        "target": "FAST006-REUSE-17EC3D0EE53B",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "Metadata must return zero or one exact logical-name match, never an ambiguous or substituted component."
+      },
+      {
+        "id": "component-owner",
+        "target": "FAST006-REUSE-17EC3D0EE53B",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "Ownership requires exact solution-component membership and publisher metadata; prefix alone is not ownership proof."
+      },
+      {
+        "id": "environment-identity",
+        "target": "https://synthetic.example.test",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_DECISION_CHANGE",
+        "message": "Server-reported environment, tenant and organization must match the explicit target and WhoAmI context."
+      },
+      {
+        "id": "extension-publisher",
+        "target": "extension_solution",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "The selected extension solution must be unmanaged and have the exact planned publisher identity/prefix."
+      },
+      {
+        "id": "installed-solution",
+        "target": "synthetic_records",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_PREREQUISITES",
+        "message": "The required solution must be installed exactly once."
+      },
+      {
+        "id": "managed-property",
+        "target": "FAST006-REUSE-17EC3D0EE53B",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_EVIDENCE",
+        "message": "Actual managed state must be returned by the metadata service."
+      },
+      {
+        "id": "package-content-hash",
+        "target": "synthetic-records-v1",
+        "state": "inferred",
+        "satisfied": false,
+        "requiredForReadiness": false,
+        "blockingStatus": "BLOCKED_EVIDENCE",
+        "message": "The SHA-256 identifies the approved local package; Dataverse does not attest the original installed ZIP bytes."
+      },
+      {
+        "id": "package-publisher",
+        "target": "synthetic_records",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "Installed managed state and publisher identity must match verified package metadata."
+      },
+      {
+        "id": "package-version",
+        "target": "synthetic_records",
+        "state": "verified",
+        "satisfied": true,
+        "requiredForReadiness": true,
+        "blockingStatus": "BLOCKED_COMPATIBILITY",
+        "message": "Installed solution version must exactly match the approved package."
+      }
+    ],
+    "evidence": {
+      "schemaVersion": "1.0",
+      "decisionId": "sha256:25285de37f941532b0f7781a2eb69d716584940ace0e7c89b6618eb4c0320d70",
+      "planId": "sha256:59fb2a3a8e9c71edb74e07c1b5f20774e4f26c84ebfefdc6f8ca2df8dd72b4b9",
+      "planSha256": "315d1b7631e905161e25a8242aafdf8dd92f5aa9a5a245586d7fd29d9c1e24f4",
+      "environment": {
+        "environmentId": "11111111-1111-4111-8111-111111111111",
+        "tenantId": "22222222-2222-4222-8222-222222222222",
+        "url": "https://synthetic.example.test"
+      },
+      "observedAtUtc": "2026-10-19T12:00:00.0000000+00:00",
+      "expiresAtUtc": "2026-10-19T12:15:00.0000000+00:00",
+      "inputArtifacts": [
+        {
+          "key": "analysisManifest",
+          "path": "specs/library-circulation/accelerator/accelerator-analysis-manifest.json"
+        },
+        {
+          "key": "componentDelta",
+          "path": "specs/library-circulation/accelerator/component-delta-analysis.json"
+        },
+        {
+          "key": "coverage",
+          "path": "specs/library-circulation/accelerator/requirements-coverage-matrix.json"
+        },
+        {
+          "key": "decision",
+          "path": "specs/library-circulation/accelerator/accelerator-decision.json"
+        },
+        {
+          "key": "dependencies",
+          "path": "specs/library-circulation/accelerator/dependency-manifest.json"
+        },
+        {
+          "key": "environment",
+          "path": "specs/library-circulation/accelerator/environment-readiness-reference.json"
+        },
+        {
+          "key": "packageManifest",
+          "path": "specs/library-circulation/accelerator/package-input-manifest.json"
+        },
+        {
+          "key": "schemaPlan",
+          "path": "specs/library-circulation/accelerator/schema-reuse-extension-plan.json"
+        },
+        {
+          "key": "spec",
+          "path": "specs/library-circulation/spec.md"
+        },
+        {
+          "key": "traceability",
+          "path": "specs/library-circulation/accelerator/acceptance-traceability.json"
+        }
+      ],
+      "packages": [
+        {
+          "moduleId": "synthetic-records",
+          "packageId": "synthetic-records-v1",
+          "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "solutionUniqueName": "synthetic_records",
+          "version": "1.0.0.0",
+          "installed": true,
+          "dependencies": []
+        }
+      ],
+      "components": [
+        {
+          "taskId": "FAST006-REUSE-17EC3D0EE53B",
+          "componentKind": "table",
+          "componentIdentity": "tst_record",
+          "exists": true,
+          "ownership": "accelerator-managed",
+          "managed": true,
+          "customizable": true,
+          "allowedActions": [
+            "REUSE"
+          ]
+        }
+      ],
+      "security": {
+        "principalId": "33333333-3333-4333-8333-333333333333",
+        "grantedPermissions": [
+          "read-metadata"
+        ]
+      }
+    }
+  },
+  "signature": {
+    "algorithm": "RS256",
+    "certificateSha256": "655f507d1baa753ff9e0521f52c994d3ca6faa3d9f30469ac5b6e055e10b0680",
+    "value": "pAwwsVBR2ZlF7nYk8aj8jAOODzj6GEd7h2Tf8Y35S4+o3ncuJmt4z+ot03DPesl4mcJyTQmRQyNg9qq4QyQ2i87oLrmKUY/m5nwplesYeHw61pBX6Snd2M4W2+azAp7IGXGpn3CU5AgzdfWNkwMDP5GGC3xpbKszguORYexK0eLB8bMxFIkXjPQK5xD4Ikme+f8eHIXdyic+kxkT7uKv4pASjzNYM7MTvZpxbGMlYi7WYqxHbLJKJo4/zt6B3bIMX2mQf/paMJLuqW08h/NcR7keZky9JzEf+ZMxZKgq5V2L8d+U+v9X1PG+aOuSfzLJxHKBsPJTD6K/tobKMBgcrg=="
+  }
+}
