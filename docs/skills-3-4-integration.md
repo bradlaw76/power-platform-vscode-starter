@@ -7,7 +7,7 @@ These optional skills are available to both GitHub Copilot (`.github/skills/`) a
 - Requirements discovery and acceptance criteria: `power-platform-requirements-analyst`.
 - Table, column and relationship architecture: `dataverse-solution-architect`.
 - Independent solution quality/readiness review: `dataverse-solution-validator`. Static review never constitutes environment or deployment validation.
-- Optional dataset design after affirmative opt-in: `power-platform-demo-data-designer`. Use the preexisting `demo-data-plan.json` and `data-*.json` schemas, never a parallel import engine.
+- Optional dataset design after affirmative opt-in: `power-platform-demo-data-designer`. Use the existing `demo-data-plan.json` planning contract defined by `scripts/bootstrap/05-start-wizard.ps1`; no standalone JSON Schema currently exists for that planning document. `schemas/payloads/data.schema.json` validates executable `data-*.json` payloads, not the planning document. Never create a parallel import engine.
 - Existing Dataverse reporting: `dataverse-report-wizard` and its own approval gates.
 
 ## Constraints
