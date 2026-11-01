@@ -66,6 +66,10 @@ NON-NEGOTIABLES
       model-driven apps from VS Code using PAC CLI.
     - dataverse-report-wizard: report-only workflow for discovering,
       previewing, and deploying native Dataverse charts and dashboards.
+    - power-platform-requirements-analyst: planning-only requirements,
+      traceability, and scenario Spec Kit guidance.
+    - dataverse-solution-architect: planning-only Dataverse architecture
+      and native semantic field type guidance.
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/01-install-skills.ps1

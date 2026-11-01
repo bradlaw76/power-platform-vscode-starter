@@ -41,7 +41,7 @@ if (-not (Test-Path -LiteralPath $FrameworkRoot -PathType Container)) {
     throw 'Repository context preflight requires an existing FrameworkRoot.'
 }
 $root = Resolve-WizardPhysicalPath -Path $FrameworkRoot
-$identity = Get-WizardGitIdentity -RepositoryPath $root
+$identity = Get-WizardGitIdentity -RepositoryPath $root -RequireSecureTransport
 if (-not $identity.Root.Equals($root, [StringComparison]::Ordinal)) {
     throw 'Repository context preflight requires the exact Git repository root, not a subdirectory.'
 }

@@ -23,6 +23,9 @@ The check fails closed on wrong repository identity, ambiguous fetch/push
 identities, a subdirectory supplied as root, detached HEAD, another branch
 (including another maintenance branch), or any HEAD mismatch. It accepts
 equivalent HTTPS/SSH remote spellings through the existing identity helper.
+Maintenance authorization rejects insecure HTTP and `git://` fetch or push
+URLs. General canonical identity detection still recognizes those transports
+so an application target cannot disguise itself as a different repository.
 It performs no network calls, authentication, branch changes, writes, commits,
 or pushes. Dirty status is reported, not discarded: inspect it, preserve
 unrelated changes, and stop for clarification if they conflict with the task.
@@ -43,6 +46,14 @@ merge requires a further explicit human approval and is not implemented by
 this script. Never bundle approvals. A successful preflight does not grant any
 of them. Preserve existing branches and histories; never force-push or reset
 to make a preflight pass. Stop and report the mismatch instead.
+
+Before a modify operation writes any file, all approved paths are checked for
+staged, unstaged, untracked or ignored content conflicts. Existing file content
+is also compared with the approved HEAD using Git's attribute-aware blob
+hashing, including paths marked assume-unchanged or skip-worktree. A conflict
+reports the affected paths and stops the whole operation before writing any
+approved file; unrelated dirty files are preserved. Review and reconcile the
+existing content rather than discarding it or forcing an overwrite.
 
 Follow the existing durable recovery policy in `docs/skill-distribution.md`.
 A task-specific approved durable-backup exception applies only to that task:
@@ -67,3 +78,6 @@ Run `pwsh ./scripts/ci/test-framework-context-preflight.ps1` and
 `pwsh ./scripts/ci/test-framework-source-protection.ps1`. Both use isolated
 temporary repositories, never change the operator's branch or history, and
 exercise failed checks before any framework write.
+The preflight regression includes real-Windows mixed-case root checks when run
+on Windows. Linux execution reports those checks as NOT RUN; it is not evidence
+that Windows root comparison behavior is correct.

@@ -61,7 +61,8 @@ try {
     $null = Invoke-FixtureGit @('config', 'user.email', 'context@example.invalid')
     $null = Invoke-FixtureGit @('remote', 'add', 'origin', 'https://github.com/bradlaw76/power-platform-vscode-starter.git')
     Set-Content -LiteralPath (Join-Path $fixture 'baseline.txt') -Value 'baseline'
-    $null = Invoke-FixtureGit @('add', 'baseline.txt')
+    Set-Content -LiteralPath (Join-Path $fixture 'flagged.txt') -Value 'tracked flag baseline'
+    $null = Invoke-FixtureGit @('add', 'baseline.txt', 'flagged.txt')
     $null = Invoke-FixtureGit @('commit', '-m', 'baseline')
     $head = (Invoke-FixtureGit @('rev-parse', 'HEAD') -join '').Trim()
     $contextArgs = @{
@@ -80,12 +81,46 @@ try {
     $null = Invoke-FixtureGit @('remote', 'set-url', 'origin', 'git@github.com:bradlaw76/power-platform-vscode-starter.git')
     $null = & $preflight @contextArgs
     $script:checks++
+    foreach ($url in @(
+        'https://github.com/bradlaw76/power-platform-vscode-starter.git',
+        'ssh://git@github.com/bradlaw76/power-platform-vscode-starter.git'
+    )) {
+        $null = Invoke-FixtureGit @('remote', 'set-url', 'origin', $url)
+        $null = & $preflight @contextArgs
+        $script:checks++
+    }
+    foreach ($url in @(
+        'http://github.com/bradlaw76/power-platform-vscode-starter.git',
+        'git://github.com/bradlaw76/power-platform-vscode-starter.git'
+    )) {
+        $null = Invoke-FixtureGit @('remote', 'set-url', 'origin', $url)
+        Assert-Rejected { & $preflight @contextArgs } 'secure HTTPS/SSH Git transport'
+        $null = Invoke-FixtureGit @('remote', 'set-url', 'origin', 'https://github.com/bradlaw76/power-platform-vscode-starter.git')
+        $null = Invoke-FixtureGit @('remote', 'set-url', '--push', 'origin', $url)
+        Assert-Rejected { & $preflight @contextArgs } 'secure HTTPS/SSH Git transport'
+        $null = Invoke-FixtureGit @('config', '--unset', 'remote.origin.pushurl')
+    }
     Assert-Rejected { & $preflight @contextArgs -ExpectedHead ('0' * 40) } 'HEAD mismatch'
     Assert-Rejected { & $preflight @contextArgs -ExpectedHead 'short' } 'Cannot validate argument'
     Assert-Rejected { & $preflight @contextArgs -ExpectedBranch 'main' } 'Cannot validate argument'
     Assert-Rejected { & $preflight @contextArgs -ExpectedBranch 'framework-maintenance/task/../escape' } 'traversal'
     New-Item -ItemType Directory -Path (Join-Path $fixture 'docs') | Out-Null
     Assert-Rejected { & $preflight @contextArgs -FrameworkRoot (Join-Path $fixture 'docs') } 'exact Git repository root'
+    if ([IO.Path]::DirectorySeparatorChar -eq '\') {
+        foreach ($caseRoot in @($fixture.ToUpperInvariant(), $fixture.ToLowerInvariant())) {
+            $caseResult = & $preflight @contextArgs -FrameworkRoot $caseRoot
+            if (-not $caseResult.Verified -or $caseResult.Head -cne $head) {
+                throw 'Windows mixed-case repository root did not verify.'
+            }
+            $script:checks++
+        }
+        Assert-Rejected {
+            & $preflight @contextArgs -FrameworkRoot (Join-Path $fixture 'docs').ToUpperInvariant()
+        } 'exact Git repository root'
+        Write-Host 'Windows mixed-case root checks: 3 passed.'
+    } else {
+        Write-Host 'Windows mixed-case root checks: NOT RUN (requires Windows).'
+    }
     Assert-Rejected { & $preflight @contextArgs -FrameworkRoot (Join-Path $fixture 'missing') } 'existing FrameworkRoot'
     foreach ($branch in @('main', 'feature/application', 'framework-maintenance/another-task')) {
         $null = Invoke-FixtureGit @('switch', '-c', $branch)
@@ -138,6 +173,71 @@ try {
     if ($preview.Completed -or $preview.VerifiedHead -cne $head -or
         (Test-Path -LiteralPath (Join-Path $fixture 'blocked.txt'))) {
         throw 'Approved maintenance preview did not preserve its verified no-write boundary.'
+    }
+    $script:checks++
+    $cleanUpdate = & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+        -Operation modify -ApprovedPaths @('baseline.txt') -FileUpdates @{ 'baseline.txt' = 'clean approved update' } -ApproveModify
+    if (-not $cleanUpdate.Completed -or (Get-Content -LiteralPath (Join-Path $fixture 'baseline.txt') -Raw) -cne 'clean approved update' -or
+        (Get-Content -LiteralPath (Join-Path $fixture 'unrelated.txt') -Raw).Trim() -cne 'preserve') {
+        throw 'Clean approved update failed or modified unrelated dirty work.'
+    }
+    $script:checks++
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('baseline.txt') -FileUpdates @{ 'baseline.txt' = 'overwrite dirty edit' } -ApproveModify
+    } 'conflicting approved paths: baseline.txt'
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('aaa-clean.txt', 'baseline.txt') `
+            -FileUpdates @{ 'aaa-clean.txt' = 'must not be created'; 'baseline.txt' = 'overwrite dirty edit' } -ApproveModify
+    } 'conflicting approved paths: baseline.txt'
+    if (Test-Path -LiteralPath (Join-Path $fixture 'aaa-clean.txt')) {
+        throw 'A partially conflicting operation wrote its clean path.'
+    }
+    if ((Get-Content -LiteralPath (Join-Path $fixture 'baseline.txt') -Raw) -cne 'clean approved update') {
+        throw 'A conflicting operation overwrote the original dirty edit.'
+    }
+    $script:checks++
+    $null = Invoke-FixtureGit @('add', 'baseline.txt')
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('baseline.txt') -FileUpdates @{ 'baseline.txt' = 'overwrite staged edit' } -ApproveModify
+    } 'conflicting approved paths: baseline.txt'
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('unrelated.txt') -FileUpdates @{ 'unrelated.txt' = 'overwrite untracked edit' } -ApproveModify
+    } 'conflicting approved paths: unrelated.txt'
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('baseline.txt', 'unrelated.txt') `
+            -FileUpdates @{ 'baseline.txt' = 'overwrite staged edit'; 'unrelated.txt' = 'overwrite untracked edit' } -ApproveModify
+    } 'conflicting approved paths: baseline.txt, unrelated.txt'
+    Set-Content -LiteralPath (Join-Path $fixture 'flagged.txt') -Value 'preserve hidden edit'
+    $null = Invoke-FixtureGit @('update-index', '--assume-unchanged', 'flagged.txt')
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('flagged.txt') -FileUpdates @{ 'flagged.txt' = 'overwrite assumed-unchanged edit' } -ApproveModify
+    } 'conflicting approved paths: flagged.txt'
+    $null = Invoke-FixtureGit @('update-index', '--no-assume-unchanged', 'flagged.txt')
+    $null = Invoke-FixtureGit @('update-index', '--skip-worktree', 'flagged.txt')
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('flagged.txt') -FileUpdates @{ 'flagged.txt' = 'overwrite skip-worktree edit' } -ApproveModify
+    } 'conflicting approved paths: flagged.txt'
+    $null = Invoke-FixtureGit @('update-index', '--no-skip-worktree', 'flagged.txt')
+    Add-Content -LiteralPath (Join-Path $fixture '.git/info/exclude') -Value 'ignored.txt'
+    Set-Content -LiteralPath (Join-Path $fixture 'ignored.txt') -Value 'preserve ignored work'
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('ignored.txt') -FileUpdates @{ 'ignored.txt' = 'overwrite ignored edit' } -ApproveModify
+    } 'conflicting approved paths: ignored.txt'
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('aaa-clean.txt', 'zzz-null.txt') `
+            -FileUpdates @{ 'aaa-clean.txt' = 'must not be created'; 'zzz-null.txt' = $null } -ApproveModify
+    } 'requires text content'
+    if (Test-Path -LiteralPath (Join-Path $fixture 'aaa-clean.txt')) {
+        throw 'A null-content operation wrote a preceding approved path.'
     }
     $script:checks++
     $null = Invoke-FixtureGit @('commit', '--allow-empty', '-m', 'new head')

@@ -145,3 +145,59 @@ SHA; after an approved commit, review the new SHA before a later operation.
 There are no known implementation failures in the executed checks. No live
 environment validation was attempted or authorized. Commit, push and merge
 remain separate pending approval boundaries, not completed operations.
+
+## 2026-10-31 UTC - Current publication and remediation status
+
+This addendum supersedes the earlier pre-commit and pre-CI status statements;
+the original implementation and validation history above is preserved.
+
+Skills 1-2 were committed and published at
+`8d35b723852dbc0a218a29cebd877d6bc1cc128a`. They are the subject of
+[PR #4](https://github.com/bradlaw76/power-platform-vscode-starter/pull/4).
+Skills 3-4 and the S34-01 documentation correction are published on
+`review/skills-3-4-chatgpt` at
+[`428214e0b3da337b88573b3d734777338e075e10`](https://github.com/bradlaw76/power-platform-vscode-starter/commit/428214e0b3da337b88573b3d734777338e075e10).
+The authorized
+[Wizard Quality run 41240527619](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/41240527619)
+passed at that exact commit, including Pester 5.7.1 (90 passed, zero failures
+or skips) and PSScriptAnalyzer 1.24.0 (zero findings). These results establish
+that the older pinned-tool blocker was resolved for the published baseline;
+they are not results for later uncommitted remediation.
+
+Targeted remediation is now local on `framework-maintenance/pr-findings`,
+created from the reviewed `428214e0...` baseline. The existing remote
+`framework-maintenance/skills-3-4` remains at `8d35b723...` and lacks the
+validated Skills 3-4 package, so it was not used as the implementation baseline.
+The original four skill definitions and their approved behavior are unchanged.
+
+| Original finding | Current local status |
+| --- | --- |
+| 1 - Insecure maintenance transports | Resolved locally: secure HTTPS/SSH is required for preflight, direct maintenance approval and push validation; general application identity detection is preserved |
+| 2 - Dirty approved path overwrite | Resolved locally: all approved paths are checked before any write; conflicts preserve existing edits and prevent partial writes |
+| 3 - Stale original handoff | Resolved locally by this dated addendum, without rewriting historical entries |
+| 4 - Installer help omissions | Resolved locally: help includes both planning skills; directory enumeration/copy behavior is unchanged |
+| 5 - Windows root comparison | Needs verification: real-Windows mixed-case root tests are present, but have not run; the existing root comparison has not been speculatively changed |
+
+Local remediation checks passed: all 30 standalone CI scripts, 47 preflight
+checks including transport and dirty-path cases, 202 planning/discoverability
+checks, 70 Skills 3-4 assertions, 75 PowerShell scripts parsed, 84 JSON documents
+parsed and 60 payloads schema-validated. Pester 5.7.1 also passed 90 tests with
+zero failures, skips or unrun tests on the local remediation. It was built from
+the official Pester 5.7.1 source tag with unchanged locked dependencies and the
+installed .NET SDK; no other Pester version was substituted.
+
+PSScriptAnalyzer 1.24.0 remains NOT RUN for this uncommitted remediation:
+the approved module is unavailable locally, Gallery access has the recorded
+DNS restriction, and the official analyzer release lookup is SAML-restricted.
+Do not substitute the passing baseline Actions result. Windows runner inventory
+inspection returned HTTP 403 (`Resource not accessible by integration`), and
+the existing quality workflow uses Ubuntu. No Windows result is inferred from
+Linux execution. Neither new workflow configuration nor publication of the
+uncommitted code was authorized.
+
+The current local review record is in
+[ChatGPT review handoff](chatgpt-review-handoff.md). No remediation commit,
+push, PR change, merge, release, environment write or deployment has occurred.
+Readiness remains CONDITIONAL PASS (8/10) pending pinned analyzer validation
+of the remediation, real Windows verification and independent review. Commit,
+push, merge and deployment each remain subject to separate approval.

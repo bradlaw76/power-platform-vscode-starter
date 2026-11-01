@@ -23,11 +23,15 @@ function Invoke-TestGit {
 
 function Assert-Throws {
     param([scriptblock]$Action, [string]$ExpectedText)
+    $rejected = $false
     try {
-        & $Action
-        throw "Expected failure containing '$ExpectedText'."
+        & $Action | Out-Null
     } catch {
         if ($_.Exception.Message -notmatch [regex]::Escape($ExpectedText)) { throw }
+        $rejected = $true
+    }
+    if (-not $rejected) {
+        throw "Expected failure containing '$ExpectedText'."
     }
 }
 
@@ -110,21 +114,21 @@ try {
         } 'sharing the framework Git remote'
     }
 
-    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'ssh://git@github.com/example/wizard-framework.git')
+    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'ssh://git@github.com/bradlaw76/power-platform-vscode-starter.git')
     Assert-Throws {
         Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot
     } 'sharing the framework Git remote'
-    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'git@github.com:example/wizard-framework.git')
+    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'git@github.com:bradlaw76/power-platform-vscode-starter.git')
     Assert-Throws {
         Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot
     } 'sharing the framework Git remote'
 
-    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('config', 'url.https://github.com/example/.insteadOf', 'github:')
-    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'github:wizard-framework')
+    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('config', 'url.https://github.com/bradlaw76/.insteadOf', 'github:')
+    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'github:power-platform-vscode-starter.git')
     Assert-Throws {
         Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $frameworkRoot -TargetProjectRoot $targetRoot
     } 'sharing the framework Git remote'
-    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('config', '--unset', 'url.https://github.com/example/.insteadOf')
+    Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('config', '--unset', 'url.https://github.com/bradlaw76/.insteadOf')
     Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'set-url', 'origin', 'https://github.com/example/application.git')
 
     Invoke-TestGit -WorkingDirectory $targetRoot -Arguments @('remote', 'remove', 'origin')
@@ -193,6 +197,25 @@ try {
             throw "Framework maintenance approval did not isolate the '$operation' operation."
         }
     }
+    foreach ($url in @(
+        'http://github.com/bradlaw76/power-platform-vscode-starter.git',
+        'git://github.com/bradlaw76/power-platform-vscode-starter.git'
+    )) {
+        Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('remote', 'set-url', 'origin', $url)
+        foreach ($operation in @('modify', 'commit', 'push')) {
+            Assert-Throws {
+                Assert-WizardFrameworkMaintenanceApproval -FrameworkRoot $frameworkRoot -Operation $operation -Approved:$true
+            } 'secure HTTPS/SSH Git transport'
+        }
+        $identity = Get-WizardGitIdentity -RepositoryPath $frameworkRoot
+        if ($identity.Remotes -notcontains 'github.com/bradlaw76/power-platform-vscode-starter') {
+            throw 'Transport hardening weakened canonical framework identity detection.'
+        }
+        Assert-Throws {
+            Assert-WizardApplicationRepositoryIdentity -FrameworkRoot $frameworkRoot -TargetProjectRoot $sameRepositoryClone
+        } 'sharing the framework Git remote'
+    }
+    Invoke-TestGit -WorkingDirectory $frameworkRoot -Arguments @('remote', 'set-url', 'origin', $sharedRemote)
     $expectedHead = ((& git -C $frameworkRoot rev-parse HEAD) -join '').Trim()
     Assert-Throws {
         & $maintenanceScript -ExpectedHead $expectedHead -Task test -Operation modify -FrameworkRoot $frameworkRoot -ApprovedPaths @('docs/new.md')

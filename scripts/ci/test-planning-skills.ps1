@@ -105,4 +105,8 @@ foreach ($path in @(
     }
     Assert-Contains $content 'framework-maintenance-preflight\.md' $path
 }
+$installerHelp = Get-Help (Join-Path $repoRoot 'scripts/bootstrap/01-install-skills.ps1') -Full | Out-String
+foreach ($name in @('dataverse-solution-architect', 'power-platform-requirements-analyst')) {
+    Assert-Contains $installerHelp $name 'Claude installer help'
+}
 Write-Host "Planning skills: $script:checks static contract checks passed."

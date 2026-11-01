@@ -49,7 +49,7 @@ if ($unexpectedApprovals.Count -gt 0) {
     throw "Framework Maintenance Mode requires separate approval; unexpected approval(s): $($unexpectedApprovals -join ', ')."
 }
 $approval = Assert-WizardFrameworkMaintenanceApproval -FrameworkRoot $frameworkRootPath -Operation $Operation -Approved:$approvalSwitch[$Operation]
-$identity = Get-WizardGitIdentity -RepositoryPath $frameworkRootPath
+$identity = Get-WizardGitIdentity -RepositoryPath $frameworkRootPath -RequireSecureTransport
 if (-not $identity.Root.Equals($frameworkRootPath, [StringComparison]::OrdinalIgnoreCase)) {
     throw "Framework Maintenance Mode requires FrameworkRoot to be the Git repository root: $frameworkRootPath"
 }
@@ -105,12 +105,36 @@ if ($Operation -eq 'modify') {
     if (@(Compare-Object $approvedSet $fileUpdatePaths).Count -gt 0 -or $fileUpdatePaths.Count -ne $approvedSet.Count) {
         throw 'Framework Maintenance Mode modifications must supply content for exactly the approved paths.'
     }
+    $conflictingPaths = [Collections.Generic.List[string]]::new()
+    foreach ($relativePath in $approvedSet) {
+        if ($null -eq $FileUpdates[$relativePath]) {
+            throw "Framework Maintenance Mode requires text content for '$relativePath'."
+        }
+        $status = @(& git --literal-pathspecs -C $identity.Root status --porcelain=v1 --untracked-files=all --ignored=matching -- $relativePath)
+        if ($LASTEXITCODE -ne 0) {
+            throw "Unable to inspect the approved framework path '$relativePath' before modification."
+        }
+        $conflicting = $status.Count -gt 0
+        # Git status can hide edits on assume-unchanged or skip-worktree paths.
+        if (-not $conflicting -and (Test-Path -LiteralPath (Join-Path $frameworkRootPath $relativePath) -PathType Leaf)) {
+            $expectedBlob = @(& git --literal-pathspecs -C $identity.Root ls-tree --format='%(objectname)' HEAD -- $relativePath)
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to inspect the approved baseline content for '$relativePath'."
+            }
+            $actualBlob = @(& git -C $identity.Root hash-object "--path=$relativePath" -- $relativePath)
+            if ($LASTEXITCODE -ne 0) {
+                throw "Unable to inspect the current approved content for '$relativePath'."
+            }
+            $conflicting = $expectedBlob.Count -ne 1 -or $actualBlob.Count -ne 1 -or $expectedBlob[0] -cne $actualBlob[0]
+        }
+        if ($conflicting) { $conflictingPaths.Add($relativePath) }
+    }
+    if ($conflictingPaths.Count -gt 0) {
+        throw "Framework Maintenance Mode rejected conflicting approved paths: $($conflictingPaths -join ', '). Preserve existing edits and obtain reviewed content before retrying."
+    }
     $encoding = [Text.UTF8Encoding]::new($false)
     if ($PSCmdlet.ShouldProcess(($approvedSet -join ', '), "Write approved framework files for task '$Task'")) {
         foreach ($relativePath in $approvedSet) {
-            if ($null -eq $FileUpdates[$relativePath]) {
-                throw "Framework Maintenance Mode requires text content for '$relativePath'."
-            }
             $resolvedPath = Resolve-WizardPhysicalPath -Path (Join-Path $frameworkRootPath $relativePath)
             $parent = Split-Path -Parent $resolvedPath
             New-Item -ItemType Directory -Path $parent -Force | Out-Null
@@ -166,7 +190,7 @@ if ($Operation -eq 'modify') {
     $remoteUrls = @(& git -C $identity.Root remote get-url --all $remoteName)
     if ($LASTEXITCODE -ne 0 -or $remoteUrls.Count -eq 0) { throw "Unable to resolve push remote '$remoteName'." }
     foreach ($url in $remoteUrls) {
-        if ((ConvertTo-WizardCanonicalGitRemote -Url "$url") -ne 'github.com/bradlaw76/power-platform-vscode-starter') {
+        if ((ConvertTo-WizardCanonicalGitRemote -Url "$url" -RequireSecureTransport) -ne 'github.com/bradlaw76/power-platform-vscode-starter') {
             throw "Framework Maintenance Mode rejected push remote '$remoteName' because it is not the canonical framework repository."
         }
     }

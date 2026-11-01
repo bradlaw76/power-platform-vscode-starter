@@ -135,7 +135,10 @@ function Assert-WizardWritablePath {
 }
 
 function Get-WizardGitIdentity {
-    param([Parameter(Mandatory)] [string]$RepositoryPath)
+    param(
+        [Parameter(Mandatory)] [string]$RepositoryPath,
+        [switch]$RequireSecureTransport
+    )
 
     $rootOutput = @(& git -C $RepositoryPath rev-parse --show-toplevel 2>$null)
     if ($LASTEXITCODE -ne 0 -or $rootOutput.Count -eq 0) {
@@ -150,7 +153,7 @@ function Get-WizardGitIdentity {
             throw "Framework installation identity manifest is invalid: $manifestPath"
         }
         $root = Resolve-WizardPhysicalPath -Path $RepositoryPath
-        $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url $manifest.repositoryUrl
+        $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url $manifest.repositoryUrl -RequireSecureTransport:$RequireSecureTransport
         return [pscustomobject]@{
             Root = $root
             CommonDirectory = Join-Path $root '.wizard-framework-install'
@@ -179,7 +182,7 @@ function Get-WizardGitIdentity {
         if ($LASTEXITCODE -ne 0) { throw "Unable to resolve push URL for Git remote '$remoteName'." }
         $urls = @($fetchUrls) + @($pushUrls)
         foreach ($url in $urls) {
-            $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url "$url"
+            $remoteIdentity = ConvertTo-WizardCanonicalGitRemote -Url "$url" -RequireSecureTransport:$RequireSecureTransport
             if (-not [string]::IsNullOrWhiteSpace($remoteIdentity)) { $remoteValues.Add($remoteIdentity) }
         }
     }
@@ -189,7 +192,10 @@ function Get-WizardGitIdentity {
 }
 
 function ConvertTo-WizardCanonicalGitRemote {
-    param([Parameter(Mandatory)] [string]$Url)
+    param(
+        [Parameter(Mandatory)] [string]$Url,
+        [switch]$RequireSecureTransport
+    )
 
     $value = $Url.Trim()
     if ($value -notmatch '^[a-zA-Z][a-zA-Z0-9+.-]*://' -and
@@ -214,6 +220,10 @@ function ConvertTo-WizardCanonicalGitRemote {
                 ($scheme -eq 'git' -and $uri.Port -eq 9418))) {
             $hostName = "$hostName`:$($uri.Port)"
         }
+    }
+
+    if ($RequireSecureTransport -and $scheme -notin @('https', 'ssh')) {
+        throw "Framework Maintenance Mode requires secure HTTPS/SSH Git transport; rejected '$Url'."
     }
 
     $path = $path.Trim().Trim('/')
@@ -278,7 +288,7 @@ function Assert-WizardFrameworkMaintenanceApproval {
         [Parameter(Mandatory)] [bool]$Approved
     )
 
-    $identity = Get-WizardGitIdentity -RepositoryPath $FrameworkRoot
+    $identity = Get-WizardGitIdentity -RepositoryPath $FrameworkRoot -RequireSecureTransport
     $branch = (@(& git -C $identity.Root branch --show-current 2>$null) -join "`n").Trim()
     if ($LASTEXITCODE -ne 0 -or $branch -notmatch '^framework-maintenance/[a-z0-9][a-z0-9._/-]*$') {
         throw 'Framework Maintenance Mode requires a dedicated framework-maintenance/<task> branch.'
