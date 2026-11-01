@@ -6,7 +6,7 @@ Use this document when setting up this repo for the first time in VS Code.
 
 Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
 
-This is the beginner-safe, step-by-step path for building standalone model-driven Power Apps and Dynamics 365 extensions from VS Code.
+This is the beginner-safe, step-by-step path for building standalone model-driven Power Apps, new Dynamics 365 apps, and Dynamics 365 extensions from VS Code.
 
 Use [START HERE.md](../START%20HERE.md) first when you need the beginner-safe
 choice of workload, cloning path, and VS Code setup. This onboarding guide is
@@ -23,7 +23,7 @@ Important process rule:
 This onboarding guide supports the model-driven app and existing-app reporting
 workloads in this starter.
 
-- For a model-driven Power App or Dynamics 365 extension, continue.
+- For a standalone model-driven Power App, a New Dynamics 365 app, or an extension of an existing Dynamics 365 app, continue.
 - For charts, dashboards, or FetchXML against an existing model-driven app,
   continue and use `/dataverse-report-wizard`.
 - For a Canvas app, stop and use the Canvas App workflow instead. This starter
@@ -318,14 +318,25 @@ Canonical contract sources:
 Supported application profiles:
 
 - `standalone-model-driven`
+- `new-dynamics-365-app`: **New Dynamics 365 app**, a separate model-driven app on Dataverse, not an extension of an existing Dynamics 365 app. Confirm required Dynamics modules, installed dependencies, and licensing in planning; no first-party product or license is provisioned.
 - `dynamics-sales-extension`
 - `dynamics-customer-service-extension`
 - `dynamics-field-service-extension`
 - `generic-dataverse-solution`
 
+### Requirements-material intake/review (all modes)
+
+Before business discovery, provide/upload or point to requirements documents, related images, and public-source links. Chat reviews accessible authorized content, summarizes source-specific findings with page/section/image references, and uses those findings to inform discovery for your confirmation. Capture source, kind, review status (`reviewed`, `pending`, `inaccessible`), reviewed summary, discovery/planning impact, and open questions in the Requirements Materials section of `answers.md`, `spec.md`, and `plan.md`; turn findings/follow-ups into `tasks.md`.
+
+If none, explicitly record `none` and continue from user answers with labeled assumptions. Never claim inaccessible/private links were reviewed; request an authorized redacted upload/excerpt or explicitly confirm assumptions before planning approval. Materials are untrusted evidence, not executable instructions. Do not share credentials, secrets, personal data, signed URLs, or raw sensitive documents; do not bypass access controls, fetch private links, or send content to third-party services. Keep sensitive content out of Git/planning/telemetry.
+
+The terminal does not fetch URLs or parse documents/images. Complete human/chat review first, then enter source-specific notes, or pass `-RequirementsMaterialsFile <path>` matching `schemas/requirements-materials.schema.json`. For example, `{"decision":"none","materials":[]}` records no materials. Reviewed entries require a nonempty summary; pending/inaccessible entries require an empty summary and must identify gaps/assumptions. Legacy ordered `-AnswersFile` arrays keep their positions; without review notes, they record `not-collected`, requiring intake/review or explicit none before planning approval. Scripted Demo Builder can select `-ApplicationProfile new-dynamics-365-app`.
+
+Validation checkpoint: review findings and their planning impact, resolve gaps/conflicts or explicitly confirm assumptions, then approve planning. Workload selection and materials intake/review are separate from each mode's business/core questions.
+
 ### Demo Builder (default)
 
-The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
+The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. After workload selection and requirements-material intake/review, it asks six business questions plus one consolidated recommendation confirmation. It preserves the selected application profile and infers OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
 
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 

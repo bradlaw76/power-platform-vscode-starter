@@ -15,6 +15,7 @@ function New-TestRepo {
   Copy-Item -Path $sourceTelemetryHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-telemetry.ps1') -Force
   Copy-Item -Path $sourceHardeningHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Force
   Copy-Item -Path $sourceDataverseRuntimeHelper -Destination (Join-Path $path 'scripts/bootstrap/helpers/dataverse-runtime.ps1') -Force
+  Copy-Item -Path (Join-Path $repoRoot 'scripts/bootstrap/helpers/choice-migration.ps1') -Destination (Join-Path $path 'scripts/bootstrap/helpers/choice-migration.ps1') -Force
   return $path
 }
 

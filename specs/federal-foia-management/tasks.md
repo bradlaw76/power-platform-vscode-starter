@@ -146,3 +146,17 @@
 - [ ] Obtain approval before explicit staging, commit, push, or pull-request creation.
 - [ ] Produce a managed release artifact only through a separately approved release workflow.
 - [ ] Never deploy automatically.
+# Choice migration preparation — 2026-10-20
+
+- [x] Approve repository-only preparation and offline validation (no live access).
+- [x] Prepare additive metadata, explicit mapping, preview-first migration and tests.
+- [x] Verify offline mappings/metadata/backfill, UI references, seed types, parser,
+  existing CI regressions and shared-transport tests.
+- [x] Include global Choices in expected inventory, contamination, mandatory
+  membership and export-root inspection; test stage85 Choice-ID drift and the
+  immutable Clock/Audit history exclusion.
+- [ ] Operator: independently review semantic mappings and additional enum contracts.
+- [ ] Operator: authorize target environment/solution and additive metadata.
+- [ ] Operator: review complete bounded preview; resolve unknown/conflicting rows.
+- [ ] Operator: approve backfill; verify zero pending rows, membership and rollback.
+- [ ] Operator: cut over UI/BPF/report/data, scoped publish and validate usability.

@@ -113,6 +113,15 @@ $foiaPayloads = Join-Path $repoRoot 'payloads/scenarios/federal-foia-management'
 $foiaPreview = @(Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'federal-foia-management' -PayloadsFolder $foiaPayloads -PreviewOnly)
 if (@($foiaPreview | Where-Object kind -eq 'dashboard').Count -ne 5) { throw 'FOIA reporting preview must plan five dashboards.' }
 if ($transportCalls.Count -ne $beforePreview) { throw 'Multi-dashboard preview invoked transport.' }
+try {
+    Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'federal-foia-management' -PayloadsFolder $foiaPayloads -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'foia' -RequestInvoker $reportInvoker | Out-Null
+    throw 'Expected Choice cutover safety failure.'
+} catch { if ($_.Exception.Message -notmatch 'matching scenario, environment and solution') { throw } }
+# Exercise dashboard idempotency independently; migration gates have their own injected tests.
+$foiaReportingFixture = Join-Path $testRepoRoot 'reporting-fixture'
+New-Item -ItemType Directory -Path $foiaReportingFixture -Force | Out-Null
+Copy-Item -LiteralPath (Join-Path $foiaPayloads 'reporting-federal-foia-management.json') -Destination $foiaReportingFixture
+$foiaPayloads = $foiaReportingFixture
 $firstFoia = @(Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'federal-foia-management' -PayloadsFolder $foiaPayloads -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'foia' -RequestInvoker $reportInvoker)
 $firstFoiaIds = @($firstFoia | Where-Object kind -eq 'dashboard' | ForEach-Object id)
 $secondFoia = @(Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'federal-foia-management' -PayloadsFolder $foiaPayloads -EnvironmentUrl 'https://unit.test' -AccessToken 'token' -SolutionUniqueName 'UnitSolution' -PublisherPrefix 'foia' -RequestInvoker $reportInvoker)

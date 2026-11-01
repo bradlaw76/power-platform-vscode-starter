@@ -36,8 +36,26 @@ Describe 'Invoke-WizardDataverseRequest' {
             param($request)
             $global:wizardTestTransportCalls++
         }
+
         $result.Mutated | Should -BeFalse
         $global:wizardTestTransportCalls | Should -Be 0
+    }
+
+    It 'preserves optimistic concurrency and solution headers' {
+        $response = Invoke-WizardDataverseRequest -Method Patch -Path 'accounts(00000000-0000-0000-0000-000000000001)' `
+            -EnvironmentUrl 'https://offline.invalid' -AccessToken 'offline-placeholder' -Body @{name='test'} `
+            -AdditionalHeaders @{ 'If-Match'='W/"7"'; 'MSCRM.SolutionUniqueName'='TestSolution' } `
+            -RequestInvoker { param($request) return $request.Headers }
+        $response['If-Match'] | Should -Be 'W/"7"'
+        $response['MSCRM.SolutionUniqueName'] | Should -Be 'TestSolution'
+    }
+
+    It 'rejects attempts to replace authorization through additional headers' {
+        {
+            Invoke-WizardDataverseRequest -Method Get -Path 'WhoAmI' -EnvironmentUrl 'https://offline.invalid' `
+                -AccessToken 'offline-placeholder' -AdditionalHeaders @{ Authorization='not-allowed' } `
+                -RequestInvoker { throw 'Transport must not run.' }
+        } | Should -Throw '*Unsupported additional Dataverse header*'
     }
 
     It 'refreshes once after 401 and retries with the new token' {

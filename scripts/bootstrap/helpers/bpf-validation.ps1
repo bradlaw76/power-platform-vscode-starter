@@ -303,6 +303,15 @@ function Get-PayloadEntityAndFieldIndex {
         }
     }
 
+    . (Join-Path $PSScriptRoot 'choice-migration.ps1')
+    $choiceContract = Get-WizardChoiceContract $PayloadFolder
+    if ($null -ne $choiceContract) {
+        foreach ($field in $choiceContract.Fields) {
+            if (-not $fieldsByEntity.ContainsKey($field.Table)) { $fieldsByEntity[$field.Table] = New-StringHashSet }
+            [void]$entities.Add($field.Table)
+            [void]$fieldsByEntity[$field.Table].Add($field.Target)
+        }
+    }
     foreach ($relationship in @(Get-RelationshipIndex -PayloadFolder $PayloadFolder)) {
         Add-HashSetValues -Set $entities -Values @($relationship.ReferencingEntity, $relationship.ReferencedEntity)
     }

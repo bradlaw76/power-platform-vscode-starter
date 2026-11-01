@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Wizard requirements-material review",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["decision", "materials"],
+  "properties": {
+    "decision": { "enum": ["none", "provided"] },
+    "materials": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["source", "kind", "reviewStatus", "summary", "planningImpact", "openQuestions"],
+        "properties": {
+          "source": { "type": "string", "pattern": "\\S" },
+          "kind": { "enum": ["document", "image", "public-link"] },
+          "reviewStatus": { "enum": ["reviewed", "pending", "inaccessible"] },
+          "summary": { "type": "string" },
+          "planningImpact": { "type": "string", "pattern": "\\S" },
+          "openQuestions": { "type": "string", "pattern": "\\S" }
+        },
+        "allOf": [
+          {
+            "if": { "properties": { "reviewStatus": { "const": "reviewed" } } },
+            "then": { "properties": { "summary": { "pattern": "\\S" } } },
+            "else": { "properties": { "summary": { "const": "" } } }
+          },
+          {
+            "if": { "properties": { "kind": { "const": "public-link" } } },
+            "then": { "properties": { "source": { "pattern": "^https?://[^\\s]+$" } } }
+          }
+        ]
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": { "properties": { "decision": { "const": "none" } } },
+      "then": { "properties": { "materials": { "maxItems": 0 } } },
+      "else": { "properties": { "materials": { "minItems": 1 } } }
+    }
+  ]
+}

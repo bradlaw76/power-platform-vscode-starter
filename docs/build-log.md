@@ -127,3 +127,49 @@ Complete this before implementation:
 - Known issues captured with owner/date: yes/no
 - README generated build summary reviewed/updated: yes/no
 - Post-build analysis preview run completed (`80-post-build-analysis.ps1 -PreviewOnly`): yes/no
+# 2026-10-20 — FOIA Choice repository preparation (NOT DEPLOYED)
+
+Authorization: repository changes and offline mocked tests only; no live access.
+Existing FOIA inventory, IDs, UI checks and row evidence remain historical.
+Prepared: additive Choice contract, gated metadata/backfill and surface cutover.
+Pending operator gates: semantic mapping review, environment/solution approval,
+bounded preview, backfill approval and zero-pending verification, component-9
+membership, scoped publish, app usability, final inventory/sync and export gate.
+No new live metadata, migrated rows or deployment success is claimed.
+
+Offline verification: `test-choice-migration.ps1`, `test-form-population.ps1`,
+`test-bpf-validation.ps1`, `test-reporting-and-data-stages.ps1`,
+`test-json-schema.ps1`, `test-preview-nonmutation.ps1`,
+`test-foia-requirements-traceability.ps1`, `test-script-smoke.ps1`,
+`test-script-order.ps1`, `test-contract-integrity.ps1`,
+`test-idempotency-and-export-stages.ps1`, and `test-publish-isolation.ps1`
+passed. `DataverseRuntime.Tests.ps1`: 20 passed, zero failures. Changed PowerShell
+files passed parser checks and existing repository ScriptAnalyzer rules.
+All transport execution in these checks was injected/mocked; no authentication,
+metadata, row, publish, export or other live Dataverse access occurred.
+Follow-up preparation also covers component-9 expected inventory, contamination,
+mandatory membership, export-root validation and generic stage-85 stable IDs.
+Clock/Audit rows are excluded from automatic backfill/cutover row validation;
+existing immutable synthetic records are skipped during seed reruns. New Choice
+metadata remains available for future explicitly approved synthetic rows.
+Backfill apply/cutover also require explicit active-write-freeze acknowledgement;
+secure paging detects repeated continuation paths before writes.
+Offline tests simulate a mid-run 412 after one successful update: the partial
+result blocks cutover, and preview/rerun migrates only the remaining row.
+Acknowledgements use explicit command switches, not new environment variables.
+Unknown text stops migration with sanitized diagnostics; no quarantine, default
+state changes or corrective source-text writes are performed.
+Metadata tests verify existing globals are bound by
+`GlobalOptionSet@odata.bind` using retained metadata IDs. Immutable-history
+tests prove Clock/Audit rows are not read or patched by backfill/validation;
+seed tests prove existing history is skipped and new future Choice rows are
+created once, then skipped on rerun. Post-cutover legacy/Choice conflicts remain
+an explicitly documented conservative migration-gate limitation.
+Immutable UI exception: Clock/Audit legacy categorical controls are retained
+read-only with `(Legacy evidence)` labels beside new Choice controls; both remain
+in their views. The clock chart retains historical legacy grouping, excluding
+null legacy categories. Offline XML tests verify preservation, labels, read-only
+state, Choice controls and rerun stability for both immutable tables.
+Expanded offline tests also passed `test-solution-isolation.ps1` and
+`test-wizard-hardening.ps1`; export fixtures check Choice roots by schema name
+and ID, reject missing Choices, and verify stage85 detects changed Choice IDs.

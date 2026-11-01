@@ -209,3 +209,17 @@ artifact/hash cannot be verified, a required backup is unavailable, legal hold o
 retention impact is unclear, immutable evidence would be lost, SharePoint access
 cannot be independently verified, or the rollback would require a secret to be
 placed in source-controlled material.
+# Prepared Choice migration rollback — 2026-10-20
+
+Repository only; no metadata or rows deployed. Historical checks below do not
+certify this migration. Preserve legacy columns, payloads and deployment IDs.
+Before future cutover, capture an authorized secure backup and independently
+review mappings. Backfill never writes legacy columns or deletes anything.
+To roll back surfaces, restore pre-migration repository references and republish
+only the affected components; do not delete Choice columns/global choices.
+Legacy text is a point-in-time fallback, not a synchronized mirror: freeze edits
+during cutover, and reconcile any post-cutover Choice changes before rollback.
+Subsequent migration validation intentionally blocks conflicting legacy/Choice
+pairs rather than treating a local success flag as authority. Reconcile such
+records privately under separate approval; never rerun backfill to overwrite
+the newer nonnull Choice value.

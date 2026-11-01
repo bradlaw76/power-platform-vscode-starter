@@ -45,6 +45,7 @@ $schemaByFamily = [ordered]@{
     'table'         = Join-Path $schemaRoot 'table.schema.json'
     'columns'       = Join-Path $schemaRoot 'columns.schema.json'
     'keys'          = Join-Path $schemaRoot 'keys.schema.json'
+    'choices'       = Join-Path $schemaRoot 'choices.schema.json'
     'relationships' = Join-Path $schemaRoot 'relationships.schema.json'
     'process'       = Join-Path $schemaRoot 'process.schema.json'
     'reporting'     = Join-Path $schemaRoot 'reporting.schema.json'
@@ -77,7 +78,7 @@ foreach ($file in $jsonFiles) {
         continue
     }
 
-    if ($file.Name -notmatch '^(?<family>table|columns|keys|relationships|process|reporting|views|data|security-roles)-.+\.json$') {
+    if ($file.Name -notmatch '^(?<family>table|columns|keys|choices|relationships|process|reporting|views|data|security-roles)-.+\.json$') {
         continue
     }
 

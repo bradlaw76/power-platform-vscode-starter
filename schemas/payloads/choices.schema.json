@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Additive global Choice migration contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["Version", "ScenarioSlug", "SolutionUniqueName", "PublisherPrefix", "SourceTagField", "SourceTag", "Choices", "Fields"],
+  "properties": {
+    "Version": {"const": 1},
+    "ScenarioSlug": {"const": "federal-foia-management"},
+    "SolutionUniqueName": {"const": "FederalFOIAManagement"},
+    "PublisherPrefix": {"const": "foia"},
+    "SourceTagField": {"const": "foia_syntheticsourcetag"},
+    "SourceTag": {"const": "federal-foia-synthetic-v1"},
+    "Choices": {
+      "type": "object",
+      "minProperties": 1,
+      "propertyNames": {"pattern": "^foia_[a-z0-9_]+$"},
+      "additionalProperties": {
+        "type": "array", "minItems": 1, "uniqueItems": true,
+        "items": {"type": "string", "minLength": 1}
+      }
+    },
+    "Fields": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["Table", "Source", "Target", "Choice", "Label", "Aliases"],
+        "properties": {
+          "Table": {"type": "string", "pattern": "^(foia_[a-z0-9_]+|contact|incident)$"},
+          "Source": {"type": "string", "pattern": "^foia_[a-z0-9_]+$"},
+          "Target": {"type": "string", "pattern": "^foia_[a-z0-9_]+choice$"},
+          "Choice": {"type": "string", "pattern": "^foia_[a-z0-9_]+$"},
+          "Label": {"type": "string", "minLength": 1},
+          "Aliases": {
+            "type": "object",
+            "additionalProperties": {"type": ["integer", "null"], "minimum": 100000000}
+          }
+        }
+      }
+    }
+  }
+}

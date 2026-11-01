@@ -1,14 +1,23 @@
 {
-  "profileVersion": "1.4",
-  "contractVersion": "1.10.0",
+  "profileVersion": "1.5",
+  "contractVersion": "1.11.0",
   "applicationProfiles": [
     "standalone-model-driven",
+    "new-dynamics-365-app",
     "dynamics-sales-extension",
     "dynamics-customer-service-extension",
     "dynamics-field-service-extension",
     "generic-dataverse-solution"
   ],
   "discovery": {
+    "requirementsMaterials": {
+      "requiredBeforeDiscovery": true,
+      "allowNone": true,
+      "sourceKinds": ["document", "image", "public-link"],
+      "reviewStatuses": ["reviewed", "pending", "inaccessible"],
+      "evidenceLocation": "Requirements Materials section in answers.md, spec.md, and plan.md",
+      "inputSchema": "schemas/requirements-materials.schema.json"
+    },
     "defaultMode": "demo-builder",
     "requiredQuestions": 6,
     "coreQuestions": 11,

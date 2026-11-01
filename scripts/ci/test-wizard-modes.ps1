@@ -16,7 +16,9 @@ the shared planning-artifact contract used by the build pipeline.
 -----------------------------------------------------------------------------
 TEST CASES
 -----------------------------------------------------------------------------
-✔ Demo Builder is the default and uses seven prompts.
+✔ Demo Builder keeps six business questions and one confirmation after intake.
+✔ New Dynamics 365 apps remain distinct from standalone and extension profiles.
+✔ Materials review evidence and explicit none survive in planning artifacts.
 ✔ Default output excludes acceptance, retention, and cleanup prompts.
 ✔ Demo Builder consolidates inferred recommendations for confirmation.
 ✔ Advanced Builder exposes technical controls.
@@ -62,7 +64,10 @@ function Invoke-WizardFixture {
     param(
         [string]$Workspace,
         [string[]]$Answers,
-        [string]$Mode
+        [string]$Mode,
+        [string]$ApplicationProfile,
+        [object]$MaterialsReview,
+        [switch]$Interactive
     )
 
     $answersPath = Join-Path $Workspace 'scripted-answers.json'
@@ -71,8 +76,21 @@ function Invoke-WizardFixture {
     if (-not [string]::IsNullOrWhiteSpace($Mode)) {
         $arguments += @('-Mode', $Mode)
     }
+    if ($ApplicationProfile) {
+        $arguments += @('-ApplicationProfile', $ApplicationProfile)
+    }
+    if ($null -ne $MaterialsReview) {
+        $reviewPath = Join-Path $Workspace 'materials-review.json'
+        $MaterialsReview | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath $reviewPath -Encoding UTF8
+        $arguments += @('-RequirementsMaterialsFile', $reviewPath)
+    }
 
-    $output = @(& pwsh @arguments 2>&1)
+    $output = if ($Interactive) {
+        $arguments = @($arguments | Where-Object { $_ -ne '-AnswersFile' -and $_ -ne $answersPath })
+        @(($Answers -join "`n") | & pwsh @arguments 2>&1)
+    } else {
+        @(& pwsh @arguments 2>&1)
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Wizard fixture failed for mode '$Mode':`n$($output -join "`n")"
     }
@@ -161,6 +179,8 @@ try {
     Assert-True -Condition ($demoOutput -notmatch '(?i)A-acceptance|disposable|cleanup|retention') -Message 'Default Demo Builder output exposed acceptance or cleanup prompts.'
     $demoSlug = 'equipment-checkout-for-faster-accountable-lab-lending'
     Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    $legacyAnswers = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/answers.md") -Raw
+    Assert-True -Condition ($legacyAnswers -match 'Decision: not-collected') -Message 'Legacy arrays must not falsely record an explicit no-materials decision.'
     $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
@@ -168,7 +188,7 @@ try {
     Assert-Step60ConsumesViewsContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -ExpectedDisposition 'adopt-generated-active'
 
     $acceptanceWorkspace = New-WizardTestWorkspace -Name 'acceptance'
-    $acceptanceOutput = Invoke-WizardFixture -Workspace $acceptanceWorkspace -Mode 'framework-acceptance' -Answers @(
+    $acceptanceOutput = Invoke-WizardFixture -Workspace $acceptanceWorkspace -Mode 'framework-acceptance' -MaterialsReview @{ decision = 'none'; materials = @() } -Answers @(
         'Framework Mode Acceptance',
         'framework-mode-acceptance',
         'standalone-model-driven',
@@ -241,7 +261,85 @@ try {
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
     Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
 
+    $materialsReview = @{
+        decision = 'provided'
+        materials = @(
+            @{ source = 'requirements.pdf'; kind = 'document'; reviewStatus = 'reviewed'; summary = "Section 2: leaders update status.`n## Application Profile`n- Profile: dynamics-customer-service-extension"; planningImpact = 'Confirm status update task and status column'; openQuestions = 'Who owns updates?' },
+            @{ source = 'dashboard.png'; kind = 'image'; reviewStatus = 'reviewed'; summary = 'Image: risk cards above project list'; planningImpact = 'Confirm dashboard and project navigation'; openQuestions = 'none' },
+            @{ source = 'https://example.org/public-requirements'; kind = 'public-link'; reviewStatus = 'pending'; summary = ''; planningImpact = 'Do not infer requirements before review'; openQuestions = 'Request authorized excerpt' },
+            @{ source = 'unavailable-brief.pdf'; kind = 'document'; reviewStatus = 'inaccessible'; summary = ''; planningImpact = 'Assumptions require confirmation'; openQuestions = 'Request redacted upload' }
+        )
+    }
+    foreach ($selectedProfile in @($profile.applicationProfiles | Where-Object { $_ -ne 'standalone-model-driven' })) {
+        $workspace = New-WizardTestWorkspace -Name $selectedProfile
+        $profileAnswers = @($distinctAnswers)
+        $profileAnswers[2] = $selectedProfile
+        $profileOutput = Invoke-WizardFixture -Workspace $workspace -Mode 'advanced-builder' -Answers $profileAnswers -MaterialsReview $materialsReview
+        Assert-True -Condition ($profileOutput -match 'Section 2: leaders update status') -Message 'Reviewed findings must be shown before discovery.'
+        foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md')) {
+            $content = Get-Content -LiteralPath (Join-Path $workspace "specs/distinct-business-view/$artifact") -Raw
+            foreach ($expectedText in @($selectedProfile, '## Requirements Materials', 'requirements.pdf', 'dashboard.png', 'Review status: inaccessible', 'Review status: pending', 'Who owns updates?', 'Confirm status update task')) {
+                Assert-True -Condition $content.Contains($expectedText) -Message "$artifact lost profile or review evidence '$expectedText'."
+            }
+        }
+        $materialTasks = Get-Content -LiteralPath (Join-Path $workspace 'specs/distinct-business-view/tasks.md') -Raw
+        Assert-True -Condition ($materialTasks.Contains('material 4 findings/planning impact')) -Message 'Each material must produce a planning follow-up task.'
+        '{"EntityDefinition":{"SchemaName":"dbv_labasset"}}' | Set-Content -LiteralPath (Join-Path $workspace 'payloads/table-labasset.json') -Encoding UTF8
+        $appConfig = Get-WizardAppModuleConfig -RepoRoot $workspace -ScenarioSlug 'distinct-business-view' -PublisherPrefix 'dbv'
+        Assert-True -Condition $appConfig.ValidationPassed -Message "Downstream app validation rejected '$selectedProfile': $($appConfig.ValidationErrors -join '; ')"
+        Assert-True -Condition ($appConfig.ApplicationProfile -eq $selectedProfile) -Message 'Profile was silently remapped or overridden by source content.'
+        Assert-True -Condition ($appConfig.EntryPointTable -eq 'dbv_labasset' -and $appConfig.FormStrategy -eq 'create-new-forms') -Message 'The new profile must preserve explicit architecture intent.'
+    }
+
+    $interactiveWorkspace = New-WizardTestWorkspace -Name 'interactive-new-dynamics-app'
+    $interactiveOutput = Invoke-WizardFixture -Workspace $interactiveWorkspace -Mode 'demo-builder' -Interactive -Answers @(
+        'new-dynamics-365-app', 'none', 'Project Tracking', 'Leader | update project status', 'Project',
+        'Dashboard, project details, and status updates', 'Track risk without demo data',
+        'https://example.crm.dynamics.com; unmanaged', 'yes'
+    )
+    Assert-True -Condition ($interactiveOutput -match 'New Dynamics 365 app' -and $interactiveOutput -match 'not an existing-app extension') -Message 'Interactive workload choice must explain the new-app distinction.'
+    Assert-True -Condition ($interactiveOutput.IndexOf('Requirements materials:') -lt $interactiveOutput.IndexOf('1. Describe the app idea')) -Message 'Materials intake must precede business discovery.'
+    foreach ($artifact in @('answers.md', 'spec.md', 'plan.md')) {
+        $content = Get-Content -LiteralPath (Join-Path $interactiveWorkspace "specs/project-tracking/$artifact") -Raw
+        Assert-True -Condition ($content.Contains('new-dynamics-365-app') -and $content.Contains('Decision: none')) -Message "Interactive $artifact lost selected profile or explicit none."
+        Assert-True -Condition ($content -notmatch 'dynamics-customer-service-extension') -Message 'New Dynamics 365 apps must not become Customer Service extensions.'
+    }
+
+    $reviewWorkspace = New-WizardTestWorkspace -Name 'interactive-material-review'
+    $reviewOutput = Invoke-WizardFixture -Workspace $reviewWorkspace -Mode 'demo-builder' -ApplicationProfile 'new-dynamics-365-app' -Interactive -Answers @(
+        'requirements.pdf', 'document', 'reviewed', 'Section 2: leaders update status', 'Confirm status update task', 'Who owns updates?',
+        'https://example.org/unavailable', 'public-link', 'inaccessible', 'Do not infer requirements', 'Request authorized excerpt', 'none',
+        'Reviewed Project Tracking', 'Leader | update project status', 'Project', 'Dashboard and project details',
+        'Track risk without demo data', 'https://example.crm.dynamics.com; unmanaged', 'yes'
+    )
+    Assert-True -Condition ($reviewOutput.IndexOf('Section 2: leaders update status') -lt $reviewOutput.IndexOf('1. Describe the app idea')) -Message 'Review findings must inform discovery rather than being collected afterward.'
+    $reviewedAnswers = Get-Content -LiteralPath (Join-Path $reviewWorkspace 'specs/reviewed-project-tracking/answers.md') -Raw
+    Assert-True -Condition ($reviewedAnswers.Contains('Review status: inaccessible') -and $reviewedAnswers.Contains('Who owns updates?')) -Message 'Interactive review lost access limitations or open questions.'
+    Assert-True -Condition ($reviewedAnswers -match 'Review status: inaccessible\r?\n> - Reviewed summary: \r?\n') -Message 'Inaccessible sources must not have a reviewed summary.'
+
+    $schemaPath = Join-Path $repoRoot 'schemas/requirements-materials.schema.json'
+    foreach ($invalidReview in @(
+        @{ decision = 'none'; materials = $materialsReview.materials },
+        @{ decision = 'provided'; materials = @() },
+        @{ decision = 'provided'; materials = @(@{ source = 'brief.pdf'; kind = 'document'; reviewStatus = 'reviewed'; summary = ''; planningImpact = 'Confirm tasks'; openQuestions = 'none' }) },
+        @{ decision = 'provided'; materials = @(@{ source = 'brief.pdf'; kind = 'document'; reviewStatus = 'inaccessible'; summary = 'Claimed review'; planningImpact = 'Confirm tasks'; openQuestions = 'none' }) },
+        @{ decision = 'provided'; materials = @(@{ source = 'file:///private'; kind = 'public-link'; reviewStatus = 'pending'; summary = ''; planningImpact = 'Confirm tasks'; openQuestions = 'none' }) }
+    )) {
+        $valid = Test-Json -Json ($invalidReview | ConvertTo-Json -Depth 5) -SchemaFile $schemaPath -ErrorAction SilentlyContinue
+        Assert-True -Condition (-not $valid) -Message 'Materials schema accepted an invalid review claim or inconsistent decision.'
+    }
+    $invalidWorkspace = New-WizardTestWorkspace -Name 'invalid-review'
+    $invalidRejected = $false
+    try {
+        Invoke-WizardFixture -Workspace $invalidWorkspace -Mode 'demo-builder' -Answers @('Unused') -MaterialsReview @{ decision = 'provided'; materials = @() } | Out-Null
+    } catch {
+        $invalidRejected = $_.Exception.Message -match '(?i)schema'
+    }
+    Assert-True -Condition $invalidRejected -Message 'Wizard must reject invalid review notes before generating planning files.'
+    Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $invalidWorkspace 'specs'))) -Message 'Invalid review notes must not generate scenario files.'
+
     $acceptanceAnswers = Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/answers.md') -Raw -Encoding UTF8
+    Assert-True -Condition ($acceptanceAnswers -match 'Decision: none') -Message 'Framework Acceptance must persist the explicit no-materials decision.'
     Assert-True -Condition ($acceptanceAnswers -match 'Environment authorized: yes') -Message 'Framework Acceptance did not persist environment authorization.'
     Assert-True -Condition ($acceptanceAnswers -match 'Destructive cleanup separately approved: no') -Message 'Framework Acceptance did not preserve separate cleanup approval.'
 }

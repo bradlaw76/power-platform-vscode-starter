@@ -12,7 +12,7 @@
             "emailaddress1": "synthetic.requester1@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 1",
-            "foia_requesterclassification": "Other",
+            "foia_requesterclassificationchoice": 100000003,
             "foia_identityverified": true
           }
         },
@@ -22,7 +22,7 @@
             "emailaddress1": "synthetic.requester2@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 2",
-            "foia_requesterclassification": "News Media",
+            "foia_requesterclassificationchoice": 100000002,
             "foia_identityverified": true
           }
         },
@@ -32,7 +32,7 @@
             "emailaddress1": "synthetic.requester3@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 3",
-            "foia_requesterclassification": "Educational",
+            "foia_requesterclassificationchoice": 100000001,
             "foia_identityverified": true
           }
         },
@@ -42,7 +42,7 @@
             "emailaddress1": "synthetic.requester4@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 4",
-            "foia_requesterclassification": "Commercial",
+            "foia_requesterclassificationchoice": 100000000,
             "foia_identityverified": true
           }
         },
@@ -52,7 +52,7 @@
             "emailaddress1": "synthetic.requester5@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 5",
-            "foia_requesterclassification": "Other",
+            "foia_requesterclassificationchoice": 100000003,
             "foia_identityverified": true
           }
         },
@@ -62,7 +62,7 @@
             "emailaddress1": "synthetic.requester6@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 6",
-            "foia_requesterclassification": "News Media",
+            "foia_requesterclassificationchoice": 100000002,
             "foia_identityverified": true
           }
         },
@@ -72,7 +72,7 @@
             "emailaddress1": "synthetic.requester7@example.invalid",
             "firstname": "Synthetic",
             "lastname": "Requester 7",
-            "foia_requesterclassification": "Other",
+            "foia_requesterclassificationchoice": 100000003,
             "foia_identityverified": true
           }
         }
@@ -87,9 +87,9 @@
           "Values": {
             "foia_name": "Synthetic Normal Request",
             "foia_trackingnumber": "SYN-FOIA-2026-001",
-            "foia_intakechannel": "Agency Portal",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Review",
+            "foia_intakechannelchoice": 100000001,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000003,
             "foia_receiveddate": "2026-01-05T14:00:00Z",
             "foia_perfecteddate": "2026-01-06",
             "foia_currentduedate": "2026-02-03",
@@ -97,8 +97,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic normal journey using fictional records only.",
-            "foia_disposition": "Open",
-            "foia_feecategory": "Other",
+            "foia_dispositionchoice": null,
+            "foia_feecategorychoice": 100000003,
             "foia_feeassessed": 0,
             "foia_feewaived": 0,
             "foia_feecollected": 0,
@@ -119,9 +119,9 @@
           "Values": {
             "foia_name": "Synthetic Expedited Request",
             "foia_trackingnumber": "SYN-FOIA-2026-002",
-            "foia_intakechannel": "Email",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Search",
+            "foia_intakechannelchoice": 100000002,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000002,
             "foia_receiveddate": "2026-02-02T15:00:00Z",
             "foia_perfecteddate": "2026-02-02",
             "foia_currentduedate": "2026-02-20",
@@ -129,14 +129,14 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": true,
             "foia_requestscope": "Synthetic expedited journey using fictional records only.",
-            "foia_disposition": "Open",
-            "foia_feecategory": "News Media",
+            "foia_dispositionchoice": null,
+            "foia_feecategorychoice": 100000002,
             "foia_feeassessed": 0,
             "foia_feewaived": 0,
             "foia_feecollected": 0,
             "foia_acknowledgmentreference": "SYN-ACK-002",
             "foia_fiscalperiod": "FY2026-Q2",
-            "foia_expediteddecision": "Granted"
+            "foia_expediteddecisionchoice": 100000001
           },
           "Lookups": [
             {
@@ -152,9 +152,9 @@
           "Values": {
             "foia_name": "Synthetic Overdue Request",
             "foia_trackingnumber": "SYN-FOIA-2026-003",
-            "foia_intakechannel": "Mail Room",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Review",
+            "foia_intakechannelchoice": 100000003,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000003,
             "foia_receiveddate": "2025-10-01T13:00:00Z",
             "foia_perfecteddate": "2025-10-03",
             "foia_currentduedate": "2025-11-03",
@@ -162,8 +162,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic overdue journey using fictional records only.",
-            "foia_disposition": "Open",
-            "foia_feecategory": "Other",
+            "foia_dispositionchoice": null,
+            "foia_feecategorychoice": 100000003,
             "foia_feeassessed": 25,
             "foia_feewaived": 0,
             "foia_feecollected": 25,
@@ -184,9 +184,9 @@
           "Values": {
             "foia_name": "Synthetic Appealed Request",
             "foia_trackingnumber": "SYN-FOIA-2026-004",
-            "foia_intakechannel": "FOIA.gov",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Closure",
+            "foia_intakechannelchoice": 100000005,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000007,
             "foia_receiveddate": "2025-08-04T14:00:00Z",
             "foia_perfecteddate": "2025-08-05",
             "foia_currentduedate": "2025-09-03",
@@ -194,8 +194,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic appealed journey using fictional records only.",
-            "foia_disposition": "Partial Grant",
-            "foia_feecategory": "Commercial",
+            "foia_dispositionchoice": 100000001,
+            "foia_feecategorychoice": 100000000,
             "foia_feeassessed": 75,
             "foia_feewaived": 0,
             "foia_feecollected": 75,
@@ -217,9 +217,9 @@
           "Values": {
             "foia_name": "Synthetic Fee Request",
             "foia_trackingnumber": "SYN-FOIA-2026-005",
-            "foia_intakechannel": "Public Portal",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Approval",
+            "foia_intakechannelchoice": 100000000,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000005,
             "foia_receiveddate": "2026-03-02T16:00:00Z",
             "foia_perfecteddate": "2026-03-03",
             "foia_currentduedate": "2026-03-31",
@@ -227,8 +227,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic fee journey using fictional records only.",
-            "foia_disposition": "Open",
-            "foia_feecategory": "Educational",
+            "foia_dispositionchoice": null,
+            "foia_feecategorychoice": 100000001,
             "foia_feeassessed": 120,
             "foia_feewaived": 80,
             "foia_feecollected": 40,
@@ -249,9 +249,9 @@
           "Values": {
             "foia_name": "Synthetic Exemption Request",
             "foia_trackingnumber": "SYN-FOIA-2026-006",
-            "foia_intakechannel": "Staff Assisted",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Redaction",
+            "foia_intakechannelchoice": 100000004,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000004,
             "foia_receiveddate": "2026-04-01T13:00:00Z",
             "foia_perfecteddate": "2026-04-02",
             "foia_currentduedate": "2026-04-30",
@@ -259,8 +259,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic exemption journey using fictional records only.",
-            "foia_disposition": "Open",
-            "foia_feecategory": "Other",
+            "foia_dispositionchoice": null,
+            "foia_feecategorychoice": 100000003,
             "foia_feeassessed": 10,
             "foia_feewaived": 10,
             "foia_feecollected": 0,
@@ -281,9 +281,9 @@
           "Values": {
             "foia_name": "Synthetic Released Request",
             "foia_trackingnumber": "SYN-FOIA-2026-007",
-            "foia_intakechannel": "API",
-            "foia_validationstate": "Perfected",
-            "foia_lifecyclestage": "Closure",
+            "foia_intakechannelchoice": 100000006,
+            "foia_validationstatechoice": 100000001,
+            "foia_lifecyclestagechoice": 100000007,
             "foia_receiveddate": "2026-05-01T12:00:00Z",
             "foia_perfecteddate": "2026-05-01",
             "foia_currentduedate": "2026-05-29",
@@ -291,8 +291,8 @@
             "foia_duplicatesuspected": false,
             "foia_expeditedrequested": false,
             "foia_requestscope": "Synthetic released journey using fictional records only.",
-            "foia_disposition": "Full Grant",
-            "foia_feecategory": "News Media",
+            "foia_dispositionchoice": 100000000,
+            "foia_feecategorychoice": 100000002,
             "foia_feeassessed": 0,
             "foia_feewaived": 0,
             "foia_feecollected": 0,
@@ -487,7 +487,7 @@
           "Values": {
             "foia_duedate": "2026-01-15",
             "foia_searchterms": "synthetic policy",
-            "foia_status": "Completed",
+            "foia_statuschoice": 100000006,
             "foia_searchscope": "Fictional policy repository",
             "foia_resultcount": 2,
             "foia_evidencereference": "SYN-EVIDENCE-001",
@@ -518,7 +518,7 @@
           "Values": {
             "foia_duedate": "2026-02-10",
             "foia_searchterms": "synthetic urgent",
-            "foia_status": "Completed",
+            "foia_statuschoice": 100000006,
             "foia_searchscope": "Fictional urgent correspondence",
             "foia_resultcount": 1,
             "foia_evidencereference": "SYN-EVIDENCE-002",
@@ -549,7 +549,7 @@
           "Values": {
             "foia_duedate": "2026-04-10",
             "foia_searchterms": "synthetic privileged",
-            "foia_status": "Completed",
+            "foia_statuschoice": 100000006,
             "foia_searchscope": "Fictional legal review material",
             "foia_resultcount": 1,
             "foia_evidencereference": "SYN-EVIDENCE-006",
@@ -580,7 +580,7 @@
           "Values": {
             "foia_duedate": "2026-05-08",
             "foia_searchterms": "synthetic release",
-            "foia_status": "Completed",
+            "foia_statuschoice": 100000006,
             "foia_searchscope": "Fictional releasable material",
             "foia_resultcount": 1,
             "foia_evidencereference": "SYN-EVIDENCE-007",
@@ -720,14 +720,14 @@
         {
           "Key": "SYN-REVIEW-001",
           "Values": {
-            "foia_status": "In Progress",
+            "foia_statuschoice": 100000003,
             "foia_name": "Synthetic Normal Review",
-            "foia_reviewtype": "Responsiveness",
+            "foia_reviewtypechoice": 100000000,
             "foia_reviewernotes": "Synthetic review notes only.",
             "foia_duedate": "2026-01-22",
             "foia_assigneddate": "2026-01-15T14:00:00Z",
             "foia_reviewtasknumber": "SYN-REVIEW-001",
-            "foia_disposition": "Responsive"
+            "foia_dispositionchoice": 100000000
           },
           "Lookups": [
             {
@@ -747,11 +747,11 @@
         {
           "Key": "SYN-REVIEW-006",
           "Values": {
-            "foia_disposition": "Partial Exemption",
-            "foia_status": "Completed",
+            "foia_dispositionchoice": 100000002,
+            "foia_statuschoice": 100000006,
             "foia_duedate": "2026-04-17",
             "foia_reviewtasknumber": "SYN-REVIEW-006",
-            "foia_reviewtype": "Legal",
+            "foia_reviewtypechoice": 100000002,
             "foia_assigneddate": "2026-04-10T14:00:00Z",
             "foia_completeddate": "2026-04-16T19:00:00Z",
             "foia_reviewernotes": "Synthetic legal rationale pointer.",
@@ -775,11 +775,11 @@
         {
           "Key": "SYN-REVIEW-007",
           "Values": {
-            "foia_disposition": "Approved for Release",
-            "foia_status": "Completed",
+            "foia_dispositionchoice": 100000003,
+            "foia_statuschoice": 100000006,
             "foia_duedate": "2026-05-15",
             "foia_reviewtasknumber": "SYN-REVIEW-007",
-            "foia_reviewtype": "Final Release",
+            "foia_reviewtypechoice": 100000004,
             "foia_assigneddate": "2026-05-08T14:00:00Z",
             "foia_completeddate": "2026-05-14T19:00:00Z",
             "foia_reviewernotes": "Synthetic final review.",
@@ -817,7 +817,7 @@
             "foia_scope": "Synthetic page 2 paragraphs 1-2",
             "foia_proposeridentity": "Synthetic Legal Reviewer",
             "foia_rationale": "Synthetic deliberative-process rationale.",
-            "foia_approvalstate": "Approved",
+            "foia_approvalstatechoice": 100000003,
             "foia_name": "Synthetic Exemption 5"
           },
           "Lookups": [
@@ -845,7 +845,7 @@
           "Key": "SYN-REDACTION-006",
           "Values": {
             "foia_approveddate": "2026-04-18T18:00:00Z",
-            "foia_finalstate": "Applied",
+            "foia_finalstatechoice": 100000003,
             "foia_recordlocation": "Page 2, paragraphs 1-2",
             "foia_proposedbasis": "5 U.S.C. 552(b)(5)",
             "foia_redactionnumber": "SYN-REDACTION-006",
@@ -886,7 +886,7 @@
             "foia_approveridentity": "Synthetic Release Approver",
             "foia_packagehash": "DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD",
             "foia_releasemethod": "Secure Portal",
-            "foia_approvalstate": "Released",
+            "foia_approvalstatechoice": 100000003,
             "foia_plannedreleasedate": "2025-09-02",
             "foia_name": "Synthetic Appealed Package v1"
           },
@@ -910,7 +910,7 @@
             "foia_approveridentity": "Synthetic Release Approver",
             "foia_packagehash": "EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE",
             "foia_releasemethod": "Secure Portal",
-            "foia_approvalstate": "Released",
+            "foia_approvalstatechoice": 100000003,
             "foia_plannedreleasedate": "2026-05-20",
             "foia_name": "Synthetic Released Package v1"
           },
@@ -932,12 +932,12 @@
         {
           "Key": "SYN-APPEAL-004",
           "Values": {
-            "foia_outcome": "Open",
+            "foia_outcomechoice": null,
             "foia_receiveddate": "2025-09-15T14:00:00Z",
             "foia_name": "Synthetic Open Appeal",
             "foia_appealnumber": "SYN-APPEAL-004",
             "foia_duedate": "2025-10-14",
-            "foia_stage": "Reconsideration and Legal Review",
+            "foia_stagechoice": 100000002,
             "foia_challengeddetermination": "Synthetic partial-grant determination",
             "foia_decision": "Pending"
           },
@@ -967,11 +967,11 @@
           "Values": {
             "foia_provenance": "synthetic-clock-v1",
             "foia_actorreference": "Synthetic Clock Service",
-            "foia_eventtype": "Receipt",
+            "foia_eventtypechoice": 100000000,
             "foia_effectivedatetime": "2025-10-01T13:00:00Z",
             "foia_eventidentifier": "SYN-CLOCK-003-RECEIPT",
             "foia_resultingduedate": "2025-10-29",
-            "foia_clocktype": "Request",
+            "foia_clocktypechoice": 100000000,
             "foia_reason": "Synthetic receipt",
             "foia_name": "Synthetic Overdue Receipt Event"
           },
@@ -995,12 +995,12 @@
           "Values": {
             "foia_provenance": "synthetic-clock-v1",
             "foia_actorreference": "Synthetic Clock Service",
-            "foia_eventtype": "Extension",
+            "foia_eventtypechoice": 100000004,
             "foia_effectivedatetime": "2025-10-20T13:00:00Z",
             "foia_eventidentifier": "SYN-CLOCK-003-EXTENSION",
             "foia_priorduedate": "2025-10-29",
             "foia_resultingduedate": "2025-11-03",
-            "foia_clocktype": "Request",
+            "foia_clocktypechoice": 100000000,
             "foia_reason": "Synthetic extension",
             "foia_name": "Synthetic Overdue Extension Event"
           },
@@ -1024,11 +1024,11 @@
           "Values": {
             "foia_provenance": "synthetic-clock-v1",
             "foia_actorreference": "Synthetic Clock Service",
-            "foia_eventtype": "Appeal Receipt",
+            "foia_eventtypechoice": 100000006,
             "foia_effectivedatetime": "2025-09-15T14:00:00Z",
             "foia_eventidentifier": "SYN-CLOCK-004-APPEAL",
             "foia_resultingduedate": "2025-10-14",
-            "foia_clocktype": "Appeal",
+            "foia_clocktypechoice": 100000001,
             "foia_reason": "Synthetic appeal receipt",
             "foia_name": "Synthetic Appeal Receipt Event"
           },
@@ -1055,7 +1055,7 @@
             "foia_correlationidentifier": "SYN-CORR-007",
             "foia_eventdatetime": "2026-05-20T18:00:00Z",
             "foia_name": "Synthetic Release Audit Event",
-            "foia_eventtype": "Release",
+            "foia_eventtypechoice": 100000005,
             "foia_scope": "SYN-PACKAGE-007",
             "foia_actorreference": "Synthetic Release Officer"
           },
@@ -1079,13 +1079,13 @@
           "Values": {
             "foia_operationclassification": "Summarization",
             "foia_revieweddatetime": "2026-01-16T14:05:00Z",
-            "foia_reviewerdisposition": "Rejected",
+            "foia_reviewerdispositionchoice": 100000002,
             "foia_createddatetime": "2026-01-16T14:00:00Z",
             "foia_provider": "DisabledAdapter",
             "foia_sourcereferences": "SYN-RECORD-001",
             "foia_output": "Disabled adapter returned no recommendation.",
             "foia_assistanceidentifier": "SYN-AI-001",
-            "foia_operationalstatus": "Disabled",
+            "foia_operationalstatuschoice": 100000000,
             "foia_name": "Synthetic Disabled AI Adapter Record"
           },
           "Lookups": [

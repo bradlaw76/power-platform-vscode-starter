@@ -58,8 +58,8 @@ $invalidInheritedMembership = @($inheritedMembership | Where-Object {
 if ($invalidInheritedMembership.Count -gt 0) {
     throw "Membership item '$($invalidInheritedMembership[0].Category)|$($invalidInheritedMembership[0].Name)' lacks explicit or inherited component evidence."
 }
-$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'security-roles')
-$schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources')
+$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'security-roles', 'global-choices')
+$schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'global-choices')
 $expectedComponents = @($membership.Items | Where-Object {
     $_.Category -in $rootCategories -and -not [string]::IsNullOrWhiteSpace("$($_.ObjectId)") -and $null -ne $_.ComponentType
 } | ForEach-Object {
@@ -80,6 +80,19 @@ $packageComponents = @($rootComponentNodes | ForEach-Object {
         throw 'Unpacked Solution.xml contains a root component without a type and stable ID or schema name.'
     }
     $identity = if (-not [string]::IsNullOrWhiteSpace($objectId)) { "id:$objectId" } else { "schema:$schemaName" }
+    if ($componentType -eq '9') {
+        $matches = @($expectedComponents | Where-Object {
+            $_.ComponentType -eq '9' -and (($_.ObjectId -eq $objectId -and $objectId) -or
+                ("$($_.Name)".ToLowerInvariant() -eq $schemaName -and $schemaName))
+        })
+        if ($matches.Count -eq 1) {
+            if (($objectId -and $matches[0].ObjectId -ne $objectId) -or
+                ($schemaName -and "$($matches[0].Name)".ToLowerInvariant() -ne $schemaName)) {
+                throw 'Unpacked global Choice ID/schema identity conflicts with membership.'
+            }
+            $identity = "schema:$("$($matches[0].Name)".Trim().ToLowerInvariant())"
+        }
+    }
     [pscustomobject]@{ Key="$componentType|$identity"; ComponentType=$componentType; ObjectId=$objectId; SchemaName=$schemaName }
 })
 $duplicateExpected = @($expectedComponents | Group-Object Key | Where-Object Count -gt 1)
