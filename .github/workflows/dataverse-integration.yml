@@ -53,7 +53,32 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Validate required secrets and scenario paths
+      - name: Resolve isolated target project root
+        shell: pwsh
+        run: |
+          if ($env:SCENARIO_SLUG -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+            throw 'scenario_slug must contain lowercase letters, digits, and single hyphens only.'
+          }
+          $frameworkRoot = [IO.Path]::GetFullPath($env:GITHUB_WORKSPACE)
+          $targetRoot = Join-Path $env:RUNNER_TEMP "dataverse-target-$env:GITHUB_RUN_ID-$env:GITHUB_RUN_ATTEMPT"
+          if (Test-Path -LiteralPath $targetRoot) { throw "Refusing to reuse target workspace: $targetRoot" }
+          $sourcePayload = Join-Path $frameworkRoot "payloads/scenarios/$env:SCENARIO_SLUG"
+          $sourceSpec = Join-Path $frameworkRoot "specs/$env:SCENARIO_SLUG"
+          if (-not (Test-Path -LiteralPath $sourcePayload -PathType Container)) { throw "Missing scenario payload: $sourcePayload" }
+          if (-not (Test-Path -LiteralPath $sourceSpec -PathType Container)) { throw "Missing scenario spec: $sourceSpec" }
+          New-Item -ItemType Directory -Path (Join-Path $targetRoot 'payloads/scenarios'), (Join-Path $targetRoot 'specs') -Force | Out-Null
+          Copy-Item -LiteralPath $sourcePayload -Destination (Join-Path $targetRoot 'payloads/scenarios') -Recurse
+          Copy-Item -LiteralPath $sourceSpec -Destination (Join-Path $targetRoot 'specs') -Recurse
+          git init --initial-branch=dataverse-integration $targetRoot
+          if ($LASTEXITCODE -ne 0) { throw 'Could not initialize isolated target Git repository.' }
+          git -C $targetRoot remote add origin 'https://github.com/example/dataverse-integration-target.git'
+          if ($LASTEXITCODE -ne 0) { throw 'Could not configure isolated target Git identity.' }
+          "WIZARD_FRAMEWORK_ROOT=$frameworkRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          "WIZARD_TARGET_PROJECT_ROOT=$targetRoot" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+          Write-Host "FrameworkRoot: $frameworkRoot"
+          Write-Host "TargetProjectRoot: $targetRoot"
+
+      - name: Validate required secrets and isolated scenario paths
         shell: pwsh
         run: |
           foreach ($name in @(
@@ -68,13 +93,14 @@ jobs:
               throw "Required integration secret is unavailable: $name"
             }
           }
-          if ($env:SCENARIO_SLUG -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
-            throw 'scenario_slug must contain lowercase letters, digits, and single hyphens only.'
-          }
-          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
-          $specFolder = Join-Path 'specs' $env:SCENARIO_SLUG
-          if (-not (Test-Path -LiteralPath $payloadFolder -PathType Container)) { throw "Missing payload folder: $payloadFolder" }
-          if (-not (Test-Path -LiteralPath $specFolder -PathType Container)) { throw "Missing spec folder: $specFolder" }
+          $payloadFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "payloads/scenarios/$env:SCENARIO_SLUG"
+          $specFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "specs/$env:SCENARIO_SLUG"
+          if (-not (Test-Path -LiteralPath $payloadFolder -PathType Container)) { throw "Missing isolated payload folder: $payloadFolder" }
+          if (-not (Test-Path -LiteralPath $specFolder -PathType Container)) { throw "Missing isolated spec folder: $specFolder" }
+
+      - name: Run non-mutating workflow preflight
+        shell: pwsh
+        run: ./scripts/ci/test-dataverse-integration-workflow.ps1
 
       - name: Install PAC CLI
         shell: pwsh
@@ -97,13 +123,13 @@ jobs:
       - name: Preview static build contract
         shell: pwsh
         run: |
-          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
-          ./scripts/bootstrap/15-dry-validate.ps1 -ScenarioSlug $env:SCENARIO_SLUG -PayloadsFolder $payloadFolder -PublisherPrefixOverride $env:DV_PUBLISHER_PREFIX -PreviewOnly $true
+          $payloadFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "payloads/scenarios/$env:SCENARIO_SLUG"
+          ./scripts/bootstrap/15-dry-validate.ps1 -ScenarioSlug $env:SCENARIO_SLUG -PayloadsFolder $payloadFolder -TargetProjectRoot $env:WIZARD_TARGET_PROJECT_ROOT -PublisherPrefixOverride $env:DV_PUBLISHER_PREFIX -PreviewOnly $true
 
       - name: Build twice to verify idempotency
         shell: pwsh
         run: |
-          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          $payloadFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "payloads/scenarios/$env:SCENARIO_SLUG"
           foreach ($pass in 1..2) {
             Write-Host "Starting Dataverse build pass $pass of 2."
             ./scripts/bootstrap/20-build-tables.ps1 -PayloadsFolder $payloadFolder
@@ -118,15 +144,16 @@ jobs:
       - name: Verify inventory and post-build validation
         shell: pwsh
         run: |
-          $payloadFolder = Join-Path 'payloads/scenarios' $env:SCENARIO_SLUG
+          $payloadFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "payloads/scenarios/$env:SCENARIO_SLUG"
           ./scripts/bootstrap/50-add-to-solution.ps1 -PayloadsFolder $payloadFolder -ScenarioSlug $env:SCENARIO_SLUG
           ./scripts/bootstrap/80-post-build-analysis.ps1 -ScenarioSlug $env:SCENARIO_SLUG -PayloadFolder $payloadFolder -PreviewOnly
 
       - name: Export and verify solution
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path out -Force | Out-Null
-          $zipPath = Join-Path 'out' "$($env:DV_SOLUTION_NAME)_unmanaged.zip"
+          $outputFolder = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT 'out'
+          New-Item -ItemType Directory -Path $outputFolder -Force | Out-Null
+          $zipPath = Join-Path $outputFolder "$($env:DV_SOLUTION_NAME)_unmanaged.zip"
           pac solution export --name $env:DV_SOLUTION_NAME --path $zipPath --managed false --overwrite
           if (-not (Test-Path -LiteralPath $zipPath -PathType Leaf)) { throw "Solution export was not created: $zipPath" }
           if ((Get-Item -LiteralPath $zipPath).Length -le 0) { throw "Solution export is empty: $zipPath" }
@@ -135,7 +162,7 @@ jobs:
         if: ${{ always() && inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
         shell: pwsh
         run: |
-          $artifactRoot = New-Item -ItemType Directory -Path integration-artifacts -Force
+          $artifactRoot = New-Item -ItemType Directory -Path (Join-Path $env:RUNNER_TEMP 'integration-artifacts') -Force
           $redactions = @(
             $env:DV_ENVIRONMENT_URL,
             $env:AZURE_TENANT_ID,
@@ -143,11 +170,14 @@ jobs:
             $env:AZURE_CLIENT_SECRET,
             $env:DV_TOKEN
           ) | Where-Object { -not [string]::IsNullOrWhiteSpace($_) }
-          $reportRoots = @('.wizard-metrics/artifacts', (Join-Path 'specs' $env:SCENARIO_SLUG))
+          $reportRoots = @(
+            (Join-Path $env:WIZARD_TARGET_PROJECT_ROOT '.wizard-metrics/artifacts'),
+            (Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "specs/$env:SCENARIO_SLUG")
+          )
           foreach ($root in $reportRoots) {
             if (-not (Test-Path -LiteralPath $root)) { continue }
             foreach ($file in Get-ChildItem -LiteralPath $root -File -Recurse -Include '*.json', '*.md', '*.html') {
-              $relativePath = [IO.Path]::GetRelativePath('.', $file.FullName)
+              $relativePath = [IO.Path]::GetRelativePath($env:WIZARD_TARGET_PROJECT_ROOT, $file.FullName)
               $targetPath = Join-Path $artifactRoot.FullName $relativePath
               New-Item -ItemType Directory -Path (Split-Path $targetPath -Parent) -Force | Out-Null
               $content = Get-Content -LiteralPath $file.FullName -Raw
@@ -155,7 +185,7 @@ jobs:
               Set-Content -LiteralPath $targetPath -Value $content -Encoding UTF8
             }
           }
-          $zipPath = Join-Path 'out' "$($env:DV_SOLUTION_NAME)_unmanaged.zip"
+          $zipPath = Join-Path $env:WIZARD_TARGET_PROJECT_ROOT "out/$($env:DV_SOLUTION_NAME)_unmanaged.zip"
           if (Test-Path -LiteralPath $zipPath) {
             $zip = Get-Item -LiteralPath $zipPath
             $hash = Get-FileHash -LiteralPath $zipPath -Algorithm SHA256
@@ -172,7 +202,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: dataverse-integration-${{ inputs.scenario_slug }}-${{ github.run_id }}
-          path: integration-artifacts
+          path: ${{ runner.temp }}/integration-artifacts
           if-no-files-found: error
           retention-days: 7
 
@@ -180,8 +210,8 @@ jobs:
         if: ${{ always() && inputs.disposable_environment_confirmation == 'I_CONFIRM_DISPOSABLE_ENVIRONMENT' }}
         shell: pwsh
         run: |
-          Remove-Item -LiteralPath '.env.ps1' -Force -ErrorAction SilentlyContinue
-          Remove-Item -LiteralPath 'out' -Recurse -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath (Join-Path $env:WIZARD_TARGET_PROJECT_ROOT '.env.ps1') -Force -ErrorAction SilentlyContinue
+          Remove-Item -LiteralPath (Join-Path $env:WIZARD_TARGET_PROJECT_ROOT 'out') -Recurse -Force -ErrorAction SilentlyContinue
           pac auth clear 2>$null
           az logout
           Write-Host 'Runner-local credentials and raw export removed. No Dataverse deletion was attempted.'

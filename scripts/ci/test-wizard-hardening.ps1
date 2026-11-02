@@ -100,10 +100,30 @@ try {
 
   $scenarioPayloadPath = Join-Path $testRepo 'payloads/scenarios/test-scenario'
   New-Item -ItemType Directory -Path $scenarioPayloadPath -Force | Out-Null
+  $unselectedContext = Get-WizardScenarioContext -RepoRoot $testRepo
+  if (-not [string]::IsNullOrWhiteSpace($unselectedContext.ScenarioSlug)) {
+    throw 'Scenario context must not silently select the only scenario.'
+  }
   $scenarioContext = Get-WizardScenarioContext -RepoRoot $testRepo -PayloadsFolder 'payloads/scenarios/test-scenario'
   if ($scenarioContext.ScenarioSlug -cne 'test-scenario' -or
       -not $scenarioContext.ScenarioPayloadFolder.Equals($scenarioPayloadPath, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Scenario context must resolve a scenario-scoped relative payload folder without appending the path twice.'
+  }
+  $secondScenarioPayloadPath = Join-Path $testRepo 'payloads/scenarios/second-scenario'
+  New-Item -ItemType Directory -Path $secondScenarioPayloadPath -Force | Out-Null
+  $secondScenarioContext = Get-WizardScenarioContext -RepoRoot $testRepo -ScenarioSlug 'second-scenario'
+  if ($secondScenarioContext.ScenarioSlug -cne 'second-scenario' -or
+      -not $secondScenarioContext.ScenarioPayloadFolder.Equals($secondScenarioPayloadPath, [StringComparison]::OrdinalIgnoreCase) -or
+      $secondScenarioContext.ScenarioPayloadFolder.Equals($scenarioContext.ScenarioPayloadFolder, [StringComparison]::OrdinalIgnoreCase)) {
+    throw 'Explicitly selected scenarios must resolve to distinct payload roots.'
+  }
+  foreach ($exampleSlug in @('federal-foia-management', 'contoso-case-tracker')) {
+    $exampleContext = Get-WizardScenarioContext -RepoRoot $repoRoot -ScenarioSlug $exampleSlug
+    if ($exampleContext.ScenarioSlug -cne $exampleSlug -or
+        -not (Test-Path -LiteralPath $exampleContext.ScenarioFolder -PathType Container) -or
+        -not (Test-Path -LiteralPath $exampleContext.ScenarioPayloadFolder -PathType Container)) {
+      throw "Existing example '$exampleSlug' must remain available only through explicit scenario selection."
+    }
   }
 
   $expected = New-WizardExpectedArtifacts -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -PublisherPrefix 'tst'

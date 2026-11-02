@@ -94,18 +94,19 @@ NON-NEGOTIABLES
     Optional JSON file containing an ordered array of answers for unattended
     acceptance testing.
 
-.PARAMETER WorkspaceRoot
-    Optional repository root used for isolated acceptance testing. Defaults to
-    the repository containing this script.
+.PARAMETER TargetProjectRoot
+    Required existing application project directory. WorkspaceRoot is retained
+    only as an explicit compatibility alias; neither value defaults to the
+    framework repository containing this script.
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Force
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application -Force
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit
+    pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot /path/to/application -Mode advanced-builder -Retrofit
 #>
 
 param(
@@ -114,17 +115,21 @@ param(
     [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
-    [string]$WorkspaceRoot
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
-    Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-} else {
-    [System.IO.Path]::GetFullPath($WorkspaceRoot)
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
+    throw 'Application Authoring Mode requires an explicit -TargetProjectRoot. Existing scenario files are not moved automatically.'
 }
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$TargetProjectRoot = $projectRoots.TargetProjectRoot
+$repoRoot = $TargetProjectRoot
 $scriptedAnswers = $null
 $scriptedAnswerIndex = 0
 if (-not [string]::IsNullOrWhiteSpace($AnswersFile)) {
@@ -676,10 +681,10 @@ function Read-BpfDiscovery {
     }
 }
 
-$profilePath = Join-Path $repoRoot "wizard.profile.json"
-$contractPath = Join-Path $repoRoot "docs\wizard-contract-v1.md"
-$onboardingPath = Join-Path $repoRoot "docs\onboarding.md"
-$payloadPath = Join-Path $repoRoot "payloads"
+$profilePath = Join-Path $frameworkRoot "wizard.profile.json"
+$contractPath = Join-Path $frameworkRoot "docs\wizard-contract-v1.md"
+$onboardingPath = Join-Path $frameworkRoot "docs\onboarding.md"
+$payloadPath = Join-Path $frameworkRoot "payloads"
 $reportsModuleEnabled = $true
 $bpfModuleEnabled = $true
 $sourceControlModuleEnabled = $true
@@ -1131,14 +1136,18 @@ $standardTableMapping = Format-StandardTableMapping -Input $answers["StandardTab
 $customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
 
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
+$null = Assert-WizardWritablePath -Path $scenarioFolder -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
 
 # Write planning values to .env.ps1 so 10-auth-connect.ps1 can use them as defaults.
 # 10-auth-connect.ps1 will overwrite this file with full auth + config when it runs.
 $envFilePath = Join-Path $repoRoot ".env.ps1"
+$null = Assert-WizardWritablePath -Path $envFilePath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$escapedTargetRoot = $TargetProjectRoot.Replace("'", "''")
 $planEnvContent = @"
 # Planning values set by 05-start-wizard.ps1 -- do not commit this file.
 # Run 10-auth-connect.ps1 next to complete authentication and full configuration.
+`$env:WIZARD_TARGET_PROJECT_ROOT = '$escapedTargetRoot'
 `$env:DV_SOLUTION_NAME       = "$($answers["SolutionName"])"
 `$env:DV_PUBLISHER_PREFIX    = "$($answers["PublisherPrefix"])"
 `$global:DV_SOLUTION_NAME    = "`$env:DV_SOLUTION_NAME"
@@ -1154,6 +1163,7 @@ $demoDataPlanPath = Join-Path $scenarioFolder "demo-data-plan.json"
 $reportMappingsPath = Join-Path $scenarioFolder "report-mappings.md"
 $viewsPath = Join-Path $scenarioFolder "views.json"
 $scenarioPayloadFolder = Join-Path (Join-Path $repoRoot "payloads\scenarios") $scenarioSlug
+$null = Assert-WizardWritablePath -Path $scenarioPayloadFolder -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 $bpfPayloadPath = Join-Path $scenarioPayloadFolder "process-$scenarioSlug.json"
 
 $viewsContract = [ordered]@{
@@ -1742,6 +1752,10 @@ $tasksContent = @"
 - [ ] Update 'docs/build-log.md'
 "@
 
+$outputPaths = @($answersPath, $specPath, $planPath, $tasksPath, $reportMappingsPath, $viewsPath)
+foreach ($outputPath in $outputPaths) {
+    $null = Assert-WizardWritablePath -Path $outputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+}
 Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
 Set-Content -Path $specPath -Value $specContent -Encoding UTF8
 Set-Content -Path $planPath -Value $planContent -Encoding UTF8
@@ -1749,10 +1763,12 @@ Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
 Set-Content -Path $reportMappingsPath -Value $reportMappingsContent -Encoding UTF8
 Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
 if ($null -ne $demoDataPlanObject) {
+    $null = Assert-WizardWritablePath -Path $demoDataPlanPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
     Set-Content -Path $demoDataPlanPath -Value $demoDataPlanJson -Encoding UTF8
 }
 if ($bpf.Enabled) {
     New-Item -ItemType Directory -Path $scenarioPayloadFolder -Force | Out-Null
+    $null = Assert-WizardWritablePath -Path $bpfPayloadPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
     Set-Content -Path $bpfPayloadPath -Value $bpfPayloadJson -Encoding UTF8
 }
 
@@ -1776,12 +1792,12 @@ Write-Host "Next steps:" -ForegroundColor Cyan
 if ($Retrofit) {
     Write-Host "  1. Review spec.md — confirm it reflects current state accurately."
     Write-Host "  2. Review plan.md — confirm remaining work is complete and correct."
-    Write-Host "  3. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
+    Write-Host "  3. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug -TargetProjectRoot `"$TargetProjectRoot`""
     Write-Host "  4. Get stakeholder approval on current state + remaining work."
     Write-Host "  5. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
 } else {
     Write-Host "  1. Review and refine the generated files."
-    Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug"
+    Write-Host "  2. Generate a demo script: pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug $scenarioSlug -TargetProjectRoot `"$TargetProjectRoot`""
     Write-Host "  3. Get approval on scope, success criteria, and demo story."
     Write-Host "  4. Then run: pwsh ./scripts/bootstrap/00-prereq-check.ps1"
 }

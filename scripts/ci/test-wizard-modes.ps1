@@ -28,11 +28,12 @@ TEST CASES
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$wizardPath = Join-Path $repoRoot 'scripts/bootstrap/05-start-wizard.ps1'
-$formsViewsPath = Join-Path $repoRoot 'scripts/bootstrap/60-build-forms-views.ps1'
-$profile = Get-Content -LiteralPath (Join-Path $repoRoot 'wizard.profile.json') -Raw -Encoding UTF8 | ConvertFrom-Json
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$wizardPath = Join-Path $frameworkRoot 'scripts/bootstrap/05-start-wizard.ps1'
+$formsViewsPath = Join-Path $frameworkRoot 'scripts/bootstrap/60-build-forms-views.ps1'
+$profile = Get-Content -LiteralPath (Join-Path $frameworkRoot 'wizard.profile.json') -Raw -Encoding UTF8 | ConvertFrom-Json
 $testRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("wizard-modes-test-" + [guid]::NewGuid().ToString('N'))
+$originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
 $coreArtifacts = @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md', 'views.json')
 
 function Assert-True {
@@ -52,9 +53,13 @@ function New-WizardTestWorkspace {
     $workspace = Join-Path $testRoot $Name
     New-Item -ItemType Directory -Path (Join-Path $workspace 'docs') -Force | Out-Null
     New-Item -ItemType Directory -Path (Join-Path $workspace 'payloads') -Force | Out-Null
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'wizard.profile.json') -Destination $workspace
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs/wizard-contract-v1.md') -Destination (Join-Path $workspace 'docs')
-    Copy-Item -LiteralPath (Join-Path $repoRoot 'docs/onboarding.md') -Destination (Join-Path $workspace 'docs')
+    Copy-Item -LiteralPath (Join-Path $frameworkRoot 'wizard.profile.json') -Destination $workspace
+    Copy-Item -LiteralPath (Join-Path $frameworkRoot 'docs/wizard-contract-v1.md') -Destination (Join-Path $workspace 'docs')
+    Copy-Item -LiteralPath (Join-Path $frameworkRoot 'docs/onboarding.md') -Destination (Join-Path $workspace 'docs')
+    $null = & git -C $workspace init -b test-mode
+    if ($LASTEXITCODE -ne 0) { throw "Could not initialize target repository for mode fixture '$Name'." }
+    $null = & git -C $workspace remote add origin "https://github.com/example/$Name-mode-target.git"
+    if ($LASTEXITCODE -ne 0) { throw "Could not configure target remote for mode fixture '$Name'." }
     return $workspace
 }
 
@@ -112,6 +117,12 @@ function Assert-Step60ConsumesViewsContract {
 }
 
 try {
+    New-Item -ItemType Directory -Path $testRoot -Force | Out-Null
+    $null = & git -C $testRoot init -b test-modes
+    if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the wizard-modes target repository.' }
+    $null = & git -C $testRoot remote add origin 'https://github.com/example/wizard-modes-target.git'
+    if ($LASTEXITCODE -ne 0) { throw 'Could not configure the wizard-modes target remote.' }
+    $env:WIZARD_TARGET_PROJECT_ROOT = $testRoot
     $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
     [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
     . $formsViewsPath
@@ -140,7 +151,7 @@ try {
         Assert-True -Condition ($null -eq $modeProperty.Value.PSObject.Properties['execution']) -Message "Mode '$($modeProperty.Name)' must use the shared execution pipeline."
     }
 
-    $advancedAcceptanceTest = Get-Content -LiteralPath (Join-Path $repoRoot 'scripts/ci/test-wizard-source-control-acceptance.ps1') -Raw -Encoding UTF8
+    $advancedAcceptanceTest = Get-Content -LiteralPath (Join-Path $frameworkRoot 'scripts/ci/test-wizard-source-control-acceptance.ps1') -Raw -Encoding UTF8
     Assert-True -Condition ($advancedAcceptanceTest -match '-Mode advanced-builder') -Message 'Advanced Builder must retain a runtime artifact acceptance test.'
     foreach ($artifact in $coreArtifacts) {
         Assert-True -Condition ($advancedAcceptanceTest.Contains("'$artifact'")) -Message "Advanced Builder acceptance does not verify $artifact."
@@ -161,6 +172,9 @@ try {
     Assert-True -Condition ($demoOutput -notmatch '(?i)A-acceptance|disposable|cleanup|retention') -Message 'Default Demo Builder output exposed acceptance or cleanup prompts.'
     $demoSlug = 'equipment-checkout-for-faster-accountable-lab-lending'
     Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    foreach ($exampleSlug in @('federal-foia-management', 'contoso-case-tracker')) {
+        Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $demoWorkspace "payloads/scenarios/$exampleSlug"))) -Message "Generic Demo Builder unexpectedly copied example '$exampleSlug'."
+    }
     $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
@@ -247,6 +261,7 @@ try {
 }
 finally {
     [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', $originalSkipMain)
+    $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
     if (Test-Path -LiteralPath $testRoot) {
         Remove-Item -LiteralPath $testRoot -Recurse -Force
     }

@@ -30,9 +30,11 @@ workloads in this starter.
   does not create Canvas App authoring workspaces.
 - For another workload, review [README.md](../README.md) before continuing.
 
-The full clone created below is a local **authoring workspace** for the
-reusable wizard. Follow the workflow in this repository; the wizard manages
-its reusable capabilities and each build's generated artifacts.
+Application Authoring Mode uses a versioned, read-only framework installation
+and a separate writable application repository. A framework source checkout is
+for explicitly authorized maintenance, not application authoring. See
+[skill-distribution.md](skill-distribution.md) for package verification and
+installation. Do not silently migrate existing scenario files.
 
 ---
 
@@ -72,26 +74,31 @@ Why this matters:
 
 ---
 
-## Step 0: Clone the Repo and Open in VS Code
+## Step 0: Install the Framework and Open the Application Project
 
-If this is your first time with the repository:
+Download the versioned framework ZIP and `.sha256` file from a reviewed GitHub
+release. Verify the archive SHA-256 against the published checksum, extract it
+to a temporary directory, then run its
+`scripts/bootstrap/install-framework.ps1` from an elevated PowerShell session.
+See [skill-distribution.md](skill-distribution.md) for the exact command and
+protected installation locations. Do not use a framework source checkout for
+application authoring.
 
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter
-cd power-platform-vscode-starter
-code .
-```
+Open the installed read-only `FrameworkRoot` in VS Code, and keep the writable
+application repository separate. Resolve and confirm `TargetProjectRoot`
+explicitly before running any wizard command.
 
 Validation checkpoint:
 
-- The folder opens in VS Code.
-- You can see `README.md`, `docs/`, `requirements/`, and `scripts/` in Explorer.
+- The installed framework opens in VS Code and is not writable by the
+  application-authoring account.
+- The application repository is a separate root and Git repository.
 
 ---
 
 ## Step 0A: Install Claude Code Skills (Run Once Per Machine)
 
-If you are using Claude Code (the VS Code CLI or extension), install the wizard skill so it is available in every Claude session on this machine:
+If you are using Claude Code (the VS Code CLI or extension), install the wizard skill from the installed framework so it is available in every Claude session on this machine:
 
 ```powershell
 pwsh ./scripts/bootstrap/01-install-skills.ps1
@@ -197,16 +204,18 @@ Common mistake:
 
 ## Step 4A: Start a Direct Wizard Path
 
+Before discovery, identify the installed wizard as the read-only `FrameworkRoot` and explicitly resolve a separate application `TargetProjectRoot`. Follow the Framework Source Protection Contract in `docs/wizard-contract-v1.md`; no planning, telemetry, or generated output may be written until the target is resolved.
+
 If you already started `/power-platform-wizard-init`, continue in that conversation and do not start another wizard command. For the manual sequence, start one direct path:
 
 - VS Code chat prompt (direct wizard path): run `/power-platform-demo-wizard` in Copilot Chat.
-- Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`.
-- Terminal retrofit wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Retrofit`.
+- Terminal wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root>`.
+- Terminal retrofit wizard: run `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Retrofit`.
 
 What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
-- Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
+- Terminal wizard: asks discovery questions in PowerShell and creates starter files under the approved target's `specs/<scenario-slug>/`.
 - Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
 - Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
@@ -222,7 +231,7 @@ Validation checkpoint:
 After the first wizard creates your scenario files, generate the demo artifacts for both engineer and presenter:
 
 ```powershell
-pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 What this step does:
@@ -236,12 +245,12 @@ What this step does:
 Optional rehearsal step:
 
 ```powershell
-pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 Validation checkpoint:
 
-- `demo-walkthrough.md` and `demo-talk-track.md` exist under `specs/<scenario-slug>/`.
+- `demo-walkthrough.md` and `demo-talk-track.md` exist under the target project's `specs/<scenario-slug>/`.
 - The story, hero record, and talking points reflect the business problem and success criteria.
 
 ---

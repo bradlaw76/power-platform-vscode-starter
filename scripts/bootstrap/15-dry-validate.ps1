@@ -92,9 +92,11 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-if ([string]::IsNullOrWhiteSpace($RepoRoot)) {
-    $RepoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-}
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$requestedTargetRoot = if ([string]::IsNullOrWhiteSpace($RepoRoot)) { $env:WIZARD_TARGET_PROJECT_ROOT } else { $RepoRoot }
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $requestedTargetRoot
+$RepoRoot = $applicationRoots.TargetProjectRoot
 
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {

@@ -10,14 +10,19 @@ ENVIRONMENT:  PowerShell 7 | Credential-free CI
 #>
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$payloads = Join-Path $repoRoot 'payloads/scenarios/gcc-framework-acceptance'
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$payloads = Join-Path $frameworkRoot 'payloads/scenarios/gcc-framework-acceptance'
 $testRepoRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-report-data-$([guid]::NewGuid())"
 New-Item -ItemType Directory -Path $testRepoRoot -Force | Out-Null
+& git -C $testRepoRoot init -b test-report-data | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the reporting/data test target repository.' }
+& git -C $testRepoRoot remote add origin "https://github.com/example/report-data-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the reporting/data test target identity.' }
 $env:WIZARD_REPORTING_SKIP_MAIN = 'true'
 $env:WIZARD_DATA_SKIP_MAIN = 'true'
-. (Join-Path $repoRoot 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug 'ignored'
-. (Join-Path $repoRoot 'scripts/bootstrap/66-seed-synthetic-data.ps1') -ScenarioSlug 'ignored'
+. (Join-Path $frameworkRoot 'scripts/bootstrap/64-build-charts-dashboard.ps1') -ScenarioSlug 'ignored' -TargetProjectRoot $testRepoRoot
+$env:WIZARD_TARGET_PROJECT_ROOT = $testRepoRoot
+. (Join-Path $frameworkRoot 'scripts/bootstrap/66-seed-synthetic-data.ps1') -ScenarioSlug 'ignored'
 Remove-Item Env:WIZARD_REPORTING_SKIP_MAIN, Env:WIZARD_DATA_SKIP_MAIN
 
 $transportCalls = [Collections.Generic.List[object]]::new()
@@ -109,7 +114,7 @@ $beforePreview = $transportCalls.Count
 Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'gcc-framework-acceptance' -PayloadsFolder $payloads -PreviewOnly | Out-Null
 if ($transportCalls.Count -ne $beforePreview) { throw 'Reporting preview invoked transport.' }
 
-$foiaPayloads = Join-Path $repoRoot 'payloads/scenarios/federal-foia-management'
+$foiaPayloads = Join-Path $frameworkRoot 'payloads/scenarios/federal-foia-management'
 $foiaPreview = @(Invoke-WizardReportingStage -RepoRoot $testRepoRoot -ScenarioSlug 'federal-foia-management' -PayloadsFolder $foiaPayloads -PreviewOnly)
 if (@($foiaPreview | Where-Object kind -eq 'dashboard').Count -ne 5) { throw 'FOIA reporting preview must plan five dashboards.' }
 if ($transportCalls.Count -ne $beforePreview) { throw 'Multi-dashboard preview invoked transport.' }

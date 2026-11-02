@@ -96,12 +96,12 @@ result.
 Use when the user wants to design a report against a real authorized
 nonproduction environment without deploying it.
 
-1. Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`.
+1. Resolve `TargetProjectRoot` separately from the read-only framework installation, then run `pwsh ./scripts/bootstrap/00-prereq-check.ps1 -TargetProjectRoot <target-project-root>`.
 2. Run the report wizard. It asks for the environment URL, authenticates
    immediately, and then uses live metadata for report design:
 
 ```powershell
-pwsh ./scripts/bootstrap/08-report-wizard.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/08-report-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 3. Read and summarize:
@@ -118,6 +118,7 @@ dashboard, charts, tables, calculations, and filters. Then run:
 ```powershell
 pwsh ./scripts/bootstrap/08-report-wizard.ps1 `
   -ScenarioSlug <scenario-slug> `
+  -TargetProjectRoot <target-project-root> `
   -Force `
   -Deploy
 ```
@@ -164,24 +165,24 @@ configuration files behind.
 
 ```json
 {
-  "ReportRequest": "Show open cases grouped by priority for service managers.",
-  "TargetAppUniqueName": "contoso_customer_service",
+  "ReportRequest": "Show open service requests grouped by urgency for support leads.",
+  "TargetAppUniqueName": "sample_service_app",
   "OutputTargets": [
     "fetchxml-preview",
     "native-chart-dashboard"
   ],
-  "DashboardName": "Case Operations",
+  "DashboardName": "Service Request Operations",
   "Charts": [
     {
-      "Name": "Open Cases by Priority",
-      "TableLogicalName": "incident",
-      "CategoryField": "prioritycode",
-      "AggregateField": "incidentid",
+      "Name": "Open Requests by Urgency",
+      "TableLogicalName": "sample_request",
+      "CategoryField": "sample_urgency",
+      "AggregateField": "sample_requestid",
       "Aggregate": "count",
       "ChartType": "column",
       "Filters": [
         {
-          "Field": "statecode",
+          "Field": "sample_status",
           "Operator": "eq",
           "Value": "0"
         }

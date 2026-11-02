@@ -17,6 +17,8 @@ param(
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot,
     [string]$MetadataSnapshotPath = '',
     [string]$ConfigurationPath = '',
     [switch]$Force,
@@ -26,7 +28,14 @@ param(
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
+    throw 'Application Authoring Mode requires an explicit -TargetProjectRoot. Report artifacts cannot be written to FrameworkRoot.'
+}
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$TargetProjectRoot = $projectRoots.TargetProjectRoot
+$repoRoot = $TargetProjectRoot
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/reporting-wizard.ps1')
 
@@ -185,7 +194,7 @@ if ($validationErrors.Count -gt 0) {
     throw "Report definition validation failed:`n - $($validationErrors -join "`n - ")"
 }
 
-$paths = Write-WizardReportArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -Definition $definition -Force:$Force
+$paths = Write-WizardReportArtifacts -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot -ScenarioSlug $ScenarioSlug -Definition $definition -Force:$Force
 Write-Host ''
 Write-Host 'Dataverse report wizard completed.' -ForegroundColor Green
 Write-Host "  Payload:  $($paths.PayloadPath)"
@@ -207,7 +216,7 @@ if ($Deploy) {
             throw 'Deployment requires environment URL, access token, solution unique name, and publisher prefix.'
         }
     }
-    & (Join-Path $PSScriptRoot '64-build-charts-dashboard.ps1') -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -ScenarioSlug $ScenarioSlug -PayloadsFolder $paths.PayloadFolder -RequestInvoker $RequestInvoker
+    & (Join-Path $PSScriptRoot '64-build-charts-dashboard.ps1') -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -ScenarioSlug $ScenarioSlug -PayloadsFolder $paths.PayloadFolder -TargetProjectRoot $TargetProjectRoot -RequestInvoker $RequestInvoker
     $payload = Get-Content -LiteralPath $paths.PayloadPath -Raw -Encoding UTF8 | ConvertFrom-Json -Depth 20
     $appWiring = Add-WizardReportsToApp -Payload $payload -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -RequestInvoker $RequestInvoker
     Write-Host "  App:      $($appWiring.AppUniqueName) ($($appWiring.ComponentCount) report components attached)"

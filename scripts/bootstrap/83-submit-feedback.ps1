@@ -54,12 +54,15 @@ param(
 )
 
 # Constants
-$RepoRoot = (git rev-parse --show-toplevel 2>$null) -or (pwd).Path
+$FrameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $FrameworkRoot
+$RepoRoot = $applicationRoots.TargetProjectRoot
 $MetricsDir = Join-Path $RepoRoot ".wizard-metrics"
 $AnalysisDir = Join-Path $MetricsDir "artifacts/analysis"
 $BuildMindMapPath = Join-Path $AnalysisDir "build-mind-map.json"
 $EventsPath = Join-Path $MetricsDir "events.jsonl"
-$ProfilePath = Join-Path $RepoRoot "wizard.profile.json"
+$ProfilePath = Join-Path $FrameworkRoot "wizard.profile.json"
 
 Write-Host ""
 Write-Host "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" -ForegroundColor Cyan
@@ -296,7 +299,7 @@ $contextBlock
 }
 
 # === Step 5: Detect GitHub Remote ===
-$ghRemote = & git remote get-url origin 2>$null
+$ghRemote = & git -C $RepoRoot remote get-url origin 2>$null
 if (-not $ghRemote) {
     Write-Host "❌ Could not detect GitHub remote. Are you in a Git repository?" -ForegroundColor Red
     exit 1
@@ -411,6 +414,7 @@ try {
     if (-not (Test-Path $MetricsDir)) {
         New-Item -ItemType Directory -Path $MetricsDir -Force > $null
     }
+    $null = Assert-WizardWritablePath -Path $EventsPath -FrameworkRoot $FrameworkRoot -TargetProjectRoot $RepoRoot
     Add-Content -Path $EventsPath -Value $telemetryEvent -ErrorAction Stop
     Write-Host ""
     Write-Host "✓ Feedback telemetry recorded" -ForegroundColor Green

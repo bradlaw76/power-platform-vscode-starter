@@ -113,7 +113,10 @@ function Get-WizardTelemetryPathInfo {
 }
 
 function Get-WizardTelemetryMetadata {
-    param([string]$RepoRoot)
+    param(
+        [string]$RepoRoot,
+        [string]$FrameworkRoot = $env:WIZARD_FRAMEWORK_ROOT
+    )
 
     $metadata = [ordered]@{
         TelemetrySchemaVersion = '2.0'
@@ -122,7 +125,8 @@ function Get-WizardTelemetryMetadata {
         RepoRevision           = 'unknown'
     }
 
-    $profilePath = Join-Path $RepoRoot 'wizard.profile.json'
+    $profileRoot = if ([string]::IsNullOrWhiteSpace($FrameworkRoot)) { $RepoRoot } else { $FrameworkRoot }
+    $profilePath = Join-Path $profileRoot 'wizard.profile.json'
     if (Test-Path $profilePath) {
         try {
             $profile = Get-Content -Path $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -285,6 +289,10 @@ function Initialize-WizardStepTelemetry {
     )
 
     $pathInfo = Get-WizardTelemetryPathInfo -RepoRoot $RepoRoot
+    if (Get-Command Assert-WizardWritablePath -ErrorAction SilentlyContinue) {
+        $frameworkRoot = if ([string]::IsNullOrWhiteSpace($env:WIZARD_FRAMEWORK_ROOT)) { $RepoRoot } else { $env:WIZARD_FRAMEWORK_ROOT }
+        $null = Assert-WizardWritablePath -Path $pathInfo.RootPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $RepoRoot
+    }
     New-Item -ItemType Directory -Path $pathInfo.RootPath -Force | Out-Null
 
     if (Test-WizardTelemetryOptOut) {

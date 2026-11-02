@@ -35,6 +35,19 @@ $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $orchestrator = Join-Path $repoRoot 'scripts/bootstrap/90-run-build.ps1'
+$targetRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('wizard-preview-target-' + [guid]::NewGuid().ToString('N'))
+$null = New-Item -ItemType Directory -Path $targetRoot -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'specs') -Destination $targetRoot -Recurse -Force
+Copy-Item -LiteralPath (Join-Path $repoRoot 'payloads') -Destination $targetRoot -Recurse -Force
+& git -C $targetRoot init -b test-preview | Out-Null
+if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the preview test target repository.' }
+& git -C $targetRoot config user.name 'Wizard Preview Test'
+& git -C $targetRoot config user.email 'wizard-preview@example.invalid'
+& git -C $targetRoot add specs payloads
+& git -C $targetRoot commit -m 'test: initialize preview target'
+if ($LASTEXITCODE -ne 0) { throw 'Could not commit the preview test target baseline.' }
+& git -C $targetRoot remote add origin "https://github.com/example/preview-$([guid]::NewGuid().ToString('N')).git"
+if ($LASTEXITCODE -ne 0) { throw 'Could not configure the preview test target identity.' }
 
 function Get-GitPreviewSnapshot {
     param([string]$RepositoryRoot)
@@ -66,8 +79,8 @@ function Get-ManifestProvenanceSnapshot {
 
 $tokenBefore = $env:DV_TOKEN
 $before = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
-$manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
-& pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview
+$manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $targetRoot)
+& pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview -TargetProjectRoot $targetRoot
 if ($LASTEXITCODE -ne 0) {
     throw "Orchestrated preview failed with exit code $LASTEXITCODE."
 }
@@ -80,11 +93,11 @@ try {
     $env:DV_TOKEN = 'preview-no-token'
     $env:DV_SOLUTION_NAME = 'LabEquipmentCheckoutAcceptance20260826'
     $env:DV_PUBLISHER_PREFIX = 'ppvs'
-    & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation
+    & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -TargetProjectRoot $targetRoot -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation
     if ($LASTEXITCODE -ne 0) {
         throw "Enabled-app orchestrated preview failed with exit code $LASTEXITCODE."
     }
-    $previewSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
+    $previewSummary = Get-Content -LiteralPath (Join-Path $targetRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
     $formsViewsPreview = @($previewSummary.stages | Where-Object { $_.name -eq 'forms-views' })[0]
     if (@($formsViewsPreview.details) -notcontains 'ppvs_checkoutrequest|Active Checkout Requests|adopt-generated-active') {
         throw 'Credential-free preview did not report generated Active-view adoption.'
@@ -99,7 +112,7 @@ try {
     $env:DV_PUBLISHER_PREFIX = $prefixBefore
 }
 $after = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
-$manifestAfter = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
+$manifestAfter = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $targetRoot)
 
 if ($before.Head -ne $after.Head -or $before.Branch -ne $after.Branch -or $before.IndexHash -ne $after.IndexHash) {
     throw 'Preview changed Git HEAD, branch, or index.'
@@ -115,3 +128,4 @@ if (@(Compare-Object $manifestBefore $manifestAfter).Count -ne 0) {
 }
 
 Write-Host 'Preview non-mutation checks passed.' -ForegroundColor Green
+Remove-Item -LiteralPath $targetRoot -Recurse -Force -ErrorAction SilentlyContinue

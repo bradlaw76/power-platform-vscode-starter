@@ -59,6 +59,9 @@ NON-NEGOTIABLES
     Uses the AppModule table plus AddAppComponents and ValidateApp.
     Safe to rerun: existing apps are updated in place and component adds are
     idempotent.
+
+.PARAMETER ScenarioSlug
+    Required, explicit scenario whose app, sitemap, forms, and views are assembled.
 #>
 
 param(
@@ -66,7 +69,9 @@ param(
     [string]$AccessToken = $env:DV_TOKEN,
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
-    [string]$ScenarioSlug = '',
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
     [string]$PayloadsFolder = '',
     [bool]$EnableAppModuleWiring = $true,
     [bool]$EnableArtifactManifest = $true,
@@ -78,7 +83,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot 'helpers\wizard-telemetry.ps1'
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -222,6 +230,13 @@ function Get-ViewComponent {
     $safeLogicalName = $LogicalName.Replace("'", "''")
     $safeViewName = $ViewName.Replace("'", "''")
     return @((Invoke-Dv -Method 'Get' -Path "savedqueries?`$select=savedqueryid,name,returnedtypecode&`$filter=returnedtypecode eq '$safeLogicalName' and querytype eq 0 and name eq '$safeViewName'").value | Select-Object -First 1)
+}
+
+function Get-DefaultViewComponent {
+    param([string]$LogicalName)
+
+    $safeLogicalName = $LogicalName.Replace("'", "''")
+    return @((Invoke-Dv -Method 'Get' -Path "savedqueries?`$select=savedqueryid,name,returnedtypecode,isdefault&`$filter=returnedtypecode eq '$safeLogicalName' and querytype eq 0 and isdefault eq true").value)
 }
 
 function Get-BpfComponent {
@@ -556,8 +571,13 @@ foreach ($table in @($orderedTables.ToArray())) {
     }
 
     try {
-        $requestedViewName = if ($table -eq $appConfig.EntryPointTable -and -not [string]::IsNullOrWhiteSpace($appConfig.LandingView)) { $appConfig.LandingView } else { 'Active Records' }
-        $view = @(Get-ViewComponent -LogicalName $table -ViewName $requestedViewName)
+        if ($table -eq $appConfig.EntryPointTable) {
+            $requestedViewName = $appConfig.LandingView
+            $view = @(Get-ViewComponent -LogicalName $table -ViewName $requestedViewName)
+        } else {
+            $view = @(Get-DefaultViewComponent -LogicalName $table)
+            if ($view.Count -eq 1) { $requestedViewName = "$($view[0].name)" } else { $requestedViewName = '' }
+        }
         if ($view.Count -gt 0) {
             $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.savedquery' -IdProperty 'savedqueryid' -IdValue $view[0].savedqueryid)) | Out-Null
             $navigationItem = @($navigationItems | Where-Object { $_.name -eq $table } | Select-Object -First 1)
@@ -565,8 +585,12 @@ foreach ($table in @($orderedTables.ToArray())) {
                 $navigationItem[0] | Add-Member -NotePropertyName view -NotePropertyValue $requestedViewName -Force
                 $navigationItem[0] | Add-Member -NotePropertyName viewId -NotePropertyValue $view[0].savedqueryid -Force
             }
-        } elseif ($table -eq $appConfig.EntryPointTable) {
+        } else {
+            if ($table -eq $appConfig.EntryPointTable) {
             $localValidationIssues.Add("Landing view '$requestedViewName' was not found for entry-point table '$table'.") | Out-Null
+            } else {
+                $localValidationIssues.Add("The default active view for table '$table' did not resolve uniquely.") | Out-Null
+            }
         }
     } catch {
         $localValidationIssues.Add("View for '$table' could not be resolved: $($_.Exception.Message)") | Out-Null
@@ -608,7 +632,7 @@ if ($reportingPayloads.Count -gt 1) {
             $localValidationIssues.Add("Dashboard '$($dashboard.Name)' must resolve exactly once; found $($dashboardMatches.Count).") | Out-Null
         } else {
             $componentRefs.Add((New-AppComponentRef -ODataType 'Microsoft.Dynamics.CRM.systemform' -IdProperty 'formid' -IdValue $dashboardMatches[0].formid)) | Out-Null
-            $dashboardTitle = "$($dashboard.Name)" -replace '^Federal FOIA\s+', ''
+            $dashboardTitle = "$($dashboard.Name)"
             $dashboardNavigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; title=$dashboardTitle; id=$dashboardMatches[0].formid }) | Out-Null
             $navigationItems.Add([pscustomobject]@{ group='Dashboards'; type='dashboard'; name=$dashboard.Name; isEntryPoint=$false }) | Out-Null
         }

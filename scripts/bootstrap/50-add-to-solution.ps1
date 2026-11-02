@@ -59,8 +59,8 @@ NON-NEGOTIABLES
 .PARAMETER PayloadsFolder     Folder containing table/column/relationship payloads. Defaults to ../../payloads.
 
 .EXAMPLE
-    pwsh ./scripts/bootstrap/50-add-to-solution.ps1
-    pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -SolutionUniqueName "MyApp"
+    pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug my-app
+    pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug my-app -SolutionUniqueName "MyApp"
 #>
 
 param(
@@ -69,7 +69,9 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix    = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder     = "",
-    [string]$ScenarioSlug       = "",
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
     [bool]$FailIfSolutionHasForeignTables = $true,
     [bool]$EnableContaminationScan = $true,
     [bool]$EnableArtifactManifest = $true,
@@ -83,7 +85,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -144,13 +149,6 @@ if (-not (Test-Path $PayloadsFolder)) {
     Write-Host "Payload folder not found: $PayloadsFolder" -ForegroundColor Red
     Write-Host "Expected payload location is the repo root 'payloads/' folder." -ForegroundColor Yellow
     exit 1
-}
-
-if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
-    $scenarioDirs = @(Get-ChildItem -Path (Join-Path $repoRoot "specs") -Directory -ErrorAction SilentlyContinue)
-    if ($scenarioDirs.Count -eq 1) {
-        $ScenarioSlug = $scenarioDirs[0].Name
-    }
 }
 
 if ($EnableArtifactManifest -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {

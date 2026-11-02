@@ -4,6 +4,8 @@
 
 These rules define the source-control, repository, CI/CD, branch, commit, pull-request, release, security, and agent-development standards for this repository.
 
+For application authoring with the Power Platform wizard, `docs/wizard-contract-v1.md` is authoritative for the FrameworkRoot/TargetProjectRoot security boundary. Verify the target repository identity before any stage, commit, push, or pull-request operation; framework repository writes from Application Authoring Mode are Critical failures, regardless of caller permissions.
+
 They are intentionally technology-neutral.
 
 The repository is the authoritative engineering record for the project.

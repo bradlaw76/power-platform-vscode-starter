@@ -11,9 +11,24 @@ A wizard-guided workflow for building Power Platform model-driven apps from VS C
 
 ## Runtime Compatibility Preflight
 
+Optional planning specialists are `power-platform-requirements-analyst` for
+requirements traceability and Spec Kit refinement, and
+`dataverse-solution-architect` for architecture and the Semantic Field Type
+Standard. Both are planning-only: reuse completed intake, preserve the selected
+mode and consolidated approval, and return to this same execution contract.
+See `docs/requirements-traceability.md`. They do not authorize builds,
+deployment or starting Skill 3.
+
+For explicit framework maintenance, first follow
+`docs/framework-maintenance-preflight.md` to verify the approved repository,
+exact maintenance branch and HEAD SHA. This never grants application-write
+access to the framework or approval to commit, push or merge.
+
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use `docs/skill-distribution.md` for installation and provenance checks.
+
+The authoritative Framework Source Protection Contract in `docs/wizard-contract-v1.md` applies to every mode. Application Authoring Mode must run from a verified, read-only framework release installation and use a separate writable application repository. Resolve `TargetProjectRoot` explicitly before any write; reject overlapping roots, path escapes, and framework repository Git operations. Do not silently relocate existing scenario files. A framework source checkout is for separately authorized maintenance only.
 
 ## Mandatory Rule
 
@@ -38,7 +53,7 @@ Reverse-engineer the discovery answers:
 1. Ask what tables or entities already exist.
 2. Ask what forms, views, or flows are already built.
 3. Ask for the current solution name and publisher prefix.
-4. Generate `spec.md` to reflect the **current state**.
+4. Generate `spec.md` under the explicitly resolved target project to reflect the **current state**.
 5. Use `plan.md` to capture only the **remaining work**.
 6. Run `06-demo-script-wizard.ps1` once the spec is ready to generate the demo story.
 
@@ -100,12 +115,12 @@ Follow this exact sequence — do not skip validation checkpoints:
 | Step | Action | Validation |
 |------|--------|------------|
 | 0 | Clone repo, open in VS Code, install extensions | Extensions installed via `@recommended` |
-| 1 | Start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose mode and chat or terminal intake; default terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Mode-specific discovery and source-control plan captured |
+| 1 | Resolve a separate `TargetProjectRoot`; start with `/power-platform-wizard-init` in Copilot Chat (primary), then choose mode and chat or terminal intake; default terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root>` | Mode-specific discovery and source-control plan captured without writing to the framework |
 | 2 | **GATE: Complete Spec Kit** (`spec.md`, `plan.md`, `tasks.md`) | All three files exist and are consistent |
-| 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` | `demo-script.md` exists and matches the scenario story |
-| 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` | `demo-dry-run.md` captures rehearsal notes |
-| 5 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1` | All tools show PASS |
-| 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1` | `az account show` + `pac auth list` both return profile |
+| 3 | Generate presenter script: `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>` | `demo-script.md` exists in the target project and matches the scenario story |
+| 4 | Optional rehearsal: `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>` | `demo-dry-run.md` is captured in the target project |
+| 5 | Check prerequisites: `pwsh ./scripts/bootstrap/00-prereq-check.ps1 -TargetProjectRoot <target-project-root>` | All tools show PASS |
+| 6 | Authenticate: `pwsh ./scripts/bootstrap/10-auth-connect.ps1 -TargetProjectRoot <target-project-root>` | `az account show` + `pac auth list` both return profile; target configuration can be dot-sourced to set the application root |
 | 6.5 | **Validate solution + prefix** (`10-auth-connect.ps1` does this automatically) | Existing solution confirmed via `solutions?$filter=uniquename eq '<name>'`; existing prefix confirmed via `publishers?$filter=customizationprefix eq '<prefix>'`. Stop and fix if either is missing before running scripts 20–60. |
 | 7 | Add payloads (`payloads/table-*.json`, `columns-*.json`, `relationships-*.json`) | Files present |
 | 8 | Build in order (scripts 20–60, plus optional 65 if Q19=yes) | Each script exits with zero failed count |
@@ -137,7 +152,7 @@ pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenari
 
 All scripts are idempotent — safe to rerun after fixing failures.
 
-Prefer `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -Mode <Preview|Apply>` for the complete ordered run. A planned BPF generates a designer handoff; author the initial definition through Power Apps. Script 55 validates, activates, adds, and links the existing category-4 process rather than fabricating workflow definition metadata. Do not export while the final solution membership gate fails.
+Prefer `pwsh ./scripts/bootstrap/90-run-build.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root> -Mode <Preview|Apply>` for the complete ordered run. It propagates the approved target root to all stages. A planned BPF generates a designer handoff; author the initial definition through Power Apps. Script 55 validates, activates, adds, and links the existing category-4 process rather than fabricating workflow definition metadata. Do not export while the final solution membership gate fails.
 
 Native charts/dashboard and HTML web resources are separate capabilities. Framework Acceptance uses scenario-owned reporting/data payloads, a controlled second pass proving stable IDs and zero duplicates, and unmanaged export plus local unpack/inspection. Never import the Framework Acceptance export.
 
@@ -183,9 +198,11 @@ Available entry points:
 - `pwsh ./scripts/bootstrap/05-start-wizard.ps1` — terminal wizard
 - `docs/wizard-walkthrough.html` — visual, end-to-end walkthrough
 
+Resolve a separate `TargetProjectRoot` before starting any of these application-authoring paths; framework files are read-only. Follow `docs/wizard-contract-v1.md` for path and repository-identity enforcement.
+
 Post-wizard demo helpers:
-- `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>` — generate a single reviewable demo script
-- `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug>` — rehearse the script and capture edits
+- `pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>` — generate a single reviewable demo script
+- `pwsh ./scripts/bootstrap/07-demo-dry-run.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>` — rehearse the script and capture edits
 
 Note:
 - `01-install-skills.ps1` installs this skill to your local Claude skills folder.

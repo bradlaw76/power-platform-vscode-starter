@@ -80,13 +80,22 @@ NON-NEGOTIABLES
 
 param(
     [string]$ScenarioSlug,
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot,
     [switch]$Force
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) {
+    throw 'Application Authoring Mode requires an explicit -TargetProjectRoot. Existing scenario files are not moved automatically.'
+}
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+$TargetProjectRoot = $projectRoots.TargetProjectRoot
+$repoRoot = $TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot "helpers\wizard-telemetry.ps1"
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -508,7 +517,6 @@ function Normalize-MarkdownText {
     return $Text.Replace([string][char]96, "'")
 }
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 $specsRoot = Join-Path $repoRoot "specs"
 
 if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
@@ -524,6 +532,10 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
 }
 
 $scenarioFolder = Join-Path $specsRoot $ScenarioSlug
+if ($ScenarioSlug -notmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+    throw "Scenario slug '$ScenarioSlug' must contain lowercase letters, numbers, and single hyphens."
+}
+$null = Assert-WizardWritablePath -Path $scenarioFolder -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
 $specPath = Join-Path $scenarioFolder "spec.md"
 $answersPath = Join-Path $scenarioFolder "answers.md"
 $planPath = Join-Path $scenarioFolder "plan.md"
@@ -532,6 +544,10 @@ $demoScriptPath = Join-Path $scenarioFolder "demo-script.md"
 $demoWalkthroughPath = Join-Path $scenarioFolder "demo-walkthrough.md"
 $demoTalkTrackPath = Join-Path $scenarioFolder "demo-talk-track.md"
 $demoAnswersPath = Join-Path $scenarioFolder "demo-script-answers.md"
+$outputPaths = @($demoAnswersPath, $demoWalkthroughPath, $demoTalkTrackPath, $demoScriptPath)
+foreach ($outputPath in $outputPaths) {
+    $null = Assert-WizardWritablePath -Path $outputPath -FrameworkRoot $frameworkRoot -TargetProjectRoot $TargetProjectRoot
+}
 
 if (-not (Test-Path $specPath)) {
     throw "Missing spec file: $specPath"

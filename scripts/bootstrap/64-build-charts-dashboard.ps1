@@ -16,13 +16,20 @@ param(
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [Parameter(Mandatory)] [string]$ScenarioSlug,
     [string]$PayloadsFolder = '',
+    [Alias('WorkspaceRoot')]
+    [string]$TargetProjectRoot,
     [switch]$PreviewOnly,
     [scriptblock]$RequestInvoker
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$requestedTargetRoot = if ([string]::IsNullOrWhiteSpace($TargetProjectRoot)) { $env:WIZARD_TARGET_PROJECT_ROOT } else { $TargetProjectRoot }
+$projectRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot -TargetProjectRoot $requestedTargetRoot
+$TargetProjectRoot = $projectRoots.TargetProjectRoot
+$repoRoot = $TargetProjectRoot
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-hardening.ps1')
 . (Join-Path $PSScriptRoot 'helpers/reporting-wizard.ps1')
@@ -231,6 +238,7 @@ function Invoke-WizardReportingStage {
         & $invoke Post 'PublishXml' @{ ParameterXml=$publishXml } | Out-Null
     }
     $evidencePath = Join-Path $RepoRoot ".wizard-metrics/artifacts/reporting/$ScenarioSlug.json"
+    $null = Assert-WizardWritablePath -Path $evidencePath -FrameworkRoot $frameworkRoot -TargetProjectRoot $repoRoot
     New-Item -ItemType Directory -Path (Split-Path $evidencePath -Parent) -Force | Out-Null
     [ordered]@{ scenarioSlug=$ScenarioSlug; preview=[bool]$PreviewOnly; items=@($evidenceItems) } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
     return @($evidenceItems)

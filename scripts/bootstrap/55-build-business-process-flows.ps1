@@ -85,7 +85,9 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$PublisherPrefix = $env:DV_PUBLISHER_PREFIX,
     [string]$PayloadsFolder = '',
-    [string]$ScenarioSlug = '',
+    [Parameter(Mandatory)]
+    [ValidatePattern('^[a-z0-9]+(?:-[a-z0-9]+)*$')]
+    [string]$ScenarioSlug,
     [bool]$EnableBusinessProcessFlow = $true,
     [string]$BusinessProcessFlowName = '',
     [string]$PrimaryProcessEntity = '',
@@ -100,7 +102,10 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $telemetryHelper = Join-Path $PSScriptRoot 'helpers\wizard-telemetry.ps1'
 if (Test-Path $telemetryHelper) {
     . $telemetryHelper
@@ -137,13 +142,6 @@ if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) {
     } elseif (Test-Path $envFile) {
         . $envFile
         $PublisherPrefix = $global:DV_PUBLISHER_PREFIX
-    }
-}
-
-if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
-    $scenarioDirs = @(Get-ChildItem -Path (Join-Path $repoRoot 'specs') -Directory -ErrorAction SilentlyContinue)
-    if ($scenarioDirs.Count -eq 1) {
-        $ScenarioSlug = $scenarioDirs[0].Name
     }
 }
 

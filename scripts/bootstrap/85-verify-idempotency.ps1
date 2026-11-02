@@ -16,7 +16,10 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
-$repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$frameworkRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers/wizard-source-protection.ps1')
+$applicationRoots = Initialize-WizardApplicationContext -FrameworkRoot $frameworkRoot
+$repoRoot = $applicationRoots.TargetProjectRoot
 $artifactRoot = Join-Path $repoRoot '.wizard-metrics/artifacts'
 $verificationRoot = Join-Path $artifactRoot "idempotency/$ScenarioSlug"
 $baselinePath = Join-Path $verificationRoot 'baseline.json'

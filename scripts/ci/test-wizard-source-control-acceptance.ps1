@@ -81,6 +81,7 @@ try {
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'commit', '-m', 'test: initialize acceptance fixture')
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'remote', 'add', 'origin', $remoteRoot)
     Invoke-Git -Arguments @('-C', $workspaceRoot, 'push', '-u', 'origin', 'main')
+    Invoke-Git -Arguments @('-C', $workspaceRoot, 'remote', 'set-url', 'origin', 'https://github.com/example/source-control-acceptance.git')
 
     $scriptedAnswers = @(
         'Source Control Acceptance',
@@ -148,7 +149,7 @@ try {
     $beforeRemoteHead = Invoke-Git -Arguments @('--git-dir', $remoteRoot, 'rev-parse', 'refs/heads/main') -AllowOutput
 
     $env:WIZARD_METRICS_OPTOUT = '1'
-    $wizardOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $wizardOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -TargetProjectRoot $workspaceRoot 2>&1)
     if ($LASTEXITCODE -ne 0) {
         throw "Wizard acceptance run failed:`n$($wizardOutput -join "`n")"
     }
@@ -251,7 +252,7 @@ try {
 
     $previousErrorActionPreference = $ErrorActionPreference
     $ErrorActionPreference = 'Continue'
-    $blockedOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $blockedOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -TargetProjectRoot $workspaceRoot 2>&1)
     $blockedExitCode = $LASTEXITCODE
     $ErrorActionPreference = $previousErrorActionPreference
     if ($blockedExitCode -eq 0) {
@@ -271,7 +272,7 @@ try {
     $invalidEntryAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
 
     $ErrorActionPreference = 'Continue'
-    $invalidEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $invalidEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -TargetProjectRoot $workspaceRoot 2>&1)
     $invalidEntryExitCode = $LASTEXITCODE
     $ErrorActionPreference = $previousErrorActionPreference
     if ($invalidEntryExitCode -eq 0) {
@@ -290,7 +291,7 @@ try {
     }
     $customEntryAnswers[$landingViewIndex] = 'Active Reviews'
     $customEntryAnswers | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
-    $customEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $customEntryOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Force -AnswersFile $answersFile -TargetProjectRoot $workspaceRoot 2>&1)
     if ($LASTEXITCODE -ne 0) {
         throw "Custom entry-point wizard run failed:`n$($customEntryOutput -join "`n")"
     }
@@ -348,7 +349,7 @@ try {
         'review request | App owner | coordinator can open and triage an existing request'
     ) | ConvertTo-Json | Set-Content -LiteralPath $answersFile -Encoding UTF8
 
-    $retrofitOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Retrofit -Force -AnswersFile $answersFile -WorkspaceRoot $workspaceRoot 2>&1)
+    $retrofitOutput = @(& pwsh -NoProfile -File $wizardPath -Mode advanced-builder -Retrofit -Force -AnswersFile $answersFile -TargetProjectRoot $workspaceRoot 2>&1)
     if ($LASTEXITCODE -ne 0) {
         throw "Retrofit wizard acceptance run failed:`n$($retrofitOutput -join "`n")"
     }

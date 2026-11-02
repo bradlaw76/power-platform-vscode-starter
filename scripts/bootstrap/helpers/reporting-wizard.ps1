@@ -463,18 +463,25 @@ function Get-WizardReportRecommendation {
 
 function Write-WizardReportArtifacts {
     param(
-        [Parameter(Mandatory)] [string]$RepoRoot,
+        [Parameter(Mandatory)] [string]$FrameworkRoot,
+        [Parameter(Mandatory)] [string]$TargetProjectRoot,
         [Parameter(Mandatory)] [string]$ScenarioSlug,
         [Parameter(Mandatory)] [object]$Definition,
         [switch]$Force
     )
 
-    $payloadFolder = Join-Path $RepoRoot "payloads/scenarios/$ScenarioSlug"
-    $scenarioFolder = Join-Path $RepoRoot "specs/$ScenarioSlug"
+    . (Join-Path $PSScriptRoot 'wizard-source-protection.ps1')
+    $roots = Assert-WizardApplicationRoots -FrameworkRoot $FrameworkRoot -TargetProjectRoot $TargetProjectRoot
+    $payloadFolder = Join-Path $roots.TargetProjectRoot "payloads/scenarios/$ScenarioSlug"
+    $scenarioFolder = Join-Path $roots.TargetProjectRoot "specs/$ScenarioSlug"
     $artifactFolder = Join-Path $scenarioFolder 'report-artifacts'
-    New-Item -ItemType Directory -Path $payloadFolder, $scenarioFolder, $artifactFolder -Force | Out-Null
+    foreach ($path in @($payloadFolder, $scenarioFolder, $artifactFolder)) {
+        $null = Assert-WizardWritablePath -Path $path -FrameworkRoot $roots.FrameworkRoot -TargetProjectRoot $roots.TargetProjectRoot
+    }
 
     $payloadPath = Join-Path $payloadFolder "reporting-$ScenarioSlug.json"
+    $previewPath = Join-Path $artifactFolder 'query-preview.json'
+    $mappingPath = Join-Path $scenarioFolder 'report-mappings.md'
     if ((Test-Path -LiteralPath $payloadPath) -and -not $Force) {
         throw "Reporting payload already exists. Review it and rerun with -Force to replace it: $payloadPath"
     }
@@ -506,10 +513,14 @@ function Write-WizardReportArtifacts {
     }
 
     $payloadJson = $payload | ConvertTo-Json -Depth 20
-    $schemaPath = Join-Path $RepoRoot 'schemas/payloads/reporting.schema.json'
+    $schemaPath = Join-Path $roots.FrameworkRoot 'schemas/payloads/reporting.schema.json'
     if (-not (Test-Json -Json $payloadJson -SchemaFile $schemaPath -ErrorAction Stop)) {
         throw 'Generated reporting payload failed schema validation.'
     }
+    foreach ($path in @($payloadFolder, $scenarioFolder, $artifactFolder, $payloadPath, $previewPath, $mappingPath)) {
+        $null = Assert-WizardWritablePath -Path $path -FrameworkRoot $roots.FrameworkRoot -TargetProjectRoot $roots.TargetProjectRoot
+    }
+    New-Item -ItemType Directory -Path $payloadFolder, $scenarioFolder, $artifactFolder -Force | Out-Null
     Set-Content -LiteralPath $payloadPath -Value $payloadJson -Encoding UTF8
 
     $preview = [ordered]@{
@@ -523,7 +534,6 @@ function Write-WizardReportArtifacts {
             }
         })
     }
-    $previewPath = Join-Path $artifactFolder 'query-preview.json'
     $preview | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $previewPath -Encoding UTF8
 
     $mappingLines = [Collections.Generic.List[string]]::new()
@@ -541,7 +551,6 @@ function Write-WizardReportArtifacts {
         if ([string]::IsNullOrWhiteSpace($filterSummary)) { $filterSummary = 'none' }
         $mappingLines.Add("| $($chart.TableLogicalName) | $($chart.Name) | $($chart.CategoryField) | $($chart.AggregateField) | $($chart.Aggregate) | $filterSummary |")
     }
-    $mappingPath = Join-Path $scenarioFolder 'report-mappings.md'
     Set-Content -LiteralPath $mappingPath -Value ($mappingLines -join "`r`n") -Encoding UTF8
 
     return [pscustomobject]@{

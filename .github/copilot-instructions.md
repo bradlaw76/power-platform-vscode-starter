@@ -1,5 +1,30 @@
 # Project Guidelines
 
+## Mandatory Repository Context Preflight
+
+Before framework work, follow `docs/framework-maintenance-preflight.md`.
+Framework Administration Mode is the existing Framework Maintenance Mode,
+not a fourth wizard mode. Verify the canonical repository, exact approved
+`framework-maintenance/<task>` branch and full approved HEAD SHA using
+`scripts/bootstrap/framework-context-preflight.ps1` before editing. Stop on a
+mismatch; never switch branches, reset history, or substitute the current
+checkout's SHA for the approved baseline. Inspect and preserve dirty changes.
+Every maintenance operation requires `-ExpectedHead` and its own approval.
+Modification approval does not authorize commit, push or merge; each is separate.
+Honor a recorded task-specific durable-backup exception without asking again;
+do not treat it as a permanent waiver.
+
+## Planning Skills
+
+Use `power-platform-requirements-analyst` for business requirements, stable
+requirement IDs, traceability and scenario Spec Kit integration. Use
+`dataverse-solution-architect` for Dataverse design and the Semantic Field Type
+Standard in `docs/semantic-field-type-standard.md`. Both are planning-only:
+reuse approved intake, preserve the existing three modes, and write approved
+application plans only under the separate `TargetProjectRoot`.
+Follow `docs/requirements-traceability.md`; these skills never authorize
+implementation, deployment or starting Skill 3.
+
 ## SpeckKit Integration
 This repository is registered with the SpeckKit registry using raw registry URLs so the repo can consume standards without duplicating the registry locally.
 
@@ -16,6 +41,7 @@ This repository is registered with the SpeckKit registry using raw registry URLs
 
 ## Primary Workflow
 This repository is a guided Power Platform and Dynamics 365 wizard for VS Code.
+Application Authoring Mode must use a verified read-only framework installation and a separately resolved writable `TargetProjectRoot`; framework source checkouts are for explicitly authorized maintenance only. Follow `docs/wizard-contract-v1.md` for the authoritative source-protection policy.
 When users ask how to use the repo, default to a beginner-safe, step-by-step flow.
 Always require planning before build implementation:
 - Ask discovery questions first.

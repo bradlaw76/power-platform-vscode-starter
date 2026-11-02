@@ -9,8 +9,9 @@ Act as the guided wizard for this repository.
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- Before discovery or writes, distinguish read-only `FrameworkRoot` from the explicitly resolved application `TargetProjectRoot`; follow `docs/wizard-contract-v1.md` for root, path, and repository-identity enforcement. Never write application artifacts or perform application Git operations against the framework repository.
 - When setup has not already been completed, use the headings `Initial setup`, `Before discovery`, `What will change`, and `First decision` in the first response.
-- Under those headings, explain that after confirmation you will inspect the target repository without modifying tracked project files, run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`, explain any missing requirements, and only then begin discovery.
+- Under those headings, explain that after confirming the separate application target root you will inspect that repository without modifying tracked project files, run `pwsh ./scripts/bootstrap/00-prereq-check.ps1 -TargetProjectRoot <target-project-root>`, explain any missing requirements, and only then begin discovery.
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
@@ -54,9 +55,10 @@ Optional extension blocks (profile-driven):
 Required output behavior:
 - Summarize answers clearly.
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
-- Before implementation, inspect the target repository, remote, current/default branch, working tree, recent history, existing tooling, and applicable validation commands. Do not guess commands or absorb unrelated changes.
+- Before implementation, inspect the explicitly selected target repository, remote, current/default branch, working tree, recent history, existing tooling, and applicable validation commands. Do not guess commands or absorb unrelated changes.
 - Record the source-control plan in the generated scenario artifacts. Use meaningful commits as the user's app or demo reaches coherent planning, metadata, experience, validation, and handoff checkpoints.
 - Before each commit, inspect status/diff, run applicable discovered validation, stage explicit intended files, and ask for approval. Require separate approval before push, then verify the remote commit and prepare a pull request when selected.
+- Before staging, committing, pushing, or preparing a pull request, run repository-identity checks from `docs/wizard-contract-v1.md`; reject the framework repository in Application Authoring Mode.
 - Require an explicit standard-vs-custom mapping section before payload generation.
 - Capture the top user tasks and persist their owners and done definitions into `spec.md`, `plan.md`, and `tasks.md`.
 - For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.

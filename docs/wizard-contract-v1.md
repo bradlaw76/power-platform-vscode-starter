@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.10.0
+Version: 1.11.0
 
 ## Purpose
 
@@ -42,13 +42,13 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 
 - Exposes the complete core discovery, architecture intent, entity mapping, user-task, relationship, report, demo-data, solution identity, and source-control controls.
 - Must not ask about disposable environments, destructive cleanup, retention policy, or framework rerun-proof evidence.
-- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder`.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode advanced-builder`.
 
 ### Framework Acceptance (explicit only)
 
 - Includes Advanced Builder controls plus authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved destructive cleanup, and an evidence plan.
 - Never select this mode implicitly from an app idea or environment name.
-- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`.
+- Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot <target-project-root> -Mode framework-acceptance`.
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
 
@@ -134,6 +134,40 @@ When demo data is enabled, default scope may be all scenario-created custom tabl
 
 Dataverse Task activity generation is opt-in. When enabled, planning must identify eligible parent tables, latest/all/selected scope, a source-record limit, the ordering field used to determine latest records, and tasks per selected record. The recommended default is the latest 10 parent records per table ordered by `createdon desc`; every-record task creation requires the user to explicitly select `all`.
 
+## Framework Source Protection Contract
+
+The wizard framework is a read-only dependency during normal application development. This section is the authoritative policy for separating framework maintenance from application authoring; entry-point instructions and scripts must enforce it rather than weakening or duplicating it.
+
+### Roots and Application Authoring Mode
+
+- `FrameworkRoot` identifies the installed wizard source and is read-only in Application Authoring Mode. It contains scripts, schemas, skills, instructions, CI, templates, and framework configuration.
+- `TargetProjectRoot` identifies the user's application repository and must be explicitly supplied and physically resolved before discovery, telemetry, planning, preview, build, or other generated writes begin. No default may resolve to `FrameworkRoot`.
+- Application Authoring Mode must reject identical or overlapping roots, traversal, symlink/junction redirection into framework-owned paths, and output paths inside nested Git repositories. Every generated specification, payload, log, manifest, export, deployment manifest, and evidence file belongs under the approved `TargetProjectRoot`.
+- Framework resources are read from `FrameworkRoot`; application inputs and outputs are read from and written to `TargetProjectRoot`. Any failed or ambiguous root/identity check is a hard stop and a **Critical failure**.
+- Scenario-producing and scenario-consuming stages require an explicit scenario slug (or an explicitly supplied scenario-scoped payload directory where the contract permits it). A single discovered scenario is never selected implicitly, and payload metadata must not be aggregated from another scenario.
+- Application Authoring Mode must reject staging, committing, pushing, or pull-request operations whose Git root or remote identifies the framework repository, independent of the caller's repository permissions.
+- Where practical, run the framework from a read-only installation or packaged distribution. Source-level checks are mandatory and do not rely on agent prompts or repository ownership.
+- Supported consumer installations are versioned release packages installed by `scripts/bootstrap/install-framework.ps1`; the installer verifies the archive SHA-256 and embedded repository/commit identity, installs only to a protected system location, and removes application-user write permission. A source checkout is not the application-authoring runtime.
+
+### Framework Maintenance Mode
+
+- Framework Administration Mode is the operator-facing name for Framework Maintenance Mode, not an additional wizard mode. Before framework edits, run `scripts/bootstrap/framework-context-preflight.ps1` against the explicitly approved repository root, exact maintenance branch, and full HEAD SHA. A mismatch is a hard stop; never switch branches or change history to make the check pass. See `docs/framework-maintenance-preflight.md`.
+- Framework changes require the separately selected Framework Maintenance Mode; Application Authoring Mode never grants framework-write access.
+- Maintenance operations require a dedicated `framework-maintenance/<task>` branch and distinct explicit approvals for modifying files, committing, and pushing. Approval for one operation does not authorize another.
+- Application build commands and application credentials cannot be reused as implicit framework maintenance authorization.
+- The source-level operation gate is `scripts/bootstrap/framework-maintenance.ps1`; invoke it separately for each operation on the canonical framework repository and exact `framework-maintenance/<task>` branch. `modify` accepts text content only through `-FileUpdates`; `commit` requires an explicit message and exact staged-path match; `push` requires an upstream or remote-tracking `-BaseRef`, exact changed-path match, and verifies the remote head after a non-forced push. Each operation requires its own approval switch and `ShouldProcess` gate.
+- Every operation also requires `-ExpectedHead` and runs the repository-context preflight before mutation. Review the resulting SHA after an approved commit before further operations. Commit, push, and merge approvals remain separate; the maintenance script does not implement merge.
+
+### Compatibility and Migration
+
+- Existing scenario files are never silently reinterpreted, moved, or deleted. Existing in-repository scenarios remain usable only through an explicitly reviewed migration into a separate target project or an approved read-only/packaged compatibility workflow.
+- Migration must inventory source and destination files, detect conflicts, preserve scenario and payload content, and require opt-in approval before copying or relocating anything. Until migration is approved, fail closed rather than writing into `FrameworkRoot`.
+- `-WorkspaceRoot` remains an explicit compatibility alias for `-TargetProjectRoot`; omission of both is an error. Existing scenario data is not automatically migrated.
+
+### Mandatory Security Verification
+
+CI must test that ordinary users and framework repository owners cannot write framework files during Application Authoring Mode; framework-as-target and framework Git operations are rejected; root overlap, traversal, symlink redirection, and nested-repository escapes are blocked; Framework Maintenance Mode requires the dedicated branch and per-operation approvals; and existing external target repositories and example scenarios still work without implicit migration. Unauthorized framework modification or cross-repository writes are **Critical failures**.
+
 ## Source Control Contract
 
 Apply `requirements/GithubInstructions_General.md` throughout each end user's app or demo lifecycle.
@@ -147,6 +181,15 @@ Apply `requirements/GithubInstructions_General.md` throughout each end user's ap
 7. Distinguish modified locally, committed locally, pushed, pull request opened, merged, released, and deployed.
 
 ## Planning Contract
+
+The optional `power-platform-requirements-analyst` and
+`dataverse-solution-architect` skills refine the existing planning contract for
+Copilot and Claude. They preserve mode-specific intake and use only the
+application's approved `specs/<scenario-slug>/` artifacts. Apply
+`docs/requirements-traceability.md` and `docs/semantic-field-type-standard.md`
+for their traceability matrix, architecture and field catalog. These review
+aids neither replace required artifacts nor change the shared runtime gates.
+Planning skills do not authenticate, deploy, or authorize starting Skill 3.
 
 Required artifacts:
 - `spec.md`
@@ -179,8 +222,8 @@ Required gate before execution:
 
 ### Core Modules (always)
 
-1. `00-prereq-check.ps1`
-2. `10-auth-connect.ps1`
+1. `00-prereq-check.ps1 -TargetProjectRoot <target-project-root>`
+2. `10-auth-connect.ps1 -TargetProjectRoot <target-project-root>`
 3. `15-dry-validate.ps1`
 4. `20-build-tables.ps1`
 5. `30-build-columns.ps1`

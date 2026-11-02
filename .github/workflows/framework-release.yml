@@ -1,0 +1,47 @@
+name: Publish framework package
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+      - name: Create versioned package and checksum
+        shell: pwsh
+        env:
+          FRAMEWORK_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $stage = Join-Path $env:RUNNER_TEMP 'framework-package'
+          $package = Join-Path $env:RUNNER_TEMP "power-platform-vscode-starter-$env:FRAMEWORK_VERSION.zip"
+          $commit = (git rev-parse "refs/tags/$env:FRAMEWORK_VERSION^{commit}").Trim()
+          if ($LASTEXITCODE -ne 0 -or $commit -notmatch '^[a-f0-9]{40}$') { throw 'Could not resolve the release tag to a commit.' }
+          New-Item -ItemType Directory -Path $stage -Force | Out-Null
+          git archive $commit | tar -x -C $stage
+          $identity = @{
+            repositoryUrl = 'https://github.com/bradlaw76/power-platform-vscode-starter'
+            version = $env:FRAMEWORK_VERSION
+            commit = $commit
+            readOnlyDistribution = $true
+          }
+          $identity | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $stage 'wizard-framework-install.json') -Encoding utf8
+          Get-ChildItem -LiteralPath $stage -Force | Compress-Archive -DestinationPath $package
+          $hash = (Get-FileHash -LiteralPath $package -Algorithm SHA256).Hash.ToLowerInvariant()
+          "$hash  $(Split-Path -Leaf $package)" | Set-Content -LiteralPath "$package.sha256" -Encoding ascii
+      - name: Attach verified package to release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          FRAMEWORK_VERSION: ${{ github.event.release.tag_name }}
+        run: |
+          $package = Join-Path $env:RUNNER_TEMP "power-platform-vscode-starter-$env:FRAMEWORK_VERSION.zip"
+          gh release upload $env:FRAMEWORK_VERSION $package "$package.sha256"

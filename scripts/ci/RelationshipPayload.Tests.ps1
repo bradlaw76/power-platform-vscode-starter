@@ -18,13 +18,22 @@ Describe 'Dataverse relationship payload support' {
         $script:relationshipScript = Join-Path $repoRoot 'scripts/bootstrap/40-build-relationships.ps1'
         $script:scenarioPayload = Join-Path $repoRoot 'payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json'
         $script:schemaPath = Join-Path $repoRoot 'schemas/payloads/relationships.schema.json'
-        $script:scratchRoot = Join-Path $repoRoot '.relationship-ci-scratch'
+        $script:originalTargetRoot = $env:WIZARD_TARGET_PROJECT_ROOT
+        $script:targetRoot = Join-Path ([IO.Path]::GetTempPath()) "relationship-ci-$([guid]::NewGuid().ToString('N'))"
+        $script:scratchRoot = Join-Path $targetRoot 'scratch'
+        New-Item -ItemType Directory -Path $targetRoot -Force | Out-Null
+        & git -C $targetRoot init -b test-relationship-target | Out-Null
+        if ($LASTEXITCODE -ne 0) { throw 'Could not initialize the relationship test target repository.' }
+        & git -C $targetRoot remote add origin 'https://github.com/example/relationship-target.git'
+        if ($LASTEXITCODE -ne 0) { throw 'Could not configure the relationship test target identity.' }
+        $env:WIZARD_TARGET_PROJECT_ROOT = $targetRoot
         if (Test-Path -LiteralPath $scratchRoot) { Remove-Item -LiteralPath $scratchRoot -Recurse -Force }
         New-Item -ItemType Directory -Path $scratchRoot | Out-Null
     }
 
     AfterAll {
-        if (Test-Path -LiteralPath $scratchRoot) { Remove-Item -LiteralPath $scratchRoot -Recurse -Force }
+        $env:WIZARD_TARGET_PROJECT_ROOT = $originalTargetRoot
+        if (Test-Path -LiteralPath $targetRoot) { Remove-Item -LiteralPath $targetRoot -Recurse -Force }
     }
 
     It 'validates existing 1:N and the Federal FOIA N:N payload with the shared schema' {

@@ -85,12 +85,12 @@ result.
 
 ### Live preview
 
-1. Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`.
+1. Resolve `TargetProjectRoot` separately from the read-only framework installation, then run `pwsh ./scripts/bootstrap/00-prereq-check.ps1 -TargetProjectRoot <target-project-root>`.
 2. Run the report wizard. It asks for the environment URL, authenticates
    immediately, and then uses live metadata for report design:
 
 ```powershell
-pwsh ./scripts/bootstrap/08-report-wizard.ps1 -ScenarioSlug <scenario-slug>
+pwsh ./scripts/bootstrap/08-report-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot <target-project-root>
 ```
 
 3. Review and summarize the reporting payload, FetchXML preview, and
@@ -105,6 +105,7 @@ dashboard, charts, tables, calculations, and filters. Then run:
 ```powershell
 pwsh ./scripts/bootstrap/08-report-wizard.ps1 `
   -ScenarioSlug <scenario-slug> `
+  -TargetProjectRoot <target-project-root> `
   -Force `
   -Deploy
 ```

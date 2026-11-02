@@ -14,6 +14,12 @@ artifacts as part of its guided workflow.
 
 > [!IMPORTANT]
 > **Spec Kit planning is a mandatory gate for model-driven app builds.** Do not run app build scripts until your planning files are complete (`spec.md`, `plan.md`, and `tasks.md` in root or under `specs/<scenario-slug>/`). The app wizard helps you create them. For reporting against an existing app, use the focused [Dataverse Report Wizard guide](docs/dataverse-report-wizard.md).
+>
+> **Framework isolation is mandatory.** Application Authoring Mode uses a
+> verified, read-only framework package and a distinct writable application
+> repository. Do not use this source checkout as the application target. See
+> [Framework distribution](docs/skill-distribution.md) and the authoritative
+> [wizard contract](docs/wizard-contract-v1.md).
 
 ---
 
@@ -31,6 +37,16 @@ reporting workload reuses this starter's authentication, Dataverse runtime,
 solution, app-module, publishing, schema, and CI capabilities; it is not a
 separate implementation.
 
+Optional planning-only skills for both Copilot and Claude are
+`power-platform-requirements-analyst` (requirements, traceability and Spec Kit)
+and `dataverse-solution-architect` (architecture and semantic field types).
+They refine the existing scenario plans without changing wizard modes or
+authorizing execution. See [planning and traceability](docs/requirements-traceability.md)
+and the [Semantic Field Type Standard](docs/semantic-field-type-standard.md).
+Framework contributors must follow the
+[repository-context and maintenance preflight](docs/framework-maintenance-preflight.md)
+before changing framework files.
+
 ---
 
 ## Start here
@@ -43,8 +59,8 @@ separate implementation.
 
 ### What happens when you use this starter
 
-1. You create a local **authoring workspace**: a full clone of this reusable
-   wizard.
+1. You install a reviewed framework release read-only and open a separate
+   writable application repository.
 2. The wizard checks prerequisites, confirms the workload, asks discovery
    questions, and prepares planning artifacts before it runs any build steps.
 3. It can then guide or run the model-driven build sequence for the specific
@@ -54,17 +70,15 @@ The wizard keeps generic capabilities, templates, and workflow instructions
 separate from each build's generated artifacts. Follow the guided workflow;
 it determines where its planning and build artifacts belong.
 
-If Git, VS Code, and Copilot Chat are already available, clone this canonical
-repository:
+If Git, VS Code, and Copilot Chat are already available, install a reviewed
+framework release and create or open a separate application repository. Follow
+the [framework distribution guide](docs/skill-distribution.md) for checksum
+verification and protected installation. Cloning this repository is only for
+explicit framework maintenance; it is not an application-authoring workspace.
 
-```powershell
-git clone https://github.com/bradlaw76/power-platform-vscode-starter.git
-cd power-platform-vscode-starter
-code .
-```
-
-When the folder opens in VS Code, open Copilot Chat and choose the entry point
-for your workload. For model-driven app development, enter:
+Open the installed read-only `FrameworkRoot` in VS Code and identify the
+application repository separately as `TargetProjectRoot`. For model-driven app
+development, open Copilot Chat and enter:
 
 ```text
 /power-platform-wizard-init
@@ -290,6 +304,8 @@ Official upstream project:
 
 Use this setup so Spec Kit artifacts can be created consistently:
 
+The wizard checkout is the read-only `FrameworkRoot`. Choose an existing, separate application repository as `TargetProjectRoot` before starting; generated application artifacts must never be written into the framework checkout.
+
 1. Install repo skills (once per machine):
 
 ```powershell
@@ -299,7 +315,8 @@ pwsh ./scripts/bootstrap/01-install-skills.ps1
 2. Start the guided planning flow (creates `spec.md`, `plan.md`, `tasks.md`):
 
 ```powershell
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
+$targetProjectRoot = "$HOME/projects/my-app"
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot
 ```
 
 The default `demo-builder` asks six business questions and presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering.
@@ -356,14 +373,16 @@ Primary path:
 Direct wizard alternatives (still supported):
 
 ```powershell
+$targetProjectRoot = "$HOME/projects/my-app"
+
 # Demo Builder (default)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot
 
 # Advanced Builder (explicit technical controls)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot -Mode advanced-builder
 
 # Framework Acceptance (explicit authorized acceptance only)
-pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance
+pwsh ./scripts/bootstrap/05-start-wizard.ps1 -TargetProjectRoot $targetProjectRoot -Mode framework-acceptance
 ```
 
 ```text
@@ -443,7 +462,8 @@ Validation: `az account show` and `pac auth list` both return your profile and e
 Optional but recommended before authentication and build scripts:
 
 ```powershell
-pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug>
+$targetProjectRoot = "$HOME/projects/my-app"
+pwsh ./scripts/bootstrap/06-demo-script-wizard.ps1 -ScenarioSlug <scenario-slug> -TargetProjectRoot $targetProjectRoot
 ```
 
 This second wizard reads the scenario created by `05-start-wizard.ps1`, suggests a business use case, asks for the hero record and demo emphasis, and generates:
