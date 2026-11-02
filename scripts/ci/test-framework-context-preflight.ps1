@@ -62,7 +62,9 @@ try {
     $null = Invoke-FixtureGit @('remote', 'add', 'origin', 'https://github.com/bradlaw76/power-platform-vscode-starter.git')
     Set-Content -LiteralPath (Join-Path $fixture 'baseline.txt') -Value 'baseline'
     Set-Content -LiteralPath (Join-Path $fixture 'flagged.txt') -Value 'tracked flag baseline'
-    $null = Invoke-FixtureGit @('add', 'baseline.txt', 'flagged.txt')
+    Set-Content -LiteralPath (Join-Path $fixture 'deleted.txt') -Value 'tracked deletion baseline'
+    Set-Content -LiteralPath (Join-Path $fixture 'aaa-tracked.txt') -Value 'clean tracked baseline'
+    $null = Invoke-FixtureGit @('add', 'baseline.txt', 'flagged.txt', 'deleted.txt', 'aaa-tracked.txt')
     $null = Invoke-FixtureGit @('commit', '-m', 'baseline')
     $head = (Invoke-FixtureGit @('rev-parse', 'HEAD') -join '').Trim()
     $contextArgs = @{
@@ -173,6 +175,110 @@ try {
     if ($preview.Completed -or $preview.VerifiedHead -cne $head -or
         (Test-Path -LiteralPath (Join-Path $fixture 'blocked.txt'))) {
         throw 'Approved maintenance preview did not preserve its verified no-write boundary.'
+    }
+    $script:checks++
+    $deletedPath = Join-Path $fixture 'deleted.txt'
+    $deletedBytes = [IO.File]::ReadAllBytes($deletedPath)
+    $cleanTrackedPath = Join-Path $fixture 'aaa-tracked.txt'
+    $cleanTrackedBytes = [IO.File]::ReadAllBytes($cleanTrackedPath)
+    foreach ($flag in @('--skip-worktree', '--assume-unchanged', 'ordinary')) {
+        if ($flag -ne 'ordinary') {
+            $null = Invoke-FixtureGit @('update-index', $flag, 'deleted.txt')
+        }
+        Remove-Item -LiteralPath $deletedPath
+        if ($flag -ne 'ordinary') {
+            $hiddenStatus = @(Invoke-FixtureGit @('status', '--porcelain=v1', '--', 'deleted.txt'))
+            if ($hiddenStatus.Count -ne 0) { throw "The $flag deletion fixture was not hidden from Git status." }
+            $script:checks++
+        }
+        Assert-Rejected {
+            & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+                -Operation modify -ApprovedPaths @('deleted.txt') `
+                -FileUpdates @{ 'deleted.txt' = 'must not recreate deleted file' } -ApproveModify
+        } 'conflicting approved paths: deleted.txt'
+        if (Test-Path -LiteralPath $deletedPath) { throw "Rejected $flag deletion was silently recreated." }
+        $script:checks++
+        Assert-Rejected {
+            & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+                -Operation modify -ApprovedPaths @('aaa-clean.txt', 'aaa-tracked.txt', 'deleted.txt') `
+                -FileUpdates @{
+                    'aaa-clean.txt' = 'must not create new file'
+                    'aaa-tracked.txt' = 'must not update clean tracked file'
+                    'deleted.txt' = 'must not recreate deleted file'
+                } -ApproveModify
+        } 'conflicting approved paths: deleted.txt'
+        if ((Test-Path -LiteralPath (Join-Path $fixture 'aaa-clean.txt')) -or
+            (Test-Path -LiteralPath $deletedPath) -or
+            [Convert]::ToBase64String([IO.File]::ReadAllBytes($cleanTrackedPath)) -cne
+            [Convert]::ToBase64String($cleanTrackedBytes)) {
+            throw "A partially conflicting $flag deletion batch mutated an approved path."
+        }
+        $script:checks++
+        [IO.File]::WriteAllBytes($deletedPath, $deletedBytes)
+        if ($flag -ne 'ordinary') {
+            $clearFlag = if ($flag -eq '--skip-worktree') { '--no-skip-worktree' } else { '--no-assume-unchanged' }
+            $null = Invoke-FixtureGit @('update-index', $clearFlag, 'deleted.txt')
+        }
+    }
+    foreach ($target in @('flagged.txt/child.txt', 'flagged.txt/missing/deep.txt')) {
+        Assert-Rejected {
+            & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+                -Operation modify -ApprovedPaths @($target) -FileUpdates @{ $target = 'invalid parent write' } -ApproveModify
+        } "conflicting approved paths: $target"
+        if ((Get-Content -LiteralPath (Join-Path $fixture 'flagged.txt') -Raw).Trim() -cne 'tracked flag baseline') {
+            throw 'A parent-conflict rejection modified the existing parent file.'
+        }
+        $script:checks++
+    }
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('aaa-parent-new.txt', 'aaa-tracked.txt', 'deleted.txt/child.txt', 'flagged.txt/child.txt') `
+            -FileUpdates @{
+                'aaa-parent-new.txt' = 'must not create valid first target'
+                'aaa-tracked.txt' = 'must not modify valid tracked target'
+                'deleted.txt/child.txt' = 'first invalid parent'
+                'flagged.txt/child.txt' = 'second invalid parent'
+            } -ApproveModify
+    } 'conflicting approved paths: deleted.txt/child.txt, flagged.txt/child.txt'
+    if ((Test-Path -LiteralPath (Join-Path $fixture 'aaa-parent-new.txt')) -or
+        [Convert]::ToBase64String([IO.File]::ReadAllBytes($cleanTrackedPath)) -cne [Convert]::ToBase64String($cleanTrackedBytes) -or
+        [Convert]::ToBase64String([IO.File]::ReadAllBytes($deletedPath)) -cne [Convert]::ToBase64String($deletedBytes) -or
+        (Get-Content -LiteralPath (Join-Path $fixture 'flagged.txt') -Raw).Trim() -cne 'tracked flag baseline') {
+        throw 'A parent-conflicting batch partially mutated its valid targets or existing parent files.'
+    }
+    $script:checks++
+    Assert-Rejected {
+        & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+            -Operation modify -ApprovedPaths @('aaa-parent-new.txt', 'planned-parent', 'planned-parent/child.txt') `
+            -FileUpdates @{
+                'aaa-parent-new.txt' = 'must not create valid first target'
+                'planned-parent' = 'approved file cannot be a directory'
+                'planned-parent/child.txt' = 'must not create child of approved file'
+            } -ApproveModify
+    } 'conflicting approved paths: planned-parent/child.txt'
+    if ((Test-Path -LiteralPath (Join-Path $fixture 'aaa-parent-new.txt')) -or
+        (Test-Path -LiteralPath (Join-Path $fixture 'planned-parent'))) {
+        throw 'An overlapping approved parent/child batch partially wrote files.'
+    }
+    $script:checks++
+    $nestedUpdate = & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+        -Operation modify -ApprovedPaths @('docs/new/deep/first.txt', 'docs/new/deep/second.txt') `
+        -FileUpdates @{
+            'docs/new/deep/first.txt' = 'legitimate first nested file'
+            'docs/new/deep/second.txt' = 'legitimate second nested file'
+        } -ApproveModify
+    if (-not $nestedUpdate.Completed -or
+        (Get-Content -LiteralPath (Join-Path $fixture 'docs/new/deep/first.txt') -Raw) -cne 'legitimate first nested file' -or
+        (Get-Content -LiteralPath (Join-Path $fixture 'docs/new/deep/second.txt') -Raw) -cne 'legitimate second nested file') {
+        throw 'Legitimate shared nested-directory creation did not succeed.'
+    }
+    $script:checks++
+    $newUpdate = & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `
+        -Operation modify -ApprovedPaths @('new-approved.txt') `
+        -FileUpdates @{ 'new-approved.txt' = 'legitimate new approved file' } -ApproveModify
+    if (-not $newUpdate.Completed -or
+        (Get-Content -LiteralPath (Join-Path $fixture 'new-approved.txt') -Raw) -cne 'legitimate new approved file') {
+        throw 'Legitimate approved new-file creation did not succeed.'
     }
     $script:checks++
     $cleanUpdate = & $maintenance -FrameworkRoot $fixture -Task skills-1-2 -ExpectedHead $head `

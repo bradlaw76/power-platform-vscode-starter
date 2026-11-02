@@ -106,6 +106,7 @@ if ($Operation -eq 'modify') {
         throw 'Framework Maintenance Mode modifications must supply content for exactly the approved paths.'
     }
     $conflictingPaths = [Collections.Generic.List[string]]::new()
+    $parentConflicts = [Collections.Generic.List[string]]::new()
     foreach ($relativePath in $approvedSet) {
         if ($null -eq $FileUpdates[$relativePath]) {
             throw "Framework Maintenance Mode requires text content for '$relativePath'."
@@ -115,22 +116,37 @@ if ($Operation -eq 'modify') {
             throw "Unable to inspect the approved framework path '$relativePath' before modification."
         }
         $conflicting = $status.Count -gt 0
-        # Git status can hide edits on assume-unchanged or skip-worktree paths.
-        if (-not $conflicting -and (Test-Path -LiteralPath (Join-Path $frameworkRootPath $relativePath) -PathType Leaf)) {
-            $expectedBlob = @(& git --literal-pathspecs -C $identity.Root ls-tree --format='%(objectname)' HEAD -- $relativePath)
-            if ($LASTEXITCODE -ne 0) {
-                throw "Unable to inspect the approved baseline content for '$relativePath'."
-            }
+        $expectedBlob = @(& git --literal-pathspecs -C $identity.Root ls-tree --format='%(objectname)' HEAD -- $relativePath)
+        if ($LASTEXITCODE -ne 0) {
+            throw "Unable to inspect the approved baseline content for '$relativePath'."
+        }
+        $currentPath = Join-Path $frameworkRootPath $relativePath
+        # Git status can hide both edits and deletions on index-flagged paths.
+        if (-not $conflicting -and (Test-Path -LiteralPath $currentPath -PathType Leaf)) {
             $actualBlob = @(& git -C $identity.Root hash-object "--path=$relativePath" -- $relativePath)
             if ($LASTEXITCODE -ne 0) {
                 throw "Unable to inspect the current approved content for '$relativePath'."
             }
             $conflicting = $expectedBlob.Count -ne 1 -or $actualBlob.Count -ne 1 -or $expectedBlob[0] -cne $actualBlob[0]
+        } elseif (-not $conflicting) {
+            $conflicting = $expectedBlob.Count -gt 0 -or (Test-Path -LiteralPath $currentPath)
+        }
+        $parent = Split-Path -Parent $currentPath
+        while ((Test-WizardPathWithin -Path $parent -Root $frameworkRootPath) -and
+            -not $parent.Equals($frameworkRootPath, [StringComparison]::OrdinalIgnoreCase)) {
+            $relativeParent = [IO.Path]::GetRelativePath($frameworkRootPath, $parent).Replace('\', '/')
+            if (($approvedSet -contains $relativeParent) -or
+                ((Test-Path -LiteralPath $parent) -and -not (Get-Item -LiteralPath $parent -Force).PSIsContainer)) {
+                $conflicting = $true
+                $parentConflicts.Add("'$relativePath' requires directory '$relativeParent'")
+            }
+            $parent = Split-Path -Parent $parent
         }
         if ($conflicting) { $conflictingPaths.Add($relativePath) }
     }
     if ($conflictingPaths.Count -gt 0) {
-        throw "Framework Maintenance Mode rejected conflicting approved paths: $($conflictingPaths -join ', '). Preserve existing edits and obtain reviewed content before retrying."
+        $parentDetails = if ($parentConflicts.Count -gt 0) { " Parent conflicts: $($parentConflicts -join '; ')." } else { '' }
+        throw "Framework Maintenance Mode rejected conflicting approved paths: $($conflictingPaths -join ', ').$parentDetails Preserve existing edits and obtain reviewed content before retrying."
     }
     $encoding = [Text.UTF8Encoding]::new($false)
     if ($PSCmdlet.ShouldProcess(($approvedSet -join ', '), "Write approved framework files for task '$Task'")) {

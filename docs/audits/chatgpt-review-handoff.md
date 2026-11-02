@@ -295,3 +295,426 @@ mixed-case tests remain NOT RUN, not resolved through Linux execution.
 Independent review, exact pinned analyzer results and real Windows evidence
 remain required before integration. Publication does not authorize PR changes,
 merge, deployment or release.
+
+## 2026-11-02 UTC - Framework maintenance final validation
+
+### Reviewed context and evidence boundary
+
+- Updated: `2026-11-02T00:56:39Z`.
+- AI agent: GitHub Copilot.
+- Repository: `bradlaw76/power-platform-vscode-starter`.
+- Branch: `framework-maintenance/pr-findings`.
+- Exact reviewed and published HEAD:
+  [`e4a62749dbd3398faf6da3f1f862ca865564a9b0`](https://github.com/bradlaw76/power-platform-vscode-starter/commit/e4a62749dbd3398faf6da3f1f862ca865564a9b0).
+- Parent comparison:
+  `428214e0b3da337b88573b3d734777338e075e10`.
+- Local and remote HEAD matched; the initial working tree was clean. The
+  published comparison has exactly the ten remediation files inventoried
+  above. Skills 1-4 definitions, schemas, workflows and S34-01 corrections
+  remain unchanged.
+- This dated addendum is local only. Historical entries are preserved.
+  No implementation edit, commit, push, PR change, merge, deployment or
+  release was performed in this final validation task.
+
+### Exact-commit pinned quality validation
+
+The owner-authorized existing `Wizard Quality` workflow was dispatched without
+changing its definition and completed successfully:
+
+- [Run 41369683794](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/41369683794).
+- [Job 125037267965](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/41369683794/job/125037267965).
+- Tested SHA: `e4a62749dbd3398faf6da3f1f862ca865564a9b0`.
+- Job execution: `2026-11-02T00:54:51Z` to `2026-11-02T00:56:22Z`.
+
+| Check | Actual result |
+| --- | --- |
+| Pester 5.7.1 | PASS: 90 passed; 0 failed, skipped, inconclusive or not run |
+| PSScriptAnalyzer 1.24.0 | PASS: zero findings under the checked-in settings |
+| Standalone CI | PASS: all 30 scripts; contract integrity separately plus 29 remaining checks |
+| Framework preflight | PASS: 47 checks |
+| Framework source protection | PASS |
+| Skills 1-2 and installer discoverability | PASS: 202 checks |
+| Skills 3-4 | PASS: 70 static assertions |
+| PowerShell parsing | PASS in Actions; repository inventory contains 75 scripts |
+| JSON/payload schema validation | PASS: 84 documents parsed, 60 payloads matched schemas |
+| Markdown | PASS: 102 files, zero errors |
+| Package scope and whitespace | PASS |
+| Independent hidden-deletion probe | FAIL: remaining unsafe approved-path write reproduced |
+| Real Windows tests | NOT RUN; finding 5 remains NEEDS VERIFICATION |
+
+Logs explicitly show `Pester v5.7.1` and the pinned
+`Import-Module PSScriptAnalyzer -RequiredVersion 1.24.0`. These are results
+for the reviewed remediation, not inherited baseline results. The previous
+analyzer blocker is now resolved for this commit through the authorized runner.
+The analyzer settings enable `PSAvoidUsingInvokeExpression`; zero findings
+do not constitute exhaustive security analysis.
+
+### Independent findings assessment
+
+| Original ID | Status | Source evidence and remaining risk |
+| --- | --- | --- |
+| 1 | RESOLVED within tested scope | `helpers/wizard-source-protection.ps1:225-226` rejects insecure HTTP/Git when secure transport is required. Preflight, direct maintenance approval and push validation require that flag. Direct probes reject HTTP, uppercase HTTP and Git URLs; HTTPS, URI SSH and SCP-style SSH map correctly. Canonical application identity behavior remains unchanged. |
+| 2 | OPEN | `framework-maintenance.ps1:117-128` skips baseline comparison when the current target does not exist. A tracked file deleted while marked skip-worktree has empty Git status; approved modify silently recreates it. Existing content-conflict and partial-batch tests pass, but do not cover this hidden deletion. |
+| 3 | RESOLVED for historical-status correction | Original handoff history was preserved and a dated current-status addendum added. Pre-publication text remains historical; remote publication was independently verified. This addendum updates the quality results and qualifies the earlier claim that finding 2 was fully resolved. |
+| 4 | RESOLVED | `01-install-skills.ps1:69-72` lists both planning skills. `Get-Help -Full` independently confirms them; only help text changed and enumeration/copy behavior is unchanged. |
+| 5 | NEEDS VERIFICATION | `framework-context-preflight.ps1:45` retains ordinal root equality. The prepared real-Windows checks were not executed. Linux success proves neither Windows acceptance nor rejection semantics. |
+
+The independent isolated fixture probe used the committed maintenance script:
+
+1. Commit `hidden-deleted.txt` in a local test repository on a maintenance
+   branch with canonical HTTPS identity.
+2. Mark the tracked path `skip-worktree` and remove its working-tree file.
+3. Observe empty path-specific Git status.
+4. Invoke separately approved modify at the fixture's exact HEAD.
+5. Observe `Completed=True` and replacement content, rather than a conflict.
+
+Ordinary deleted and unstaged renamed paths were rejected in independent
+probes. Reviewed regressions cover staged, unstaged, untracked, ignored,
+assume-unchanged/skip-worktree content edits and partially conflicting batches.
+They do not exhaust all unexpected filesystem combinations. No reviewed
+repository file was touched by the probes.
+
+Remaining defect severity: Moderate (MEDIUM), confidence 10/10. Minimum proposed
+correction: inspect the approved HEAD tree entry even when the current file is
+absent; if HEAD tracks the path but the expected file is missing, report a
+conflict before any batch write. Preserve legitimate new-file creation.
+Add hidden-deletion and clean-plus-conflicting batch regressions. No correction
+was applied under this read-only authorization.
+
+### Windows and operational boundaries
+
+Windows runner inventory access returned HTTP 403
+(`Resource not accessible by integration`). The unchanged quality workflow
+uses `ubuntu-latest`. No approved, accessible real Windows execution path was
+established. No runner was introduced and root comparison logic was not changed.
+Finding 5 is not PASS or resolved.
+
+Live Dataverse operations, intended-user app access, agent execution behavior,
+deployments and production readiness were not tested or authorized. Offline
+CI success does not authorize those activities or resolve finding 2.
+
+### Updated decision and recommended next action
+
+Readiness: CONDITIONAL PASS for continued development, 7/10; HOLD controlled
+integration. Exact pinned quality gates now pass, but the reproduced Moderate
+write-protection defect and unverified Windows behavior prevent full readiness.
+The score is a qualitative review judgment, not a measured completion percentage.
+
+One recommended next action: authorize the narrowly scoped missing-tracked-file
+guard correction and its regression tests, then rerun pinned CI on the resulting
+reviewed commit. Real Windows validation remains a separate gate before
+integration. Publishing this local addendum requires separate commit/push
+approval; no PR, merge, deployment or release approval is implied.
+
+## 2026-11-02 UTC - Finding 2 hidden-deletion correction (local only)
+
+- Updated: `2026-11-02T01:06:06Z`; agent: GitHub Copilot.
+- Repository: `bradlaw76/power-platform-vscode-starter`.
+- Branch: `framework-maintenance/pr-findings`.
+- Unchanged local and published baseline HEAD:
+  `e4a62749dbd3398faf6da3f1f862ca865564a9b0`.
+- Initial working tree contained only the preceding uncommitted final-validation
+  addendum. That entire document was preserved before this appended entry.
+- No competing remote update was observed. No commit, push, PR #4 change,
+  workflow change, merge, deployment or live environment mutation was performed.
+
+### Exact change inventory and correction
+
+1. `scripts/bootstrap/framework-maintenance.ps1`: inspect the approved HEAD
+   entry independently of working-tree existence. An absent tracked target
+   is a conflict even when index flags hide its deletion from status.
+   An existing non-file target is also rejected; a genuinely absent new
+   approved file remains permitted.
+2. `scripts/ci/test-framework-context-preflight.ps1`: add skip-worktree,
+   assume-unchanged and ordinary tracked-deletion cases, positive new-file
+   creation, and mixed batches containing both a clean tracked file and a
+   genuinely new target before the conflict. Check missing paths and unchanged
+   bytes explicitly, because Git status cannot prove hidden files were preserved.
+3. `docs/audits/chatgpt-review-handoff.md`: append this local correction evidence
+   without rewriting previous findings, results or publication history.
+
+Root cause: the previous baseline lookup was gated by `Test-Path -PathType Leaf`.
+Hidden deletions therefore bypassed both status and blob comparison. The lookup
+now runs for every approved target. All conflicts are collected and reported
+before the existing write loop; a single conflict blocks the entire batch.
+Existing content hashing, staged/unstaged/untracked/ignored detection, literal
+pathspecs, exact HEAD, separate approvals, secure transport and path isolation
+remain unchanged.
+
+Validated source SHA-256 identities:
+
+```text
+framework-maintenance.ps1:
+75d5f601bafdf816e833616b881589bcadaaf484b97ccff74ab8133e02a7d471
+test-framework-context-preflight.ps1:
+a9b33eb87d0723bf59336ac06e8afba1fec15db6395529ca2ce18f48bd18f0af
+```
+
+### Fresh validation of the uncommitted correction
+
+All following results apply to this changed working tree, not the previously
+published commit or its Actions run.
+
+| Check | Result |
+| --- | --- |
+| Targeted framework preflight/maintenance regression | PASS: 62 checks (previously 47) |
+| Baseline mutation probes | PASS: both hidden-deletion tests fail against the vulnerable e4a62749 guard |
+| All standalone CI scripts | PASS: 30 scripts, including source/approval/transport protections |
+| Skills 1-2 and installer contracts | PASS: 202 checks |
+| Skills 3-4 contracts | PASS: 70 assertions; definitions and S34-01 unchanged |
+| PowerShell 7.6.0 parsing | PASS: 75 repository scripts |
+| JSON/payload-schema validation | PASS: 84 documents, 60 payloads |
+| Pester 5.7.1 | PASS: 90 passed; zero failed, skipped, inconclusive or not run |
+| Markdownlint-cli2 0.18.1 | PASS: all 102 Markdown files; zero errors |
+| Whitespace and final file scope | PASS |
+| PSScriptAnalyzer 1.24.0 | NOT RUN: pinned module absent locally |
+| Real Windows mixed-case roots | NOT RUN: existing Windows availability blocker remains |
+
+The production-script tests explicitly verify that both index-flagged deletions
+are hidden from Git status, reject individual and mixed operations, and leave
+the deleted targets absent, new targets absent and clean tracked bytes intact.
+Ordinary deletion rejects; legitimate approved creation and existing clean
+maintenance success also pass. Existing dirty-content regressions still pass.
+
+Two isolated scratch copies used the newly expanded regression script with the
+verified old production guard. Selecting each hidden-deletion flag separately
+caused exit 1 at `Expected rejection: conflicting approved paths: deleted.txt`.
+Thus neither new negative test can falsely pass with the vulnerable behavior.
+Mutation fixtures were removed; operator refs/index and source were not altered.
+
+Exact execution entry points:
+
+```powershell
+pwsh -NoProfile -NonInteractive -File scripts/ci/test-framework-context-preflight.ps1
+Get-ChildItem ./scripts/ci -Filter 'test-*.ps1' -File | Sort-Object Name
+# Each enumerated script executed in a separate pwsh process; all exit codes checked.
+Import-Module /tmp/framework-pr-findings-pester-source/bin/Pester.psd1 -RequiredVersion 5.7.1
+Invoke-Pester -Path ./scripts/ci -Output Detailed -PassThru
+Get-Module -ListAvailable PSScriptAnalyzer
+```
+
+```bash
+npx --yes markdownlint-cli2@0.18.1 '**/*.md'
+git diff --check
+```
+
+Full local runner and mutation harness, plus captured output, are retained in
+the session evidence directory, not included in the repository change inventory.
+The analyzer module was unavailable on configured local paths. Previously
+documented approved-source restrictions were not bypassed. The prior exact
+commit's analyzer PASS is historical evidence only, not validation of this diff.
+No workflow was dispatched to pretend it could validate unpublished changes.
+
+### Finding status, readiness and exact next approval
+
+Finding 2: RESOLVED IN LOCAL DIFF for the reproduced hidden-deletion defect,
+with positive, negative and all-or-nothing regression evidence; pending
+independent review and exact-commit pinned quality validation. The published
+baseline still contains the defect until separately approved publication.
+Findings 1, 3 and 4 remain resolved within their reviewed scope.
+Finding 5 remains NEEDS VERIFICATION on real Windows; no root logic changed.
+
+Readiness: CONDITIONAL PASS for continued development, 8/10 qualitative
+assessment; HOLD integration pending independent review, pinned analyzer
+validation of this correction and real Windows evidence. No live Dataverse,
+deployment, actual agent execution or release readiness is claimed.
+
+Exact next owner approval: authorize committing these three reviewed files and
+non-force pushing only `framework-maintenance/pr-findings`, then dispatching the
+unchanged Wizard Quality workflow against the resulting exact SHA. Approve an
+accessible real Windows execution path separately. None of these actions was
+performed or inferred from the present local-remediation authorization.
+
+## 2026-11-02 UTC - Complete parent-path pre-write validation (local only)
+
+- Updated: `2026-11-02T01:23:49Z`; agent: GitHub Copilot.
+- Repository: `bradlaw76/power-platform-vscode-starter`.
+- Branch: `framework-maintenance/pr-findings`.
+- Local and remote baseline HEAD remain
+  `e4a62749dbd3398faf6da3f1f862ca865564a9b0`.
+- The existing three-file hidden-deletion correction and all preceding handoff
+  text were preserved. No competing remote update was observed.
+- This entry records local implementation and testing only. No commit, push,
+  merge, PR #4 modification, workflow change, deployment or release occurred.
+
+### Independent finding and narrowly scoped correction
+
+The preceding independent read-only review accepted the hidden-deletion fix
+conditionally and reproduced a separate parent-path partial-write defect:
+`aaa-clean.txt` was updated before `zzz-target/child.txt` failed because
+`zzz-target` was a regular file. Both the published baseline and the
+hidden-deletion-only guard exhibited this behavior.
+
+The modify guard now walks every approved target's parent hierarchy before
+the write loop. Existing parents must be directories. A parent that is itself
+an approved file update is also a conflict, including an absent parent that
+would otherwise become a file earlier in the same batch. Missing directories
+not reserved for file updates remain valid for nested-directory creation.
+All detected target and parent conflicts are collected, and the rejection
+reports affected target paths plus the required directory paths.
+
+The original HEAD-entry inspection and hidden-deletion rejection remain intact.
+Existing dirty, staged, ignored, untracked and Git-hidden content checks,
+separate approvals, exact HEAD, canonical secure transport, application
+protections and physical-path isolation were not weakened.
+
+### Exact files modified
+
+1. `scripts/bootstrap/framework-maintenance.ps1`: add non-directory and
+   approved-file ancestor checks to the existing pre-write validation loop,
+   with aggregated parent-conflict diagnostics.
+2. `scripts/ci/test-framework-context-preflight.ps1`: add immediate/deep regular
+   file parents, multi-conflict batches with valid preceding targets,
+   overlapping approved file/child paths and shared nested-directory success.
+   Preserve all hidden-deletion and existing clean/dirty regressions.
+3. `docs/audits/chatgpt-review-handoff.md`: append this evidence, preserving
+   the prior review and correction history.
+
+Validated source SHA-256 identities:
+
+```text
+framework-maintenance.ps1:
+b5527b50ff450b054150b79f4f129d9d3acfb41caf8668585a23984b99c7ede9
+test-framework-context-preflight.ps1:
+bd0176abe7a05dc07c3dec7a8ed210632176574010bac8989a31d632673fc2b2
+```
+
+### Fresh combined-correction validation
+
+All results below apply to the current uncommitted combined correction.
+Previously published Actions results are not substituted.
+
+| Check | Actual result |
+| --- | --- |
+| Framework preflight/maintenance regression | PASS: 71 checks (62 preserved plus 9 parent-path checks) |
+| Parent-defect mutation regression | PASS: expanded suite fails against the preserved hidden-deletion-only guard |
+| Isolated old/new batch comparison | PASS: old guard partially writes; corrected guard rejects before either target changes |
+| Unsupported Linux FIFO parent | PASS: real modify operation rejects before the valid preceding target changes |
+| Hidden-deletion mutation regressions | PASS: both index-flag cases fail against the vulnerable published baseline |
+| Standalone CI | PASS: all 30 scripts |
+| Skills 1-2 / installer contracts | PASS: 202 checks |
+| Skills 3-4 contracts | PASS: 70 assertions |
+| Pester 5.7.1 | PASS: 90 passed; zero failed, skipped, inconclusive or not run |
+| PowerShell 7.6.0 parsing | PASS: 75 scripts |
+| JSON/schema validation | PASS: 84 documents, 60 payloads |
+| Markdownlint-cli2 0.18.1 | PASS: 102 Markdown files, zero errors |
+| Whitespace, preserved history and scope | PASS |
+| PSScriptAnalyzer 1.24.0 | NOT RUN: pinned module unavailable locally |
+| Real Windows verification | NOT RUN: existing authorized-runner availability blocker remains |
+
+The new batch regression includes a valid new file, a valid tracked file and
+two invalid later targets. It verifies both invalid paths are reported, neither
+valid target is written and both existing parent files retain their content.
+The planned-parent regression rejects creating a file and a child beneath that
+file in one batch. Two new files sharing a genuinely new nested directory
+successfully demonstrate legitimate directory creation.
+
+The negative mutation suite used the preserved pre-parent-fix production script,
+not a weakened assertion helper. The expanded repository test exits nonzero
+at the invalid-parent case. A separate isolated comparison reproduces the old
+partial write and verifies the new rejection leaves the whole batch unchanged.
+Scratch repositories were removed; no operator refs or index were changed.
+Exact execution commands and full output are retained in session evidence:
+the existing full validation runner enumerates all `test-*.ps1` scripts,
+checks every exit code, parses scripts and imports exact Pester 5.7.1.
+The parent-path and hidden-deletion mutation harnesses run in isolated scratch.
+
+### Remaining risks and readiness boundary
+
+Preventable conditions now covered: hidden or ordinary missing tracked files,
+dirty approved targets, existing non-file targets, non-directory ancestors and
+approved file/child collisions. Inspection errors terminate before the write
+loop. This is a bounded pre-write safety improvement, not a transactional engine.
+
+Concurrent changes to HEAD, file content, links or parent directories after
+validation remain check-to-write races. No lock or atomic snapshot is provided.
+Write permissions/read-only mounts, platform path limits, disk exhaustion and
+other I/O failures are not comprehensively predicted; a later write-time failure
+can still leave earlier approved writes applied. Separate platform-specific
+preflight checks could reduce predictable failures. Full all-or-nothing recovery
+would require separately scoped staging/rollback design and tests; neither
+transactions nor complete rollback are implemented or claimed here.
+
+Finding 2: both reproduced defects are RESOLVED IN LOCAL DIFF with regression
+evidence, pending independent review of the combined correction. The published
+baseline still contains them. Finding 5 remains NEEDS VERIFICATION on real
+Windows; existing workflow and root comparison logic are unchanged.
+Skills 1-4 and S34-01 remain untouched.
+
+Readiness: CONDITIONAL PASS for continued development, 8/10 qualitative
+assessment; HOLD integration pending combined-diff independent review,
+exact-commit pinned analyzer results and real Windows evidence.
+
+Next required step: independent read-only review of these same three files.
+After acceptance, obtain explicit owner authorization to commit and non-force
+push only this maintenance branch and run the unchanged Wizard Quality workflow
+against the resulting SHA. Real Windows execution authorization remains a
+separate requirement. No publication or integration permission is inferred.
+
+## 2026-11-02 UTC - Final independent review of combined safety fixes
+
+- Reviewed: `2026-11-02T01:36:38Z`; agent: GitHub Copilot.
+- Repository: `bradlaw76/power-platform-vscode-starter`.
+- Branch: `framework-maintenance/pr-findings`.
+- Local and remote HEAD: `e4a62749dbd3398faf6da3f1f862ca865564a9b0`.
+- Verdict: PASS for the scoped local correction and publication review;
+  integration remains conditional on its separate quality/platform gates.
+- Exactly the three files inventoried above differ from HEAD. Implementation
+  and regression-script hashes match the preceding combined-correction entry.
+  The tested diff was unchanged throughout this review. Only this permitted
+  documentation addendum was appended afterward.
+
+### File-level review
+
+| File | Assessment |
+| --- | --- |
+| `scripts/bootstrap/framework-maintenance.ps1` | PASS: baseline lookup at line 119 is independent of existence; lines 131-132 reject missing tracked files. Lines 134-144 validate existing and planned ancestors. All conflicts reject at 147-149 before writes at 152-157. Existing approval, HEAD, transport and isolation logic is unchanged. |
+| `scripts/ci/test-framework-context-preflight.ps1` | PASS: explicit rejection flag prevents success-shaped negative results. Tests assert hidden status, missing-path preservation and unchanged bytes, not Git status alone. Mixed conflict and overlapping file/child cases reject, while legitimate new/shared nested creation succeeds. |
+| `docs/audits/chatgpt-review-handoff.md` | PASS: historical evidence preserved; local correction, published baseline, unavailable tools and integration boundaries remain distinguished. |
+
+### Independently rerun validation
+
+| Check | Result for current local correction |
+| --- | --- |
+| Guard regressions | PASS: 71 checks |
+| Hidden-deletion mutation tests | PASS: both fail against vulnerable baseline with the expected rejection assertion |
+| Parent-path mutation test | PASS: expanded test fails against preserved pre-parent-fix guard |
+| Parent old/new comparison | PASS: old partial write reproduced; corrected batch leaves valid target and parent unchanged |
+| FIFO parent | PASS: actual Linux modify call rejects before preceding target writes |
+| Standalone CI | PASS: 30 scripts |
+| Skills 1-2 / Skills 3-4 | PASS: 202 checks / 70 assertions |
+| Pester 5.7.1 | PASS: 90 passed; zero failed, skipped, inconclusive or not run |
+| PowerShell 7.6.0 parsing | PASS: 75 scripts |
+| JSON/schema validation | PASS: 84 documents / 60 payloads |
+| Markdownlint-cli2 0.18.1 / whitespace | PASS: 102 files, zero errors / clean |
+| PSScriptAnalyzer 1.24.0 | NOT RUN: approved pinned module unavailable locally |
+| Real Windows verification | NOT RUN: no accessible authorized Windows execution route |
+
+Fresh runner and mutation output are preserved as
+`framework-combined-final-review-validation.log`,
+`framework-combined-final-review-hidden.log` and
+`framework-combined-final-review-parent.log` in session evidence.
+No prior commit's test results were substituted.
+Skills 1-4, schemas, workflows and S34-01 are unchanged.
+
+### Remaining risks and publication decision
+
+No additional material predictable pre-write conflict was demonstrated in the
+reviewed scope. The two reproduced defects and approved file/child collisions
+now reject before mutation. This is not proof that every platform-specific
+permission, path-limit or storage condition is preflighted.
+
+Concurrent changes after validation and write-time I/O failures remain
+non-transactional limitations, not regressions introduced by these corrections.
+No new material defect justifies requiring rollback or maintenance-engine
+redesign as a condition of publishing this scoped fix.
+
+Recommendation: obtain explicit owner approval to commit these three reviewed
+files and non-force push only `framework-maintenance/pr-findings`; then run
+the unchanged Wizard Quality workflow against the resulting exact SHA.
+Pinned analyzer results for that correction and real Windows verification
+remain required before integration. Finding 5 is NEEDS VERIFICATION.
+Publication acceptance is not release, deployment or live Dataverse readiness.
+
+No implementation edits, commits, pushes, PR #4 changes, merges, workflow
+changes or deployments occurred during this independent review.
