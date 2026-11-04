@@ -214,6 +214,14 @@ Validation checkpoint:
 
 - You have discovery answers captured before authentication or build scripts.
 - You have starter planning files or a clear set of answers to create them.
+- Every planned column appears in a field-type decision table.
+- Every bounded vocabulary has been resolved to Choice, Yes/No, or lookup;
+  categorical-looking text fields have an explicit rationale and approval.
+- Choice labels, stable numeric values, scope (global or local), defaults, and
+  sample-data mappings are defined before `columns-*.json` is generated.
+- The decision follows the domain-neutral
+  [Semantic Field Type Decision Standard](field-type-decision-standard.md),
+  which applies to every Dataverse use case.
 
 ---
 
@@ -476,6 +484,130 @@ pwsh ./scripts/bootstrap/81-build-progress-matrix.ps1
 # Build an HTML dashboard from telemetry analytics
 pwsh ./scripts/bootstrap/82-build-progress-report.ps1
 ```
+
+For an explicitly planned retrofit that replaces existing text columns with
+global-choice-backed columns, run the read-only contract and dependency checks
+before any destructive authorization:
+
+```powershell
+pwsh ./scripts/bootstrap/35-preview-choice-migration.ps1 -ScenarioSlug <scenario-slug> -Mode Offline
+pwsh ./scripts/bootstrap/35-preview-choice-migration.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+pwsh ./scripts/bootstrap/37-prepare-choice-dependencies.ps1 -ScenarioSlug <scenario-slug> -Mode Offline
+pwsh ./scripts/bootstrap/37-prepare-choice-dependencies.ps1 -ScenarioSlug <scenario-slug> -Mode Preview
+```
+
+Stages 35 and 37 do not implement Apply and issue only GET requests in Preview.
+Stage 37 resolves the dependency references from stage 35, verifies complete
+coverage by the reviewed operator handoff, and writes original plus temporary
+definitions for script-managed views, forms, and charts. It does not patch those
+components. BPFs and their generated backing forms remain a Power Apps designer
+boundary. A same-logical-name migration requires a fresh unmanaged backup,
+exact synthetic-data snapshot, dependency removal and restoration, scoped
+publish, strict membership, idempotency, and export checks.
+
+After the Apply implementation and operator dependency handoff are reviewed,
+stage 36 provides separately gated phases:
+
+```powershell
+pwsh ./scripts/bootstrap/36-apply-choice-migration.ps1 -ScenarioSlug <scenario-slug> -Phase Snapshot
+# Remove every reported dependency through supported builders/designers.
+# Do not run Apply without explicit destructive authorization.
+pwsh ./scripts/bootstrap/36-apply-choice-migration.ps1 -ScenarioSlug <scenario-slug> -Phase Apply -ConfirmDestructiveMigration -AuthorizationReference <approval-reference>
+pwsh ./scripts/bootstrap/36-apply-choice-migration.ps1 -ScenarioSlug <scenario-slug> -Phase Verify
+```
+
+Stage 36 refuses Apply while any dependency remains. Designer-authored BPF
+references must be removed and restored in Power Apps; the script never
+fabricates workflow definition metadata.
+Before any Apply mutation, all existing target global Choices must match
+the approved global Picklist type, option values, rendered English labels,
+colors, and metadata identities. Incompatible definitions stop the run;
+Apply does not silently repair them or wait until post-deletion Verify.
+
+For a separately authorized migration, establish an operator-controlled write
+freeze before Snapshot and retain it through Apply and Verify. Stop interactive
+edits, imports, flows, integrations, and other data or customization writers to
+the affected tables and global Choices;
+the script does not establish or enforce that freeze. Snapshot and Apply read
+every data page, reject invalid/repeated next links, and validate ownership and
+mappings on every page. Before any mutation, Apply compares the complete current
+populated-row cohort, exact text values, attribute identities, definitions, and
+mappings against the snapshot. Added, removed, cleared, changed, or duplicate
+rows and stale/invalid snapshot bindings stop Apply and require a refreshed
+Snapshot. This preflight is not a transaction or concurrency lock: without the
+write freeze, edits after validation can still be lost. Do not run destructive
+migration on an active production workload.
+
+Stage 36 Verify checks the exact global Choice bindings, numeric values,
+English labels, and explicit or include-all solution membership, retaining
+the live metadata IDs in a read-only verification report. After restoring
+dependencies and publishing, require the same contract at the final gates:
+
+```powershell
+pwsh ./scripts/bootstrap/50-add-to-solution.ps1 -ScenarioSlug <scenario-slug> -InventoryOnly -EnforceExportGate -RequireChoiceMigration
+# Complete the stage-85 baseline/rerun/verification sequence before export.
+pwsh ./scripts/bootstrap/95-export-unmanaged-solution.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name> -RequireChoiceMigration
+```
+
+An approved versioned `CurrentSchema` declaration in the choice-migration
+payload automatically enables the current contract without local Apply evidence.
+It binds the contract to the scenario, solution, and publisher; mismatches stop
+the run. Matching successful stage-36 Apply evidence continues to enable checks
+for legacy payloads and is validated whenever present. Stage 50 inventories global Choices as
+mandatory components; stage 95 checks their package roots, complete option
+definitions and labels, and every migrated column's actual Picklist type and
+global binding. For a separately approved backup of an existing pre-migration
+environment, explicitly use `-PreMigrationBackup` on stage 50 with
+`-InventoryOnly -EnforceExportGate`, then on stage 95. This selects the legacy
+contract only before successful Apply evidence exists and without mandatory
+Choice checks; the switch cannot suppress checks required by `-RequireChoiceMigration`
+or exported global-Choice membership. Do not use it for an ordinary build/release.
+These gates do not authorize destructive changes or package import.
+
+For scenario-owned FOIA grid views, exported-package verification requires the
+FOIA marker on the primary table as a mandatory AND condition. Its presence
+only inside an OR filter or on a related-table alias is not sufficient. View
+names, displayed columns, and control settings do not prove FOIA row scope.
+
+After successful Apply, retain its identity-matched runtime evidence for audit.
+The original String column and label-shaped seed payloads remain available for
+rollback/audit; the approved choice-migration payload becomes the effective
+override in stage 30 (Picklist metadata and GUID-based global binding) and stage
+66 (numeric option values). For a declared current contract, stage 30 preflights
+all existing bindings, validates existing global Choices, creates only missing
+global Choices/columns, records their IDs, and publishes scoped metadata.
+Incompatible existing text columns stop before mutation and still require the
+separate destructive migration path. Stage 50 explicitly syncs missing global
+Choice memberships; stage 66 validates all categorical input values before any
+requests and verifies live field types/bindings/options before row writes.
+Neither fresh-source builds nor ordinary reruns need borrowed Apply evidence.
+Do not directly replay legacy String declarations
+against converted fields. Archive the pre-migration stage-85 baseline and capture
+a new post-schema-change baseline before proving rerun stability: recreated
+attribute IDs intentionally change, but record and restored component IDs must
+remain stable. Export inspection accepts PAC's case-varied entity names and
+`OptionSetName` references while still checking exact approved global bindings.
+
+For the migrated FOIA global Choices, optional `Icon` and `ColorToken` on each
+migration option reuse the original wizard's inline Unicode symbols and eight
+pastels. Semantic `Label`, numeric `Value`, and seed `ValueMap` remain unchanged.
+The newer wizard's local-Choice-only styling stage must not be used on these
+global sets. Use the bounded global stage instead:
+
+```powershell
+pwsh ./scripts/bootstrap/38-style-global-choices.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name> -PublisherPrefix <prefix> -EnvironmentUrl <url> -PreviewOnly
+# Review preview.html and approve its exact hash, then supply authenticated credentials.
+pwsh ./scripts/bootstrap/38-style-global-choices.ps1 -ScenarioSlug <scenario-slug> -SolutionUniqueName <solution-name> -PublisherPrefix <prefix> -EnvironmentUrl <url> -AccessToken <token> -ApprovedPlanHash <approved-hash>
+```
+
+This stage preflights every set and binding before any update, rejects managed
+or foreign options and unknown labels/values, backs up original metadata, uses
+`UpdateOptionValue` with `OptionSetName`/`MergeLabels`, publishes only changed
+global sets, and verifies labels/colors and unchanged Choice IDs. A settled
+rerun must report zero changes. The read-only migration and final package gates
+also verify the exact rendered labels and pastel colors. Grid background colors
+depend on the grid control's option-set-color setting; styling metadata does
+not automatically replace/configure a grid control.
 
 All scripts are idempotent and safe to rerun.
 

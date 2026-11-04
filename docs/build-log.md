@@ -32,6 +32,375 @@ Use this to document what was planned, built, validated, and promoted.
 | Evidence | `specs/federal-foia-management/evidence-index.md` |
 | Remaining release gates | Security roles/access tests, flows/integrations, accessibility, performance, complete E2E journeys, documentation sign-off, push/PR approval, and any managed-release approval |
 
+## Federal FOIA Choice Migration Readiness - 2026-10-21
+
+- Local implementation and credential-free validation only; no authentication,
+  live Dataverse requests, dependency removal, column deletion, import, commit,
+  or push performed.
+- Added exact post-Apply verification for 26 global Choices and 29 Picklist
+  columns, including option values/English labels, global bindings, live
+  metadata IDs, and explicit/include-all solution membership.
+- Strict inventory now includes global Choices; unmanaged export checks their
+  roots and full definitions plus migrated attribute types/bindings.
+- Successful matching Apply evidence automatically enables these gates;
+  operators can also require them with `-RequireChoiceMigration`. The
+  pre-migration backup path remains available before Apply.
+- Seven focused credential-free suites passed: Choice verification, migration
+  Apply/rollback, migration Preview, dependency preparation, solution isolation,
+  idempotency/export, and wizard hardening. Existing tests that write scenario
+  evidence were run in an isolated copy so saved live evidence was preserved.
+- Live status is unchanged: refresh preview/backup and snapshot, complete
+  supported dependency removal (including both designer-owned BPFs), obtain
+  separate destructive authorization, apply/restore/publish, then perform
+  live validation, membership, idempotency, and export gates.
+
+## Federal FOIA Choice Migration Checkpoint - 2026-10-22
+
+- Operator selected surgical same-logical-name replacement of all 29 approved
+  categorical text fields for the synthetic demonstration, including restoration
+  of demo values and affected app references; unrelated components remain outside
+  scope.
+- Fresh live stage-35 Preview passed: 26 global Choices, 29 bindings, zero
+  mutations. Stage-37 Preview passed with the same 60 dependency references
+  across 37 components and zero mutations.
+- Fresh stage-95 unmanaged export and local unpack inspection passed: 27 expected
+  roots matched, 235 membership items, zero missing or unrelated roots.
+  Backup ZIP SHA-256:
+  `AE139A57D0A60279F522C0399770BD3461D57B6D318A6FE66A5FACA566BF2DCE`.
+  Runtime export evidence records the short session-storage path.
+- Stage-36 Snapshot captured all 29 bindings without mutation; runtime evidence:
+  `.wizard-metrics/artifacts/choice-migration/federal-foia-management-snapshot.json`.
+- PAC printed a NuGet service-index TLS warning, but export, unpack, and package
+  inspection completed successfully.
+- Initial checkpoint paused before mutation for Microsoft sign-in. After the
+  operator signed in, the authorized replacement completed on 2026-10-22:
+  **26 global Choices, 29 same-logical-name Picklist columns, and all 97 captured
+  populated field values restored and verified**.
+- Temporarily rebound BPF steps through the supported Power Apps designer,
+  preserved their names/order/requiredness, and reached zero delete dependencies.
+  Restored all 33 reviewed ordinary form/view/chart definitions with their
+  original IDs, corrected Choice controls and numeric chart filters, and restored,
+  validated, and activated both BPFs without fabricating workflow metadata.
+- Stage-36 Verify passed exact live metadata, option labels/values, global
+  bindings, solution membership, and snapshot-value checks. All 29 recreated
+  attributes were explicitly added to the solution. Attribute IDs intentionally
+  changed; the pre-migration baseline was archived before the new baseline.
+- Controlled reporting/data rerun: 7 reporting surfaces updated, 6 skipped, and
+  all 41 approved synthetic records updated with the same IDs. Stage 85 passed:
+  stable IDs true, zero duplicates, zero failures. Final strict membership:
+  261 already in solution; zero failed, missing, or unauthorized.
+- Published-app inspection confirmed actual dropdowns on Synthetic Normal
+  Request: Intake Channel = Agency portal, Validation State = Perfected, and
+  Disposition = Open; all seven channel options were available and the record
+  remained Saved. Unrelated platform feature/licensing/telemetry warnings remain;
+  they did not block the dropdown interaction. Full journey rehearsal is separate.
+- Final unmanaged export/unpack and exact Choice-package inspection passed:
+  53/53 expected roots, 261 membership items, 243 files, zero missing or unrelated
+  roots, and all 26 option definitions/29 Picklist bindings verified. ZIP SHA-256:
+  `1E06A159EAABD8F2168F53C1BA8F754FFA91422A6F88194AEFD8ECBD009BE97C`.
+  Runtime export evidence retains the package and unpack paths.
+- Runtime corrections cover supported global-option-set collection queries,
+  bounded metadata visibility polling, GUID-based global binding, native
+  Retry-After headers, and PAC's case-varied entity names and `OptionSetName`
+  references. Legacy String/data payloads remain the pre-migration source;
+  matching successful Apply evidence activates the approved migration overlay
+  for stage-30 metadata and stage-66 numeric seed values.
+- No import, managed release, commit, push, or pull request was performed.
+- Final isolated regression run passed all eight focused suites (including
+  19/19 runtime Pester tests). JSON validation parsed 86 documents and matched
+  61 payload schemas; changed PowerShell files parsed and whitespace checks
+  passed. Local test fixtures did not overwrite live migration evidence.
+
+## Federal FOIA Choice Icons And Pastels - 2026-10-22
+
+- Located the original VS Code wizard in the sibling starter workspace and
+  reused its eight exact pastel tokens and inline symbol vocabulary. Its
+  local-Choice-only styling stage was not executed against FOIA's global sets;
+  stage 38 uses the supported global `UpdateOptionValue` action instead.
+- Operator approved the rendered 162-option / 26-global-Choice / 29-field preview:
+  `5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48`.
+  Semantic labels, numeric values, bindings, record values, option order, and
+  metadata identities remain unchanged. Only English display-label prefixes
+  and native color metadata were changed; other language labels are merged.
+- Preflight verified the complete scope before mutation and captured original
+  metadata under `.wizard-metrics/artifacts/choice-presentations/federal-foia-management/`.
+  The stage published only changed global Choices and read back all 162 exact
+  labels/colors. An immediate rerun repeated one validation-state option update
+  during propagation; the settled rerun verified all options with zero updates.
+- Stage 36 Verify reconfirmed 29 Picklists, 26 global bindings, and all 97 restored
+  values. Strict membership remained 261 with zero missing/failed/unauthorized;
+  stage 85 retained stable identities and zero duplicates.
+- Authenticated published-app smoke test after reload showed `Agency portal`,
+  `Perfected`, `Review`, `Other`, and `Open` with their intended symbols.
+  All seven channel options displayed symbols and the record remained Saved.
+  Standard form dropdowns rendered transparent option backgrounds; the pastel
+  colors are configured and verified in metadata/package, not forced onto
+  unsupported controls. Color-capable grids need their option-set-color setting.
+- Final unmanaged export passed 53/53 roots, all 26 exact option definitions,
+  all 162 labels/colors, and all 29 bindings; 243 unpacked files. ZIP SHA-256:
+  `4ACFC90A018C62D09F95A9C800DCBAE1B82058D6C3B96BD590BE2ADD57E3FD55`.
+- Eight isolated credential-free regression suites passed, including no-write
+  preview, wrong-hash/managed/drift/membership rejection, unchanged translations,
+  zero-write rerun, numeric seed mappings, and wrong-color live/package gates.
+- No record edits, field recreation, imports, commits, or pushes were performed.
+
+## Federal FOIA Pastel Grids - 2026-10-22
+
+- Operator approved enabling Choice colors for all 13 FOIA tables, including
+  shared Contact and Case, provided new views contain FOIA in their names.
+- Configured native Power Apps grid controls through supported classic maker
+  UI, selected Web, enabled OptionSet colors, and kept editing off. Existing
+  phone/tablet selections were retained, including Case's inherited OneGrid.
+  Explicitly saved Case settings into the selected solution for portability.
+- Created and published two separately owned public views, linked to both
+  solution and app: FOIA Requester Choice Overview
+  (`3285d88d-5f40-4cb3-8a74-baf08e711b7a`) and FOIA Case Choice Overview
+  (`4807ed1b-2597-4682-abf9-969d911df4d6`). All 45 original Contact/Case public
+  views retain exact names, FetchXML, layouts, and default/managed flags.
+- Actual Request, Contact, and Case grids displayed the configured pastel
+  symbol badges. Case showed seven FOIA work types; Contact showed seven
+  FOIA-related records. Forms and record values were not changed.
+- The strict gate detected incidental `incident.entityimage` solution
+  membership added by maker Save. Removed only its solution membership through
+  the supported removal action; did not delete or modify the live field.
+  Final gate: 263 already in solution; zero failed, missing, or unauthorized.
+- Stage 36 Verify reconfirmed all 29 Picklists, 26 global Choices, and 97
+  restored values. Archived the 702-identity pre-grid baseline and proved all
+  original IDs unchanged, allowing only four identity entries for the two new
+  views. Their bounded rerun created no views; stage 85 passed 706 identities,
+  stable IDs, zero duplicates, and zero failures.
+- Final stage-95 unmanaged export passed 53/53 roots, exact labels/colors for
+  all 162 options, 29 bindings, all 13 selected read-only/color-enabled Web
+  controls, both new views, and 245 unpacked files. ZIP SHA-256:
+  `0243CE764FA103462585648FFA0911CEAACFFA3117B6FCB2CA89E3426A07D5D1`.
+- Eight isolated credential-free regression suites passed: grid package,
+  new views, Choice verification/presentation, strict solution isolation,
+  wizard hardening, idempotency/export, and JSON schemas (88 documents;
+  61 schema matches). The grid gate tests actual property text rather than
+  treating the `static=true` binding qualifier as a boolean setting.
+- No imports, managed releases, commits, or pushes were performed.
+
+## Federal FOIA Production-Hardening Planning Checkpoint - 2026-11-04
+
+- Operator approved local review and scenario planning updates only. No
+  authentication, live requests, schema/data mutation, assignments, SharePoint
+  provisioning, import, managed release, staging, commit, or push was performed.
+- Reviewed working-tree status, dated build/manifest/task evidence, and pending
+  runtime integration changes. This was a readiness review, not a complete code
+  audit or fresh validation of the live environment.
+- Latest recorded live checkpoint remains 2026-10-22: 263 memberships, 706 stable
+  identities, 41 synthetic rows, and 53 matching unmanaged package roots.
+- Recorded outstanding source work and the clean-clone reproducibility gate:
+  current stages 30/66 enable Choice overlays from matching local Apply evidence,
+  while original String/label payloads remain the rollback source. Promotion must
+  not depend on borrowing another environment's evidence.
+- Updated the scenario specification, plan, and tasks with PH-00 through PH-06,
+  explicit prerequisites/owners, ten first-slice acceptance tests, and unresolved
+  policy/identity/document/environment/operational decisions. The proposal is not
+  approved for implementation or production release.
+- Separated completed demo-role metadata/idempotency checks from still-pending
+  real-user access and server-side enforcement tests. No existing unchecked
+  business-behavior or production-release gate was declared complete.
+- Validation passed: existing FOIA traceability check (300 catalog IDs and 84
+  profile IDs), documentation consistency check, whitespace checks for the four
+  updated documents, and syntax parsing of all 28 pending PowerShell files.
+  Full implementation regression and live functional tests were not run; they
+  remain PH-00 and later milestone gates respectively.
+- Planning and next-work details:
+  [Federal FOIA implementation plan](../specs/federal-foia-management/plan.md#production-hardening-increment---2026-11-04)
+  and [tasks](../specs/federal-foia-management/tasks.md).
+
+## Federal FOIA PH-00 Isolated Source Verification - 2026-11-04
+
+- Continued local source-baseline verification only; no authentication, live
+  requests, schema/data mutation, assignments, provisioning, real export/import,
+  staging, commit, push, or deployment.
+- Copied 273 source files into an isolated repository without credentials or
+  runtime evidence. Tests used mocks and their own evidence paths. Verified
+  SHA-256 hashes and file counts: all 286 original runtime-evidence files remain
+  unchanged.
+- All 15 selected standalone suites passed: Choice migration Preview,
+  Apply/rollback, dependency preparation, exact Choice verification, global
+  presentation, grid views, grid package verification, solution isolation,
+  wizard hardening, idempotency/export, forms, JSON schemas, contract integrity,
+  docs consistency, and FOIA traceability.
+- Pester 5.7.1 request-runtime suite: 19 passed, zero failed/skipped. JSON:
+  89 documents parsed and 61 payload schema matches. Traceability: 300 catalog
+  IDs and 84 profile IDs validated.
+- Reproduced the fresh-source blocker without network access: default contract
+  selection returns no overlay without local Apply evidence, leaving 29
+  rollback String definitions. Explicit contract resolution can produce all
+  26 Choices/29 Picklists; this is not end-to-end provisioning proof.
+- Grouped pending files for review without staging: 18 framework, 12 validation,
+  17 scenario, 11 guidance, and one local test-output file. Full implementation
+  review, full CI, source checkpoint approval, and clean-target reproducibility
+  remain open.
+- Updated the scenario plan/tasks with results and a proposed versioned
+  source-controlled effective-contract decision. Runtime/payload implementation
+  awaits approval; destructive migration protections must remain independent.
+
+## Federal FOIA PH-00 Reproducible Choice Contract - 2026-11-04
+
+- Operator separately approved local implementation of a versioned checked-in
+  effective Choice contract. No live operations, commits, push, or deployment
+  were authorized or performed.
+- Added `CurrentSchema` version `1.0.0` with scenario/solution/publisher binding
+  to the existing approved migration payload and schema. Normal stages
+  30/50/66/95 share its selection without local Apply evidence. Present execution
+  evidence remains validated; original String/label rollback payloads remain.
+- Schema stage preflights types/bindings and existing options before mutations,
+  creates missing Choices with bounded visibility polling, binds Picklists by
+  GUID, records IDs, and publishes scoped metadata. Incompatible text fields
+  stop rather than being skipped/deleted. Global Choice creation reuses the
+  migration stage's extracted metadata-body builder.
+- Stage 50 explicitly syncs/rechecks global Choice membership. Seed stage
+  prevalidates all numeric/label mappings and live types/bindings/options.
+  Inventory/export enforce exact current metadata and package definitions.
+  Explicit `PreMigrationBackup` retains the legacy backup route without
+  bypassing mandatory Choice checks or destructive migration approvals.
+- Fresh-source isolated transport tests passed: 26 Choices, 29 GUID-bound
+  Picklists, 97 numeric field values, 41 stable seeded record IDs, safe reruns,
+  no Preview mutations, no fabricated Apply evidence, and negative gates for
+  identity, incompatible type, unmapped input, and backup bypass.
+- All 20 selected standalone suites and 19 runtime Pester tests passed.
+  PowerShell syntax and ScriptAnalyzer 1.24.0 passed for eight changed
+  implementation/test files. JSON: 89 documents and 61 schema matches.
+  All 286 original runtime-evidence hashes remain unchanged.
+- Updated scenario spec/plan/tasks and onboarding. Remaining gates include full
+  pending-source review, applicable full CI and checkpoint commit approval,
+  separately authorized live clean-target proof, policy/design decisions, and
+  the later functional/security/release milestones. Mocked success is not a
+  claim of production readiness or live deployment.
+
+## Federal FOIA PH-00 Full Local CI And Blocked Review - 2026-11-04
+
+- Full credential-free CI equivalent passed in an isolated Windows source copy:
+  81 PowerShell files parsed, zero errors; ScriptAnalyzer 1.24.0 had zero findings
+  under repository settings; all 32 standalone suites and all 91 Pester tests
+  passed, with zero failed/skipped/not-run tests. markdownlint-cli2 0.18.1
+  checked 93 Markdown files with zero errors. Hosted Linux CI and live tests
+  were not run; this is not a security certification.
+- Original evidence integrity passed: all 286 runtime-evidence files retained
+  their SHA-256 hashes and count.
+- Source review found two migration-safety blockers despite the green suites.
+  An isolated mock proved stage 36 overwrites a valid post-Snapshot edit with
+  stale saved data (expected `100000000`, actual `100000003`; 237 mocked
+  mutations). A separate pagination probe proved Snapshot succeeds while
+  ignoring 29 advertised next pages, omitting later ownership/mapping checks.
+- These are additional mock probes, not failures of the existing CI suite and
+  not claims of historical DEV data loss. No repository runtime implementation
+  was changed in this review. No live access, export/import, staging, commit,
+  push, or deployment occurred; pre-existing local test output was untouched.
+- Checkpoint review remains blocked. Request approval for local fixes/tests,
+  including complete pagination, live/snapshot cohort comparison, and a
+  documented write-quiescence boundary; then resume the remaining source
+  review. The green suite alone does not satisfy PH-00 or production readiness.
+- Detailed findings and checkpoint exclusions:
+  [PH-00 full CI and review blockers](../specs/federal-foia-management/plan.md#ph-00-full-local-ci-and-review-blockers---2026-11-04).
+
+## Federal FOIA PH-00 Approved Migration-Safety Fixes - 2026-11-04
+
+- Operator approved local code/test/documentation fixes for both review
+  blockers. No live access, destructive execution, staging, commit, push, or
+  deployment was authorized or performed.
+- Stage 36 now reuses the paged collection reader with page-shape, cycle,
+  environment, and collection checks. Every returned data page is included in
+  ownership/mapping validation and Snapshot capture.
+- Before any mutating request, Apply compares the full binding/row/value cohort,
+  exact numeric mappings, attribute metadata identities, entity-set/primary-ID
+  identities, and rollback definitions against the saved snapshot. Drift or
+  malformed/incomplete evidence stops Apply and requires a refreshed Snapshot.
+- Expanded stateful tests use one-row pages and capture all 97 values.
+  First/late-page edits, cleared/deleted/added/duplicate rows, replaced metadata,
+  malformed bindings/restore values/definitions, late-page foreign/unmapped
+  rows, missing page values, cross-environment/collection next links, and
+  paging cycles are rejected without mutations. Empty Snapshot, healthy
+  Apply/Verify, rerun, and rollback paths pass.
+- Eight affected suites passed: migration Apply, exact migration verification,
+  current-contract reproducibility, migration Preview, dependency preparation,
+  Choice presentation, solution isolation, and idempotency/export. One initial
+  runner-path typo exited 64 before a test ran; the correctly named
+  idempotency/export suite passed. Final migration regression passed again
+  after adding explicit malformed metadata-ID rejection.
+- Syntax and pinned ScriptAnalyzer 1.24.0 passed for the three affected
+  PowerShell files. Original evidence integrity passed: 286 unchanged files
+  and SHA-256 hashes. The earlier complete 32-suite/91-Pester/full-lint run
+  predates these fixes; post-fix checks are targeted, not a second full CI run.
+- Onboarding explicitly requires an independently established write freeze
+  from Snapshot through Apply and Verify. Preflight is not a transaction,
+  concurrency lock, or authorization to migrate an active production workload.
+- Remaining gate: complete pending-source review and obtain checkpoint commit
+  approval, then resolve PH-01 policy/design decisions. All live deployment,
+  access/security testing, and production-release gates remain open.
+
+## Federal FOIA PH-00 Final Grouped Review Findings - 2026-11-04
+
+- Completed the remaining checkpoint-oriented review across 59 pending paths:
+  18 runtime/schema/profile, 13 validation, 17 scenario payload/planning/evidence,
+  and 11 guidance. The pre-existing local test XML remains excluded.
+- Reproduced an existing-global-Choice preflight gap: a wrong English label
+  did not stop Apply. It converted all 29 fields, issued 211 mock mutations,
+  and reported success; only Verify rejected the incompatible definition.
+- Reproduced an export verification gap: both FOIA views passed with OR filters
+  admitting rows without their FOIA marker. This proves a package-gate defect,
+  not a live data exposure or bypass of table permissions.
+- Reproduced a portability defect: the dependency-preparation suite exits 1
+  before tests execute when `TEMP` is unset. Hosted Linux CI was not run.
+- Resolved the new wizard skill's relative paths read-only: all six `../../`
+  links are broken because the skill is one directory deeper than the prompt
+  from which it was copied.
+- Confirmed historical evidence remains dated October 22, future managed
+  release/commit/push authorizations are false, all 26 Choices are represented
+  in the design, and the reporting filter uses the approved numeric value.
+  A limited credential-key check found zero nonempty matches in pending JSON;
+  it is not a comprehensive secret scan.
+- No repository runtime implementation changed during this review pass.
+  All defect probes used an isolated credential-free copy or process.
+  No live access, staging, commit, push, export/import, or deployment occurred.
+- Checkpoint sign-off is blocked by the four reproduced findings. Obtain one
+  consolidated local-fix/test approval, then complete applicable validation
+  before requesting commit approval. See
+  [final grouped source review](../specs/federal-foia-management/plan.md#ph-00-final-grouped-source-review---2026-11-04).
+
+## Federal FOIA PH-00 Final Corrections And Checkpoint Validation - 2026-11-04
+
+- Operator approved all four local corrections and validation. Stage 36 now
+  validates every existing global Choice before any mutation, including exact
+  labels, values, colors, global/type flags, and consistent metadata identity.
+  Compatible definitions are reused; newly created definitions are read back
+  before replacing columns.
+- Export verification now requires a mandatory primary-table FOIA conjunction,
+  rejecting OR-only, nested-OR-only, and alias-qualified marker conditions.
+  Dependency preparation supports unset `TEMP`; all six skill links now resolve.
+  Onboarding documents the guards and a write freeze covering both data and
+  customization writers. Preflight still is not a transaction or concurrency lock.
+- Targeted regressions pass: seven existing-Choice drift cases stop with zero
+  mutations; healthy reuse passes; grid checks include fourteen negative gates
+  and a positive explicit-AND case; the old broken links fail the new docs guard,
+  fixed links pass; dependency preparation passes with `TEMP` explicitly unset.
+- Fresh full credential-free Windows validation passed in a separate isolated
+  source copy: 81 PowerShell files parsed, zero findings under pinned
+  ScriptAnalyzer 1.24.0/repository settings, all 32 standalone suites, all 91
+  Pester 5.7.1 tests (zero failed/skipped/not run), and pinned Markdown lint over
+  all 88 current source Markdown files. A runner redirection initially omitted
+  Pester counters from the summary; the rerun asserted the actual result object
+  and confirmed all 91 passed. Hosted Linux CI and live validation were not run.
+- SHA-256 integrity check confirms all 286 original runtime-evidence files
+  unchanged. Exact checkpoint scope is 60 source paths: 18 runtime/schema/profile,
+  14 validation, 17 scenario payload/planning/evidence, and 11 guidance.
+  Whitespace checks pass. Credentials, runtime metrics, pre-existing local test
+  XML, packages/unpacked output, and session probes remain outside the checkpoint.
+- The four final review blockers are resolved locally. After validation, the
+  operator explicitly approved staging the exact 60 reviewed source paths and
+  creating one local checkpoint commit only. No push, live request,
+  export/import, or deployment is authorized by that approval. Historical
+  October evidence remains historical.
+- The initial staged whitespace check also covered newly added files and caught
+  trailing EOF blank lines in two Markdown files. Removed only those blank lines;
+  the commit remains gated on a successful staged recheck, without bypasses.
+  PH-01 policy/design decisions and server-enforced behavior, access tests,
+  end-to-end journeys, operations, and production-release gates remain open.
+
 ## Wizard Behavior Versions
 
 Record wizard version changes here so you can trace which behavior applied to each build.

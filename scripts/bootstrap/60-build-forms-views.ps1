@@ -584,6 +584,7 @@ function Get-DesiredFormFields {
       Label       = $attribute.Label
       Source      = 'payload'
       IsBusiness  = $eligibility.IsBusiness
+      AttributeType = $attribute.AttributeType
     }) | Out-Null
     [void]$seen.Add($logical)
     if ($eligibility.IsBusiness) {
@@ -620,6 +621,7 @@ function Get-DesiredFormFields {
         Label       = $attribute.Label
         Source      = 'fallback'
         IsBusiness  = $eligibility.IsBusiness
+        AttributeType = $attribute.AttributeType
       }) | Out-Null
       [void]$seen.Add($logical)
       if ($eligibility.IsBusiness) {
@@ -967,7 +969,8 @@ function New-FieldCellNode {
     [xml]$Document,
     [string]$FieldLogicalName,
     [string]$FieldLabel,
-    [int]$CellIndex
+    [int]$CellIndex,
+    [string]$AttributeType = ''
   )
 
   $cellId = '{0:d12}' -f $CellIndex
@@ -979,7 +982,7 @@ function New-FieldCellNode {
 
   $control = New-XmlElement -Document $Document -Name 'control' -Attributes @{
     id            = $FieldLogicalName
-    classid       = '{4273EDBD-AC1D-40d3-9FB2-095C621B552D}'
+    classid       = if ($AttributeType -eq 'Picklist') { '{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}' } else { '{4273EDBD-AC1D-40d3-9FB2-095C621B552D}' }
     datafieldname = $FieldLogicalName
     disabled      = 'false'
   }
@@ -1120,11 +1123,11 @@ function Add-FieldsToRows {
 
   for ($index = 0; $index -lt $Fields.Count; $index += 2) {
     $rowNode = New-XmlElement -Document $Document -Name 'row'
-    [void]$rowNode.AppendChild((New-FieldCellNode -Document $Document -FieldLogicalName $Fields[$index].LogicalName -FieldLabel $Fields[$index].Label -CellIndex $CellIndex.Value))
+    [void]$rowNode.AppendChild((New-FieldCellNode -Document $Document -FieldLogicalName $Fields[$index].LogicalName -FieldLabel $Fields[$index].Label -CellIndex $CellIndex.Value -AttributeType (Get-PropertyValue -Object $Fields[$index] -Name 'AttributeType' -Default '')))
     $CellIndex.Value++
 
     if ($index + 1 -lt $Fields.Count) {
-      [void]$rowNode.AppendChild((New-FieldCellNode -Document $Document -FieldLogicalName $Fields[$index + 1].LogicalName -FieldLabel $Fields[$index + 1].Label -CellIndex $CellIndex.Value))
+      [void]$rowNode.AppendChild((New-FieldCellNode -Document $Document -FieldLogicalName $Fields[$index + 1].LogicalName -FieldLabel $Fields[$index + 1].Label -CellIndex $CellIndex.Value -AttributeType (Get-PropertyValue -Object $Fields[$index + 1] -Name 'AttributeType' -Default '')))
       $CellIndex.Value++
     } else {
       [void]$rowNode.AppendChild((New-EmptyCellNode -Document $Document -CellIndex $CellIndex.Value))

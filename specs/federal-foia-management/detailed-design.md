@@ -35,7 +35,7 @@ must never be reused. New values append above the current maximum.
 |  | 100000005 | FOIA.gov |
 |  | 100000006 | API |
 | `foia_validationstate` | 100000000 | Pending |
-|  | 100000001 | Valid |
+|  | 100000001 | Perfected |
 |  | 100000002 | Correction required |
 |  | 100000003 | Rejected |
 | `foia_requestlifecycle` | 100000000 | Intake |
@@ -61,6 +61,7 @@ must never be reused. New values append above the current maximum.
 |  | 100000004 | Rejected |
 |  | 100000005 | Returned |
 |  | 100000006 | Superseded |
+|  | 100000007 | Released |
 | `foia_reviewtype` | 100000000 | Responsiveness |
 |  | 100000001 | Segregability |
 |  | 100000002 | Legal |
@@ -73,6 +74,7 @@ must never be reused. New values append above the current maximum.
 |  | 100000004 | Withdrawn |
 |  | 100000005 | Duplicate |
 |  | 100000006 | Other closure |
+|  | 100000007 | Open |
 | `foia_feecategory` | 100000000 | Commercial |
 |  | 100000001 | Educational or scientific |
 |  | 100000002 | News media |
@@ -105,6 +107,96 @@ must never be reused. New values append above the current maximum.
 |  | 100000001 | Accepted |
 |  | 100000002 | Rejected |
 |  | 100000003 | Superseded |
+
+### Additional Choices For The Schema-Normalization Retrofit
+
+These global choices complete the approved categorical-field audit. Values are
+stable once published and must be added to `FederalFOIAManagement` explicitly.
+
+| Choice | Stable value | Label |
+| --- | ---: | --- |
+| `foia_aioperation` | 100000000 | Summarization |
+|  | 100000001 | Classification |
+|  | 100000002 | Duplicate detection |
+|  | 100000003 | Search recommendation |
+|  | 100000004 | OCR enhancement |
+|  | 100000005 | Relevance ranking |
+|  | 100000006 | Draft generation |
+| `foia_appealoutcome` | 100000000 | Open |
+|  | 100000001 | Upheld |
+|  | 100000002 | Remanded |
+|  | 100000003 | Modified |
+|  | 100000004 | Withdrawn |
+|  | 100000005 | Dismissed |
+|  | 100000006 | Closed |
+| `foia_appealstage` | 100000000 | Appeal intake |
+|  | 100000001 | Validation |
+|  | 100000002 | Reconsideration and legal review |
+|  | 100000003 | Appeal decision |
+|  | 100000004 | Response |
+|  | 100000005 | Closure |
+| `foia_clocktype` | 100000000 | Request |
+|  | 100000001 | Appeal |
+| `foia_expediteddecision` | 100000000 | Pending |
+|  | 100000001 | Granted |
+|  | 100000002 | Denied |
+| `foia_redactionstate` | 100000000 | Proposed |
+|  | 100000001 | Pending approval |
+|  | 100000002 | Approved |
+|  | 100000003 | Applied |
+|  | 100000004 | Rejected |
+|  | 100000005 | Superseded |
+| `foia_releasemethod` | 100000000 | Secure portal |
+|  | 100000001 | Email |
+|  | 100000002 | Mail |
+|  | 100000003 | In person |
+|  | 100000004 | Other |
+| `foia_recordaccessstate` | 100000000 | Pending verification |
+|  | 100000001 | Verified |
+|  | 100000002 | Restricted |
+|  | 100000003 | Released copy |
+|  | 100000004 | Unavailable |
+| `foia_recordclassification` | 100000000 | Unclassified |
+|  | 100000001 | Synthetic unclassified |
+|  | 100000002 | PII |
+|  | 100000003 | PHI |
+|  | 100000004 | CUI |
+|  | 100000005 | Classified |
+|  | 100000006 | Other |
+| `foia_repositorytype` | 100000000 | SharePoint |
+|  | 100000001 | Dataverse file |
+|  | 100000002 | External governed repository |
+|  | 100000003 | Other |
+| `foia_recordreviewstate` | 100000000 | Collected |
+|  | 100000001 | Responsive |
+|  | 100000002 | Nonresponsive |
+|  | 100000003 | Duplicate |
+|  | 100000004 | Out of scope |
+|  | 100000005 | Referral |
+|  | 100000006 | Consultation |
+|  | 100000007 | Further legal review |
+|  | 100000008 | Redacted |
+|  | 100000009 | Released |
+| `foia_reviewdisposition` | 100000000 | Responsive |
+|  | 100000001 | Nonresponsive |
+|  | 100000002 | Partial exemption |
+|  | 100000003 | Full exemption |
+|  | 100000004 | Approved for release |
+|  | 100000005 | Returned |
+|  | 100000006 | Superseded |
+| `foia_caseworktype` | 100000000 | Normal |
+|  | 100000001 | Expedited |
+|  | 100000002 | Overdue |
+|  | 100000003 | Fee |
+|  | 100000004 | Exemption |
+|  | 100000005 | Released |
+|  | 100000006 | Appealed |
+| `foia_collectionsource` | 100000000 | SharePoint |
+|  | 100000001 | OneDrive |
+|  | 100000002 | Exchange |
+|  | 100000003 | Teams |
+|  | 100000004 | File share |
+|  | 100000005 | Other |
 
 ## Business Process Stage And Field Contract
 

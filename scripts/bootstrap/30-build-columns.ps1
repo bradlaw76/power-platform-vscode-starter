@@ -104,6 +104,11 @@ $scenarioContext = if (Get-Command Get-WizardScenarioContext -ErrorAction Silent
 } else { $null }
 $solutionName = if (Get-Variable global:DV_SOLUTION_NAME -ErrorAction SilentlyContinue) { $global:DV_SOLUTION_NAME } elseif ($env:DV_SOLUTION_NAME) { $env:DV_SOLUTION_NAME } else { '' }
 $publisherPrefix = if (Get-Variable global:DV_PUBLISHER_PREFIX -ErrorAction SilentlyContinue) { $global:DV_PUBLISHER_PREFIX } elseif ($env:DV_PUBLISHER_PREFIX) { $env:DV_PUBLISHER_PREFIX } else { '' }
+. (Join-Path $PSScriptRoot 'helpers/choice-migration-verification.ps1')
+$choiceMigration = $null
+if ($null -ne $scenarioContext) {
+    $choiceMigration = Get-WizardEffectiveChoiceContract -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -PayloadsFolder $PayloadsFolder -SolutionUniqueName $solutionName -PublisherPrefix $publisherPrefix
+}
 if (-not $PreviewOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
     Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix | Out-Null
 }
@@ -151,6 +156,20 @@ if ($payloads.Count -eq 0) {
 }
 
 $created = 0; $skipped = 0; $failed = 0
+$globalChoiceIds = @{}
+if ($null -ne $choiceMigration) {
+    $invokeChoices = { param($method, $path, $body) Invoke-Dv $method $path $(if ($null -eq $body) { '' } else { $body | ConvertTo-Json -Depth 30 -Compress }) }
+    $choiceArguments = @{ Payload = $choiceMigration; ScenarioSlug = $scenarioContext.ScenarioSlug; Invoke = $invokeChoices; PreviewOnly = $PreviewOnly }
+    if ($null -ne $SleepAction) { $choiceArguments.SleepAction = $SleepAction }
+    $choiceResults = @(Initialize-WizardCurrentChoices @choiceArguments)
+    foreach ($result in $choiceResults) {
+        $globalChoiceIds[$result.Name] = $result.MetadataId
+        Write-Host "  Global Choice: $($result.Name) ($($result.Action))" -ForegroundColor DarkGray
+        if (-not $PreviewOnly) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $scenarioContext.ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'global-choice' -Name $result.Name -Status $(if ($result.Action -eq 'existing') { 'skipped' } else { 'created' }) -Step '30-build-columns.ps1' -Details @{ metadataId = $result.MetadataId } | Out-Null
+        }
+    }
+}
 
 foreach ($file in $payloads) {
     $doc = Get-Content $file.FullName -Raw | ConvertFrom-Json
@@ -182,6 +201,9 @@ foreach ($file in $payloads) {
         }
 
             $logical = $logical.Trim()
+        if ($null -ne $choiceMigration) {
+            $col = ConvertTo-WizardMigratedColumn -Payload $choiceMigration -TableLogicalName $tableName -Column $col
+        }
         Write-Host "    $logical " -NoNewline
 
         if (Test-ColumnExists $tableName $logical) {
@@ -201,6 +223,13 @@ foreach ($file in $payloads) {
         try {
             if ([string]::IsNullOrWhiteSpace($col.LogicalName)) {
                 $col.LogicalName = $logical
+            }
+            if ($null -ne $choiceMigration -and $col.PSObject.Properties.Name -contains 'GlobalOptionSet@odata.bind') {
+                $binding = @($choiceMigration.Bindings | Where-Object {
+                    $_.TableLogicalName -eq $tableName -and $_.ColumnLogicalName -eq $logical
+                })
+                if ($binding.Count -ne 1) { throw 'Migrated column global Choice did not resolve uniquely.' }
+                $col.'GlobalOptionSet@odata.bind' = "/GlobalOptionSetDefinitions($([guid]$globalChoiceIds[$binding[0].GlobalChoiceName]))"
             }
             $body = $col | ConvertTo-Json -Depth 20 -Compress
             Invoke-Dv "Post" "EntityDefinitions(LogicalName='$tableName')/Attributes" $body | Out-Null
@@ -267,6 +296,11 @@ if ($failed -gt 0) {
     exit 1
 }
 Write-Host ""
+if ($null -ne $choiceMigration -and -not $PreviewOnly) {
+    $entities = @($choiceMigration.Bindings.TableLogicalName | Sort-Object -Unique | ForEach-Object { "<entity>$_</entity>" }) -join ''
+    $choices = @($choiceMigration.GlobalChoices.Name | ForEach-Object { "<optionset>$_</optionset>" }) -join ''
+    Invoke-Dv 'Post' 'PublishXml' (@{ ParameterXml = "<importexportxml><entities>$entities</entities><optionsets>$choices</optionsets></importexportxml>" } | ConvertTo-Json -Compress) | Out-Null
+}
 Write-Host "Next step: pwsh ./scripts/bootstrap/40-build-relationships.ps1"
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Column build completed."

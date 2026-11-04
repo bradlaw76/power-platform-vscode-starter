@@ -1,0 +1,136 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://power-platform-vscode-starter.local/schemas/payloads/choice-migration.schema.json",
+  "title": "Dataverse choice-column migration payload",
+  "type": "object",
+  "required": [
+    "Enabled",
+    "MigrationId",
+    "Destructive",
+    "RequiresSeparateApplyApproval",
+    "SyntheticOnly",
+    "GlobalChoices",
+    "Bindings"
+  ],
+  "properties": {
+    "CurrentSchema": {
+      "type": "object",
+      "required": ["Version", "ScenarioSlug", "SolutionUniqueName", "PublisherPrefix"],
+      "properties": {
+        "Version": { "const": "1.0.0" },
+        "ScenarioSlug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+        "SolutionUniqueName": { "$ref": "#/definitions/logicalName" },
+        "PublisherPrefix": { "$ref": "#/definitions/logicalName" }
+      },
+      "additionalProperties": false
+    },
+    "Enabled": {
+      "const": true
+    },
+    "MigrationId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "Destructive": {
+      "const": true
+    },
+    "RequiresSeparateApplyApproval": {
+      "const": true
+    },
+    "SyntheticOnly": {
+      "const": true
+    },
+    "GlobalChoices": {
+      "type": "array",
+      "minItems": 26,
+      "maxItems": 26,
+      "items": {
+        "type": "object",
+        "required": [
+          "Name",
+          "DisplayName",
+          "Options"
+        ],
+        "properties": {
+          "Name": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "DisplayName": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Options": {
+            "type": "array",
+            "minItems": 2,
+            "items": {
+              "type": "object",
+              "required": [
+                "Value",
+                "Label"
+              ],
+              "properties": {
+                "Value": {
+                  "type": "integer",
+                  "minimum": 100000000
+                },
+                "Label": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "Icon": {
+                  "enum": ["none", "circle-filled", "diamond-filled", "diamond-outline", "info", "square-filled", "triangle-filled", "triangle-outline", "warning"]
+                },
+                "ColorToken": {
+                  "enum": ["pastel-apricot", "pastel-blue", "pastel-gray", "pastel-lavender", "pastel-mint", "pastel-peach", "pastel-rose", "pastel-yellow"]
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "Bindings": {
+      "type": "array",
+      "minItems": 29,
+      "maxItems": 29,
+      "items": {
+        "type": "object",
+        "required": [
+          "TableLogicalName",
+          "ColumnLogicalName",
+          "GlobalChoiceName",
+          "ValueMap"
+        ],
+        "properties": {
+          "TableLogicalName": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "ColumnLogicalName": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "GlobalChoiceName": {
+            "$ref": "#/definitions/logicalName"
+          },
+          "ValueMap": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "integer",
+              "minimum": 100000000
+            }
+          }
+        },
+        "additionalProperties": false
+      }
+    }
+  },
+  "additionalProperties": false,
+  "definitions": {
+    "logicalName": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    }
+  }
+}

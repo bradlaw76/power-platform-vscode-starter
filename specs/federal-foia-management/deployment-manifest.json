@@ -29,7 +29,11 @@
       "55-build-business-process-flows:validate-two-process-payloads-and-integrate-only-existing-designer-authored-bpfs",
       "60-build-forms-views:create-13-wizard-owned-main-forms-and-implement-13-explicit-public-views",
       "64-build-charts-dashboard:create-8-native-charts-and-5-native-dashboards",
-      "68-build-security-roles:create-three-bounded-demo-roles-without-assignments"
+      "68-build-security-roles:create-three-bounded-demo-roles-without-assignments",
+      "36-apply-choice-migration:replace-29-approved-text-fields-and-restore-demo-values-and-references",
+      "38-style-global-choices:162-existing-option-labels-and-colors-only",
+      "maker-grid-controls:13-read-only-color-enabled-Web-grids-preserving-mobile-selections",
+      "61-build-grid-choice-views:two-new-FOIA-named-Contact-Case-views-and-scoped-app-linkage"
     ],
     "schemaApplyAuthorized": true,
     "authorizedSchemaStages": [
@@ -59,16 +63,19 @@
     "authorizationReferences": [
       "interactive-approval-2026-10-07-publisher-and-solution-only",
       "interactive-approval-2026-10-15-bounded-demo-security-roles",
-      "interactive-approval-2026-10-15-updated-unmanaged-export"
+      "interactive-approval-2026-10-15-updated-unmanaged-export",
+      "Operator chat 2026-10-22: surgical replacement confirmed for all 29 approved categorical text fields; synthetic demo only",
+      "interactive-approval-2026-10-22-choice-presentation-5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48",
+      "Operator chat 2026-10-22: enable grid colors; Contact and Case authorized provided new views have FOIA in their names"
     ]
   },
   "finalMembershipGate": {
-    "verifiedAtUtc": "2026-10-15T20:46:06.6415583Z",
+    "verifiedAtUtc": "2026-10-22T19:59:39.9412742Z",
     "strictIsolation": true,
     "exportAllowed": true,
     "counts": {
       "added": 0,
-      "alreadyInSolution": 235,
+      "alreadyInSolution": 263,
       "failed": 0,
       "missing": 0,
       "unauthorized": 0
@@ -76,29 +83,35 @@
     "reportPath": ".wizard-metrics/artifacts/contamination/federal-foia-management/solution-membership-report.json"
   },
   "unmanagedExportInspection": {
-    "verifiedAtUtc": "2026-10-15T21:07:02.2329330Z",
+    "verifiedAtUtc": "2026-10-22T20:00:13Z",
     "managed": false,
     "importPermitted": false,
-    "membershipItemCount": 235,
-    "inheritedMembershipItemCount": 198,
-    "rootComponentsExpected": 27,
-    "rootComponentsMatched": 27,
+    "membershipItemCount": 263,
+    "inheritedMembershipItemCount": 171,
+    "rootComponentsExpected": 53,
+    "rootComponentsMatched": 53,
     "missingRootComponents": 0,
     "unrelatedRootComponents": 0,
-    "unpackedFileCount": 217,
-    "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
+    "unpackedFileCount": 245,
+    "evidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json",
+    "zipSha256": "0243CE764FA103462585648FFA0911CEAACFFA3117B6FCB2CA89E3426A07D5D1"
   },
   "idempotencyVerification": {
-    "baselineCapturedAtUtc": "2026-10-15T20:32:01.7289571Z",
-    "verifiedAtUtc": "2026-10-15T20:46:08.7957224Z",
-    "identityCount": 676,
+    "baselineCapturedAtUtc": "2026-10-22T19:56:27Z",
+    "verifiedAtUtc": "2026-10-22T19:59:40.1724054Z",
+    "identityCount": 706,
+    "preGridIdentityCount": 702,
+    "allPreGridIdentitiesUnchanged": true,
+    "approvedAddedIdentityEntries": 4,
+    "baselineTransitionEvidencePath": ".wizard-metrics/artifacts/grid-controls/federal-foia-management/baseline-transition.json",
     "stableIds": true,
     "duplicateCount": 0,
     "failureCount": 0,
     "secondPassActions": {
-      "reportingSkipped": 13,
+      "reportingSkipped": 6,
       "syntheticDataUpdated": 41,
-      "securityRolesSkipped": 3
+      "securityRolesSkipped": 3,
+      "reportingUpdated": 7
     },
     "evidencePath": ".wizard-metrics/artifacts/idempotency/federal-foia-management/verification.json"
   },
@@ -369,16 +382,18 @@
       {
         "tableLogicalName": "contact",
         "logicalName": "foia_requesterclassification",
-        "liveId": "4a23ca56-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "f89b5145-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-DAT-002",
           "FOIA-RPT-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-contact.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_feecategory",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "contact",
@@ -438,15 +453,17 @@
       {
         "tableLogicalName": "foia_aiassistancerecord",
         "logicalName": "foia_operationalstatus",
-        "liveId": "2c083596-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "b036104b-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-AI-005"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_adapterstatus",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_aiassistancerecord",
@@ -478,15 +495,17 @@
       {
         "tableLogicalName": "foia_aiassistancerecord",
         "logicalName": "foia_operationclassification",
-        "liveId": "98e85ba8-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "a099534b-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-AI-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_aioperation",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_aiassistancerecord",
@@ -530,15 +549,17 @@
       {
         "tableLogicalName": "foia_aiassistancerecord",
         "logicalName": "foia_reviewerdisposition",
-        "liveId": "4a5053c0-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "b499534b-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-AI-003"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_aidisposition",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_aiassistancerecord",
@@ -651,15 +672,17 @@
       {
         "tableLogicalName": "foia_appeal",
         "logicalName": "foia_stage",
-        "liveId": "3e727ff1-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "d999534b-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_appealstage",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_appeal",
@@ -677,15 +700,17 @@
       {
         "tableLogicalName": "foia_appeal",
         "logicalName": "foia_outcome",
-        "liveId": "a98ed6fd-53c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "d299534b-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-006"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_appealoutcome",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_appeal",
@@ -718,15 +743,17 @@
       {
         "tableLogicalName": "foia_auditevent",
         "logicalName": "foia_eventtype",
-        "liveId": "c38cd410-54c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "dd99534b-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-SEC-006"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_auditaction",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_auditevent",
@@ -824,29 +851,33 @@
       {
         "tableLogicalName": "foia_clockevent",
         "logicalName": "foia_clocktype",
-        "liveId": "00a1573f-54c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "09077251-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-002",
           "FOIA-CLK-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_clocktype",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_clockevent",
         "logicalName": "foia_eventtype",
-        "liveId": "7d6d4b46-54c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "2a470d51-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CLK-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_clockeventtype",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_clockevent",
@@ -996,16 +1027,18 @@
       {
         "tableLogicalName": "foia_exemptiondecision",
         "logicalName": "foia_approvalstate",
-        "liveId": "f31a5b88-54c3-f111-aaae-001dd80816e7",
-        "attributeType": "String",
+        "liveId": "d48c9750-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-005",
           "FOIA-REV-003"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_approvalstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_exemptiondecision",
@@ -1090,41 +1123,47 @@
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_intakechannel",
-        "liveId": "e14bc854-55c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "61077251-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-INT-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_intakechannel",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_validationstate",
-        "liveId": "29e6185b-55c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "df2e2257-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-INT-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_validationstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_lifecyclestage",
-        "liveId": "80994361-55c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "bb2e2257-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_requestlifecycle",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
@@ -1233,15 +1272,17 @@
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_expediteddecision",
-        "liveId": "d843e396-55c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "2f077251-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-RPT-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_expediteddecision",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
@@ -1259,28 +1300,32 @@
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_disposition",
-        "liveId": "946938a0-55c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "de8c9750-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-RPT-003"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_disposition",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
         "logicalName": "foia_feecategory",
-        "liveId": "8ebde3a3-55c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "9c470d51-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-RPT-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_feecategory",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_foiarequest",
@@ -1404,15 +1449,17 @@
       {
         "tableLogicalName": "foia_redactiondecision",
         "logicalName": "foia_finalstate",
-        "liveId": "2cb117ee-55c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "aa1da356-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-004"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_redactionstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_redactiondecision",
@@ -1510,16 +1557,18 @@
       {
         "tableLogicalName": "foia_releasepackage",
         "logicalName": "foia_approvalstate",
-        "liveId": "51c31324-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "fa2e2257-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-005",
           "FOIA-REV-005"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_approvalstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_releasepackage",
@@ -1576,15 +1625,17 @@
       {
         "tableLogicalName": "foia_releasepackage",
         "logicalName": "foia_releasemethod",
-        "liveId": "feb3213e-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "41d46c57-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-005"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_releasemethod",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_releasepackage",
@@ -1669,15 +1720,17 @@
       {
         "tableLogicalName": "foia_responsiverecord",
         "logicalName": "foia_repository",
-        "liveId": "99da2865-56c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "b77a1a5d-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-COL-004"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_repositorytype",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_responsiverecord",
@@ -1762,42 +1815,48 @@
       {
         "tableLogicalName": "foia_responsiverecord",
         "logicalName": "foia_classification",
-        "liveId": "8a92518c-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "9e199e5c-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-SEC-008"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_recordclassification",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_responsiverecord",
         "logicalName": "foia_accessstate",
-        "liveId": "39c2f092-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "c71da356-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-INT-003",
           "FOIA-SEC-009"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_recordaccessstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_responsiverecord",
         "logicalName": "foia_reviewstate",
-        "liveId": "f3492299-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "ba199e5c-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_recordreviewstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_responsiverecord",
@@ -1830,41 +1889,47 @@
       {
         "tableLogicalName": "foia_reviewtask",
         "logicalName": "foia_reviewtype",
-        "liveId": "ab54dbaa-56c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "717e675d-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_reviewtype",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_reviewtask",
         "logicalName": "foia_status",
-        "liveId": "aee343b3-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "c5199e5c-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_taskstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_reviewtask",
         "logicalName": "foia_disposition",
-        "liveId": "1c6420be-56c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "687e675d-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-REV-002"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_reviewdisposition",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_reviewtask",
@@ -1949,15 +2014,17 @@
       {
         "tableLogicalName": "foia_searchtask",
         "logicalName": "foia_collectionsourcesystem",
-        "liveId": "98898eeb-56c3-f111-aaae-001dd80bb94c",
-        "attributeType": "String",
+        "liveId": "cc7a1a5d-44ce-f111-a05b-001dd80bb94c",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-COL-001"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_collectionsource",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_searchtask",
@@ -2001,15 +2068,17 @@
       {
         "tableLogicalName": "foia_searchtask",
         "logicalName": "foia_status",
-        "liveId": "4a98c204-57c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "8b7e675d-44ce-f111-a05b-001dd80816e7",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-COL-003"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_taskstate",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "foia_searchtask",
@@ -2094,15 +2163,17 @@
       {
         "tableLogicalName": "incident",
         "logicalName": "foia_caseworktype",
-        "liveId": "47af0e2b-57c3-f111-aaae-001dd80753e2",
-        "attributeType": "String",
+        "liveId": "c52d2a63-44ce-f111-a05b-001dd80753e2",
+        "attributeType": "Picklist",
         "requirementReferences": [
           "FOIA-CAS-003"
         ],
         "payloadPath": "payloads/scenarios/federal-foia-management/columns-incident.json",
-        "result": "verified-existing",
+        "result": "migrated-and-verified",
         "published": true,
-        "membership": "verified"
+        "membership": "verified",
+        "globalChoiceName": "foia_caseworktype",
+        "migrationPayloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json"
       },
       {
         "tableLogicalName": "incident",
@@ -2787,7 +2858,1396 @@
         "membership": "verified"
       }
     ],
-    "choices": [],
+    "choices": [
+      {
+        "logicalName": "foia_intakechannel",
+        "liveId": "ae54f2a9-41ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "49dd3fd4-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Public portal",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Agency portal",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Email",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Mail room",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Staff assisted",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "FOIA.gov",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "API",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_validationstate",
+        "liveId": "a2d345d4-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "8554f1d8-41ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Pending",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Perfected",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Correction required",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Rejected",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_requestlifecycle",
+        "liveId": "75dd3fd4-41ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "9654f1d8-41ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Intake",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Clarification",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Search",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Review",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Redaction",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Approval",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Release",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Closure",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_taskstate",
+        "liveId": "9954f1d8-41ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "ef6a96da-41ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Draft",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Ready",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Assigned",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000003,
+              "Label": "In progress",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Blocked",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Submitted",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Completed",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Cancelled",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_approvalstate",
+        "liveId": "7b5757da-41ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "6aa876e0-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Draft",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Proposed",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Pending independent approval",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Approved",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Rejected",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Returned",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Superseded",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Released",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_reviewtype",
+        "liveId": "1c0a47df-41ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "ed659fe0-41ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Responsiveness",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Segregability",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Legal",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Supervisory",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Final release",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_disposition",
+        "liveId": "ee659fe0-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "d0e52de7-41ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Full grant",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Partial grant",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Full denial",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000003,
+              "Label": "No records",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Withdrawn",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Duplicate",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Other closure",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Open",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_feecategory",
+        "liveId": "dee52de7-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "b0489ce5-41ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Commercial",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Educational or scientific",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "News media",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Other",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_clockeventtype",
+        "liveId": "b1489ce5-41ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "c2d6e0ec-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Received",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Perfected",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Toll started",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Toll ended",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Extension applied",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Due date recalculated",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Appeal received",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Appeal due date calculated",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000008,
+              "Label": "Closed",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000009,
+              "Label": "Correction",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_auditaction",
+        "liveId": "7b3045ed-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "792e2af3-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "View sensitive content",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Download",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Export",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Package inclusion",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Approval",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Release",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Permission change",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Configuration change",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_adapterstatus",
+        "liveId": "7c2e2af3-41ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "777b1ef8-41ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Disabled",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Ready",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Running",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Succeeded",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Unavailable",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Failed",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_aidisposition",
+        "liveId": "9dff2bf9-41ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "a6ff2bf9-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Pending human review",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Accepted",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Rejected",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Superseded",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_aioperation",
+        "liveId": "a48c3af9-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "ae8c3af9-41ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Summarization",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Classification",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Duplicate detection",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Search recommendation",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "OCR enhancement",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Relevance ranking",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Draft generation",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_appealoutcome",
+        "liveId": "b87b1ef8-41ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "865c8dfe-41ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Open",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Upheld",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Remanded",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Modified",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Withdrawn",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Dismissed",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Closed",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_appealstage",
+        "liveId": "0a8d3af9-41ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "05f653ff-41ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Appeal intake",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Validation",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Reconsideration and legal review",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Appeal decision",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Response",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Closure",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_clocktype",
+        "liveId": "06f653ff-41ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "8b189b04-42ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Request",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Appeal",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_expediteddecision",
+        "liveId": "16a99105-42ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "39a99105-42ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Pending",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Granted",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Denied",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_redactionstate",
+        "liveId": "3aa99105-42ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "af3b0a07-42ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Proposed",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Pending approval",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Approved",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Applied",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Rejected",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Superseded",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_releasemethod",
+        "liveId": "ea2cb50a-42ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "ee2cb50a-42ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Secure portal",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Email",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Mail",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "In person",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Other",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_recordaccessstate",
+        "liveId": "ef2cb50a-42ce-f111-a05b-001dd80753e2",
+        "solutionComponentId": "8c3c8f0b-42ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Pending verification",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Verified",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Restricted",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Released copy",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Unavailable",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_recordclassification",
+        "liveId": "8f3c8f0b-42ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "6453ff12-42ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Unclassified",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Synthetic unclassified",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "PII",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000003,
+              "Label": "PHI",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000004,
+              "Label": "CUI",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Classified",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Other",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_repositorytype",
+        "liveId": "044d8c11-42ce-f111-a05b-001dd80bb94c",
+        "solutionComponentId": "8153ff12-42ce-f111-a05b-001dd80753e2",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "SharePoint",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Dataverse file",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "External governed repository",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Other",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_recordreviewstate",
+        "liveId": "36fece13-42ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "0a4d8c11-42ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Collected",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Responsive",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Nonresponsive",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Duplicate",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Out of scope",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Referral",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Consultation",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000007,
+              "Label": "Further legal review",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000008,
+              "Label": "Redacted",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000009,
+              "Label": "Released",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_reviewdisposition",
+        "liveId": "3efece13-42ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "75fece13-42ce-f111-a05b-001dd80816e7",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Responsive",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Nonresponsive",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Partial exemption",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Full exemption",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Approved for release",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Returned",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Superseded",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_caseworktype",
+        "liveId": "77fece13-42ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "4db28417-42ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "Normal",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "Expedited",
+              "Icon": "triangle-outline",
+              "ColorToken": "pastel-yellow"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Overdue",
+              "Icon": "warning",
+              "ColorToken": "pastel-rose"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Fee",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "Exemption",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Released",
+              "Icon": "circle-filled",
+              "ColorToken": "pastel-mint"
+            },
+            {
+              "Value": 100000006,
+              "Label": "Appealed",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      },
+      {
+        "logicalName": "foia_collectionsource",
+        "liveId": "8992f419-42ce-f111-a05b-001dd80816e7",
+        "solutionComponentId": "14fd7c1d-42ce-f111-a05b-001dd80bb94c",
+        "componentType": 9,
+        "isGlobal": true,
+        "result": "verified-existing",
+        "membership": "verified",
+        "payloadPath": "payloads/scenarios/federal-foia-management/choice-migration-federal-foia-management.json",
+        "presentation": {
+          "status": "verified-live-and-export",
+          "options": [
+            {
+              "Value": 100000000,
+              "Label": "SharePoint",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000001,
+              "Label": "OneDrive",
+              "Icon": "diamond-filled",
+              "ColorToken": "pastel-lavender"
+            },
+            {
+              "Value": 100000002,
+              "Label": "Exchange",
+              "Icon": "triangle-filled",
+              "ColorToken": "pastel-peach"
+            },
+            {
+              "Value": 100000003,
+              "Label": "Teams",
+              "Icon": "diamond-outline",
+              "ColorToken": "pastel-apricot"
+            },
+            {
+              "Value": 100000004,
+              "Label": "File share",
+              "Icon": "info",
+              "ColorToken": "pastel-blue"
+            },
+            {
+              "Value": 100000005,
+              "Label": "Other",
+              "Icon": "square-filled",
+              "ColorToken": "pastel-gray"
+            }
+          ],
+          "planHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48"
+        }
+      }
+    ],
     "alternateKeys": [
       {
         "tableLogicalName": "foia_aiassistancerecord",
@@ -2990,51 +4450,340 @@
       }
     ],
     "forms": [
-      {"tableLogicalName": "contact", "name": "Starter Main Form", "liveId": "40657ef3-62c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_aiassistancerecord", "name": "Starter Main Form", "liveId": "2a2ffa01-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_appeal", "name": "FOIA Appeal Main", "liveId": "18ec340b-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_auditevent", "name": "Starter Main Form", "liveId": "d95dc51a-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_clockevent", "name": "Starter Main Form", "liveId": "c2ea372e-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_exemptiondecision", "name": "Starter Main Form", "liveId": "2366d437-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_foiarequest", "name": "FOIA Request Main", "liveId": "7f4a2b4a-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_redactiondecision", "name": "Starter Main Form", "liveId": "26c0f760-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_releasepackage", "name": "Starter Main Form", "liveId": "e5897874-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_responsiverecord", "name": "Starter Main Form", "liveId": "76546381-63c6-f111-aaae-001dd80816e7", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_reviewtask", "name": "Starter Main Form", "liveId": "09e6828f-63c6-f111-aaae-001dd80bb94c", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_searchtask", "name": "Starter Main Form", "liveId": "edbdd59e-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "incident", "name": "Starter Main Form", "liveId": "af4ab8af-63c6-f111-aaae-001dd80753e2", "result": "verified-existing", "published": true}
+      {
+        "tableLogicalName": "contact",
+        "name": "Starter Main Form",
+        "liveId": "40657ef3-62c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "name": "Starter Main Form",
+        "liveId": "2a2ffa01-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "name": "FOIA Appeal Main",
+        "liveId": "18ec340b-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "name": "Starter Main Form",
+        "liveId": "d95dc51a-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "name": "Starter Main Form",
+        "liveId": "c2ea372e-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "name": "Starter Main Form",
+        "liveId": "2366d437-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "name": "FOIA Request Main",
+        "liveId": "7f4a2b4a-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "name": "Starter Main Form",
+        "liveId": "26c0f760-63c6-f111-aaae-001dd80bb94c",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "name": "Starter Main Form",
+        "liveId": "e5897874-63c6-f111-aaae-001dd80bb94c",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "name": "Starter Main Form",
+        "liveId": "76546381-63c6-f111-aaae-001dd80816e7",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "name": "Starter Main Form",
+        "liveId": "09e6828f-63c6-f111-aaae-001dd80bb94c",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "name": "Starter Main Form",
+        "liveId": "edbdd59e-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "incident",
+        "name": "Starter Main Form",
+        "liveId": "af4ab8af-63c6-f111-aaae-001dd80753e2",
+        "result": "verified-existing",
+        "published": true
+      }
     ],
     "views": [
-      {"tableLogicalName": "contact", "name": "FOIA Requesters", "liveId": "a1d4e0dd-61c6-f111-aaae-001dd80bb94c", "disposition": "create-custom", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_aiassistancerecord", "name": "Active AI Assistance Records", "liveId": "3f6d7a12-fd09-403d-9a27-28487a2afdb7", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_appeal", "name": "Active Appeals", "liveId": "6f678b18-2400-49d0-b437-5baa5fd4d8d2", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_auditevent", "name": "Active Audit Events", "liveId": "662a7644-4168-4c2d-b7f4-6dc9f8c9170f", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_clockevent", "name": "Active Clock Events", "liveId": "4facefe8-84dd-4597-897f-e5c4a104ddbb", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_exemptiondecision", "name": "Active Exemption Decisions", "liveId": "a982275c-26aa-46d3-b394-6cef51b4b61a", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_foiarequest", "name": "Active FOIA Requests", "liveId": "3e922e74-957e-43c3-8595-683ce84d643d", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_redactiondecision", "name": "Active Redaction Decisions", "liveId": "d4c06148-5167-4f97-b6ea-d943cff420ce", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_releasepackage", "name": "Active Release Packages", "liveId": "b6347d45-740b-4764-9ccc-fed6e6ec014a", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_responsiverecord", "name": "Active Responsive Records", "liveId": "016cd4f6-9aa7-4b36-b526-feef5b71a896", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_reviewtask", "name": "Active Review Tasks", "liveId": "0d7864b2-cc6c-4c8a-9aa1-09a57a11b6b2", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "foia_searchtask", "name": "Active Search Tasks", "liveId": "c9803fe4-54e9-4a31-822e-a024b9983f1b", "disposition": "adopt-generated-active", "result": "verified-existing", "published": true},
-      {"tableLogicalName": "incident", "name": "Active FOIA Case Work", "liveId": "fc5e5e9a-62c6-f111-aaae-001dd80753e2", "disposition": "create-custom", "result": "verified-existing", "published": true}
+      {
+        "tableLogicalName": "contact",
+        "name": "FOIA Requesters",
+        "liveId": "a1d4e0dd-61c6-f111-aaae-001dd80bb94c",
+        "disposition": "create-custom",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_aiassistancerecord",
+        "name": "Active AI Assistance Records",
+        "liveId": "3f6d7a12-fd09-403d-9a27-28487a2afdb7",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_appeal",
+        "name": "Active Appeals",
+        "liveId": "6f678b18-2400-49d0-b437-5baa5fd4d8d2",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_auditevent",
+        "name": "Active Audit Events",
+        "liveId": "662a7644-4168-4c2d-b7f4-6dc9f8c9170f",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_clockevent",
+        "name": "Active Clock Events",
+        "liveId": "4facefe8-84dd-4597-897f-e5c4a104ddbb",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_exemptiondecision",
+        "name": "Active Exemption Decisions",
+        "liveId": "a982275c-26aa-46d3-b394-6cef51b4b61a",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_foiarequest",
+        "name": "Active FOIA Requests",
+        "liveId": "3e922e74-957e-43c3-8595-683ce84d643d",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_redactiondecision",
+        "name": "Active Redaction Decisions",
+        "liveId": "d4c06148-5167-4f97-b6ea-d943cff420ce",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_releasepackage",
+        "name": "Active Release Packages",
+        "liveId": "b6347d45-740b-4764-9ccc-fed6e6ec014a",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_responsiverecord",
+        "name": "Active Responsive Records",
+        "liveId": "016cd4f6-9aa7-4b36-b526-feef5b71a896",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_reviewtask",
+        "name": "Active Review Tasks",
+        "liveId": "0d7864b2-cc6c-4c8a-9aa1-09a57a11b6b2",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "foia_searchtask",
+        "name": "Active Search Tasks",
+        "liveId": "c9803fe4-54e9-4a31-822e-a024b9983f1b",
+        "disposition": "adopt-generated-active",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "incident",
+        "name": "Active FOIA Case Work",
+        "liveId": "fc5e5e9a-62c6-f111-aaae-001dd80753e2",
+        "disposition": "create-custom",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "contact",
+        "name": "FOIA Requester Choice Overview",
+        "liveId": "3285d88d-5f40-4cb3-8a74-baf08e711b7a",
+        "disposition": "create-custom",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "tableLogicalName": "incident",
+        "name": "FOIA Case Choice Overview",
+        "liveId": "4807ed1b-2597-4682-abf9-969d911df4d6",
+        "disposition": "create-custom",
+        "result": "verified-existing",
+        "published": true
+      }
     ],
     "charts": [
-      {"name": "Active Requests by Lifecycle Stage", "tableLogicalName": "foia_foiarequest", "liveId": "fd5bd876-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
-      {"name": "Expedited Requests by Decision", "tableLogicalName": "foia_foiarequest", "liveId": "e220bb81-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
-      {"name": "Fees Assessed by Fiscal Period", "tableLogicalName": "foia_foiarequest", "liveId": "c2cc678d-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
-      {"name": "Appeals by Outcome", "tableLogicalName": "foia_appeal", "liveId": "a1c61a95-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "inherited-from-table", "result": "verified-existing", "published": true},
-      {"name": "Approved Exemptions by Authority", "tableLogicalName": "foia_exemptiondecision", "liveId": "422dca9d-6ec6-f111-aaae-001dd80816e7", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
-      {"name": "Clock Events by Type", "tableLogicalName": "foia_clockevent", "liveId": "ebdcc7ab-6ec6-f111-aaae-001dd80bb94c", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
-      {"name": "Open Reviews by Type", "tableLogicalName": "foia_reviewtask", "liveId": "178499b5-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true},
-      {"name": "Release Packages by Approval State", "tableLogicalName": "foia_releasepackage", "liveId": "97a1e1bd-6ec6-f111-aaae-001dd80753e2", "componentType": 59, "solutionMembership": "explicit", "result": "verified-existing", "published": true}
+      {
+        "name": "Active Requests by Lifecycle Stage",
+        "tableLogicalName": "foia_foiarequest",
+        "liveId": "fd5bd876-6ec6-f111-aaae-001dd80bb94c",
+        "componentType": 59,
+        "solutionMembership": "inherited-from-table",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Expedited Requests by Decision",
+        "tableLogicalName": "foia_foiarequest",
+        "liveId": "e220bb81-6ec6-f111-aaae-001dd80753e2",
+        "componentType": 59,
+        "solutionMembership": "inherited-from-table",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Fees Assessed by Fiscal Period",
+        "tableLogicalName": "foia_foiarequest",
+        "liveId": "c2cc678d-6ec6-f111-aaae-001dd80bb94c",
+        "componentType": 59,
+        "solutionMembership": "inherited-from-table",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Appeals by Outcome",
+        "tableLogicalName": "foia_appeal",
+        "liveId": "a1c61a95-6ec6-f111-aaae-001dd80753e2",
+        "componentType": 59,
+        "solutionMembership": "inherited-from-table",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Approved Exemptions by Authority",
+        "tableLogicalName": "foia_exemptiondecision",
+        "liveId": "422dca9d-6ec6-f111-aaae-001dd80816e7",
+        "componentType": 59,
+        "solutionMembership": "explicit",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Clock Events by Type",
+        "tableLogicalName": "foia_clockevent",
+        "liveId": "ebdcc7ab-6ec6-f111-aaae-001dd80bb94c",
+        "componentType": 59,
+        "solutionMembership": "explicit",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Open Reviews by Type",
+        "tableLogicalName": "foia_reviewtask",
+        "liveId": "178499b5-6ec6-f111-aaae-001dd80753e2",
+        "componentType": 59,
+        "solutionMembership": "explicit",
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Release Packages by Approval State",
+        "tableLogicalName": "foia_releasepackage",
+        "liveId": "97a1e1bd-6ec6-f111-aaae-001dd80753e2",
+        "componentType": 59,
+        "solutionMembership": "explicit",
+        "result": "verified-existing",
+        "published": true
+      }
     ],
     "dashboards": [
-      {"name": "Federal FOIA Operations", "liveId": "3706cafb-7fc6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 3, "result": "verified-existing", "published": true},
-      {"name": "Federal FOIA Statutory Reporting", "liveId": "afea9509-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 2, "result": "verified-existing", "published": true},
-      {"name": "Federal FOIA Appeals", "liveId": "f7fb8513-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 1, "result": "verified-existing", "published": true},
-      {"name": "Federal FOIA Review Workload", "liveId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 2, "result": "verified-existing", "published": true},
-      {"name": "Federal FOIA Release Readiness", "liveId": "d15b4436-80c6-f111-aaae-001dd80753e2", "componentType": 60, "solutionMembership": "explicit", "nativeChartControlsVerified": 3, "result": "verified-existing", "published": true}
+      {
+        "name": "Federal FOIA Operations",
+        "liveId": "3706cafb-7fc6-f111-aaae-001dd80753e2",
+        "componentType": 60,
+        "solutionMembership": "explicit",
+        "nativeChartControlsVerified": 3,
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Federal FOIA Statutory Reporting",
+        "liveId": "afea9509-80c6-f111-aaae-001dd80753e2",
+        "componentType": 60,
+        "solutionMembership": "explicit",
+        "nativeChartControlsVerified": 2,
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Federal FOIA Appeals",
+        "liveId": "f7fb8513-80c6-f111-aaae-001dd80753e2",
+        "componentType": 60,
+        "solutionMembership": "explicit",
+        "nativeChartControlsVerified": 1,
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Federal FOIA Review Workload",
+        "liveId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c",
+        "componentType": 60,
+        "solutionMembership": "explicit",
+        "nativeChartControlsVerified": 2,
+        "result": "verified-existing",
+        "published": true
+      },
+      {
+        "name": "Federal FOIA Release Readiness",
+        "liveId": "d15b4436-80c6-f111-aaae-001dd80753e2",
+        "componentType": 60,
+        "solutionMembership": "explicit",
+        "nativeChartControlsVerified": 3,
+        "result": "verified-existing",
+        "published": true
+      }
     ],
     "businessProcessFlows": [
       {
@@ -3093,24 +4842,117 @@
       }
     ],
     "sitemapEntries": [
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "componentType": 62, "solutionMembership": "explicit", "group": "FOIA Operations", "tableLogicalName": "foia_foiarequest", "isEntryPoint": true, "landingView": "Active FOIA Requests"},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "contact", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "incident", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_aiassistancerecord", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_appeal", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_auditevent", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_clockevent", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_exemptiondecision", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_redactiondecision", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_releasepackage", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_responsiverecord", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_reviewtask", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "FOIA Operations", "tableLogicalName": "foia_searchtask", "isEntryPoint": false},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Appeals", "dashboardId": "f7fb8513-80c6-f111-aaae-001dd80753e2"},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Operations", "dashboardId": "3706cafb-7fc6-f111-aaae-001dd80753e2"},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Release Readiness", "dashboardId": "d15b4436-80c6-f111-aaae-001dd80753e2"},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Review Workload", "dashboardId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c"},
-      {"siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2", "group": "Dashboards", "dashboardName": "Federal FOIA Statutory Reporting", "dashboardId": "afea9509-80c6-f111-aaae-001dd80753e2"}
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "componentType": 62,
+        "solutionMembership": "explicit",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_foiarequest",
+        "isEntryPoint": true,
+        "landingView": "Active FOIA Requests"
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "contact",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "incident",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_aiassistancerecord",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_appeal",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_auditevent",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_clockevent",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_exemptiondecision",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_redactiondecision",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_releasepackage",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_responsiverecord",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_reviewtask",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "FOIA Operations",
+        "tableLogicalName": "foia_searchtask",
+        "isEntryPoint": false
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "Dashboards",
+        "dashboardName": "Federal FOIA Appeals",
+        "dashboardId": "f7fb8513-80c6-f111-aaae-001dd80753e2"
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "Dashboards",
+        "dashboardName": "Federal FOIA Operations",
+        "dashboardId": "3706cafb-7fc6-f111-aaae-001dd80753e2"
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "Dashboards",
+        "dashboardName": "Federal FOIA Release Readiness",
+        "dashboardId": "d15b4436-80c6-f111-aaae-001dd80753e2"
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "Dashboards",
+        "dashboardName": "Federal FOIA Review Workload",
+        "dashboardId": "c2a1cf23-80c6-f111-aaae-001dd80bb94c"
+      },
+      {
+        "siteMapId": "169fb0a4-11c7-f111-aaae-001dd80753e2",
+        "group": "Dashboards",
+        "dashboardName": "Federal FOIA Statutory Reporting",
+        "dashboardId": "afea9509-80c6-f111-aaae-001dd80753e2"
+      }
     ],
     "reports": [],
     "syntheticDataSets": [
@@ -3427,15 +5269,23 @@
   },
   "runSummary": {
     "startedAtUtc": "2026-10-08T00:24:04Z",
-    "completedAtUtc": "2026-10-13T14:38:02.4263644Z",
-    "result": "stage-66-passed-native-reporting-visually-verified",
+    "completedAtUtc": "2026-10-22T20:00:13Z",
+    "result": "pastel-grids-published-visually-verified-and-exported",
+    "countsScope": "Original bootstrap counts below; grid increment counts are recorded separately",
+    "gridIncrementCounts": {
+      "gridConfigurationsUpdated": 13,
+      "viewsCreated": 2,
+      "originalSharedTableViewsVerifiedUnchanged": 45,
+      "rerunViewsCreated": 0,
+      "failed": 0
+    },
     "created": 208,
     "updated": 168,
     "skipped": 184,
     "failed": 0,
     "blockedReasons": [
       "Broader end-to-end, security, accessibility, and performance validation is pending.",
-      "Data, export, commit, and push are not authorized."
+      "Additional data changes, imports, managed releases, commits, and pushes are not authorized."
     ]
   },
   "stageResults": {
@@ -3636,11 +5486,11 @@
         "Loaded authenticated environment and solution provenance when stage 64 is invoked directly.",
         "Extended bounded transport retries for Windows forcibly-closed connection errors.",
         "Compared chart and dashboard definitions semantically so Dataverse XML normalization does not trigger repeated updates.",
-        "Recognized charts inherited through include-all table roots as valid solution membership alongside explicit component-59 rows."
-        ,"Replaced incomplete dashboard cells after visual inspection showed that VisualizationId alone does not render a native chart control."
-        ,"Validated each live dashboard control for VisualizationId, ViewId, TargetEntityType, and ChartGridMode=Chart."
-        ,"Updated chart definitions to exact working native templates for column, bar, pie, and doughnut charts, retained FetchXML aliases, removed the invalid category alias, and verified all eight aggregates return grouped data."
-        ,"The operator confirmed that all charts render in the published app after stage 66 populated the six chart-source tables."
+        "Recognized charts inherited through include-all table roots as valid solution membership alongside explicit component-59 rows.",
+        "Replaced incomplete dashboard cells after visual inspection showed that VisualizationId alone does not render a native chart control.",
+        "Validated each live dashboard control for VisualizationId, ViewId, TargetEntityType, and ChartGridMode=Chart.",
+        "Updated chart definitions to exact working native templates for column, bar, pie, and doughnut charts, retained FetchXML aliases, removed the invalid category alias, and verified all eight aggregates return grouped data.",
+        "The operator confirmed that all charts render in the published app after stage 66 populated the six chart-source tables."
       ],
       "verifiedAtUtc": "2026-10-13T16:39:20.1737579Z"
     },
@@ -3669,5 +5519,548 @@
       ],
       "verifiedAtUtc": "2026-10-13T16:39:20.1737579Z"
     }
+  },
+  "choiceMigrationVerification": {
+    "migrationId": "federal-foia-choice-normalization-v1",
+    "status": "applied-restored-verified-exported",
+    "verifiedAtUtc": "2026-10-22T18:49:29.6517582Z",
+    "globalChoiceCount": 26,
+    "picklistColumnCount": 29,
+    "restoredPopulatedValueCount": 97,
+    "stableSyntheticRecordCount": 41,
+    "restoredOrdinaryComponentCount": 33,
+    "restoredActiveBusinessProcessFlowCount": 2,
+    "attributeIdsIntentionallyReplaced": true,
+    "preMigrationBaselineArchived": true,
+    "liveAppDropdownSmokeTest": "passed",
+    "fullJourneyRehearsal": "pending",
+    "payloadStrategy": "Retained legacy definitions with approved migration overlay after matching Apply evidence",
+    "applyEvidencePath": ".wizard-metrics/artifacts/choice-migration/federal-foia-management-apply.json",
+    "verificationEvidencePath": ".wizard-metrics/artifacts/choice-migration/federal-foia-management-verification.json",
+    "inventory": [
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_intakechannel",
+        "ObjectId": "ae54f2a9-41ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "49dd3fd4-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_validationstate",
+        "ObjectId": "a2d345d4-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "8554f1d8-41ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_requestlifecycle",
+        "ObjectId": "75dd3fd4-41ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "9654f1d8-41ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_taskstate",
+        "ObjectId": "9954f1d8-41ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "ef6a96da-41ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_approvalstate",
+        "ObjectId": "7b5757da-41ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "6aa876e0-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_reviewtype",
+        "ObjectId": "1c0a47df-41ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "ed659fe0-41ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_disposition",
+        "ObjectId": "ee659fe0-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "d0e52de7-41ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_feecategory",
+        "ObjectId": "dee52de7-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "b0489ce5-41ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_clockeventtype",
+        "ObjectId": "b1489ce5-41ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "c2d6e0ec-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_auditaction",
+        "ObjectId": "7b3045ed-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "792e2af3-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_adapterstatus",
+        "ObjectId": "7c2e2af3-41ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "777b1ef8-41ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_aidisposition",
+        "ObjectId": "9dff2bf9-41ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "a6ff2bf9-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_aioperation",
+        "ObjectId": "a48c3af9-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "ae8c3af9-41ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_appealoutcome",
+        "ObjectId": "b87b1ef8-41ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "865c8dfe-41ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_appealstage",
+        "ObjectId": "0a8d3af9-41ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "05f653ff-41ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_clocktype",
+        "ObjectId": "06f653ff-41ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "8b189b04-42ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_expediteddecision",
+        "ObjectId": "16a99105-42ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "39a99105-42ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_redactionstate",
+        "ObjectId": "3aa99105-42ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "af3b0a07-42ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_releasemethod",
+        "ObjectId": "ea2cb50a-42ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "ee2cb50a-42ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_recordaccessstate",
+        "ObjectId": "ef2cb50a-42ce-f111-a05b-001dd80753e2",
+        "ComponentType": 9,
+        "SolutionComponentId": "8c3c8f0b-42ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_recordclassification",
+        "ObjectId": "8f3c8f0b-42ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "6453ff12-42ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_repositorytype",
+        "ObjectId": "044d8c11-42ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 9,
+        "SolutionComponentId": "8153ff12-42ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_recordreviewstate",
+        "ObjectId": "36fece13-42ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "0a4d8c11-42ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_reviewdisposition",
+        "ObjectId": "3efece13-42ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "75fece13-42ce-f111-a05b-001dd80816e7"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_caseworktype",
+        "ObjectId": "77fece13-42ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "4db28417-42ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "global-choice",
+        "Category": "global-choices",
+        "Name": "foia_collectionsource",
+        "ObjectId": "8992f419-42ce-f111-a05b-001dd80816e7",
+        "ComponentType": 9,
+        "SolutionComponentId": "14fd7c1d-42ce-f111-a05b-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "contact.foia_requesterclassification",
+        "ObjectId": "f89b5145-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "a0aa0f3e-45ce-f111-a05b-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_aiassistancerecord.foia_operationalstatus",
+        "ObjectId": "b036104b-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "6e99a4cd-58c3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_aiassistancerecord.foia_operationclassification",
+        "ObjectId": "a099534b-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "6e99a4cd-58c3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_aiassistancerecord.foia_reviewerdisposition",
+        "ObjectId": "b499534b-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "6e99a4cd-58c3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_appeal.foia_outcome",
+        "ObjectId": "d299534b-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "9f05d751-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_appeal.foia_stage",
+        "ObjectId": "d999534b-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "9f05d751-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_auditevent.foia_eventtype",
+        "ObjectId": "dd99534b-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "b1e48465-5ac3-f111-aaae-001dd80816e7"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_clockevent.foia_clocktype",
+        "ObjectId": "09077251-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "06e2ce7d-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_clockevent.foia_eventtype",
+        "ObjectId": "2a470d51-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "06e2ce7d-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_exemptiondecision.foia_approvalstate",
+        "ObjectId": "d48c9750-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "a1aaa396-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_disposition",
+        "ObjectId": "de8c9750-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_expediteddecision",
+        "ObjectId": "2f077251-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_feecategory",
+        "ObjectId": "9c470d51-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_intakechannel",
+        "ObjectId": "61077251-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_lifecyclestage",
+        "ObjectId": "bb2e2257-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_foiarequest.foia_validationstate",
+        "ObjectId": "df2e2257-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "a792d6a8-5ac3-f111-aaae-001dd80753e2"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_redactiondecision.foia_finalstate",
+        "ObjectId": "aa1da356-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "dd87d3b7-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_releasepackage.foia_approvalstate",
+        "ObjectId": "fa2e2257-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "9f6349ca-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_releasepackage.foia_releasemethod",
+        "ObjectId": "41d46c57-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "9f6349ca-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_responsiverecord.foia_accessstate",
+        "ObjectId": "c71da356-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "b058b1dc-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_responsiverecord.foia_classification",
+        "ObjectId": "9e199e5c-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "b058b1dc-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_responsiverecord.foia_repository",
+        "ObjectId": "b77a1a5d-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "b058b1dc-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_responsiverecord.foia_reviewstate",
+        "ObjectId": "ba199e5c-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "b058b1dc-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_reviewtask.foia_disposition",
+        "ObjectId": "687e675d-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "b9ff90ef-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_reviewtask.foia_reviewtype",
+        "ObjectId": "717e675d-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "b9ff90ef-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_reviewtask.foia_status",
+        "ObjectId": "c5199e5c-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "b9ff90ef-5ac3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_searchtask.foia_collectionsourcesystem",
+        "ObjectId": "cc7a1a5d-44ce-f111-a05b-001dd80bb94c",
+        "ComponentType": 2,
+        "SolutionComponentId": "37eded01-5bc3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "foia_searchtask.foia_status",
+        "ObjectId": "8b7e675d-44ce-f111-a05b-001dd80816e7",
+        "ComponentType": 2,
+        "SolutionComponentId": "37eded01-5bc3-f111-aaae-001dd80bb94c"
+      },
+      {
+        "Kind": "column",
+        "Category": "columns",
+        "Name": "incident.foia_caseworktype",
+        "ObjectId": "c52d2a63-44ce-f111-a05b-001dd80753e2",
+        "ComponentType": 2,
+        "SolutionComponentId": "69114444-45ce-f111-a05b-001dd80753e2"
+      }
+    ]
+  },
+  "choicePresentationVerification": {
+    "status": "applied-published-verified-exported",
+    "verifiedAtUtc": "2026-10-22T18:48:29.8934238Z",
+    "approvedPlanHash": "5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48",
+    "globalChoiceCount": 26,
+    "bindingCount": 29,
+    "optionCount": 162,
+    "settledRerunUpdateCount": 0,
+    "metadataIdsUnchanged": true,
+    "populatedValuesUnchanged": 97,
+    "semanticLabelsUnchanged": true,
+    "numericValuesUnchanged": true,
+    "originalWizardTokensReused": true,
+    "publishedAppSymbolSmokeTest": "passed",
+    "standardFormPastelBackgrounds": "not rendered by native dropdown; metadata configured",
+    "gridControlsChangedDuringThisPresentationStage": false,
+    "evidencePath": ".wizard-metrics/artifacts/choice-presentations/federal-foia-management/verification.json",
+    "originalMetadataBackupPath": ".wizard-metrics/artifacts/choice-presentations/federal-foia-management/original-5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48.json",
+    "palette": {
+      "mint": "#C8E6C9",
+      "apricot": "#FFD1A3",
+      "gray": "#D9E1E8",
+      "blue": "#B9DDF5",
+      "yellow": "#F7E7A9",
+      "lavender": "#D8C4F1",
+      "peach": "#FAD7A0",
+      "rose": "#F5BEC8"
+    }
+  },
+  "gridControlVerification": {
+      "status": "configured-published-visually-verified-exported",
+      "verifiedAtUtc": "2026-10-22T20:00:13Z",
+      "runtimeControl": "Microsoft.PowerApps.PowerAppsOneGrid",
+      "client": "Web",
+      "tableCount": 13,
+      "enableEditing": false,
+      "optionSetColors": true,
+      "configurationMethod": "Supported classic solution explorer controls UI; no internal control metadata writes or fabricated solution imports",
+      "mobileSelectionsPreserved": true,
+      "caseMobileSelections": "Existing OneGrid retained for Phone and Tablet",
+      "tableLogicalNames": [
+        "foia_foiarequest",
+        "foia_appeal",
+        "foia_searchtask",
+        "foia_responsiverecord",
+        "foia_reviewtask",
+        "foia_exemptiondecision",
+        "foia_redactiondecision",
+        "foia_releasepackage",
+        "foia_clockevent",
+        "foia_auditevent",
+        "foia_aiassistancerecord",
+        "contact",
+        "incident"
+      ],
+      "tableMetadataIds": "Eleven custom tables in componentInventory.tables; two reused tables below",
+      "reusedTableMetadataIds": {
+        "contact": "608861bc-50a4-4c5f-a02c-21fe1943e2cf",
+        "incident": "e3fe4ff2-a630-49bb-a1e9-debc3a076815"
+      },
+      "newViewCount": 2,
+      "newViewIds": [
+        "3285d88d-5f40-4cb3-8a74-baf08e711b7a",
+        "4807ed1b-2597-4682-abf9-969d911df4d6"
+      ],
+      "originalPublicViewCount": 45,
+      "originalViewDefinitionsUnchanged": true,
+      "existingFormsUnchanged": true,
+      "populatedValuesUnchanged": 97,
+      "allOriginalIdentitiesStable": true,
+      "appAndSolutionViewLinkageVerified": true,
+      "actualPastelBadgeRendering": {
+        "foia_foiarequest": "Review: yellow",
+        "contact": "Seven FOIA-related records; gray, peach, lavender, blue classification badges",
+        "incident": "Seven FOIA work types; peach, rose, blue, yellow, apricot, mint badges"
+      },
+      "incidentalCaseImageMembership": "Maker Save added entityimage membership; removed only this solution membership through supported action; live field retained",
+      "isolatedRegressionSuitesPassed": 8,
+      "contractPath": "specs/federal-foia-management/grid-controls.json",
+      "viewPayloadPath": "payloads/scenarios/federal-foia-management/grid-views-federal-foia-management.json",
+      "evidenceRoot": ".wizard-metrics/artifacts/grid-controls/federal-foia-management",
+      "packageEvidencePath": ".wizard-metrics/artifacts/export/federal-foia-management.json"
   }
 }

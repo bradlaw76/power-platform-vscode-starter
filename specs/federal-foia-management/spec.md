@@ -6,6 +6,46 @@ Federal FOIA Management is a reusable Dynamics 365 Customer Service extension fo
 
 The authoritative reusable requirement catalog is [Federal-FOIA-Solution-Requirements.md](Federal-FOIA-Solution-Requirements.md). The condensed [requirements-baseline.md](requirements-baseline.md) is the implementation profile for this demonstration. All acceptance evidence must retain the applicable catalog and profile IDs.
 
+## Current State And Next Increment - 2026-11-04
+
+The latest recorded live verification is 2026-10-22, not a current environment
+health check. The development/demo solution has 11 custom tables plus Case and
+Contact, 134 columns, 11 alternate keys, 21 relationships, 13 main forms,
+15 scenario public views, two active BPFs, eight charts, five dashboards, and
+three unassigned demo roles. The approved Choice retrofit includes 26 global
+Choices and 29 Picklist bindings. Recorded final evidence shows 263 solution
+memberships, 706 stable identities, zero duplicates/failures, 41 synthetic rows,
+and an inspected unmanaged package with 53 matching roots and 245 files.
+
+These are component and bounded usability results, not proof of working
+statutory clocks, controlled approvals/releases, document security, complete
+journeys, production security, or production readiness. See
+[deployment-manifest.json](deployment-manifest.json) and
+[evidence-index.md](evidence-index.md) for the recorded evidence.
+
+The next proposed increment is a production-hardening path in development:
+accepted staff-assisted intake through one normal request's controlled release,
+with server-enforced identifiers, clocks, approval, immutable evidence,
+independently secured SharePoint documents, and explicit notification failures.
+This is a vertical slice: one complete, tested user journey rather than more
+disconnected screens. Existing personas, relationships, and business rules remain
+the design authority; the first slice does not waive other catalog requirements.
+
+Before implementation, approve the remaining policy/configuration decisions and
+the staged plan in [plan.md](plan.md#production-hardening-increment---2026-11-04).
+Acceptance must include direct-API bypass attempts, independent test identities,
+retries/concurrency, and operation with optional Azure capabilities disabled.
+Synthetic records remain bounded by the existing approved data plan.
+
+The 2026-11-04 instructions authorize local review/planning, the approved PH-00
+effective-contract implementation, approved local migration/export/test/guidance
+corrections, and credential-free source-baseline verification. No new
+authentication, live access, live schema changes, role assignments,
+SharePoint provisioning, plug-in/flow deployment, import, managed release, commit,
+or push is authorized. Production data, agency policy, production targets, and
+operational sign-off require separate decisions. The proposal is not an approved
+production specification or a deployment authorization.
+
 ## Scope
 
 ### In Scope
@@ -155,6 +195,84 @@ The BPF stage chevrons are authoritative for the interactive process position. `
 Appeal dates use the same immutable clock-event mechanism but a distinct clock type and reporting classification.
 
 The same rule applies to appeals: the BPF chevrons are authoritative for interactive stage position, while `foia_stage` (display label **Appeal Stage**) remains available for reporting, views, sample data, and external status projection without being repeated as a BPF step. Due Date and Outcome may be reused contextually across stages as references to the same Appeal record values.
+
+### Choice-Column Normalization Retrofit
+
+The implemented payloads incorrectly created 29 bounded categorical fields as
+text despite the approved stable-choice design. The retrofit shall recreate all
+29 with the same logical names as global-choice-backed Dataverse Choice columns.
+It shall preserve published numeric values, map every existing synthetic label
+deterministically, and reject unmapped values.
+
+Because Dataverse cannot change a text column to Choice in place, the retrofit
+is an explicitly destructive schema migration limited to this synthetic demo.
+Preview must inventory dependencies and produce a reversible migration plan
+without mutation. Apply requires separate approval, a fresh unmanaged export,
+an exact 41-record snapshot, dependency removal, same-name column recreation,
+form/view/BPF/chart rewiring, reseeding, publishing, membership verification,
+idempotency verification, and a new unmanaged export inspection. No production
+or non-synthetic record may be migrated by this stage.
+
+Completion evidence must identify all 26 global Choices and 29 Picklist
+columns by live metadata ID, verify their exact global bindings and English
+option labels/numeric values, and prove solution membership. The exported
+package must contain all 26 global Choice roots and definitions and the
+29 correctly typed and bound attributes; counts or displayed labels alone
+are not sufficient.
+
+Current demo state (2026-10-22): the authorized retrofit is complete. All 29
+columns are global-choice-backed Picklists, all 97 populated values were
+restored, both BPFs and the affected forms/views/charts were restored and
+published, and the Request dropdown smoke test passed. Exact live metadata,
+261-item solution membership, stable IDs for 41 synthetic records, zero
+duplicates, and the final 53-root unmanaged package inspection passed.
+Legacy String payloads remain the rollback/audit source; the approved migration
+payload supplies the effective column and seed-value override. The locally
+approved 2026-11-04 `CurrentSchema` version `1.0.0` declaration makes that
+contract reproducible from source, independent of local Apply evidence, for
+normal stages 30/50/66/95. It binds scenario, solution, and publisher identity.
+Existing incompatible text columns must fail preflight, not be skipped or
+automatically replaced. Explicit pre-migration backup selection preserves the
+legacy backup path without disabling mandatory post-migration checks.
+Credential-free tests prove fresh creation, typed seed values, stable reruns,
+strict inventory/package verification, and failure gates; no new live build
+or production deployment has been performed.
+This completion does not imply that the broader automation, security, or full
+journey acceptance criteria below are complete.
+
+## Choice Presentation Increment
+
+Apply the original VS Code wizard's eight pastel tokens and redundant inline
+Unicode label symbols to all 26 FOIA global Choices (29 bound fields). Preserve
+semantic labels in the migration payload, every numeric value, record value,
+metadata ID, binding, and option order. Use mint for successful/ready states,
+rose for rejection/failure/restriction, yellow for pending/review, gray for
+inactive/retired states, and blue/lavender/peach/apricot for categorical distinctions.
+Symbols supplement readable labels; color alone must not convey meaning.
+Preview the exact labels/colors before approval and modify only existing
+unmanaged, solution-owned global options. Grid color rendering depends on its
+control configuration; this increment does not replace grid controls.
+
+Completed on 2026-10-22: all 162 option labels/colors verified live and in the
+unmanaged package, zero-update settled rerun, unchanged data/identities, and
+published Request symbol rendering confirmed. Standard form dropdowns do not
+display the pastel background metadata; no unsupported styling was injected.
+
+## Pastel Grid Increment
+
+Enable Power Apps grid Choice colors for web table views on the 11 custom FOIA
+tables and reused Contact/Case, using supported maker controls only. Keep inline
+editing off and retain existing phone/tablet settings. The operator authorized
+shared-table configuration provided new views include FOIA in their names.
+Create FOIA Requester Choice Overview and FOIA Case Choice Overview without
+modifying standard view definitions, existing FOIA views, forms, or record values.
+Table-level control selection affects all views of a selected table.
+
+Completed on 2026-10-22: all 13 exported Web controls use the native read-only
+color-enabled grid. Actual Request, Contact, and Case cells displayed the
+configured pastel fills and symbols. Both new FOIA views are published and
+linked to the app and solution; all 45 original Contact/Case public view
+definitions, 97 populated values, and original identities remain unchanged.
 
 ## Statutory Clock Design
 

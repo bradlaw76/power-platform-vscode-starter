@@ -77,6 +77,8 @@ param(
     [bool]$AllowContaminatedSolution = $false,
     [switch]$InventoryOnly,
     [switch]$EnforceExportGate,
+    [switch]$RequireChoiceMigration,
+    [switch]$PreMigrationBackup,
     [switch]$PublishScoped
 )
 
@@ -97,6 +99,7 @@ if (-not (Test-Path $solutionIsolationHelper)) {
 }
 
 . $solutionIsolationHelper
+. (Join-Path $PSScriptRoot 'helpers\choice-migration-verification.ps1')
 
 $hardeningHelper = Join-Path $PSScriptRoot "helpers\wizard-hardening.ps1"
 if (Test-Path $hardeningHelper) {
@@ -325,6 +328,7 @@ function Get-SolutionComponentInventory {
     $siteMapType = Get-ComponentTypeValue -Map $typeMap -Labels @('Site Map', 'SiteMap') -Fallback 62
     $chartType = Get-ComponentTypeValue -Map $typeMap -Labels @('Saved Query Visualization', 'SavedQueryVisualization') -Fallback 59
     $roleType = Get-ComponentTypeValue -Map $typeMap -Labels @('Role', 'Security Role') -Fallback 20
+    $globalChoiceType = Get-ComponentTypeValue -Map $typeMap -Labels @('Option Set') -Fallback 9
 
     $items = New-Object System.Collections.Generic.List[object]
     $components = @(Invoke-SolutionIsolationPagedGet -InvokeGet $InvokeGet -Path "solutioncomponents?`$select=solutioncomponentid,objectid,_solutionid_value,componenttype,rootcomponentbehavior")
@@ -335,6 +339,12 @@ function Get-SolutionComponentInventory {
 
         $componentType = [int]$component.componenttype
         $objectId = ("$($component.objectid)").Trim()
+
+        if ($componentType -eq $globalChoiceType) {
+            $choice = & $InvokeGet "GlobalOptionSetDefinitions($objectId)?`$select=Name,MetadataId"
+            $items.Add([pscustomobject]@{ Kind = 'global-choice'; Category = 'global-choices'; Name = $choice.Name; ObjectId = $objectId; SolutionComponentId = "$($component.solutioncomponentid)"; ComponentType = $componentType }) | Out-Null
+            continue
+        }
 
         if ($componentType -eq $entityType) {
             $entity = Get-EntityDefinitionByMetadataId -InvokeGet $InvokeGet -MetadataId $objectId
@@ -454,6 +464,11 @@ Write-Host "  Solution ID: $($sol.solutionid)" -ForegroundColor DarkGray
 $invokeDvGet = { param($path) Invoke-Dv "Get" $path }
 $allEntityNames = @(Get-PayloadEntityNames -Folder $PayloadsFolder)
 $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+if ($PreMigrationBackup -and -not $InventoryOnly) { throw 'PreMigrationBackup is restricted to read-only inventory for a separately approved backup.' }
+$choiceMigration = Get-WizardEffectiveChoiceContract -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -SolutionUniqueName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Required:$RequireChoiceMigration -PreMigrationBackup:$PreMigrationBackup
+if ($null -ne $choiceMigration) {
+    $expectedArtifacts | Add-Member -NotePropertyName GlobalChoices -NotePropertyValue @($choiceMigration.GlobalChoices.Name)
+}
 $entityNames = @($expectedArtifacts.Tables)
 $solutionEntityNames = @(@($expectedArtifacts.Tables) + @($expectedArtifacts.DependencyTables) | Sort-Object -Unique)
 $reportWebResourceNames = @(Get-ReportWebResourceNames -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PublisherPrefix $PublisherPrefix)
@@ -466,6 +481,11 @@ if ($InventoryOnly) {
 
     $expectedByCategory = ConvertTo-SolutionExpectedCategoryMap -ExpectedArtifacts $expectedArtifacts
     $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
+    if ($null -ne $choiceMigration) {
+        $choiceInventory = @(Get-WizardChoiceMigrationInventory -Payload $choiceMigration -SolutionId "$($sol.solutionid)" -InvokeGet $invokeDvGet)
+        $verifiedNames = @($choiceInventory.Name)
+        $inventory = @($inventory | Where-Object { $_.Name -notin $verifiedNames }) + $choiceInventory
+    }
     $relationshipTables = @{}
     foreach ($file in @(Get-ChildItem -LiteralPath $PayloadsFolder -Filter 'relationships-*.json' -File -ErrorAction SilentlyContinue)) {
         $document = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
@@ -518,6 +538,9 @@ if ($InventoryOnly) {
 
 if ($EnableContaminationScan -and (Get-Command New-WizardExpectedArtifacts -ErrorAction SilentlyContinue)) {
     $expectedArtifacts = New-WizardExpectedArtifacts -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -PublisherPrefix $PublisherPrefix
+    if ($null -ne $choiceMigration) {
+        $expectedArtifacts | Add-Member -NotePropertyName GlobalChoices -NotePropertyValue @($choiceMigration.GlobalChoices.Name)
+    }
     $inventory = @(Get-SolutionComponentInventory -InvokeGet $invokeDvGet -SolutionId "$($sol.solutionid)")
     $scanResult = New-WizardContaminationVerdict -CurrentComponents $inventory -ExpectedArtifacts $expectedArtifacts -PublisherPrefix $PublisherPrefix
     $scanArtifact = [pscustomobject]@{
@@ -585,6 +608,29 @@ $added = 0; $skipped = 0; $failed = 0
 $componentTypeMap = Get-SolutionComponentTypeMap
 $attributeComponentType = Get-ComponentTypeValue -Map $componentTypeMap -Labels @('Attribute') -Fallback 2
 $relationshipComponentType = Get-ComponentTypeValue -Map $componentTypeMap -Labels @('Entity Relationship', 'Relationship') -Fallback 10
+if ($null -ne $choiceMigration) {
+    foreach ($choice in $choiceMigration.GlobalChoices) {
+        $metadata = Invoke-Dv 'Get' "GlobalOptionSetDefinitions(Name='$($choice.Name)')/Microsoft.Dynamics.CRM.OptionSetMetadata"
+        Assert-WizardGlobalChoiceMetadata -Choice $choice -Metadata $metadata
+        $choiceId = ([guid]$metadata.MetadataId).ToString()
+        $status = 'skipped'
+        if (Test-SolutionComponentMembership -SolutionId "$($sol.solutionid)" -ObjectId $choiceId -ComponentType 9) {
+            $skipped++
+            Write-Host "  Global Choice: $($choice.Name) (already in solution)" -ForegroundColor DarkGray
+        } else {
+            Invoke-Dv 'Post' 'AddSolutionComponent' (@{ ComponentId = $choiceId; ComponentType = 9; SolutionUniqueName = $SolutionUniqueName; AddRequiredComponents = $false } | ConvertTo-Json -Compress) | Out-Null
+            if (-not (Test-SolutionComponentMembership -SolutionId "$($sol.solutionid)" -ObjectId $choiceId -ComponentType 9)) {
+                throw "Global choice '$($choice.Name)' is missing after solution sync."
+            }
+            $added++
+            $status = 'created'
+            Write-Host "  Global Choice: $($choice.Name) (added)" -ForegroundColor Green
+        }
+        if ($EnableArtifactManifest) {
+            Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix -Kind 'global-choice' -Name $choice.Name -Status $status -Step '50-add-to-solution.ps1' -Details @{ metadataId = $choiceId; componentType = 9 } | Out-Null
+        }
+    }
+}
 # ComponentType 1 = Entity
 foreach ($logicalName in $entityNames | Sort-Object) {
     Write-Host "  $logicalName " -NoNewline

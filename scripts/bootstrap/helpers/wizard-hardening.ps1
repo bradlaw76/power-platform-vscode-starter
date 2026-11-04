@@ -819,6 +819,12 @@ function New-WizardExpectedArtifacts {
         }
     }
 
+    $gridViewNames = @()
+    foreach ($file in @(Get-ChildItem -LiteralPath $context.PayloadsFolder -Filter 'grid-views-*.json' -File)) {
+        $gridViews = Get-Content -LiteralPath $file.FullName -Raw -Encoding UTF8 | ConvertFrom-Json
+        $gridViewNames += @($gridViews.Views | ForEach-Object { "$($_.TableLogicalName)|$($_.Name)" })
+    }
+
     return [pscustomobject]@{
         Tables = @($payloadSummary.Tables)
         DependencyTables = @(
@@ -837,7 +843,7 @@ function New-WizardExpectedArtifacts {
         })
         WebResources = @($reportWebResources | Sort-Object)
         Forms = @($payloadSummary.Tables | ForEach-Object { "$($_)|main" })
-        Views = @($payloadSummary.Tables | ForEach-Object { "$($_)|active" })
+        Views = @(@($payloadSummary.Tables | ForEach-Object { "$($_)|active" }) + $gridViewNames)
         Dashboards = $nativeDashboards
         Charts = $nativeCharts
         SecurityRoles = @($payloadSummary.SecurityRoleNames)
@@ -869,6 +875,7 @@ function New-WizardContaminationVerdict {
         flow = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         bpf = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
         role = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
+        'global-choice' = New-Object 'System.Collections.Generic.HashSet[string]' ([System.StringComparer]::OrdinalIgnoreCase)
     }
 
     foreach ($name in @(@($ExpectedArtifacts.Tables) + @($ExpectedArtifacts.DependencyTables))) { [void]$expected.table.Add(($name ?? '').Trim().ToLowerInvariant()) }
@@ -884,6 +891,9 @@ function New-WizardContaminationVerdict {
     foreach ($name in @($ExpectedArtifacts.Flows)) { [void]$expected.flow.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.Bpfs)) { [void]$expected.bpf.Add(($name ?? '').Trim().ToLowerInvariant()) }
     foreach ($name in @($ExpectedArtifacts.SecurityRoles)) { [void]$expected.role.Add(($name ?? '').Trim().ToLowerInvariant()) }
+    foreach ($name in @((Get-WizardOptionalPropertyValue -InputObject $ExpectedArtifacts -PropertyName 'GlobalChoices'))) {
+        if (-not [string]::IsNullOrWhiteSpace("$name")) { [void]$expected['global-choice'].Add("$name".Trim().ToLowerInvariant()) }
+    }
 
     $prefix = ($PublisherPrefix ?? '').Trim().ToLowerInvariant()
     $expectedItems = New-Object System.Collections.Generic.List[object]

@@ -3,20 +3,20 @@
 ## Rehearsal Summary
 - Step: Open with the business problem
   Status: pass
-  Note: Business framing is concise and aligned to the reusable demo scope
+  Note: Business framing is concise, outcome-first, and explicit about synthetic data and human authority.
 - Step: Start from the hero record
-  Status: skip
-  Note: App shell and synthetic hero request are not deployed yet
+  Status: partial
+  Note: Published app identity, FOIA Request entry point, Active FOIA Requests landing view, and the live `SYN-FOIA-2026-001` record are verified. Interactive browser navigation remains pending because the automation browser sign-in window was inaccessible.
 - Step: Walk through the core workflow
-  Status: skip
-  Note: Forms, relationships, and lifecycle controls require the built app
+  Status: pass
+  Note: Read-only Dataverse validation found all seven planned journey requests at their expected stages and all 41 source-tagged records exactly once, with no missing, extra, duplicate, or mismatched key records.
 - Step: Show supporting experience
-  Status: skip
-  Note: Dashboards, approvals, and release evidence require deployed components and seeded data
+  Status: partial
+  Note: Five published dashboards, eight native charts, app navigation, role metadata, and export membership are verified. Interactive chart and dashboard click-through remains pending with browser authentication.
 - Step: Close with success and next step
   Status: pass
-  Note: Closing clearly restates traceability and human decision authority
+  Note: Closing now distinguishes verified demo capabilities from deferred flows, SharePoint, full production security, and server-side enforcement.
 
 ## Overall Result
-- Outcome: Talk track review passed; live click rehearsal is deferred until app deployment
-- Requested edit: Replace generic show actions with exact model-driven app navigation after app assembly and synthetic-data verification
+- Outcome: Deployed metadata and read-only live-data rehearsal passed. Authenticated UI click rehearsal remains pending and is not represented as passed.
+- Requested edit: Complete one operator-driven click rehearsal using the exact navigation in `demo-script.md` when an accessible authenticated browser session is available.

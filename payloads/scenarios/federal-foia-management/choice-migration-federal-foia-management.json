@@ -1,0 +1,1414 @@
+{
+  "Enabled": true,
+  "MigrationId": "federal-foia-choice-normalization-v1",
+  "CurrentSchema": {
+    "Version": "1.0.0",
+    "ScenarioSlug": "federal-foia-management",
+    "SolutionUniqueName": "FederalFOIAManagement",
+    "PublisherPrefix": "foia"
+  },
+  "Destructive": true,
+  "RequiresSeparateApplyApproval": true,
+  "SyntheticOnly": true,
+  "GlobalChoices": [
+    {
+      "Name": "foia_intakechannel",
+      "DisplayName": "FOIA Intake Channel",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Public portal",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Agency portal",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Email",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Mail room",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Staff assisted",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "FOIA.gov",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "API",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        }
+      ]
+    },
+    {
+      "Name": "foia_validationstate",
+      "DisplayName": "FOIA Validation State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Pending",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Perfected",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Correction required",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Rejected",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        }
+      ]
+    },
+    {
+      "Name": "foia_requestlifecycle",
+      "DisplayName": "FOIA Request Lifecycle",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Intake",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Clarification",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Search",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Review",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Redaction",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Approval",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Release",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Closure",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_taskstate",
+      "DisplayName": "FOIA Task State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Draft",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Ready",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Assigned",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000003,
+          "Label": "In progress",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Blocked",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Submitted",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Completed",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Cancelled",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_approvalstate",
+      "DisplayName": "FOIA Approval State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Draft",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Proposed",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Pending independent approval",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Approved",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Rejected",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Returned",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Superseded",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Released",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        }
+      ]
+    },
+    {
+      "Name": "foia_reviewtype",
+      "DisplayName": "FOIA Review Type",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Responsiveness",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Segregability",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Legal",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Supervisory",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Final release",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        }
+      ]
+    },
+    {
+      "Name": "foia_disposition",
+      "DisplayName": "FOIA Request Disposition",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Full grant",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Partial grant",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Full denial",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000003,
+          "Label": "No records",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Withdrawn",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Duplicate",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Other closure",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Open",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        }
+      ]
+    },
+    {
+      "Name": "foia_feecategory",
+      "DisplayName": "FOIA Fee Category",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Commercial",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Educational or scientific",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "News media",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Other",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_clockeventtype",
+      "DisplayName": "FOIA Clock Event Type",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Received",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Perfected",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Toll started",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Toll ended",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Extension applied",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Due date recalculated",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Appeal received",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Appeal due date calculated",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000008,
+          "Label": "Closed",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000009,
+          "Label": "Correction",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        }
+      ]
+    },
+    {
+      "Name": "foia_auditaction",
+      "DisplayName": "FOIA Audit Action",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "View sensitive content",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Download",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Export",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Package inclusion",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Approval",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Release",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Permission change",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Configuration change",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        }
+      ]
+    },
+    {
+      "Name": "foia_adapterstatus",
+      "DisplayName": "FOIA Adapter Status",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Disabled",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Ready",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Running",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Succeeded",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Unavailable",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Failed",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        }
+      ]
+    },
+    {
+      "Name": "foia_aidisposition",
+      "DisplayName": "FOIA AI Disposition",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Pending human review",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Accepted",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Rejected",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Superseded",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_aioperation",
+      "DisplayName": "FOIA AI Operation",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Summarization",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Classification",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Duplicate detection",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Search recommendation",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "OCR enhancement",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Relevance ranking",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Draft generation",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        }
+      ]
+    },
+    {
+      "Name": "foia_appealoutcome",
+      "DisplayName": "FOIA Appeal Outcome",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Open",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Upheld",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Remanded",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Modified",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Withdrawn",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Dismissed",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Closed",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_appealstage",
+      "DisplayName": "FOIA Appeal Stage",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Appeal intake",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Validation",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Reconsideration and legal review",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Appeal decision",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Response",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Closure",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_clocktype",
+      "DisplayName": "FOIA Clock Type",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Request",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Appeal",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        }
+      ]
+    },
+    {
+      "Name": "foia_expediteddecision",
+      "DisplayName": "FOIA Expedited Decision",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Pending",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Granted",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Denied",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        }
+      ]
+    },
+    {
+      "Name": "foia_redactionstate",
+      "DisplayName": "FOIA Redaction State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Proposed",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Pending approval",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Approved",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Applied",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Rejected",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Superseded",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_releasemethod",
+      "DisplayName": "FOIA Release Method",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Secure portal",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Email",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Mail",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "In person",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Other",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_recordaccessstate",
+      "DisplayName": "FOIA Record Access State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Pending verification",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Verified",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Restricted",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Released copy",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Unavailable",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_recordclassification",
+      "DisplayName": "FOIA Record Classification",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Unclassified",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Synthetic unclassified",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "PII",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000003,
+          "Label": "PHI",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000004,
+          "Label": "CUI",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Classified",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Other",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_repositorytype",
+      "DisplayName": "FOIA Repository Type",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "SharePoint",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Dataverse file",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "External governed repository",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Other",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_recordreviewstate",
+      "DisplayName": "FOIA Record Review State",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Collected",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Responsive",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Nonresponsive",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Duplicate",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Out of scope",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Referral",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Consultation",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000007,
+          "Label": "Further legal review",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000008,
+          "Label": "Redacted",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000009,
+          "Label": "Released",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        }
+      ]
+    },
+    {
+      "Name": "foia_reviewdisposition",
+      "DisplayName": "FOIA Review Disposition",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Responsive",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Nonresponsive",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Partial exemption",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Full exemption",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Approved for release",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Returned",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Superseded",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    },
+    {
+      "Name": "foia_caseworktype",
+      "DisplayName": "FOIA Case Work Type",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "Normal",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "Expedited",
+          "Icon": "triangle-outline",
+          "ColorToken": "pastel-yellow"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Overdue",
+          "Icon": "warning",
+          "ColorToken": "pastel-rose"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Fee",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "Exemption",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Released",
+          "Icon": "circle-filled",
+          "ColorToken": "pastel-mint"
+        },
+        {
+          "Value": 100000006,
+          "Label": "Appealed",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        }
+      ]
+    },
+    {
+      "Name": "foia_collectionsource",
+      "DisplayName": "FOIA Collection Source",
+      "Options": [
+        {
+          "Value": 100000000,
+          "Label": "SharePoint",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000001,
+          "Label": "OneDrive",
+          "Icon": "diamond-filled",
+          "ColorToken": "pastel-lavender"
+        },
+        {
+          "Value": 100000002,
+          "Label": "Exchange",
+          "Icon": "triangle-filled",
+          "ColorToken": "pastel-peach"
+        },
+        {
+          "Value": 100000003,
+          "Label": "Teams",
+          "Icon": "diamond-outline",
+          "ColorToken": "pastel-apricot"
+        },
+        {
+          "Value": 100000004,
+          "Label": "File share",
+          "Icon": "info",
+          "ColorToken": "pastel-blue"
+        },
+        {
+          "Value": 100000005,
+          "Label": "Other",
+          "Icon": "square-filled",
+          "ColorToken": "pastel-gray"
+        }
+      ]
+    }
+  ],
+  "Bindings": [
+    {
+      "TableLogicalName": "contact",
+      "ColumnLogicalName": "foia_requesterclassification",
+      "GlobalChoiceName": "foia_feecategory",
+      "ValueMap": {
+        "Commercial": 100000000,
+        "Educational": 100000001,
+        "News Media": 100000002,
+        "Other": 100000003
+      }
+    },
+    {
+      "TableLogicalName": "foia_aiassistancerecord",
+      "ColumnLogicalName": "foia_operationalstatus",
+      "GlobalChoiceName": "foia_adapterstatus",
+      "ValueMap": {
+        "Disabled": 100000000
+      }
+    },
+    {
+      "TableLogicalName": "foia_aiassistancerecord",
+      "ColumnLogicalName": "foia_operationclassification",
+      "GlobalChoiceName": "foia_aioperation",
+      "ValueMap": {
+        "Summarization": 100000000
+      }
+    },
+    {
+      "TableLogicalName": "foia_aiassistancerecord",
+      "ColumnLogicalName": "foia_reviewerdisposition",
+      "GlobalChoiceName": "foia_aidisposition",
+      "ValueMap": {
+        "Rejected": 100000002
+      }
+    },
+    {
+      "TableLogicalName": "foia_appeal",
+      "ColumnLogicalName": "foia_outcome",
+      "GlobalChoiceName": "foia_appealoutcome",
+      "ValueMap": {
+        "Open": 100000000
+      }
+    },
+    {
+      "TableLogicalName": "foia_appeal",
+      "ColumnLogicalName": "foia_stage",
+      "GlobalChoiceName": "foia_appealstage",
+      "ValueMap": {
+        "Reconsideration and Legal Review": 100000002
+      }
+    },
+    {
+      "TableLogicalName": "foia_auditevent",
+      "ColumnLogicalName": "foia_eventtype",
+      "GlobalChoiceName": "foia_auditaction",
+      "ValueMap": {
+        "Release": 100000005
+      }
+    },
+    {
+      "TableLogicalName": "foia_clockevent",
+      "ColumnLogicalName": "foia_clocktype",
+      "GlobalChoiceName": "foia_clocktype",
+      "ValueMap": {
+        "Request": 100000000,
+        "Appeal": 100000001
+      }
+    },
+    {
+      "TableLogicalName": "foia_clockevent",
+      "ColumnLogicalName": "foia_eventtype",
+      "GlobalChoiceName": "foia_clockeventtype",
+      "ValueMap": {
+        "Receipt": 100000000,
+        "Extension": 100000004,
+        "Appeal Receipt": 100000006
+      }
+    },
+    {
+      "TableLogicalName": "foia_exemptiondecision",
+      "ColumnLogicalName": "foia_approvalstate",
+      "GlobalChoiceName": "foia_approvalstate",
+      "ValueMap": {
+        "Approved": 100000003
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_disposition",
+      "GlobalChoiceName": "foia_disposition",
+      "ValueMap": {
+        "Full Grant": 100000000,
+        "Partial Grant": 100000001,
+        "Open": 100000007
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_expediteddecision",
+      "GlobalChoiceName": "foia_expediteddecision",
+      "ValueMap": {
+        "Granted": 100000001
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_feecategory",
+      "GlobalChoiceName": "foia_feecategory",
+      "ValueMap": {
+        "Commercial": 100000000,
+        "Educational": 100000001,
+        "News Media": 100000002,
+        "Other": 100000003
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_intakechannel",
+      "GlobalChoiceName": "foia_intakechannel",
+      "ValueMap": {
+        "Public Portal": 100000000,
+        "Agency Portal": 100000001,
+        "Email": 100000002,
+        "Mail Room": 100000003,
+        "Staff Assisted": 100000004,
+        "FOIA.gov": 100000005,
+        "API": 100000006
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_lifecyclestage",
+      "GlobalChoiceName": "foia_requestlifecycle",
+      "ValueMap": {
+        "Search": 100000002,
+        "Review": 100000003,
+        "Redaction": 100000004,
+        "Approval": 100000005,
+        "Closure": 100000007
+      }
+    },
+    {
+      "TableLogicalName": "foia_foiarequest",
+      "ColumnLogicalName": "foia_validationstate",
+      "GlobalChoiceName": "foia_validationstate",
+      "ValueMap": {
+        "Perfected": 100000001
+      }
+    },
+    {
+      "TableLogicalName": "foia_redactiondecision",
+      "ColumnLogicalName": "foia_finalstate",
+      "GlobalChoiceName": "foia_redactionstate",
+      "ValueMap": {
+        "Applied": 100000003
+      }
+    },
+    {
+      "TableLogicalName": "foia_releasepackage",
+      "ColumnLogicalName": "foia_approvalstate",
+      "GlobalChoiceName": "foia_approvalstate",
+      "ValueMap": {
+        "Released": 100000007
+      }
+    },
+    {
+      "TableLogicalName": "foia_releasepackage",
+      "ColumnLogicalName": "foia_releasemethod",
+      "GlobalChoiceName": "foia_releasemethod",
+      "ValueMap": {
+        "Secure Portal": 100000000
+      }
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "ColumnLogicalName": "foia_accessstate",
+      "GlobalChoiceName": "foia_recordaccessstate",
+      "ValueMap": {
+        "Validated": 100000001,
+        "ReleasedCopy": 100000003
+      }
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "ColumnLogicalName": "foia_classification",
+      "GlobalChoiceName": "foia_recordclassification",
+      "ValueMap": {
+        "Synthetic-Unclassified": 100000001
+      }
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "ColumnLogicalName": "foia_repository",
+      "GlobalChoiceName": "foia_repositorytype",
+      "ValueMap": {
+        "SharePoint": 100000000
+      }
+    },
+    {
+      "TableLogicalName": "foia_responsiverecord",
+      "ColumnLogicalName": "foia_reviewstate",
+      "GlobalChoiceName": "foia_recordreviewstate",
+      "ValueMap": {
+        "Responsive": 100000001,
+        "Redacted": 100000008,
+        "Released": 100000009
+      }
+    },
+    {
+      "TableLogicalName": "foia_reviewtask",
+      "ColumnLogicalName": "foia_disposition",
+      "GlobalChoiceName": "foia_reviewdisposition",
+      "ValueMap": {
+        "Responsive": 100000000,
+        "Partial Exemption": 100000002,
+        "Approved for Release": 100000004
+      }
+    },
+    {
+      "TableLogicalName": "foia_reviewtask",
+      "ColumnLogicalName": "foia_reviewtype",
+      "GlobalChoiceName": "foia_reviewtype",
+      "ValueMap": {
+        "Responsiveness": 100000000,
+        "Legal": 100000002,
+        "Final Release": 100000004
+      }
+    },
+    {
+      "TableLogicalName": "foia_reviewtask",
+      "ColumnLogicalName": "foia_status",
+      "GlobalChoiceName": "foia_taskstate",
+      "ValueMap": {
+        "In Progress": 100000003,
+        "Completed": 100000006
+      }
+    },
+    {
+      "TableLogicalName": "foia_searchtask",
+      "ColumnLogicalName": "foia_collectionsourcesystem",
+      "GlobalChoiceName": "foia_collectionsource",
+      "ValueMap": {
+        "SharePoint": 100000000,
+        "OneDrive": 100000001,
+        "Exchange": 100000002
+      }
+    },
+    {
+      "TableLogicalName": "foia_searchtask",
+      "ColumnLogicalName": "foia_status",
+      "GlobalChoiceName": "foia_taskstate",
+      "ValueMap": {
+        "Completed": 100000006
+      }
+    },
+    {
+      "TableLogicalName": "incident",
+      "ColumnLogicalName": "foia_caseworktype",
+      "GlobalChoiceName": "foia_caseworktype",
+      "ValueMap": {
+        "Normal": 100000000,
+        "Expedited": 100000001,
+        "Overdue": 100000002,
+        "Fee": 100000003,
+        "Exemption": 100000004,
+        "Released": 100000005,
+        "Appealed": 100000006
+      }
+    }
+  ]
+}

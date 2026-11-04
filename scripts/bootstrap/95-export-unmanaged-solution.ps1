@@ -14,11 +14,14 @@ param(
     [string]$SolutionUniqueName = $env:DV_SOLUTION_NAME,
     [string]$OutputFolder = '',
     [switch]$PreviewOnly,
+    [switch]$RequireChoiceMigration,
+    [switch]$PreMigrationBackup,
     [scriptblock]$PacInvoker
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+. (Join-Path $PSScriptRoot 'helpers\choice-migration-verification.ps1')
 if ([string]::IsNullOrWhiteSpace($SolutionUniqueName) -and -not $PreviewOnly) { throw 'SolutionUniqueName is required.' }
 $effectiveSolutionName = if ([string]::IsNullOrWhiteSpace($SolutionUniqueName)) { '[not configured]' } else { $SolutionUniqueName }
 if ([string]::IsNullOrWhiteSpace($OutputFolder)) { $OutputFolder = Join-Path $repoRoot ".wizard-metrics/exports/$ScenarioSlug" }
@@ -38,10 +41,17 @@ if ($PreviewOnly) {
 if (-not (Test-Path -LiteralPath $membershipPath -PathType Leaf)) { throw 'Final solution membership report is missing; export is blocked.' }
 $membership = Get-Content -LiteralPath $membershipPath -Raw -Encoding UTF8 | ConvertFrom-Json
 if (-not $membership.ExportAllowed -or @($membership.Items | Where-Object State -in @('Missing','Failed','Unauthorized')).Count -gt 0) { throw 'Final solution membership did not pass; export is blocked.' }
+$choiceMigration = Get-WizardEffectiveChoiceContract -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionUniqueName $SolutionUniqueName `
+    -Required:($RequireChoiceMigration -or @($membership.Items | Where-Object Category -eq 'global-choices').Count -gt 0) -PreMigrationBackup:$PreMigrationBackup
 if ($null -eq $PacInvoker) { $PacInvoker = { param([string[]]$Arguments) & pac @Arguments; if ($LASTEXITCODE -ne 0) { throw "pac exited with code $LASTEXITCODE." } } }
 New-Item -ItemType Directory -Path $OutputFolder -Force | Out-Null
 Remove-Item -LiteralPath $zipPath,$unpackPath -Recurse -Force -ErrorAction SilentlyContinue
-foreach ($arguments in $commands) { & $PacInvoker ([string[]]$arguments) }
+foreach ($arguments in $commands) {
+    & $PacInvoker ([string[]]$arguments)
+    if ($arguments[1] -eq 'export' -and -not (Test-Path -LiteralPath $zipPath -PathType Leaf)) {
+        throw "PAC export did not create '$zipPath'; unpack was not attempted."
+    }
+}
 if (-not (Test-Path -LiteralPath $zipPath -PathType Leaf)) { throw "PAC export did not create '$zipPath'." }
 $solutionXmlPath = Get-ChildItem -LiteralPath $unpackPath -Filter 'Solution.xml' -File -Recurse | Select-Object -First 1
 if ($null -eq $solutionXmlPath) { throw 'Unpacked solution does not contain Solution.xml.' }
@@ -58,8 +68,8 @@ $invalidInheritedMembership = @($inheritedMembership | Where-Object {
 if ($invalidInheritedMembership.Count -gt 0) {
     throw "Membership item '$($invalidInheritedMembership[0].Category)|$($invalidInheritedMembership[0].Name)' lacks explicit or inherited component evidence."
 }
-$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'security-roles')
-$schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources')
+$rootCategories = @('tables', 'flows', 'dashboards', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'security-roles', 'global-choices')
+$schemaIdentityCategories = @('tables', 'model-driven-apps', 'sitemap-updates', 'web-resources', 'global-choices')
 $expectedComponents = @($membership.Items | Where-Object {
     $_.Category -in $rootCategories -and -not [string]::IsNullOrWhiteSpace("$($_.ObjectId)") -and $null -ne $_.ComponentType
 } | ForEach-Object {
@@ -92,5 +102,17 @@ $missingComponents = @($expectedComponents | Where-Object { -not $packageKeys.Co
 $unrelatedComponents = @($packageComponents | Where-Object { -not $expectedKeys.ContainsKey($_.Key) })
 if ($missingComponents.Count -gt 0) { throw "Unpacked package is missing required component '$($missingComponents[0].Category)|$($missingComponents[0].Name)' ($($missingComponents[0].Key))." }
 if ($unrelatedComponents.Count -gt 0) { throw "Unpacked package contains unrelated component '$($unrelatedComponents[0].SchemaName)' ($($unrelatedComponents[0].Key))." }
+$choiceInspection = if ($null -ne $choiceMigration) {
+    Assert-WizardChoiceMigrationPackage -Payload $choiceMigration -Membership $membership -UnpackPath $unpackPath
+} else { $null }
 $files = @(Get-ChildItem -LiteralPath $unpackPath -File -Recurse | ForEach-Object { [IO.Path]::GetRelativePath($unpackPath,$_.FullName).Replace('\','/') } | Sort-Object)
-[ordered]@{ scenarioSlug=$ScenarioSlug; solution=$SolutionUniqueName; preview=$false; managed=$false; importPermitted=$false; zip=$zipPath; unpacked=$unpackPath; files=$files; membershipItemCount=@($membership.Items).Count; inheritedMembershipItemCount=$inheritedMembership.Count; inspection=[ordered]@{ expected=$expectedComponents.Count; matched=$expectedComponents.Count; missing=@(); unrelated=@() } } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding UTF8
+$gridInspection = $null
+$gridContractPath = Join-Path $repoRoot "specs/$ScenarioSlug/grid-controls.json"
+if (Test-Path -LiteralPath $gridContractPath) {
+    . (Join-Path $PSScriptRoot 'helpers/grid-control-verification.ps1')
+    $gridContract = Get-Content -LiteralPath $gridContractPath -Raw | ConvertFrom-Json
+    if ($gridContract.solutionUniqueName -cne $SolutionUniqueName) { throw 'Grid contract solution identity mismatch.' }
+    $gridViews = Get-Content -LiteralPath (Join-Path $repoRoot "payloads/scenarios/$ScenarioSlug/grid-views-$ScenarioSlug.json") -Raw | ConvertFrom-Json
+    $gridInspection = Assert-WizardGridControlPackage -Contract $gridContract -Views @($gridViews.Views) -Membership $membership -UnpackPath $unpackPath
+}
+[ordered]@{ scenarioSlug=$ScenarioSlug; solution=$SolutionUniqueName; preview=$false; managed=$false; importPermitted=$false; zip=$zipPath; unpacked=$unpackPath; files=$files; membershipItemCount=@($membership.Items).Count; inheritedMembershipItemCount=$inheritedMembership.Count; inspection=[ordered]@{ expected=$expectedComponents.Count; matched=$expectedComponents.Count; missing=@(); unrelated=@() }; choiceMigration=$choiceInspection; gridControls=$gridInspection } | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $evidencePath -Encoding UTF8

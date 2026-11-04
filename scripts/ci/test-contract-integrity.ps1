@@ -210,6 +210,24 @@ if (-not $contractVersionMatch.Success) {
     Add-ContractFailure "Contract version mismatch: profile=$($wizardProfile.contractVersion), document=$($contractVersionMatch.Groups['version'].Value)."
 }
 
+$categoricalFieldSurfaces = @{
+    '.github/copilot-instructions.md' = 'Semantic Field Type Standard'
+    'docs/wizard-contract-v1.md' = 'Semantic Field Type Contract'
+    'docs/onboarding.md' = 'field-type decision table'
+    '.github/prompts/power-platform-demo-wizard.prompt.md' = 'field-type decision table'
+    '.github/skills/power-platform-wizard-init/SKILL.md' = 'field-type decision table'
+    '.claude/skills/power-platform-vscode-wizard/SKILL.md' = 'field-type decision table'
+    'requirements/how-to-build-dynamics-model-driven-apps-wizard.md' = 'field-type decision table'
+    'requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md' = 'field-type decision table'
+}
+foreach ($surface in $categoricalFieldSurfaces.Keys) {
+    $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+    if ($content -notmatch [regex]::Escape($categoricalFieldSurfaces[$surface])) {
+        Add-ContractFailure "$surface must retain the categorical field-type planning gate."
+    }
+    Test-RequiredPath -RelativePath 'docs/field-type-decision-standard.md' -Description 'Semantic field type decision standard'
+}
+
 if ($failures.Count -gt 0) {
     $message = "Contract integrity failed with $($failures.Count) issue(s):`n - $($failures -join "`n - ")"
     throw $message

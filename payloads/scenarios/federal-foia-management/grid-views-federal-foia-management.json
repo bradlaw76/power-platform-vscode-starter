@@ -1,0 +1,20 @@
+{
+  "Views": [
+    {
+      "TableLogicalName": "contact",
+      "Name": "FOIA Requester Choice Overview",
+      "Disposition": "create-custom",
+      "Columns": ["fullname", "foia_requesterclassification", "foia_identityverified", "emailaddress1", "telephone1"],
+      "Filter": {"Attribute": "foia_requesterclassification", "Operator": "not-null"},
+      "Sort": {"Attribute": "fullname", "Descending": false}
+    },
+    {
+      "TableLogicalName": "incident",
+      "Name": "FOIA Case Choice Overview",
+      "Disposition": "create-custom",
+      "Columns": ["title", "ticketnumber", "foia_caseworktype", "foia_statutoryduedate", "customerid"],
+      "Filter": {"Attribute": "foia_caseworktype", "Operator": "not-null"},
+      "Sort": {"Attribute": "foia_statutoryduedate", "Descending": false}
+    }
+  ]
+}

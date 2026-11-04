@@ -110,7 +110,16 @@ function Get-WizardRetryAfterSeconds {
     $response = if ($null -ne $responseProperty) { $responseProperty.Value } else { $null }
     $headersProperty = if ($null -ne $response) { $response.PSObject.Properties['Headers'] } else { $null }
     if ($null -ne $headersProperty -and $null -ne $headersProperty.Value) {
-        $retryAfter = $headersProperty.Value['Retry-After']
+        $headers = $headersProperty.Value
+        $retryAfter = $null
+        if ($headers -is [System.Net.Http.Headers.HttpHeaders]) {
+            $values = $null
+            if ($headers.TryGetValues('Retry-After', [ref]$values)) {
+                $retryAfter = @($values)[0]
+            }
+        } else {
+            $retryAfter = $headers['Retry-After']
+        }
         $seconds = 0
         if ($null -ne $retryAfter -and [int]::TryParse("$retryAfter", [ref]$seconds)) {
             return [Math]::Max(0, [Math]::Min(120, $seconds))

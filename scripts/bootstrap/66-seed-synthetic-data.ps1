@@ -19,6 +19,7 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
+. (Join-Path $PSScriptRoot 'helpers/choice-migration-verification.ps1')
 $envFile = Join-Path $repoRoot '.env.ps1'
 if ($env:WIZARD_DATA_SKIP_MAIN -ne 'true' -and (Test-Path $envFile) -and [string]::IsNullOrWhiteSpace($EnvironmentUrl)) {
     . $envFile
@@ -33,12 +34,30 @@ function ConvertTo-WizardFilterLiteral { param($Value) if($Value -is [bool]){ret
 function Invoke-WizardSyntheticDataStage {
     param([string]$RepoRoot,[string]$ScenarioSlug,[string]$PayloadsFolder,[string]$EnvironmentUrl,[string]$AccessToken,[string]$SolutionUniqueName,[switch]$PreviewOnly,[scriptblock]$RequestInvoker)
     $payload=Get-WizardDataPayload $PayloadsFolder
+    $choiceMigration = Get-WizardEffectiveChoiceContract -RepoRoot $RepoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder -SolutionUniqueName $SolutionUniqueName
+    if ($null -ne $choiceMigration) {
+        foreach ($table in $payload.Tables) {
+            foreach ($record in $table.Records) {
+                $values = [ordered]@{}
+                foreach ($property in $record.Values.PSObject.Properties) { $values[$property.Name] = $property.Value }
+                ConvertTo-WizardMigratedValues -Payload $choiceMigration -TableLogicalName $table.TableLogicalName -Values $values
+                $record.Values = [pscustomobject]$values
+            }
+        }
+    }
     $planned=@($payload.Tables|ForEach-Object{$table=$_; @($table.Records|ForEach-Object{[pscustomobject]@{table=$table.TableLogicalName;key=$_.Key;action='planned'}})})
     if($PreviewOnly){$items=$planned}else{
         foreach($required in @($EnvironmentUrl,$AccessToken,$SolutionUniqueName)){if([string]::IsNullOrWhiteSpace($required)){throw 'Synthetic-data apply requires explicit environment, token, and solution.'}}
         $invoke={param($method,$path,$body=$null) Invoke-WizardDataverseRequest -Method $method -Path $path -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body $body -RequestInvoker $RequestInvoker}
         $safeSolution=ConvertTo-WizardODataLiteral $SolutionUniqueName
         $solutions=@((&$invoke Get "solutions?`$select=solutionid&`$filter=uniquename eq '$safeSolution'").value); if($solutions.Count-ne 1){throw "Expected exactly one selected solution '$SolutionUniqueName'."}
+        if ($null -ne $choiceMigration) {
+            Assert-WizardChoiceColumnCompatibility -Payload $choiceMigration -InvokeGet { param($path) & $invoke Get $path }
+            foreach ($choice in $choiceMigration.GlobalChoices) {
+                $metadata = & $invoke Get "GlobalOptionSetDefinitions(Name='$($choice.Name)')/Microsoft.Dynamics.CRM.OptionSetMetadata"
+                Assert-WizardGlobalChoiceMetadata -Choice $choice -Metadata $metadata
+            }
+        }
         $items=[Collections.Generic.List[object]]::new(); $tableMetadata=@{}
         foreach($table in @($payload.Tables)){
             $metadata=&$invoke Get "EntityDefinitions(LogicalName='$($table.TableLogicalName)')?`$select=LogicalName,EntitySetName,PrimaryIdAttribute"

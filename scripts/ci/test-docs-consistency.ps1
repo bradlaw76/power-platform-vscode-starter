@@ -10,6 +10,18 @@ $contract = Get-Content (Join-Path $repoRoot 'docs/wizard-contract-v1.md') -Raw
 $wizardContract = Get-Content (Join-Path $repoRoot 'wizard.profile.json') -Raw | ConvertFrom-Json
 $startWizard = Get-Content (Join-Path $repoRoot 'scripts/bootstrap/05-start-wizard.ps1') -Raw
 $initSkill = Get-Content (Join-Path $repoRoot '.github/skills/power-platform-wizard-init/SKILL.md') -Raw
+$demoSkillPath = Join-Path $repoRoot '.github/skills/power-platform-demo-wizard/SKILL.md'
+$demoSkill = Get-Content -LiteralPath $demoSkillPath -Raw
+$skillLinks = [regex]::Matches($demoSkill, '\]\((?<target>\.\.?/[^)#]+)(?:#[^)]*)?\)')
+if ($skillLinks.Count -eq 0) {
+  throw 'Demo wizard skill must link canonical repository guidance.'
+}
+foreach ($link in $skillLinks) {
+  $target = Join-Path (Split-Path $demoSkillPath -Parent) $link.Groups['target'].Value
+  if (-not (Test-Path -LiteralPath $target -PathType Leaf)) {
+    throw "Demo wizard skill has a broken repository link: $($link.Groups['target'].Value)"
+  }
+}
 $sourceControlStandardsPath = Join-Path $repoRoot 'requirements/GithubInstructions_General.md'
 
 $requiredQuestions = [int]$wizardContract.discovery.coreQuestions

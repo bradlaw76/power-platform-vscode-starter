@@ -304,7 +304,7 @@ try {
     (New-Attribute -LogicalName 'tst_caseid' -Label 'Case' -AttributeType 'Uniqueidentifier' -IsPrimaryId $true),
     (New-Attribute -LogicalName 'tst_name' -Label 'Case Name' -IsPrimaryName $true),
     (New-Attribute -LogicalName 'tst_description' -Label 'Description'),
-    (New-Attribute -LogicalName 'tst_priority' -Label 'Priority'),
+    (New-Attribute -LogicalName 'tst_priority' -Label 'Priority' -AttributeType 'Picklist'),
     (New-Attribute -LogicalName 'tst_category' -Label 'Category'),
     (New-Attribute -LogicalName 'tst_region' -Label 'Region'),
     (New-Attribute -LogicalName 'statuscode' -Label 'Status' -AttributeType 'Picklist'),
@@ -335,6 +335,7 @@ try {
     Assert-Condition -Condition ($createdFields -contains $expectedField) -Message "Expected field $expectedField to be placed on the form."
   }
   [xml]$createdFormDocument = $script:MockContext.Forms[0].formxml
+  Assert-Condition -Condition ($createdFormDocument.SelectSingleNode("//control[@datafieldname='tst_priority']").GetAttribute('classid') -eq '{3EF39988-22BB-4F0B-BBBE-64B5A3748AEE}') -Message 'Picklist fields must use the Choice dropdown control.'
   $tabLabelId = $createdFormDocument.SelectSingleNode('/form/tabs/tab').GetAttribute('labelid').Trim('{}')
   $parsedTabLabelId = [guid]::Empty
   Assert-Condition -Condition ([guid]::TryParse($tabLabelId, [ref]$parsedTabLabelId)) -Message 'Generated form tab labelid must be a valid GUID.'

@@ -1,0 +1,25 @@
+{
+  "version": "1.0",
+  "solutionUniqueName": "FederalFOIAManagement",
+  "runtimeControl": "Microsoft.PowerApps.PowerAppsOneGrid",
+  "scope": "all-views",
+  "client": "Web",
+  "enableEditing": false,
+  "optionSetColors": true,
+  "preserveMobileControls": true,
+  "tables": [
+    "foia_foiarequest",
+    "foia_appeal",
+    "foia_searchtask",
+    "foia_responsiverecord",
+    "foia_reviewtask",
+    "foia_exemptiondecision",
+    "foia_redactiondecision",
+    "foia_releasepackage",
+    "foia_clockevent",
+    "foia_auditevent",
+    "foia_aiassistancerecord",
+    "contact",
+    "incident"
+  ]
+}

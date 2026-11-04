@@ -11,45 +11,54 @@
 "Today I am showing how Federal FOIA Management helps FOIA program leaders, processors, legal reviewers, release officers, and auditors address this need: provide a reusable, secure, auditable Federal FOIA request-management solution from intake through release, appeal, and closure." "Watch for this result: staff can process representative requests end to end while statutory timing, decisions, documents, approvals, and report calculations remain traceable and reproducible."
 
 ## Talk Track Steps
-### Step 1: Open with the business problem (2 min)
+### Step 1: Open with the business problem (1 min)
 **Say**
-Explain why this scenario exists, who it helps, and what outcome the audience should watch for. Show the primary workflow and one supporting artifact.
+Federal FOIA work spans intake, statutory timing, collection, review, approval, release, appeal, and audit. This demo uses only deterministic synthetic data and keeps human decision authority visible.
 
 **Show**
-- State the workflow being demoed: Process a synthetic FOIA request from intake through search, review, human approval, release, and audit
-- Anchor the audience on the hero record: FOIA Request
+- Open the published `Federal FOIA Management` model-driven app.
+- Confirm the app opens in `FOIA Operations` on `FOIA Requests` / `Active FOIA Requests`.
 
 ### Step 2: Start from the hero record (2 min)
 **Say**
-Show how a user begins work with FOIA Request and why that record matters to the scenario.
+The FOIA Request is the operational anchor for requester identity, dates, fees, lifecycle, related work, decisions, release evidence, and audit history.
 
 **Show**
-- Navigate to the app area or page where FOIA Request is managed
-- Open the relevant form, view, or page for FOIA Request
+- In `Active FOIA Requests`, search for `SYN-FOIA-2026-001`.
+- Open `Synthetic Normal Request`.
+- Point out tracking number `SYN-FOIA-2026-001`, lifecycle stage `Review`, disposition `Open`, current due date, requester, and acknowledgment reference.
+- Use the form or related navigation to connect the request to its Case, Search Task, Responsive Record, and Review Task.
 
-### Step 3: Walk through the core workflow (1 min)
+### Step 3: Walk through the core workflow (2 min)
 **Say**
-Demonstrate the main business use case from start to finish using FOIA Request and Search Task.
+The seven synthetic requests are a compact journey switcher. Each record demonstrates a distinct point in the lifecycle without changing production or tenant data.
 
 **Show**
-- Create or update the record needed for the workflow
-- Show how related data or artifacts support the process
+- `SYN-FOIA-2026-002`: expedited request in `Search`, with expedited decision `Granted`.
+- `SYN-FOIA-2026-003`: overdue request in `Review`, with due date `2025-11-03`.
+- `SYN-FOIA-2026-004`: appealed request in `Closure`, with partial-grant disposition and an Appeal.
+- `SYN-FOIA-2026-005`: fee request in `Approval`, with $120 assessed, $80 waived, and $40 collected.
+- `SYN-FOIA-2026-006`: exemption request in `Redaction`, with Exemption and Redaction Decisions.
+- `SYN-FOIA-2026-007`: released request in `Closure`, with release-package evidence.
+- Do not edit these records during the short demo; use them as stable checkpoints.
 
 ### Step 4: Show supporting experience (1 min)
 **Say**
-Use the scenario artifacts to prove that the workflow is operational, visible, and useful to the business.
+The same operational data rolls into native views, charts, and dashboards for workload, statutory reporting, appeals, review, and release readiness.
 
 **Show**
-- Show the most important artifact from: FOIA Request, Case, Contact, all downstream FOIA operational tables, forms, views, both BPF handoffs, charts, dashboards, and role-appropriate navigation
-- Explain how users monitor or act on the workflow
+- Open the `Dashboards` group and select `Federal FOIA Operations`.
+- Show `Active Requests by Lifecycle Stage` and `Expedited Requests by Decision`.
+- Point out the additional dashboard links: `Federal FOIA Statutory Reporting`, `Federal FOIA Appeals`, `Federal FOIA Review Workload`, and `Federal FOIA Release Readiness`.
+- Explain that Processor, Approver, and Release Officer roles separate coarse table actions; user assignment and production enforcement remain outside this demo increment.
 
 ### Step 5: Close with success and next step (1 min)
 **Say**
-Tie the workflow back to the business problem and tell the audience what to review next.
+The demo proves a reusable, agency-neutral FOIA data and experience foundation with traceable synthetic journeys, human decision surfaces, native reporting, and bounded demo roles.
 
 **Show**
-- Restate the measurable success outcome
-- Summarize what changed for the user
+- Restate that all seven journey records and all 41 synthetic records reconcile exactly once.
+- Clarify that SharePoint provisioning, automated flows, full production security, and server-side enforcement are planned future increments rather than hidden demo claims.
 
 
 ## Key Phrases To Use

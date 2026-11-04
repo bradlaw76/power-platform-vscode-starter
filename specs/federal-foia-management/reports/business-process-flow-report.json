@@ -1,35 +1,71 @@
 {
+  "Timestamp": "2026-10-22T14:21:43.7295285-04:00",
+  "SucceededCount": 2,
+  "FailedCount": 0,
+  "Validation": {
+    "Passed": [
+      "Process name supplied: Federal FOIA Request Lifecycle",
+      "Primary entity resolved: foia_foiarequest",
+      "Target Main form declared: FOIA Request Main",
+      "Stage threshold passed: 8 >= 2.",
+      "Condition threshold passed: 16 >= 2.",
+      "Step threshold passed: 13 >= 2.",
+      "Process name supplied: Federal FOIA Appeal Lifecycle",
+      "Primary entity resolved: foia_appeal",
+      "Target Main form declared: FOIA Appeal Main",
+      "Stage threshold passed: 6 >= 2.",
+      "Condition threshold passed: 12 >= 2.",
+      "Step threshold passed: 10 >= 2."
+    ],
+    "Failed": [],
+    "Warnings": []
+  },
+  "ProcessCount": 2,
+  "Status": "completed",
+  "Processes": [
+    {
+      "Key": "01-foia-request",
+      "ProcessName": "Federal FOIA Request Lifecycle",
+      "TargetEntity": "foia_foiarequest",
+      "Status": "validated-existing",
+      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-report.json",
+      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-designer-handoff.md"
+    },
+    {
+      "Key": "02-appeal",
+      "ProcessName": "Federal FOIA Appeal Lifecycle",
+      "TargetEntity": "foia_appeal",
+      "Status": "validated-existing",
+      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-report.json",
+      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-designer-handoff.md"
+    }
+  ],
   "DataverseResult": {
     "MetadataMutation": "existing-components-only",
     "Processes": [
       {
-        "RuntimeNotes": [],
-        "Metrics": {
-          "StageCount": 8,
-          "ConditionCount": 16,
-          "StepCount": 13
-        },
+        "MetadataMutation": "none",
+        "SolutionAddStatus": "added",
+        "UniqueName": "foia_federal_foia_request_lifecycle",
         "Action": "validated-existing",
-        "WorkflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
-        "Provisioning": "designer-authored-existing-process",
+        "Thresholds": {
+          "MinimumStageCount": 2,
+          "MinimumConditionCount": 2,
+          "MinimumStepCount": 2
+        },
+        "RuntimeNotes": [],
         "Activation": {
           "Activated": true,
           "StateCode": 1,
           "StatusCode": 2,
           "Action": "already-active"
         },
-        "UniqueName": "foia_federal_foia_request_lifecycle",
-        "SolutionAddStatus": "added",
-        "SolutionMembership": {
-          "InSolution": true,
-          "SolutionUniqueName": "FederalFOIAManagement",
-          "ComponentType": 29
+        "Metrics": {
+          "StageCount": 8,
+          "ConditionCount": 16,
+          "StepCount": 13
         },
-        "Thresholds": {
-          "MinimumStageCount": 2,
-          "MinimumConditionCount": 2,
-          "MinimumStepCount": 2
-        },
+        "WorkflowId": "33123dd4-53c6-f111-aaae-001dd80bb94c",
         "BranchPredicateSummary": [
           {
             "StageOrder": 1,
@@ -80,36 +116,36 @@
             "ExitCriteria": "Closure reconciles to clock and audit history; FOIA-RPT-003."
           }
         ],
-        "MetadataMutation": "none"
+        "Provisioning": "designer-authored-existing-process",
+        "SolutionMembership": {
+          "InSolution": true,
+          "SolutionUniqueName": "FederalFOIAManagement",
+          "ComponentType": 29
+        }
       },
       {
-        "RuntimeNotes": [],
-        "Metrics": {
-          "StageCount": 6,
-          "ConditionCount": 12,
-          "StepCount": 10
-        },
+        "MetadataMutation": "none",
+        "SolutionAddStatus": "added",
+        "UniqueName": "foia_federal_foia_appeal_lifecycle",
         "Action": "validated-existing",
-        "WorkflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
-        "Provisioning": "designer-authored-existing-process",
+        "Thresholds": {
+          "MinimumStageCount": 2,
+          "MinimumConditionCount": 2,
+          "MinimumStepCount": 2
+        },
+        "RuntimeNotes": [],
         "Activation": {
           "Activated": true,
           "StateCode": 1,
           "StatusCode": 2,
           "Action": "already-active"
         },
-        "UniqueName": "foia_federal_foia_appeal_lifecycle",
-        "SolutionAddStatus": "added",
-        "SolutionMembership": {
-          "InSolution": true,
-          "SolutionUniqueName": "FederalFOIAManagement",
-          "ComponentType": 29
+        "Metrics": {
+          "StageCount": 6,
+          "ConditionCount": 12,
+          "StepCount": 10
         },
-        "Thresholds": {
-          "MinimumStageCount": 2,
-          "MinimumConditionCount": 2,
-          "MinimumStepCount": 2
-        },
+        "WorkflowId": "96729c94-56c6-f111-aaae-001dd80753e2",
         "BranchPredicateSummary": [
           {
             "StageOrder": 1,
@@ -148,49 +184,13 @@
             "ExitCriteria": "Closure reconciles to Appeal Clock Events; FOIA-RPT-003."
           }
         ],
-        "MetadataMutation": "none"
+        "Provisioning": "designer-authored-existing-process",
+        "SolutionMembership": {
+          "InSolution": true,
+          "SolutionUniqueName": "FederalFOIAManagement",
+          "ComponentType": 29
+        }
       }
     ]
-  },
-  "FailedCount": 0,
-  "Processes": [
-    {
-      "Key": "01-foia-request",
-      "ProcessName": "Federal FOIA Request Lifecycle",
-      "TargetEntity": "foia_foiarequest",
-      "Status": "validated-existing",
-      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-report.json",
-      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-01-foia-request-designer-handoff.md"
-    },
-    {
-      "Key": "02-appeal",
-      "ProcessName": "Federal FOIA Appeal Lifecycle",
-      "TargetEntity": "foia_appeal",
-      "Status": "validated-existing",
-      "ReportPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-report.json",
-      "HandoffPath": "D:\\Onedrive\\OneDrive - Microsoft - Nov 24\\OneDrive - Microsoft\\DEMO\\My Github\\federal-foia-2\\specs\\federal-foia-management\\reports\\business-process-flow-02-appeal-designer-handoff.md"
-    }
-  ],
-  "ProcessCount": 2,
-  "Status": "completed",
-  "Timestamp": "2026-10-12T14:09:18.9598158-04:00",
-  "SucceededCount": 2,
-  "Validation": {
-    "Passed": [
-      "Process name supplied: Federal FOIA Request Lifecycle",
-      "Primary entity resolved: foia_foiarequest",
-      "Target Main form declared: FOIA Request Main",
-      "Stage threshold passed: 8 >= 2.",
-      "Condition threshold passed: 16 >= 2.",
-      "Step threshold passed: 13 >= 2.",
-      "Process name supplied: Federal FOIA Appeal Lifecycle",
-      "Primary entity resolved: foia_appeal",
-      "Target Main form declared: FOIA Appeal Main",
-      "Stage threshold passed: 6 >= 2.",
-      "Condition threshold passed: 12 >= 2.",
-      "Step threshold passed: 10 >= 2."
-    ],
-    "Failed": [],
-    "Warnings": []
   }
 }

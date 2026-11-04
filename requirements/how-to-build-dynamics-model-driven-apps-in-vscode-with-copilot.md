@@ -380,16 +380,23 @@ Also define non-functional requirements early:
 ## 5. Build the Dataverse Data Model
 
 1. Create core tables in dependency order (parent before child).
-2. Add columns with clear naming, types, and required constraints.
+2. Add columns with clear naming, explicit semantic types, and required constraints.
 3. Define relationships (1:N, N:1, N:N) intentionally.
 4. Add status and reason fields for operational state tracking.
 5. Add audit-friendly columns where needed (owner, created on, modified on, source).
+6. Complete a field-type decision table before generating column payloads.
+   Bounded vocabularies use Choice, binary decisions use Yes/No, and governed
+   reference values use lookups. Categorical-looking text requires documented
+   rationale and user approval. This rule applies to every use case, domain,
+   delivery stage, and standard/custom table strategy.
 
 Copilot prompt pattern:
 
 - Ask Copilot to generate a table definition checklist including:
   - Column names
   - Data types
+  - Business meaning and whether values are bounded
+  - Choice scope (global or local), stable numeric values, labels, and defaults
   - Required/optional
   - Validation rules
   - Relationship targets
@@ -399,7 +406,9 @@ Naming standard baseline (generic):
 - Publisher prefix on all custom tables/columns.
 - Singular table names and explicit relationship names.
 - Separate display label from schema name decisions.
-- Reserve state/status choices for lifecycle transitions only.
+- Use Choice for every bounded business vocabulary, not only lifecycle state.
+- Never infer String from label-shaped requirements or sample values.
+- Block stage 30 while a categorical candidate is unresolved.
 
 ## 5A. Reusable API-First Bootstrap (VS Code)
 

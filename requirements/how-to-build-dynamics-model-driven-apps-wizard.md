@@ -169,20 +169,36 @@ Ask the user:
 4. Which relationships are required and what cascade behavior is expected?
 5. What audit and retention fields are mandatory?
 6. Which shared source-tagging field (for example `demo_datacustomerapplication`) must be present on every app table and demo seed row?
+7. Which fields use bounded vocabularies such as status, state, stage, type,
+   category, classification, disposition, outcome, decision, channel, method,
+   reason, priority, access, approval, review, repository, or source system?
 
 Build decisions:
 - Naming convention (publisher prefix, schema style, relationship naming).
 - Parent-before-child creation order.
 - Required vs optional field policy.
 - Data classification per table.
+- Field-type decision table covering every column. Bounded vocabularies use
+  Choice, binary decisions use Yes/No, and governed reference values use
+  lookups. A categorical-looking String requires explicit rationale and user
+  approval in both `spec.md` and `plan.md`. Apply this to every domain,
+  greenfield or retrofit, demo or production-oriented build, and standard,
+  custom, or hybrid table strategy.
+- Global-versus-local Choice scope, stable numeric option values, labels,
+  defaults, and deterministic demo-data mappings.
 
 Exit criteria:
 - Table catalog with required columns completed.
 - Relationship map approved.
 - State transition table defined.
+- No unresolved categorical field candidates remain before column payloads or
+  stage 30.
 
 Copilot prompt:
-"Create a Dataverse schema checklist with table definitions, required columns, relationships, status model, validation rules, and audit metadata."
+"Create a Dataverse schema checklist with table definitions, required columns,
+explicit field-type decisions, bounded-vocabulary Choice definitions,
+relationships, status model, validation rules, and audit metadata. Do not map
+categorical labels to StringAttributeMetadata without documented approval."
 
 Response template:
 - Table catalog:

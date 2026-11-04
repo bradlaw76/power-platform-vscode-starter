@@ -51,6 +51,7 @@ $schemaByFamily = [ordered]@{
     'views'         = Join-Path $schemaRoot 'views.schema.json'
     'data'          = Join-Path $schemaRoot 'data.schema.json'
     'security-roles' = Join-Path $schemaRoot 'security-roles.schema.json'
+    'choice-migration' = Join-Path $schemaRoot 'choice-migration.schema.json'
 }
 $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
@@ -77,7 +78,7 @@ foreach ($file in $jsonFiles) {
         continue
     }
 
-    if ($file.Name -notmatch '^(?<family>table|columns|keys|relationships|process|reporting|views|data|security-roles)-.+\.json$') {
+    if ($file.Name -notmatch '^(?<family>table|columns|keys|relationships|process|reporting|views|data|security-roles|choice-migration)-.+\.json$') {
         continue
     }
 

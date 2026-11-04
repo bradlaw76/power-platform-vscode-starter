@@ -80,6 +80,39 @@ If generated guidance conflicts with any of these internal docs, either align to
    - Exponential backoff on 429
 6. App component add/remove operations must be explicit, tracked, and rerunnable.
 
+## Semantic Field Type Standard (Mandatory for Every Use Case)
+Before generating any `columns-*.json` payload, classify every planned field as
+free text, identifier/code, number/currency, date/time, yes/no, lookup, Choice,
+multi-select Choice, file, or image. Apply this to every industry and process,
+greenfield or retrofit, demo or production, and standard or custom table.
+
+- Treat bounded business vocabularies as categorical. Common signals include
+  names ending in or describing Status, State, Stage, Type, Category,
+  Classification, Disposition, Outcome, Decision, Channel, Method, Reason,
+  Priority, Access, Approval, Review, Repository, or Source System.
+- Use a Dataverse Choice for a bounded list, Yes/No for a binary decision, and
+  a lookup when values are governed records with their own lifecycle. Use text
+  only for genuinely open-ended content or an identifier/code whose allowed
+  values are not a business vocabulary.
+- Never choose `StringAttributeMetadata` merely because requirements or sample
+  data express categorical values as labels.
+- Prefer a global Choice when the same semantic vocabulary is reused across
+  tables; otherwise use a table-local Choice. Define stable numeric values,
+  labels, defaults if any, and deterministic sample-data mappings during
+  planning.
+- Any categorical-looking field intentionally kept as text requires an explicit
+  rationale and user approval in `spec.md` and `plan.md`.
+- Add a field-type decision table to planning artifacts and block stage 30
+  until every categorical candidate has a resolved type. After stage 30,
+  validate the live Dataverse metadata type, not just the displayed value.
+- A retrofit from text to Choice is destructive because Dataverse cannot change
+  the attribute type in place. Require preview, dependency inventory, backup,
+  value mapping, separate destructive approval, rollback, and post-apply
+  verification.
+
+Use `docs/field-type-decision-standard.md` as the reusable decision process and
+planning template.
+
 ## Solution Inventory and Sync (Mandatory)
 During every build run, collect and persist inventory for all created or updated artifacts:
 - Tables, Columns, Relationships

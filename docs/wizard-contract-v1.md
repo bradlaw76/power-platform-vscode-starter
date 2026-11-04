@@ -1,7 +1,7 @@
 # Wizard Contract v1
 
 Status: Active
-Version: 1.10.0
+Version: 1.11.0
 
 ## Purpose
 
@@ -71,6 +71,38 @@ Before any build recommendation, either confirm all five architecture intent que
 5. Which artifacts must the required auto-created or updated **model-driven review app** surface?
 
 Do not proceed to build until architecture intent is captured in the planning artifacts and approved.
+
+### Semantic Field Type Contract (Every Use Case)
+
+Before column payload generation, every planned field must be classified as
+free text, identifier/code, number/currency, date/time, Yes/No, lookup, Choice,
+multi-select Choice, file, or image. This applies to every domain, greenfield
+and retrofit work, demos and production-oriented builds, and standard, custom,
+or hybrid table designs.
+
+- A bounded business vocabulary defaults to Choice, not String. Signals include
+  Status, State, Stage, Type, Category, Classification, Disposition, Outcome,
+  Decision, Channel, Method, Reason, Priority, Access, Approval, Review,
+  Repository, and Source System.
+- Use Yes/No for binary decisions and a lookup when the allowed values are
+  governed records with independent metadata or lifecycle.
+- Requirements and sample data commonly express Choice values as labels; that
+  representation must not cause `StringAttributeMetadata` generation.
+- Use a global Choice for a semantic vocabulary reused across tables and a
+  local Choice for table-specific vocabulary. Planning must define stable
+  numeric values, labels, defaults, and sample-data mappings.
+- A categorical-looking field may remain String only when `spec.md` and
+  `plan.md` record an explicit rationale and user approval.
+- Planning must include a field-type decision table with field, business
+  meaning, selected Dataverse type, vocabulary scope, and rationale. Unresolved
+  candidates block `columns-*.json` generation and stage 30.
+- Post-build validation must query live metadata and prove each planned Choice,
+  Yes/No, and lookup has the intended Dataverse attribute type.
+- Retrofitting String to Choice requires a separately approved destructive
+  migration because Dataverse cannot change that attribute type in place.
+
+The complete reusable decision process and generic planning template are in
+[field-type-decision-standard.md](field-type-decision-standard.md).
 
 After explicit table mapping, the entry-point logical name must resolve to a reused standard table, a planned custom table, or an existing retrofit inventory table. Every planned view must declare a disposition in `views.json`. For a uniquely identified new custom table, the generator emits `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and emits `create-custom` for a distinct business view name. Standard, hybrid-standard, shared, preexisting, retrofit, or ambiguously classified tables emit `explicit-decision-required` rather than a guessed disposition. App assembly remains blocked until every explicit decision is resolved and each named saved query resolves in Dataverse.
 

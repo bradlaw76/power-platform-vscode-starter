@@ -1,5 +1,40 @@
 # Federal FOIA Management Tasks
 
+## Next Production-Hardening Increment - 2026-11-04
+
+This checklist is the next-work index for
+[the proposed milestone plan](plan.md#production-hardening-increment---2026-11-04).
+Earlier completed items remain historical evidence, not permission to rerun live
+operations. User approval on 2026-11-04 covers local review/planning only.
+
+- [x] Review local status, dated deployment/build evidence, pending runtime integration changes, and remaining behavior/release gaps without live access.
+- [x] Update current-state specification and separate proposed hardening scope from demo completion and production readiness.
+- [x] Record milestone prerequisites, accountable roles, acceptance tests PH-T01 through PH-T10, unresolved policy decisions, and operation-specific approval boundaries.
+- [x] PH-00 verification: run 15 selected standalone regression suites and 19 runtime Pester tests in a credential-free isolated source copy; all passed; verify all 286 original runtime-evidence files unchanged.
+- [x] PH-00 verification: reproduce the default-overlay gap without Apply evidence and prove explicit contract resolution for all 26 global Choices/29 Picklists; record pending file groups without staging.
+- [x] PH-00 design approval: operator approved local implementation of a versioned checked-in effective contract for normal consumers, preserving rollback sources and separate destructive migration/backup gates; no live operations, commits, or deployment authorized.
+- [x] PH-00: Complete grouped pending-source review across 59 files; record four additional reproduced findings and explicit checkpoint exclusions. Earlier full CI and post-fix targeted validation remain dated evidence, not coverage of these newly reproduced cases.
+- [x] PH-00: Operator approved all four final review corrections locally; targeted migration, grid, documentation-link, and unset-TEMP regressions pass. No live or source-control mutation was authorized.
+- [x] PH-00: Fresh full Windows checkpoint validation passed: 81 parsed files, zero configured analyzer findings, 32 standalone suites, 91 Pester tests, 88-file Markdown lint, exact 60-path source scope, whitespace checks, and 286 unchanged historical evidence hashes. Hosted Linux and live checks were not run.
+- [x] PH-00: Obtain explicit checkpoint commit approval. Operator approved staging the exact 60 reviewed paths and one local checkpoint commit only.
+- [ ] PH-00: Obtain separate push/PR approval; no push is authorized.
+- [x] PH-00: Approve and locally implement the reproducible post-migration schema/data contract; isolated fresh-source mocks create all 26 global Choices and 29 Picklist bindings, seed 97 numeric values across 41 stable records, and verify strict inventory/export without borrowing Apply evidence; original rollback sources retained.
+- [x] PH-00: Run 20 selected standalone regression suites, 19 runtime Pester tests, and syntax/ScriptAnalyzer checks for eight implementation/test files; all passed and all 286 original runtime-evidence hashes unchanged. This does not mark full CI or live deployment complete.
+- [x] PH-00: Run the full isolated Windows CI equivalent: parse 81 PowerShell files, pinned repository ScriptAnalyzer, 32 standalone suites, 91 Pester tests, and pinned Markdown lint over 93 files; all passed; all 286 original runtime-evidence hashes unchanged. Hosted Linux and live validation remain separate.
+- [x] PH-00 review: reproduce stale-snapshot overwrite and ignored pagination in stage 36 using isolated mocks; record both as checkpoint blockers, not historical live data-loss claims.
+- [x] PH-00 corrective approval: operator approved additional local migration-safety changes and regression coverage; no live access or destructive execution is authorized by this approval.
+- [x] PH-00 corrective implementation: read every data page, compare complete live/snapshot cohorts before any mutation, fail closed on drift or late-page ownership/mapping errors, and document the required write-quiescence boundary.
+- [x] PH-00 corrective validation: eight affected suites passed, including final drift/malformed-ID regression; three-file syntax and pinned analyzer passed; all 286 original runtime-evidence hashes unchanged. Documentation consistency and lint are required after recording these results.
+- [x] PH-00: Complete remaining grouped review after the approved migration-safety fixes; sign-off is blocked by the four final review findings, not by an unfinished review pass.
+- [x] PH-00 final corrections: validate every existing global Choice before any Apply mutation; reject broadened/aliased exported FOIA filters; make the dependency-preparation fixture portable with `TEMP` unset; fix and validate the new skill's six relative links. Regression coverage adds one modified existing test file, bringing candidate scope to 60 paths.
+- [ ] PH-01 (depends on PH-00): Resolve the plan's policy/configuration decision register, assign named owners, approve first-slice design/test expectations, and obtain separate DEV access/deployment/test-identity/SharePoint authorization where applicable.
+- [ ] PH-02 (depends on PH-01): Implement and unit test server-side intake validation, tracking allocation, deterministic clocks, protected projections, and immutable events; run authorized DEV integration and PH-T01 through PH-T04.
+- [ ] PH-03 (depends on PH-02): Implement and test controlled review/approval/release, package integrity, independent SharePoint access, and bounded queues/routing/SLAs; pass PH-T05 through PH-T07.
+- [ ] PH-04 (depends on PH-03): Implement observable idempotent notifications/integration failures; complete the normal synthetic request journey with Azure disabled; pass PH-T08 and PH-T09.
+- [ ] PH-02 through PH-04: Inventory new plug-in/flow/configuration components and exact IDs, sync to the selected solution, publish scoped changes, preserve existing identities/data/shared-table surfaces, and pass PH-T10 after each increment.
+- [ ] PH-05 (depends on PH-04): Complete the remaining journeys, full production security model and access tests, reporting reconciliation, accessibility/performance/portability/recovery suites, and named operational sign-off.
+- [ ] PH-06 (depends on PH-05 and separate release approval): Produce/test a managed candidate in an authorized validation environment, rehearse rollback, obtain UAT and release sign-off, and separately approve production cutover.
+
 ## Planning And Approval
 
 - [x] Select `advanced-builder`.
@@ -63,9 +98,29 @@
 - [x] Run stage `30` to create and independently verify all 134 columns and 11 alternate keys, including approved Case/Contact extensions; all key indexes are Active and key solution membership is verified.
 - [x] Run stage `40` to create and independently verify 20 one-to-many relationships and one many-to-many relationship with requiredness and restrictive cascades; document the Dataverse-required Contact merge cascade exception.
 - [x] Add all declared schema components and deterministic Dataverse dependencies to `FederalFOIAManagement`, publish the 13 scoped entities, inventory IDs, and verify zero missing, failed, or unauthorized schema membership.
+- [x] Audit categorical schema drift: 15 implemented fields map to the approved 12-choice contract and 14 additional fields require explicit choices.
+- [x] Approve normalization of all 29 categorical fields and same-logical-name reconstruction for this synthetic demo.
+- [x] Define 26 global choices, stable numeric values, 29 field bindings, deterministic label mappings, and the preview-first migration sequence.
+- [x] Implement credential-free schema, offline mapping, preview nonmutation, dependency-gate, and foreign/unmapped-value tests for the choice retrofit.
+- [x] Implement credential-free guarded Snapshot/Apply/Verify, dependency-zero enforcement, same-name recreation, solution membership, idempotent rerun, and rollback restoration tests.
+- [x] Produce the exact operator dependency-removal/restoration handoff for all 60 references across 13 views, 2 designer-authored BPFs, 7 charts, and 15 forms, including the two generated BPF backing forms.
+- [x] Implement and credential-free test GET-only stage 37 preparation: all 60 references and 37 handoff IDs are required; temporary definitions cover 26 stage-60 components and 7 stage-64 charts; 4 BPF-owned records remain designer-managed.
+- [x] Run live stage 37 Preview and review the generated temporary definitions: all 60 references, 37 component IDs, 33 script-managed definitions, and 4 BPF-owned records passed with zero mutations.
+- [x] Create the fresh pre-migration unmanaged stage-95 backup at a Windows-safe short path; inspect 27/27 expected roots, 235 membership items, and 217 files with zero missing or unrelated components and record SHA-256 `26c724b7df4d3b6a7efde3b689acaa483609145beb304077f900a38d22cfaf09`.
+- [x] Add post-Apply strict inventory and export assertions for all 26 global choices and 29 Picklist columns; verify exact bindings, numeric values, English labels, metadata IDs, and explicit/include-all solution membership with credential-free positive/negative tests.
+- [x] Run the choice retrofit in live read-only Preview: 29 String fields, 97 populated synthetic values, 60 blocking dependencies, and zero mutations.
+- [x] Obtain separate destructive approval before deleting or recreating any live column: operator authorized all 29 approved categorical fields for the demo.
+- [x] Apply the approved migration, restore all dependencies, reseed only owned synthetic records, publish, and run strict field/form/view/BPF/chart/app validation: 97 populated values restored, 33 ordinary definitions restored, both BPFs active, and real Request dropdown interaction verified on 2026-10-22.
+- [x] Rerun membership, stage `85`, and stage `95`: 29 Choice columns, 26 global choices, 261 solution items, 41 stable record IDs, zero duplicates, and 53/53 export roots with no missing or unrelated components.
 - [ ] Run schema integration and security tests.
 
 ## Server Logic And Automation
+
+### Choice Presentation Increment
+
+- [x] Reuse original wizard pastel/icon tokens and classify all 162 FOIA options without changing semantic labels or values.
+- [x] Add preview/hash approval, complete global-Choice preflight, backup, scoped update/publish, exact readback, and credential-free tests.
+- [x] Apply approved preview `5378829731c57f423e55925b470291b7436599457c5d50296939f0370de75e48`; settled rerun made zero updates; 29 live bindings/97 populated values, 261 memberships, 53 export roots and all 162 exported labels/colors passed. Published Request UI shows prefixed labels; standard form dropdowns do not render pastel option backgrounds.
 
 - [ ] Implement and unit test tracking-number allocation.
 - [ ] Implement and unit test deterministic statutory-clock calculation and immutable Clock Event creation.
@@ -113,6 +168,15 @@
 - [ ] Validate drill-through and security trimming.
 - [ ] Reconcile all synthetic-data totals to source records and Clock/Audit Events.
 
+## Pastel Grid Increment
+
+- [x] Record the 13-table read-only Web-grid contract and preserve a pre-grid export.
+- [x] Configure Power Apps grid Choice colors through supported maker UI, preserving mobile settings.
+- [x] Create FOIA Requester Choice Overview and FOIA Case Choice Overview; preserve all 45 original shared-table public views; add both views to solution/app and publish.
+- [x] Verify all 13 selected Web controls and colors in exported metadata and actual Request/Contact/Case app cells; prove 263 strict memberships, 97 unchanged values, all original IDs stable, and the final 53-root/245-file unmanaged package.
+- [x] Archive and compare the 702-identity pre-grid baseline; allow only the two new views' four identity entries; verify the 706-identity baseline after the bounded view rerun.
+- [x] Run eight isolated credential-free regression suites, including exact grid-property and FOIA-view positive/negative gates.
+
 ## Review App And Security
 
 - [x] Create or update the Federal FOIA Management review app with FOIA Request first and Active FOIA Requests as the landing view.
@@ -121,7 +185,8 @@
 - [x] Define the exact Business Unit privilege matrix and validated payload for `FOIA Demo Processor`, `FOIA Demo Approver`, and `FOIA Demo Release Officer`.
 - [x] Preview the three roles with zero Dataverse calls and retain the local preview evidence.
 - [x] Create the three roles after separate apply approval; verify stable IDs, exact planned privileges plus the reported Dataverse-managed baseline, explicit solution membership, and a mutation-free second pass.
-- [ ] Validate idempotent role creation, solution membership, and coarse processing/approval/release table-privilege boundaries.
+- [x] Validate idempotent role creation, exact role privilege metadata, and solution membership; the recorded second pass made zero mutations.
+- [ ] Validate actual processing/approval/release access boundaries with separately approved test-user assignments; role metadata is not proof of runtime enforcement.
 - [ ] Defer the full 10-role model, field-security profiles, ownership/team/share design, auditing/export controls, and user assignments to a separately approved production-hardening increment.
 - [ ] Defer proposer/approver identity enforcement, controlled transitions, immutable-event guards, and unauthorized-release tests until server-side controlled actions are implemented.
 - [x] Complete operator dashboard usability validation of the published scoped app; automated platform validation, publication, entry-point, landing-view, five-link dashboard group, sitemap, and solution-membership checks pass.
@@ -130,6 +195,8 @@
 
 - [x] Seed only the 41 approved deterministic synthetic records across 13 tables, including seven explicit synthetic Contacts and Cases and no Dataverse Task activities.
 - [ ] Execute normal, expedited, overdue, appealed, fee, exemption, and released journeys.
+- [x] Validate all seven journey records and all 41 source-tagged records read-only in live Dataverse with zero missing, extra, duplicate, or mismatched key records.
+- [ ] Complete the full authenticated operator click rehearsal; sign-in and the Request Choice-dropdown smoke test passed on 2026-10-22, but full UI journey execution remains pending.
 - [ ] Run unit, integration, security, accessibility, performance, end-to-end, and Azure-independence suites.
 - [x] Verify the approved data plan and payload prohibit production-derived data and committed document content.
 - [x] Capture stage-66 created/updated counts and prove a second pass preserves all 41 stable IDs without duplicates.

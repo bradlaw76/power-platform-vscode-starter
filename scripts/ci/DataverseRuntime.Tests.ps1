@@ -79,6 +79,21 @@ Describe 'Invoke-WizardDataverseRequest' {
         $global:wizardTestRequestCount | Should -Be 2
     }
 
+    It 'reads Retry-After from native PowerShell HTTP response headers' {
+        $response = [System.Net.Http.HttpResponseMessage]::new([System.Net.HttpStatusCode]::TooManyRequests)
+        try {
+            $response.Headers.RetryAfter = [System.Net.Http.Headers.RetryConditionHeaderValue]::new([TimeSpan]::FromSeconds(9))
+            $exception = [System.Exception]::new('HTTP 429')
+            $exception | Add-Member -NotePropertyName Response -NotePropertyValue $response
+            $record = [System.Management.Automation.ErrorRecord]::new($exception, 'Http429', 'InvalidOperation', $null)
+            Get-WizardRetryAfterSeconds -ErrorRecord $record -Attempt 1 | Should -Be 9
+            $response.Headers.Remove('Retry-After') | Out-Null
+            Get-WizardRetryAfterSeconds -ErrorRecord $record -Attempt 3 | Should -Be 4
+        } finally {
+            $response.Dispose()
+        }
+    }
+
     It 'retries a forcibly closed transport connection' {
         $global:wizardTestRequestCount = 0
         $result = Invoke-WizardDataverseRequest -Method Get -Path 'accounts' -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -RequestInvoker {

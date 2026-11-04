@@ -57,7 +57,7 @@
         {
           "Operator": "eq",
           "Field": "foia_approvalstate",
-          "Value": "Approved"
+          "Value": 100000003
         }
       ],
       "Name": "Approved Exemptions by Authority",
