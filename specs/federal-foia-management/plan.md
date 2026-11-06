@@ -276,6 +276,139 @@ for link coverage. Keep the framework/scenario dependencies together; exclude
 credentials, runtime metrics, local test XML, raw packages/unpacked output,
 and session-only probes. A source checkpoint is not a production release.
 
+### Demo Presentation Readiness - 2026-11-04
+
+The operator requested the next step toward showing the existing prototype.
+Prepare the existing presenter script, answers, and operator walkthrough locally
+for an approximately seven-minute, read-only presentation. Start with the normal
+synthetic request, show related work, illustrate selected seeded lifecycle
+states, and close with the operations dashboard. Other journey records are
+optional bookmarks, not a claim that their end-to-end behavior is implemented.
+
+Remove claims of demonstrated clock enforcement, automated transitions,
+assigned-role separation, immutable history, document authorization, or delivery.
+Describe these as production requirements, not verified demo behavior. Preserve
+the historical rehearsal separately from the fresh readiness checklist.
+
+A fresh authenticated DEV check requires separate approval. Limit an approved
+check to reading the existing app, synthetic records, related navigation,
+Choices, views, and charts. Do not edit records, advance stages, assign roles,
+provision SharePoint, run build/seed/export scripts, or deploy. Do not mark the
+presentation ready until the current browser checklist is actually completed.
+No new app architecture, schema, live access, commit, or push is authorized here.
+
+The operator subsequently approved bounded read-only DEV/browser access and
+completed sign-in manually. The current UI check verified the normal, expedited,
+and released synthetic requests, four related lists, Intake Channel options,
+and two operations charts. It also found the normal request's process bar at
+Intake while its lifecycle field is Review, a compatibility banner, and runtime
+console issues whose causes/impact remain undiagnosed. These were not silently
+fixed. See `demo-dry-run.md` for observations, remaining timed narration, and
+scope limits. Production behavior, deployment/export evidence, and release
+authorization are not refreshed or expanded by this check.
+
+### Bounded DEV Polish Preview - 2026-11-05
+
+The operator approved read-only diagnosis and a local fix plan, not live changes.
+Same-origin GET requests inspected only the selected app, the synthetic normal
+request, its process instance, and relevant process/table metadata. No stage,
+record, app setting, security setting, or published component was changed.
+
+#### Confirmed State
+
+| Item | Observed value |
+| --- | --- |
+| DEV target | `https://usfedfoia.crm9.dynamics.com` |
+| App | `foia_federal_foia_management`; `7ab66f1e-0ec7-f111-aaae-001dd80753e2` |
+| App configuration | Published app reports `clienttype=2`, state 0, status 1; the prior browser check showed the exact documented legacy-web-client warning |
+| Normal request | `SYN-FOIA-2026-001`; `2fd97e59-1ac7-f111-aaae-001dd80753e2`; source tag `federal-foia-synthetic-v1` |
+| Business fields | Lifecycle `100000003` / Review; validation `100000001` / Perfected; clarification due date null |
+| Process | Active category-4 `Federal FOIA Request Lifecycle`; workflow `33123dd4-53c6-f111-aaae-001dd80bb94c` |
+| Process instance | `30d97e59-1ac7-f111-aaae-001dd80753e2`; parent is the exact normal request; state 0, status 1 |
+| Actual active stage/path | Intake `9e3f4b57-4415-4f0e-85fb-7583060382ee`; traversed path contains only that stage |
+| Target stage in current path | Review `fcfabf33-a487-49a2-9c00-be43957b82a1`, after Intake, Clarification, Search |
+
+This proves independent persisted lifecycle/process state, not a stale caption.
+The seed payload supplies Review, but that is not proof of process progression.
+The app builder currently omits an explicit client type on create/update; this is
+a reproducibility concern, not proof that omission caused the live configuration.
+Microsoft's creation example also omits that field. Do not invent a numeric
+conversion value from that omission.
+
+#### Proposed Change A: Selected App Only (Recommended First)
+
+1. Obtain separate live approval for the selected DEV app's client setting and
+   scoped app publication. This affects users of this app, not the environment's
+   Unified Interface Only setting.
+2. Before mutation, re-check app/solution identity and membership, capture current
+   app properties, component/navigation identities, and published/unpublished
+   state. Stop for unexpected drafts, drift, managed restrictions, or ownership
+   ambiguity. Do not overwrite another operator's pending work.
+3. Use the supported app-properties designer to set **Client = Unified
+   Interface**, preserving the same app ID, name, sitemap, tables, forms, views,
+   dashboards, and role configuration. Read back the stored client value rather
+   than assuming a numeric flag. Do not recreate the app or rerun stage 62.
+4. Validate and publish only this app. Re-check solution membership, reopen the
+   published app, and verify request navigation, the normal record, Choices,
+   related work, and both selected operations charts. The compatibility banner
+   must actually disappear; do not hide it with CSS, user preferences, or a URL
+   override.
+5. Recheck console messages after conversion. PredictAPI, masking-feature,
+   resource-401, and CORS observations are not proven consequences of client type
+   and are not promised to disappear. Remaining failures require their own
+   diagnosis; do not weaken security, disable features globally, or suppress logs.
+6. If validation fails, restore the captured client setting through the same
+   supported designer, republish only the app, and verify the restored state.
+   Preserve the diagnostic evidence and report rollback failures explicitly.
+
+After supported conversion/readback, propose a separately reviewed local
+builder/configuration regression fix so later reruns preserve the confirmed
+client intent. This preview does not authorize framework implementation.
+
+#### Proposed Change B: One Synthetic Process Instance Only
+
+1. Obtain separate live approval for the exact normal request's process-instance
+   progression. Do not touch the other six requests, the process definition,
+   business lifecycle field, dates, decisions, or related records.
+2. Capture the request fields/identity/source tag and process instance's active
+   stage, traversed path, state/status, and current versions. Re-read before
+   applying and stop on drift or a dirty form.
+3. Use native process navigation on the selected active stage, one step at a
+   time: Intake -> Clarification -> Search -> Review. Respect current stage gates,
+   events, permissions, and callbacks. Do not directly overwrite `activestageid`
+   or `traversedpath`, skip stages, fabricate history, remove requiredness, or
+   populate a date merely to bypass a gate. Clarification due date is currently
+   blank; if the native gate requires it, stop for a separate business/design
+   decision instead of inventing a value.
+4. Verify the normal request's process bar and persisted active stage both read
+   Review; lifecycle remains `100000003`, source tag/fields/related identities
+   are unchanged, and no new process instance was created. Reopen to confirm.
+   This is synthetic-state alignment, not an automatic synchronization engine,
+   policy enforcement, or proof that real review work occurred.
+5. For a failed partial progression, stop and retain the actual path/history.
+   Restore the active position through supported previous-stage navigation only
+   if separately included in the live approval and permitted by native gates.
+   Do not erase traversed history or audit. A positional return is not a
+   transactional rollback; any residual progression must be reported.
+
+App conversion and process-instance progression are independently approvable.
+Prefer Change A first, then confirm the current native stage gates before Change
+B. No production operation, schema/process-definition edit, role/security change,
+SharePoint action, import/export, build/seed rerun, commit, or push is authorized
+by the diagnosis approval. Any required backup export needs separate approval.
+
+#### Verification And References
+
+Current diagnosis is read-only and does not replace the pending timed narrated
+rehearsal or the October deployment/export baseline. Record actual apply,
+verification, and any rollback results in `demo-dry-run.md` and `docs/build-log.md`
+only after separately authorized execution. Keep historical runtime evidence
+unchanged and use new dated receipts for any approved live work.
+
+- [Microsoft: update apps to Unified Interface](https://learn.microsoft.com/en-us/power-platform/admin/update-apps-to-unified-interface)
+- [Microsoft: app creation/management using code](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/create-manage-model-driven-apps-using-code)
+- [Microsoft: native next-stage navigation and failure states](https://learn.microsoft.com/en-us/power-apps/developer/model-driven-apps/clientapi/reference/formcontext-data-process/navigation/movenext)
+
 ### Proposed Slice And Boundaries
 
 Start with staff-assisted intake of one synthetic normal request through

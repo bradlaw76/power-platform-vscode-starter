@@ -401,6 +401,116 @@ Use this to document what was planned, built, validated, and promoted.
   PH-01 policy/design decisions and server-enforced behavior, access tests,
   end-to-end journeys, operations, and production-release gates remain open.
 
+## Federal FOIA Demo Presentation Preparation - 2026-11-04
+
+- Operator requested the next step toward showing the existing prototype.
+  Prepared the existing seven-minute script and companion copy, presenter
+  answers, and operator walkthrough locally. The source checkpoint remains
+  `1e4fb7b`; this presentation update is not staged or committed.
+- Focus is normal request -> related work -> seeded expedited/released examples
+  -> operations dashboard. Other journey records are optional bookmarks.
+  Removed unsupported claims that the demonstration proves complete journeys,
+  automated clocks, assigned-role separation, immutable release evidence,
+  document authorization, or delivery.
+- Added a separate, unchecked current-readiness checklist. Historical rehearsal
+  results remain preserved and explicitly labeled historical; no new live result
+  is claimed. No generator, build, seed, export, or deployment script was run.
+- Local validation passed: identical presenter copies; 390 narrative seconds
+  plus 30 navigation seconds equals seven minutes; current rehearsal remains
+  unchecked; documentation consistency, FOIA traceability, eight-file Markdown
+  lint, whitespace, and all 286 historical runtime-evidence hashes pass.
+  Read-only DEV/browser
+  authorization and the actual click-through/timed rehearsal remain pending.
+  Do not declare the presentation ready until observed checks pass. No record
+  changes, stage advancement, messages, external document access, role changes,
+  live access, commit, or push were performed during preparation.
+
+## Federal FOIA Approved Read-Only Demo UI Check - 2026-11-04
+
+- Operator explicitly approved the bounded DEV/browser check and completed
+  Microsoft sign-in manually. Inspected only the existing FOIA app and synthetic
+  demonstration surfaces; no business record-edit/save, stage advancement,
+  message, role change, external document access, build/seed/export, deployment,
+  commit, or push action was issued.
+- App navigation and Active FOIA Requests worked. The normal request showed
+  expected tracking/lifecycle/validation fields, acknowledgment reference,
+  seeded due date, and Open disposition. Intake Channel exposed all seven
+  options; the list was dismissed without selecting and Saved status remained.
+  Associated lists showed Synthetic FOIA Case 1, Synthetic Normal Search,
+  Synthetic Normal PDF, and Synthetic Normal Review.
+- Expedited request showed Search/Granted; released request showed Closure/Full
+  grant and a related Synthetic Released Package v1. Synthetic source tags were
+  observed. This did not verify actual document authorization or delivery.
+- Operations charts rendered: Redaction 1, Approval 1, Review 2, Search 1;
+  expedited Granted 1. Other dashboards and all 41 records were not revalidated.
+- Presentation gaps: the normal request's process bar remains at Intake while
+  the Lifecycle Stage field is Review; a visible legacy-web-client/Unified
+  Interface banner appears. Console observations include PredictAPI, masking
+  feature/400, resource 401, and fingerprint-configuration CORS issues. Checked
+  screens loaded, but causes and wider impact remain undiagnosed; no error-free
+  or production-readiness claim is made.
+- Browser is left on Synthetic Normal Request with Saved status observed after
+  rendering. The diagnostic click-through is not a timed narrated rehearsal.
+  Presenter copies now disclose the mismatch and current evidence boundary.
+  Full observations and remaining checks are in the scenario's existing
+  `demo-dry-run.md`; live polish needs separate approval.
+- Final local checks passed after recording observations: presenter-copy parity,
+  seven-minute script budget, truthful unchecked timed-rehearsal status, docs
+  consistency, FOIA traceability, nine-file Markdown lint, and whitespace.
+  All 286 historical runtime-evidence hashes remain unchanged; nothing is staged.
+
+## Federal FOIA Read-Only DEV Polish Diagnosis - 2026-11-05
+
+- Operator approved read-only app/process diagnosis and a local fix plan.
+  Scoped same-origin GETs confirmed the selected app's `clienttype=2` and the
+  normal request's Review lifecycle versus an active Intake-only process path.
+  Verified exact app, workflow, request, parent, and process-instance identities.
+- Microsoft's guidance matches the legacy-app banner and recommends supported
+  app-properties conversion to Unified Interface. The local builder omits an
+  explicit client type, but that omission is not proven to cause the current
+  value; Microsoft's creation example also omits it. The preview does not
+  prescribe an unverified numeric flag or hide warnings.
+- Prepared independent previews for selected-app conversion/publication and
+  one synthetic instance's native sequential progression to Review. Included
+  identity/draft/drift checks, before-state capture, native stage gates,
+  scoped verification, recovery limitations, and explicit exclusions.
+  Clarification due date is blank; do not fabricate one to bypass a gate.
+- No live setting/record/stage/process-definition change, publication, build,
+  export/import, framework implementation, commit, or push was performed.
+  Console causes and timed narration remain open. No production-readiness
+  claim or new deployment/export baseline is made.
+- Local preview validation passed: documentation consistency, FOIA requirements
+  traceability, five-file Markdown lint, and whitespace. All 286 historical
+  runtime-evidence hashes remain unchanged; nothing is staged.
+
+## Federal FOIA Repository Synchronization - 2026-11-06
+
+- Operator authorized review, validation, commit/push, and a ChatGPT handoff
+  only; no Azure, Dataverse, or Dynamics 365 deployment or live action.
+- Verified repository `bradlaw76/power-platform-vscode-starter`, HTTPS origin,
+  branch `feature/federal-foia-choice-normalization`, and starting commit
+  `1e4fb7bd57fcab40242b6a26b4f75bd51e52169b`. The feature branch initially had
+  no upstream and no matching remote branch. No branch switch was performed.
+- Fetched origin. Relative to `origin/main`, HEAD had one local-only checkpoint
+  and two remote-only commits. Those remote commits add then remove an unrelated
+  document: their net tree equals the checkpoint's parent `1bb72aa`.
+  Preserve feature history and publish the current feature branch without
+  rebasing, merging unrelated work, or force-pushing.
+- Reviewed all nine modified documentation files. Retain the existing
+  60-file Choice-contract checkpoint and FOIA solution summaries. Keep
+  `.env.ps1`, `.wizard-metrics/`, and untracked `testResults.xml` local.
+  Credential-pattern checks on all 62 changed tracked paths found no candidates;
+  this is not a guarantee or a substitute for a comprehensive security review.
+- Credential-free isolated Windows validation passed: all 32 standalone CI
+  suites; all 91 Pester 5.7.1 tests (zero failures/skips); all 81 PowerShell
+  files parsed; PSScriptAnalyzer 1.24.0 reported zero findings; Markdown lint
+  0.18.1 passed all 88 documents; whitespace checks passed.
+  No dependency installation, live build, export, import, or deployment ran.
+- Publication and final SHA verification are pending at this source checkpoint.
+  Record the verified source SHA and remaining work in the canonical ChatGPT
+  handoff after the first push. The handoff is absent on this FOIA branch;
+  unrelated framework status histories remain preserved on their remote branches.
+
 ## Wizard Behavior Versions
 
 Record wizard version changes here so you can trace which behavior applied to each build.

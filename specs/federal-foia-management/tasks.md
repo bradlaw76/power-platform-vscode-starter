@@ -35,6 +35,25 @@ operations. User approval on 2026-11-04 covers local review/planning only.
 - [ ] PH-05 (depends on PH-04): Complete the remaining journeys, full production security model and access tests, reporting reconciliation, accessibility/performance/portability/recovery suites, and named operational sign-off.
 - [ ] PH-06 (depends on PH-05 and separate release approval): Produce/test a managed candidate in an authorized validation environment, rehearse rollback, obtain UAT and release sign-off, and separately approve production cutover.
 
+## Demo Presentation Readiness - 2026-11-04
+
+- [x] Align the existing presenter script and its companion copy, answers, and operator walkthrough to a seven-minute, read-only prototype presentation without production-enforcement claims.
+- [x] Preserve the historical rehearsal and add a separate unchecked current-readiness checklist.
+- [x] Validate the local presentation documents before requesting fresh DEV access: presenter copies match; 390 narrative seconds plus 30 navigation seconds equals seven minutes; current rehearsal remains unchecked; docs consistency, FOIA traceability, eight-file Markdown lint, whitespace, and all 286 historical evidence hashes pass. No generators were rerun.
+- [x] Obtain separate approval for read-only DEV/browser rehearsal; operator signed in manually. No record edits, role assignments, build/seed/export operations, or deployment were authorized.
+- [x] Complete the bounded current app/hero/related-work/Choices/selected-dashboard UI check; record actual observations in demo-dry-run.md, including the process/lifecycle mismatch, compatibility banner, and undiagnosed console issues. Core screens loaded; this is not a clean run or full journey acceptance.
+- [ ] Complete timed narration and disposition the recorded presentation gaps before declaring ready; any live polish requires separate approval.
+
+## Bounded DEV Polish - 2026-11-05
+
+- [x] Obtain explicit approval for read-only diagnosis and a local fix plan; no live changes or framework implementation authorized.
+- [x] Confirm the selected app's client configuration and the exact normal request/process identities using scoped GETs; document actual Intake-only traversal versus the stored Review lifecycle.
+- [x] Prepare independently approvable app conversion and one-record process-alignment previews, including preconditions, native gate behavior, verification, rollback limitations, and exclusions in plan.md.
+- [ ] Obtain live approval for app-only Unified Interface conversion, snapshot/recheck the selected app and drafts, use supported properties, validate/publish only that app, and recheck UI/membership/banner/console.
+- [ ] Separately approve one synthetic process-instance progression and any positional recovery; respect native gates, stop for missing data, and verify no unrelated field/record/definition changes.
+- [ ] After confirmed designer readback, separately review the local builder/configuration fix and targeted regression tests; do not assume an unverified numeric client flag.
+- [ ] Complete timed narration and record actual results; do not call the diagnosis or a target script duration a completed rehearsal.
+
 ## Planning And Approval
 
 - [x] Select `advanced-builder`.

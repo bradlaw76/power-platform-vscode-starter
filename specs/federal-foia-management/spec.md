@@ -8,8 +8,11 @@ The authoritative reusable requirement catalog is [Federal-FOIA-Solution-Require
 
 ## Current State And Next Increment - 2026-11-04
 
-The latest recorded live verification is 2026-10-22, not a current environment
-health check. The development/demo solution has 11 custom tables plus Case and
+The latest full deployment/schema/export evidence is 2026-10-22, not a current
+environment health certification. A separately approved 2026-11-04 read-only
+browser check verified selected demo screens with presentation gaps; see
+[current rehearsal observations](demo-dry-run.md#current-readiness---2026-11-04).
+The historically recorded development/demo solution has 11 custom tables plus Case and
 Contact, 134 columns, 11 alternate keys, 21 relationships, 13 main forms,
 15 scenario public views, two active BPFs, eight charts, five dashboards, and
 three unassigned demo roles. The approved Choice retrofit includes 26 global
@@ -39,12 +42,29 @@ Synthetic records remain bounded by the existing approved data plan.
 
 The 2026-11-04 instructions authorize local review/planning, the approved PH-00
 effective-contract implementation, approved local migration/export/test/guidance
-corrections, and credential-free source-baseline verification. No new
-authentication, live access, live schema changes, role assignments,
-SharePoint provisioning, plug-in/flow deployment, import, managed release, commit,
-or push is authorized. Production data, agency policy, production targets, and
+corrections, and credential-free source-baseline verification. Subsequent
+explicit approvals covered local checkpoint commit `1e4fb7b` and bounded
+read-only DEV/browser inspection with operator-completed sign-in. These do not
+authorize live schema/record changes, role assignments, SharePoint provisioning,
+plug-in/flow deployment, import, managed release, further commits, or push.
+Production data, agency policy, production targets, and
 operational sign-off require separate decisions. The proposal is not an approved
 production specification or a deployment authorization.
+
+On 2026-11-06, the operator separately authorized repository review, local
+validation, commit, push of completed work on the current appropriate branch,
+and a ChatGPT synchronization handoff. This supersedes the earlier source-control
+restriction only for this synchronization; no live changes or deployment are
+authorized.
+
+On 2026-11-05 the operator additionally approved read-only diagnosis of the
+selected DEV app and synthetic normal request's process instance, plus a local
+fix plan. It confirmed app `clienttype=2` and a persisted Intake-only process path
+versus the request's Review lifecycle. The independently bounded app conversion
+and synthetic-instance alignment previews are in
+[plan.md](plan.md#bounded-dev-polish-preview---2026-11-05).
+No app-setting change, stage progression, process-definition change, framework
+implementation, or publication is authorized by this diagnosis approval.
 
 ## Scope
 

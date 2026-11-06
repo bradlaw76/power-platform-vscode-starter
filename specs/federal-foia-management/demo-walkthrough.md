@@ -3,10 +3,27 @@
 ## Purpose
 This walkthrough is for the engineer/operator running the demo. It is derived from scenario files and should stay aligned to the implemented solution.
 
+## Current Presentation Boundary - 2026-11-04
+
+Use the reviewed `demo-script.md` / `demo-talk-track.md` and the current checklist
+in `demo-dry-run.md` for a seven-minute, read-only prototype demonstration.
+Deployment/export evidence remains dated 2026-10-22. A separately approved
+2026-11-04 read-only UI check verified the core screens with presentation gaps:
+the normal request's process bar is at Intake while its lifecycle field is
+Review, a compatibility banner appears, and runtime console issues remain
+undiagnosed. See `demo-dry-run.md`; timed narration is still pending. Do not rerun
+build, seed, export, or generator scripts to prepare this walkthrough.
+
+Show the normal request, related work, selected seeded lifecycle states, and the
+operations dashboard. Do not edit records, advance stages, send correspondence,
+approve/release packages, or open external document links. Requirement statements
+and data-integrity rules below describe the target solution, not proof that its
+server enforcement, role assignments, document security, or delivery is complete.
+
 ## Scenario Source
 - Derived from: answers.md, spec.md, plan.md, and tasks.md in specs/federal-foia-management/
 - Scenario name: Federal FOIA Management
-- Platform area:
+- Platform area: Dynamics 365 Customer Service / Power Apps model-driven app
 - Environment: `https://usfedfoia.crm9.dynamics.com`
 
 ## Scenario Requirements Snapshot
@@ -77,26 +94,22 @@ All new relationships use `Restrict` delete and `NoCascade` for assign, share, u
 - AI output is never copied to a controlled decision without an explicit human disposition.
 
 ### Validation Plan
-No validation plan block found.
+Use the current read-only click and timing checklist in `demo-dry-run.md`.
+Production acceptance remains separate under the milestone plan in `plan.md`.
 
 ## Engineer Runbook
 ### Pre-demo Setup
-- Confirm environment access and app load in `https://usfedfoia.crm9.dynamics.com`.
-- Validate demo data availability mode: Use deterministic synthetic data and update one hero request during the demonstration
+- Obtain separate read-only DEV/browser authorization before checking app load in `https://usfedfoia.crm9.dynamics.com`.
+- Validate demo data availability mode: inspect existing deterministic synthetic data without editing or saving.
 - Open the hero record area for: FOIA Request
-- Confirm demo scope artifacts are available: FOIA Request form and views, statutory clock, search and review tasks, approval controls, release package, audit trail, and dashboards
+- Confirm the request form/view, Choice labels, related work, and dashboard charts are usable; seeded clock/approval/package values do not prove production controls.
 
-### Implementation Walkthrough Checklist
-- [ ] Select 'advanced-builder'.
-- [ ] Verify wizard runtime, prerequisites, contract integrity, documentation consistency, and skill parity.
-- [ ] Inspect repository documentation and record that no existing FOIA implementation or FOIA live-access authorization is present.
-- [ ] Preserve the reusable catalog as 'Federal-FOIA-Solution-Requirements.md' with stable 'FOIA-REQ-001' through 'FOIA-REQ-300' IDs.
-- [ ] Retain the categorized 'FOIA-*' IDs as the condensed demo implementation profile.
-- [ ] Approve the hybrid Customer Service architecture, new FOIA forms, FOIA Request entry point, Request-to-Case relationship, lifecycle, SharePoint storage, clock architecture, reports, synthetic data, and Azure-disabled initial release.
-- [ ] Create and align 'Federal-FOIA-Solution-Requirements.md', 'answers.md', 'requirements-baseline.md', 'spec.md', 'plan.md', 'tasks.md', 'requirement-traceability.md', and 'report-mappings.md'.
-- [ ] Generate and review the scenario-derived presenter demo script and engineer walkthrough.
-- [ ] Complete the narrative dry run and defer app-dependent rehearsal steps until deployment and synthetic-data verification.
-- [ ] Review and approve the complete planning package.
+### Current Walkthrough Checklist
+- [x] Confirm the bounded read-only approval and existing authenticated DEV access.
+- [x] Complete the current app/record/related-work/Choices/chart checks in `demo-dry-run.md`, retaining the documented presentation gaps.
+- [ ] Rehearse the presenter script and record actual elapsed time and blockers.
+- [x] Keep historical data/metadata proof separate from current UI observations.
+- [ ] Present only after the current checklist passes; otherwise report the blocker.
 
 ### What To Show (Implementation-Oriented)
 - Show where the hero record (FOIA Request) is managed.
