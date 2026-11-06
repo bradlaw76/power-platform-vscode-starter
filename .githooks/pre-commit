@@ -1,0 +1,7 @@
+#!/bin/sh
+# Component: Framework Commit Ownership Guard
+# Purpose: Keep application development out of the reusable starter.
+# Owner: Power Platform VS Code Starter
+# Version: 1.0.0
+root=$(git rev-parse --show-toplevel) || exit 1
+exec pwsh -NoLogo -NoProfile -NonInteractive -File "$root/scripts/ci/test-framework-ownership.ps1"
