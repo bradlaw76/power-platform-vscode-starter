@@ -58,3 +58,20 @@ Public application file cleanup, branch deletion, visibility changes, and
 history rewriting need separate approval. Ordinary removal must first adapt
 generic tests and references; it does not erase public history or caches.
 No Azure, Dynamics, or Dataverse deployment occurred.
+
+### Verified Publication Receipt
+
+- Additive implementation:
+  `b350a2c7bc30d1bb568f6e21a407ea03741f42aa`.
+- Review PR:
+  [bradlaw76/power-platform-vscode-starter#6](https://github.com/bradlaw76/power-platform-vscode-starter/pull/6).
+  It is conflict-free and unmerged.
+- [Wizard Quality run 42253813857](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/42253813857)
+  passed for that exact implementation commit.
+- The staged 260-file snapshot passed credential-pattern/prohibited-path checks
+  with zero candidates. All nine implementation changes are additions.
+- Public main remains unchanged and is not server-protected. The new ownership
+  test becomes part of main only after owner-approved integration. Administrative
+  main protections and any public cleanup remain outstanding decisions.
+- This receipt is documentation-only; verify its final push/SHA and hosted check
+  separately. It cannot embed its own containing commit SHA.
