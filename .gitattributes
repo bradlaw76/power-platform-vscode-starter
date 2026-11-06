@@ -1,0 +1,5 @@
+# Component: Framework Hook File Attributes
+# Purpose: Keep newly introduced Git hooks portable across operating systems.
+# Owner: Power Platform VS Code Starter
+# Version: 1.0.0
+.githooks/* text eol=lf

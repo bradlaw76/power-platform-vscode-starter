@@ -1,0 +1,290 @@
+{
+  "SourceRepository": "bradlaw76/power-platform-vscode-starter",
+  "SourceCommit": "4c9d2bfac675812a8fbe100b94c05ebe4c4bed1e",
+  "Files": [
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-contact.json",
+      "Blob": "810938768a36ef47b2dacbb8dfe042f298df87ad"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_aiassistancerecord.json",
+      "Blob": "fe7c2f469886b240035a46298ca5ba16f05e97d9"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_appeal.json",
+      "Blob": "f48abf66e5ea55f725b0a19856c0806c3d3ca13b"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_auditevent.json",
+      "Blob": "48252bdd3938a17ba9ef9294bee8e123dcf5e040"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_clockevent.json",
+      "Blob": "1084f8f8409f01bf45d3e0919f6ba26911db84f4"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_exemptiondecision.json",
+      "Blob": "54f491fdac6caed0988ca8d5d263fe6b4545dd3c"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_foiarequest.json",
+      "Blob": "9e23770fcdc8b366ed29b5ff637efddeac7003b8"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_redactiondecision.json",
+      "Blob": "77f605ded69d1774bd2f6b92cd1491028eb62b5c"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_releasepackage.json",
+      "Blob": "8caec4dda2a9906ec3ef3d4546a960e6a4daf44b"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_responsiverecord.json",
+      "Blob": "b4d7c96b539f700b95cbe7876d550c9f02012802"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_reviewtask.json",
+      "Blob": "8e6943414559c49f2cd529b1555803eccfde1c19"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-foia_searchtask.json",
+      "Blob": "eac5137899c2a06fc694370f567e7e20153aac2e"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/columns-incident.json",
+      "Blob": "56325272ff55190e854d0f3eff405f26f7c6e66c"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/data-federal-foia-management.json",
+      "Blob": "267fc170b7b86afee276dd204a51cea443c62e69"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_aiassistancerecord.json",
+      "Blob": "7ec63a225516cdd2292dd841a037a43a2496596d"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_appeal.json",
+      "Blob": "7d905bb2a049689e9fdaf446aa486b1b7ee44089"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_auditevent.json",
+      "Blob": "0a9e45b5ffc6d56ef5dbb7799f5755461020377e"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_clockevent.json",
+      "Blob": "7dedf06888f270d017333716a934a67485d10e61"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_exemptiondecision.json",
+      "Blob": "f192db6f61a5228bf866316054a591adfb42f3ab"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_foiarequest.json",
+      "Blob": "ea21d2aa9258dfcd5abb26cc2d9ec34a0a36cae6"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_redactiondecision.json",
+      "Blob": "850db9f1d58081eab3c17180d1975bec68c25bb4"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_releasepackage.json",
+      "Blob": "9aab9a2eb64727227b8378e8deb7e5b4a115518e"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_responsiverecord.json",
+      "Blob": "14117a31f4ac039431342566c0d50a1d717fa172"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_reviewtask.json",
+      "Blob": "a9e3f5108e6dc754764f9a0da94555ab8876abb6"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/keys-foia_searchtask.json",
+      "Blob": "3a114292776c847e1966f63a98d78e0514353a6e"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/process-01-foia-request.json",
+      "Blob": "cd346160bb7eddc1c9dc125af1cd135faaf266be"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/process-02-appeal.json",
+      "Blob": "96fc39516db8ce81b9cfaebdcc4b30afcf2b55db"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/relationships-federal-foia-management.json",
+      "Blob": "2f7233513db2255e659e010795ca68855ccbbd4f"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/reporting-federal-foia-management.json",
+      "Blob": "1cec38a99476d470371650690b8f424be0c692f4"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/security-roles-federal-foia-management.json",
+      "Blob": "32f064b8ad8488d4fe333b1980ff5f8a3c61dc1f"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_aiassistancerecord.json",
+      "Blob": "ec9e56a3ad8da5cee211c35fc2a3a3912cf04307"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_appeal.json",
+      "Blob": "f4f32824fdc57e636df5324c68b2324fcfa53f12"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_auditevent.json",
+      "Blob": "0669b6c017eeb14e0b5e5b196623d1c416c3a8d4"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_clockevent.json",
+      "Blob": "adf0136328977c9b0f634baf755343f12bb7aff6"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_exemptiondecision.json",
+      "Blob": "e12801611f0851c5be44ef6c9296735f8f60d230"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_foiarequest.json",
+      "Blob": "b9ead2a06728af54d8f9908e90f31eb8247ca65a"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_redactiondecision.json",
+      "Blob": "e7c94f7ceb9e21eec6b3847a106f7c950370e11f"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_releasepackage.json",
+      "Blob": "8c1a77512342fcc2d2b3d6a57c49a64011beefb1"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_responsiverecord.json",
+      "Blob": "3297ac01b1df2a0dd5f256231c89283295c363da"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_reviewtask.json",
+      "Blob": "ec6ca17176d0df5690a6d34bbc6240b9ad0355d2"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/table-foia_searchtask.json",
+      "Blob": "c3e678945026c410d333b779c78b43fde4450696"
+    },
+    {
+      "Path": "payloads/scenarios/federal-foia-management/views-federal-foia-management.json",
+      "Blob": "faad3214761a711942fb168cc767934efc506438"
+    },
+    {
+      "Path": "scripts/ci/test-foia-requirements-traceability.ps1",
+      "Blob": "0601ac6e851097f985f844963f65a97b3136d727"
+    },
+    {
+      "Path": "specs/federal-foia-management/Federal-FOIA-Solution-Requirements.md",
+      "Blob": "9c1c7107600733ae370a17e8c9f302f10adaa2b0"
+    },
+    {
+      "Path": "specs/federal-foia-management/answers.md",
+      "Blob": "dcc111505c86b4199576664b661fe6aee2e05b25"
+    },
+    {
+      "Path": "specs/federal-foia-management/configuration-contract.md",
+      "Blob": "9476810cf521e1664911ceec9ede842c1569ac95"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-data-plan.json",
+      "Blob": "655380b6dbb9878835353ec0a93bbc96e01dac19"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-dry-run.md",
+      "Blob": "c785c94d9bde91db63848394ac25b49be0d79ebe"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-script-answers.md",
+      "Blob": "5d6d6f4c223a2009449b0a43845e0256cdf57786"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-script.md",
+      "Blob": "662d837159c9fa8b0b7d32e71c1f651ffdc7baac"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-talk-track.md",
+      "Blob": "662d837159c9fa8b0b7d32e71c1f651ffdc7baac"
+    },
+    {
+      "Path": "specs/federal-foia-management/demo-walkthrough.md",
+      "Blob": "d9dafdd6f2d2737b5da52846ba144d0586dfd701"
+    },
+    {
+      "Path": "specs/federal-foia-management/deployment-manifest.json",
+      "Blob": "366424e3245d45c0b8eb9e099eb8b9eddb8635bf"
+    },
+    {
+      "Path": "specs/federal-foia-management/deployment-manifest.template.json",
+      "Blob": "8323bd7721d6a4b3bd388cf6e43866268977e524"
+    },
+    {
+      "Path": "specs/federal-foia-management/detailed-design.md",
+      "Blob": "6ca12f3de0980dc2a3fa70f791d594b850aec059"
+    },
+    {
+      "Path": "specs/federal-foia-management/evidence-index.md",
+      "Blob": "69fe74fd842d07b447e9d79156594ec5fb89975c"
+    },
+    {
+      "Path": "specs/federal-foia-management/forms.json",
+      "Blob": "06cd8c7aa91c11904d359503c4157701a5f751b6"
+    },
+    {
+      "Path": "specs/federal-foia-management/plan.md",
+      "Blob": "88702c291826ee09589d6ccfcef1f74c67c0efac"
+    },
+    {
+      "Path": "specs/federal-foia-management/report-definitions.md",
+      "Blob": "b3abfc88a8bfed74b23105dc80fd2997923b4fe1"
+    },
+    {
+      "Path": "specs/federal-foia-management/report-mappings.md",
+      "Blob": "dda66f914fc2a3693fe9fed3f460b941f7f2a89e"
+    },
+    {
+      "Path": "specs/federal-foia-management/reports/business-process-flow-01-foia-request-designer-handoff.md",
+      "Blob": "18314ce9dfdb01f9862dbb7a955f5f146c4bd5b6"
+    },
+    {
+      "Path": "specs/federal-foia-management/reports/business-process-flow-01-foia-request-report.json",
+      "Blob": "166e3f02ef80b62c0ff3b9c406467953ec2580e2"
+    },
+    {
+      "Path": "specs/federal-foia-management/reports/business-process-flow-02-appeal-designer-handoff.md",
+      "Blob": "d1a4ceaffde3635cb381cea83eb895710e8c1d7c"
+    },
+    {
+      "Path": "specs/federal-foia-management/reports/business-process-flow-02-appeal-report.json",
+      "Blob": "12fe23c8507e5e320d4b2ede57c5d16053878c9b"
+    },
+    {
+      "Path": "specs/federal-foia-management/reports/business-process-flow-report.json",
+      "Blob": "68e24e0471ed6b56244bd31b82f6f4e034e4b34b"
+    },
+    {
+      "Path": "specs/federal-foia-management/requirement-traceability.md",
+      "Blob": "7bff988e5040ca9a8d4786a6a681b9cbf6fd842e"
+    },
+    {
+      "Path": "specs/federal-foia-management/requirements-baseline.md",
+      "Blob": "e44f8186b7d1f1b6691376765d238b151c33a6dc"
+    },
+    {
+      "Path": "specs/federal-foia-management/rollback-checklist.md",
+      "Blob": "b2be401642e835572e34ba047e6ff8caa70097f5"
+    },
+    {
+      "Path": "specs/federal-foia-management/security-model.md",
+      "Blob": "ba810e43b5f5c45911ac62c2315948c8a8e4d86a"
+    },
+    {
+      "Path": "specs/federal-foia-management/spec.md",
+      "Blob": "8ce8a91cdbe3f2fd21a61d69b75dffc9d5af208c"
+    },
+    {
+      "Path": "specs/federal-foia-management/tasks.md",
+      "Blob": "a2babb5bbc965a5c634cf064713fdbac768cf8ae"
+    }
+  ]
+}
