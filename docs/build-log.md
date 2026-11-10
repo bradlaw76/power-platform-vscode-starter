@@ -44,6 +44,9 @@ Record wizard version changes here so you can trace which behavior applied to ea
 - Status: SOURCE COMPLETE and TESTED; no application deployment or
   LIVE VERIFIED claim. User permission covers this change's commit, push and PR,
   not merge or environment access.
+- Published as [PR #8](https://github.com/bradlaw76/power-platform-vscode-starter/pull/8)
+  against the existing integration branch; remote implementation SHA verified.
+  The original active branch and uncommitted README edits were preserved.
 
 ### Repository update advisor maintainer validation - 2026-10-27
 

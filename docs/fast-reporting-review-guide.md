@@ -52,6 +52,11 @@ executor is authorized by this release.
 - Limits: contract tests validate documented decisions and actual local skill
   distribution, not probabilistic agent compliance. No Dataverse/Power Pages
   access, deployment, live verification or merge is authorized or claimed.
+- Publication: [PR #8](https://github.com/bradlaw76/power-platform-vscode-starter/pull/8)
+  is open against the integration branch. Implementation commit
+  [`2f796eb4f4872b7e875d63dee77791b226153369`](https://github.com/bradlaw76/power-platform-vscode-starter/commit/2f796eb4f4872b7e875d63dee77791b226153369)
+  was pushed and its remote SHA verified. Follow-up documentation records this
+  evidence; the PR head is the current publication SHA. No merge performed.
 
 ## Verified GitHub backups
 
