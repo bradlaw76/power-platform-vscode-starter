@@ -1,5 +1,15 @@
 # Project Guidelines
 
+## Authorization and execution
+
+Mandatory for framework work and all wizard-generated projects: load and follow
+[authorization and execution](../docs/policies/authorization-and-execution.md).
+Reuse valid scoped permission without redundant approval loops; preserve every
+required platform, planning, signature and environment gate. Include the policy
+or a reviewed equivalent in consumer projects through the existing distribution
+review. Report source, test, deployment, live verification and blocked outcomes
+separately.
+
 ## SpeckKit Integration
 This repository is registered with the SpeckKit registry using raw registry URLs so the repo can consume standards without duplicating the registry locally.
 

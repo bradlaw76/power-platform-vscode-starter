@@ -5,6 +5,15 @@ description: Use when building Power Platform model-driven apps, Dynamics 365 de
 
 # Power Platform VS Code Wizard
 
+## Authorization and execution
+
+Load and follow project-root `docs/policies/authorization-and-execution.md`.
+Installed skills use bundled `references/authorization-and-execution.md` when
+project-local policy is absent. If neither exists, report BLOCKED for mutating
+work. During consumer compatibility review, include this policy or a reviewed
+equivalent and reference it from the project's existing instruction entry point;
+do not overwrite local instructions. This applies to all workloads.
+
 ## Overview
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
@@ -345,7 +354,7 @@ Ask me the discovery questions one at a time and help me write spec.md, plan.md,
 
 The shared Copilot skill is the primary entry point. It selects chat or terminal intake, enforces the planning gate, and can monitor progress from existing telemetry. Direct chat and terminal wizard paths remain supported.
 
-Source control follows the generated scenario, not just maintenance of this starter repository. Use coherent planning, metadata, experience, validation, and final unpacked-solution checkpoints. Before each commit, inspect status/diff, run applicable discovered validation, stage explicit files, and obtain approval. Push requires separate approval and remote commit verification.
+Source control follows the generated scenario, not just maintenance of this starter repository. Use coherent planning, metadata, experience, validation, and final unpacked-solution checkpoints. Before each commit, inspect status/diff, run applicable discovered validation and stage explicit files. Commit and push each require explicit permission; reuse valid scoped permission already provided and ask only for missing scope under the authorization and execution policy. Verify the remote commit after push.
 
 Available entry points:
 - `.github/skills/power-platform-wizard-init/SKILL.md` — primary shared Copilot skill

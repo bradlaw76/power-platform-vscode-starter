@@ -28,6 +28,23 @@ Record wizard version changes here so you can trace which behavior applied to ea
 
 ## Release Process
 
+### Authorization and execution maintainer validation - 2026-11-10
+
+- Added the workload-neutral [operational policy](policies/authorization-and-execution.md)
+  and mandatory existing instruction/skill references; preserved all platform,
+  planning, signed approval, environment, FAST and solution membership gates.
+- Existing Claude installer distributes canonical policy bytes per skill;
+  reviewed consumer installation retains local instructions and stricter rules.
+- Focused validation passed 111 Pester tests. The complete `run-quality.ps1`
+  passed Markdown lint, PowerShell parsing/analysis, JSON/schema validation,
+  contract integrity, all 35 standalone checks and all 141 Pester tests.
+  Publication evidence and
+  publication evidence are maintained in the
+  [existing review handoff](fast-reporting-review-guide.md#authorization-and-execution-follow-up---2026-11-10).
+- Status: SOURCE COMPLETE and TESTED; no application deployment or
+  LIVE VERIFIED claim. User permission covers this change's commit, push and PR,
+  not merge or environment access.
+
 ### Repository update advisor maintainer validation - 2026-10-27
 
 - Contract 2.2.0; update advisor passed 56 local Git fixture assertions, including

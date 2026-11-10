@@ -4,6 +4,11 @@ Created: 2026-05-28
 Scope: Generic guide (not project-specific)
 Audience: Builders using Dynamics 365, Dataverse, VS Code, and Copilot
 
+Follow [authorization and execution](../docs/policies/authorization-and-execution.md)
+for framework and generated-project work: reuse valid scope, preserve required
+safety gates, and report source, test, deployment and live verification evidence
+separately. Include the contract through the existing distribution review.
+
 Companion wizard:
 
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a

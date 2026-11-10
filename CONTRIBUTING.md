@@ -14,7 +14,9 @@ For behavior changes, update `spec.md`, `plan.md`, and `tasks.md` before impleme
 4. Add credential-free tests, including rerun behavior when metadata mutation changes.
 5. Run the repository CI commands documented in [docs/onboarding.md](docs/onboarding.md).
 6. Review staged files for secrets, generated artifacts, customer data, and local workspace files.
-7. Request explicit approval before committing and separate approval before pushing.
+7. Commit and push each require explicit permission. Reuse valid scoped
+   permission already provided; ask only for missing scope, following
+   [authorization and execution](docs/policies/authorization-and-execution.md).
 
 Never run Dataverse integration tests against production. Use only an authorized disposable development environment and the manually triggered workflow confirmation.
 

@@ -6,6 +6,11 @@ Audience: Teams that want a guided, question-first process from idea to release
 
 ## 0. How This Wizard Works
 
+Follow [authorization and execution](../docs/policies/authorization-and-execution.md)
+for all workloads and generated projects. Reuse valid scoped permission without
+repeating approval questions; preserve planning, platform and environment gates.
+Carry the policy or a reviewed equivalent through existing distribution review.
+
 ### Repository updates and traceability
 
 Use the [repository update advisor](../docs/repository-updates.md) after repo

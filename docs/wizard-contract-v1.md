@@ -338,7 +338,9 @@ Apply `requirements/GithubInstructions_General.md` throughout each end user's ap
 2. Record a scenario branch, related issue/spec/work item, commit strategy, applicable discovered validation, pull request preference, and merge strategy in scenario planning artifacts.
 3. Do not guess validation commands, stage unrelated files, or use the default branch as a scratch workspace.
 4. At coherent planning, implementation, validation, and final source checkpoints: inspect status and diff, run applicable validation, stage explicit intended files, and use a typed imperative commit message.
-5. Require explicit approval before commit and separate approval before push.
+5. Commit and push each require explicit permission; reuse valid scoped
+   authorization under [authorization and execution](policies/authorization-and-execution.md).
+   Ask only for missing scope; neither operation authorizes merge or deployment.
 6. After push, verify that the remote branch contains the local commit before reporting remote success.
 7. Distinguish modified locally, committed locally, pushed, pull request opened, merged, released, and deployed.
 

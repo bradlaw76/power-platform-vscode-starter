@@ -15,6 +15,9 @@ the authoritative detailed sequence after the authoring workspace is open.
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Follow [authorization and execution](policies/authorization-and-execution.md)
+  across every workload and generated project. Reuse valid scoped permission;
+  required planning, platform, hash/signature and environment controls remain.
 
 ---
 
@@ -600,7 +603,7 @@ Use coherent checkpoints as the app or demo progresses, such as planning, Datave
 3. Stage explicit intended files rather than using `git add .`.
 4. Review `git diff --staged` and confirm no secrets, local configuration, generated junk, or unrelated files are included.
 5. Use a typed imperative commit message, for example `feat: add case triage metadata`.
-6. Obtain explicit approval before committing.
+6. Confirm explicit commit permission, reusing valid scoped authorization already provided.
 
 Commit and push are distinct approvals. Push verification and pull request preparation happen during final handoff.
 
@@ -781,7 +784,11 @@ git rev-parse origin/feature/<scenario-slug>
 
 Use commands already supported by the repository. The test command above is a placeholder to replace with the validation discovered during preflight; do not invent a command.
 
-Before commit and again before push, obtain explicit approval. After push, the two commit IDs must match before reporting that the change is available remotely. Prepare a pull request with summary, reason, validation, impact, and the related scenario spec.
+Commit and push each require explicit permission; reuse valid scoped permission
+already provided under [authorization and execution](policies/authorization-and-execution.md).
+Ask only for missing scope. After push, the two commit IDs must match before
+reporting that the change is available remotely. Prepare a pull request with
+summary, reason, validation, impact, and the related scenario spec.
 
 Validation checkpoint:
 

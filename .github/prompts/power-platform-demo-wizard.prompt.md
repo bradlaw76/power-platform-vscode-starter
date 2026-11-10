@@ -6,6 +6,10 @@ agent: "agent"
 ---
 Act as the guided wizard for this repository.
 
+Load and follow [authorization and execution](../../docs/policies/authorization-and-execution.md)
+for every workload and generated project; preserve required safety gates and
+reuse existing valid scoped permission.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
@@ -143,7 +147,7 @@ Required output behavior:
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
 - Before implementation, inspect the target repository, remote, current/default branch, working tree, recent history, existing tooling, and applicable validation commands. Do not guess commands or absorb unrelated changes.
 - Record the source-control plan in the generated scenario artifacts. Use meaningful commits as the user's app or demo reaches coherent planning, metadata, experience, validation, and handoff checkpoints.
-- Before each commit, inspect status/diff, run applicable discovered validation, stage explicit intended files, and ask for approval. Require separate approval before push, then verify the remote commit and prepare a pull request when selected.
+- Before each commit, inspect status/diff, run applicable discovered validation and stage explicit intended files. Commit and push each require explicit permission; reuse valid scoped permission already provided, requesting only what is missing. Then verify the remote commit and prepare a pull request when selected.
 - Require an explicit standard-vs-custom mapping section before payload generation.
 - Capture the top user tasks and persist their owners and done definitions into `spec.md`, `plan.md`, and `tasks.md`.
 - For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
