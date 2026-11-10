@@ -51,7 +51,11 @@ param(
     [string]$PayloadsFolder = '',
     [switch]$Resume,
     [switch]$StrictSolutionIsolation,
-    [scriptblock]$RequestInvoker
+    [scriptblock]$RequestInvoker,
+    [ValidateSet('Legacy', 'Demo', 'Acceptance')]
+    [string]$VerificationProfile = 'Legacy',
+    [switch]$VerifyIdempotency,
+    [switch]$ExportSolution
 )
 
 Set-StrictMode -Version Latest
@@ -81,7 +85,10 @@ $reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(
 $hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasSecurityRolesPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'security-roles-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
-$idempotencyEnabled = $hasReportingPayload -or $hasDataPayload -or $hasSecurityRolesPayload
+# Intake discovery mode and delivery verification are deliberately independent.
+# Legacy and Acceptance preserve the existing payload-dependent rerun policy.
+$idempotencyEnabled = ($hasReportingPayload -or $hasDataPayload -or $hasSecurityRolesPayload) -and ($VerificationProfile -ne 'Demo' -or $VerifyIdempotency)
+$exportEnabled = $VerificationProfile -ne 'Demo' -or $ExportSolution
 
 $runRoot = Join-Path $repoRoot ".wizard-metrics/runs/$ScenarioSlug"
 New-Item -ItemType Directory -Path $runRoot -Force | Out-Null
@@ -90,6 +97,9 @@ $summaryJsonPath = Join-Path $runRoot 'run-summary.json'
 $summaryMarkdownPath = Join-Path $runRoot 'run-summary.md'
 
 $scope = [ordered]@{
+    verificationProfile = $VerificationProfile
+    idempotencyEnabled = [bool]$idempotencyEnabled
+    exportEnabled = [bool]$exportEnabled
     scenarioSlug = $ScenarioSlug
     payloadFolder = [IO.Path]::GetRelativePath($repoRoot, $paths.PayloadFolder).Replace('\', '/')
     environmentUrl = if ([string]::IsNullOrWhiteSpace($EnvironmentUrl)) { '[not configured]' } else { $EnvironmentUrl }
@@ -97,6 +107,9 @@ $scope = [ordered]@{
     publisherPrefix = if ([string]::IsNullOrWhiteSpace($PublisherPrefix)) { '[not configured]' } else { $PublisherPrefix.ToLowerInvariant() }
 }
 $scopeHashSource = "$($scope.scenarioSlug)|$($scope.payloadFolder)|$($scope.environmentUrl)|$($scope.solutionUniqueName)|$($scope.publisherPrefix)"
+# Never resume evidence from a different mode or verification policy. Old state
+# intentionally requires a fresh run rather than guessing its execution policy.
+$scopeHashSource += "|$Mode|$VerificationProfile|$([bool]$idempotencyEnabled)|$([bool]$exportEnabled)"
 $scopeHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($scopeHashSource))).ToLowerInvariant()
 
 $stageDefinitions = @(
@@ -121,7 +134,7 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'rerun-security-roles'; Script = '68-build-security-roles.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasSecurityRolesPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; Mode = $Mode; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
-    [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
+    [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $true; Enabled = $exportEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
     [pscustomobject]@{ Name = 'post-build'; Script = '80-post-build-analysis.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $paths.PayloadFolder; PreviewOnly = $true } }
 )
 
@@ -129,7 +142,7 @@ $runState = $null
 if ($Resume -and (Test-Path -LiteralPath $statePath)) {
     $runState = Read-WizardJsonFile -Path $statePath
     if ($runState.scopeHash -ne $scopeHash) {
-        throw 'Resume state belongs to a different scenario, environment, solution, publisher, or payload folder.'
+        throw 'Resume state belongs to a different scenario, environment, solution, publisher, payload folder, execution mode, or verification policy.'
     }
 }
 if ($null -eq $runState) {
@@ -137,6 +150,7 @@ if ($null -eq $runState) {
         runId = [guid]::NewGuid().ToString()
         scopeHash = $scopeHash
         mode = $Mode
+        verificationProfile = $VerificationProfile
         startedAtUtc = [DateTime]::UtcNow.ToString('o')
         stages = @()
     }
@@ -170,7 +184,7 @@ foreach ($stage in $stageDefinitions) {
     }
 
     if (-not $stage.Enabled) {
-        $result = [pscustomobject]@{ name = $stage.Name; script = $stage.Script; status = 'skipped'; reason = 'explicitly not enabled by scenario'; durationSeconds = 0 }
+        $result = [pscustomobject]@{ name = $stage.Name; script = $stage.Script; status = 'skipped'; reason = 'not enabled by scenario or verification profile'; durationSeconds = 0 }
         $results.Add($result) | Out-Null
         Write-Host "SKIP: $($stage.Name)" -ForegroundColor DarkGray
         continue
@@ -223,6 +237,7 @@ $failed = @($results | Where-Object status -eq 'failed')
 $summary = [ordered]@{
     runId = $runState.runId
     mode = $Mode
+    verificationProfile = $VerificationProfile
     status = if ($failed.Count -eq 0) { if ($Mode -eq 'Preview') { 'preview-complete' } else { 'completed' } } else { 'failed' }
     startedAtUtc = $runState.startedAtUtc
     completedAtUtc = [DateTime]::UtcNow.ToString('o')
@@ -236,6 +251,7 @@ $markdown = @(
     '',
     "- Run ID: $($summary.runId)",
     "- Mode: $Mode",
+    "- Verification profile: $VerificationProfile",
     "- Status: $($summary.status)",
     "- Scenario: $ScenarioSlug",
     "- Solution: $($scope.solutionUniqueName)",
