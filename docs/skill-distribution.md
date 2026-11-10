@@ -11,6 +11,29 @@ The repository ships three aligned skill families:
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 
+## Authorization policy inheritance
+
+All workloads and generated projects must follow
+[authorization and execution](policies/authorization-and-execution.md).
+Full clones inherit its mandatory instruction/prompt/skill references.
+During the existing reviewed consumer compatibility installation, include
+`docs/policies/authorization-and-execution.md` or an explicitly reviewed
+equivalent, and reference it from the project's existing instruction entry
+point before mutating work. Preserve stricter local policies and existing files;
+do not silently overwrite instructions or copy authorizations between projects.
+
+`01-install-skills.ps1` copies the canonical policy byte-for-byte to each
+installed Claude skill's `references/authorization-and-execution.md`; rerun the
+installer to refresh it. The installer fails before copying skills if the
+canonical policy is missing. This adds no runtime, credentials, approval system
+or project writes. Skills prefer the project-local contract and otherwise load
+the bundled policy; absent both, mutating work is BLOCKED. Links inside a bundled
+copy are project-root documentation references, not installed runtime files.
+
+Run `AuthorizationExecution.Tests.ps1` for the eight policy-contract scenarios
+and temporary-home install/rerun/missing-policy tests. These validate documented
+decisions and distribution, not live deployment or autonomous agent compliance.
+
 Contract 2.1.0 reporting additionally requires
 `scripts/bootstrap/helpers/reporting-plan.ps1`,
 `schemas/payloads/html-reports.schema.json`, its unapproved example, and matching

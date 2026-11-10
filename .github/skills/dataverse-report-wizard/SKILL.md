@@ -6,6 +6,12 @@ argument-hint: 'Optional: scenario=<slug> mode=simulate|live action=preview|depl
 
 # Dataverse Report Wizard
 
+## Authorization and execution
+
+Load and follow [authorization and execution](../../../docs/policies/authorization-and-execution.md).
+Require the policy or a reviewed equivalent in consumer projects through the
+existing compatibility review. Reuse valid scope; preserve deployment gates.
+
 ## Purpose
 
 Create native Dataverse charts and dashboards for an existing or planned

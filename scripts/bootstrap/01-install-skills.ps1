@@ -59,7 +59,8 @@ NON-NEGOTIABLES
     are available to Claude Code in any future session on this machine.
 
     Copies each full skill folder (not only SKILL.md) so future skill assets
-    are included automatically.
+    are included automatically. Bundles the canonical authorization and execution
+    policy in each installed skill's references folder without changing projects.
 
     Skills installed:
     - power-platform-vscode-wizard: guided wizard for building Power Platform
@@ -105,6 +106,10 @@ if (-not (Test-Path $skillsSource)) {
 
 $installed = 0
 $skipped   = 0
+$policySource = Join-Path $repoRoot 'docs\policies\authorization-and-execution.md'
+if (-not (Test-Path -LiteralPath $policySource -PathType Leaf)) {
+    throw "Required authorization policy is missing: $policySource. No skills installed."
+}
 
 Get-ChildItem -Path $skillsSource -Directory | ForEach-Object {
     $skillName   = $_.Name
@@ -120,6 +125,9 @@ Get-ChildItem -Path $skillsSource -Directory | ForEach-Object {
 
     New-Item -ItemType Directory -Force $destSkill | Out-Null
     Copy-Item (Join-Path $sourceSkill "*") $destSkill -Recurse -Force
+    $referencesDest = Join-Path $destSkill 'references'
+    New-Item -ItemType Directory -Force $referencesDest | Out-Null
+    Copy-Item -LiteralPath $policySource -Destination (Join-Path $referencesDest 'authorization-and-execution.md') -Force
     Write-Host "  INSTALLED $skillName" -ForegroundColor Green
     $installed++
 }

@@ -5,6 +5,14 @@ description: Use after the Power Platform wizard has built a model-driven app to
 
 # Dataverse Form Formatter
 
+## Authorization and execution
+
+Load and follow project-root `docs/policies/authorization-and-execution.md`.
+Installed skills use bundled `references/authorization-and-execution.md` when
+project-local policy is absent. If neither exists, report BLOCKED for mutating
+work. Require this policy or a reviewed equivalent in consumer projects through
+the existing compatibility review. Reuse valid scope; preserve plan-hash approval.
+
 ## Purpose
 
 Improve the information hierarchy of model-driven app forms after the wizard

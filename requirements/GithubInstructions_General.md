@@ -6,6 +6,11 @@ These rules define the source-control, repository, CI/CD, branch, commit, pull-r
 
 They are intentionally technology-neutral.
 
+Apply the [authorization and execution contract](../docs/policies/authorization-and-execution.md)
+throughout framework and generated-project work. Commit and push each need
+explicit permission; reuse valid scope without redundant approval prompts.
+Existing security, platform and repository protections remain mandatory.
+
 The repository is the authoritative engineering record for the project.
 
 ---

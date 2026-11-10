@@ -9,12 +9,54 @@ advisor and timestamped run baselines. Shared runtime, profile, instructions,
 documentation, and tests make them one integrated review set.
 
 Review the exact commit containing this document, not the default branch by
-assumption. Publication requires separate commit and push approval; a local
-checkout alone is not publication. The remote commit and pull request, when
+assumption. Publication requires explicit commit and push permission; reuse valid
+scope under [authorization and execution](policies/authorization-and-execution.md).
+A local checkout alone is not publication. The remote commit and pull request, when
 available, are the authoritative publication records.
 
 No default-branch merge, live Dataverse access, deployment, import, or FAST
 executor is authorized by this release.
+
+## Authorization and execution follow-up - 2026-11-10
+
+- Scope: [canonical policy](policies/authorization-and-execution.md),
+  [approved task scope](../specs/authorization-and-execution/spec.md),
+  [plan](../specs/authorization-and-execution/plan.md) and
+  [delivery tasks](../specs/authorization-and-execution/tasks.md).
+- Reuses onboarding, scenario planning, semantic/report-definition approvals,
+  Choice/form hashes, FAST signed/readiness boundaries, security rules,
+  source-control verification and this existing handoff. No new approval engine.
+- Resolves unconditional repeat commit/push prompts by reusing existing valid
+  explicit permission for each action. Required platform/script confirmations,
+  signed approvals and production protections are unchanged.
+- Integrates all six shipped skills and existing instruction/prompt/docs entry
+  points. The existing installer bundles canonical bytes per Claude skill;
+  consumer projects require a local policy or reviewed equivalent without
+  automatic instruction overwrite.
+- Focused validation: 111 Pester tests passed (13 policy/distribution plus
+  98 skill-parity tests); docs consistency, contract integrity and whitespace
+  checks passed.
+- Complete `pwsh .\run-quality.ps1` passed with exit 0: Markdown lint,
+  PowerShell parsing, PSScriptAnalyzer 1.24.0, JSON/schema validation, contract
+  integrity, all 35 standalone checks and all 141 Pester 5.7.1 tests.
+- No `AGENTS.md` or `.github/agents/` instruction files exist on this baseline;
+  the existing Copilot instructions, prompt and six skills are the integration
+  surfaces. This existing review guide remains the handoff; no duplicate report
+  or approval documentation was introduced.
+- Initial fixture checks caught line-wrapping sensitivity and PowerShell HOME's
+  AllScope behavior; normalized contract text and explicit try/finally restoration
+  corrected the tests. No real user skill directory was modified.
+- Active integration branch and uncommitted README edits remain untouched.
+  Work uses a separate worktree/branch based on `378ebd0a90c609207b767a9bac81ab72f4c98f35`;
+  the focused PR targets `review/fast-reporting-integration-20261023`.
+- Limits: contract tests validate documented decisions and actual local skill
+  distribution, not probabilistic agent compliance. No Dataverse/Power Pages
+  access, deployment, live verification or merge is authorized or claimed.
+- Publication: [PR #8](https://github.com/bradlaw76/power-platform-vscode-starter/pull/8)
+  is open against the integration branch. Implementation commit
+  [`2f796eb4f4872b7e875d63dee77791b226153369`](https://github.com/bradlaw76/power-platform-vscode-starter/commit/2f796eb4f4872b7e875d63dee77791b226153369)
+  was pushed and its remote SHA verified. Follow-up documentation records this
+  evidence; the PR head is the current publication SHA. No merge performed.
 
 ## Verified GitHub backups
 

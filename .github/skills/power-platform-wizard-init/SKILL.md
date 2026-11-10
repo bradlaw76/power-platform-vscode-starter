@@ -6,6 +6,13 @@ argument-hint: 'Optional: mode=demo-builder|advanced-builder|framework-acceptanc
 
 # Power Platform Wizard Init
 
+## Authorization and execution
+
+Load and follow [authorization and execution](../../../docs/policies/authorization-and-execution.md)
+for all workloads. During the existing consumer compatibility review, require
+this policy or a reviewed equivalent and a reference in the project's existing
+instruction entry point before mutating work. Do not overwrite local instructions.
+
 ## Overview
 
 This skill starts the repository wizard safely through either chat or terminal, enforces planning gates, and reports progress using existing telemetry artifacts.
@@ -269,7 +276,7 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Treat unresolved intake, missing solution identity, failed prereqs, or failed auth as hard stops.
 - Never bypass planning to jump straight to build scripts.
 - Keep unrelated working-tree changes untouched.
-- Require explicit approval before commit and separate approval before push.
+- Commit and push each require explicit permission; reuse valid scoped permission already provided and ask only for missing scope under the authorization and execution policy.
 - After push, verify that the remote branch contains the local commit before reporting success.
 
 ## Progress Commands

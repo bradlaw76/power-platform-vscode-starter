@@ -211,11 +211,13 @@ Disclosed local usage metrics are available for wizard runs. Bootstrap scripts l
 
 ## Enhancement registry and maintenance policy
 
-The semantic field gate is mandatory; the other enhancements below remain
-optional and do not become prerequisites for an otherwise valid app.
+The semantic field gate and authorization/execution contract are mandatory;
+the other enhancements below remain optional and do not become prerequisites
+for an otherwise valid app.
 
 | Enhancement | Contract | Runtime position | Approval and verification |
 | --- | --- | --- | --- |
+| **Authorization and execution (mandatory, every project)** | [Canonical policy](docs/policies/authorization-and-execution.md) | Existing instructions, skills and distribution review; no new build stage or approval engine | Reuse valid scoped permission; preserve platform/signature/environment gates; distinguish source, tests, deployment, live verification and blockers |
 | **Repository update advisor and work baseline** | [`repository-updates.json`](repository-updates.json), [`schemas/repository-updates/`](schemas/repository-updates/), optional scenario `repo-update-context.json` | Local-only startup check; per-run source capture in stage 90, not a new build stage | Explicit opt-in fetch, no automatic adoption; categorized path evidence with unknown relevance preserved; immutable Apply run baselines; [guide](docs/repository-updates.md) |
 | **Semantic field types (mandatory, every use case)** | [`field-type-decisions.schema.json`](schemas/payloads/field-type-decisions.schema.json), scenario `field-type-decisions.json`, [standard](docs/semantic-field-type-standard.md) | [`14-validate-semantic-fields.ps1`](scripts/bootstrap/14-validate-semantic-fields.ps1) Planning before column generation; Payload before build; live checks in stage 30, after relationships and before export | Explicit complete planning/Choice/mapping/exception approval; credential-free Preview; drift blocks dependent execution; no legacy bypass or implicit destructive migration |
 | **Choice presentation** | `choice-presentations-*.json` plus `choice-presentations.schema.json` | Stage 35, after columns and before relationships | Credential-free preview and SHA-256 approval; updates existing wizard-owned unmanaged local Choice options, scoped publish, metadata readback, and idempotent rerun |
@@ -838,7 +840,7 @@ Interactive flow:
 - Prompt: `Update README generated summary section now? (y/N)`.
 - If yes: replace only the content between the generated summary markers.
 - Prompt: `Stage and commit README update now? (y/N)`.
-- If yes: show repository-target safety checks (`git rev-parse --show-toplevel`, `git remote -v`, `git branch --show-current`) and require explicit confirmation before commit/push.
+- If yes: show repository-target safety checks (`git rev-parse --show-toplevel`, `git remote -v`, `git branch --show-current`). Commit and push each need explicit permission; reuse valid scope under the [authorization policy](docs/policies/authorization-and-execution.md). Required script confirmations remain unchanged.
 - Prompt: `Push to origin/<current-branch> now? (y/N)` before any push.
 
 Preview mode:
