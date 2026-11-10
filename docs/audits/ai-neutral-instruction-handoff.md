@@ -322,6 +322,158 @@ permission boundaries, negative cases, compatibility and claims. Neither should
 merge, deploy, expand access or retry uncertain external writes solely because
 this template asks for a complete result.
 
+## Proposed next implementation: persistent scenario handoffs and lean tasks
+
+### Status and how to use this proposal
+
+Added for owner review on 2026-11-10. **Everything in this section is a proposal,
+not implemented by PR #7.** The current document is a manually supplied review
+reference. It is not automatically loaded, maintained, or enforced by the wizard
+or an AI entrypoint. Only the verification-profile runtime change and its tests
+in the implementation section are operative.
+
+Give this document to Copilot, another assistant, or a developer with this request:
+
+> Read this handoff and inspect the current repository and open PRs. Produce a
+> read-only implementation plan for the proposed persistent scenario handoff,
+> conditional tasks, and optional outputs. Identify exact files, contracts,
+> compatibility risks, approval boundaries and tests. Do not implement, merge,
+> deploy or modify a live environment until the plan is approved.
+
+The plan should reconcile PR #5's application-root isolation and PR #3's intake
+changes before selecting an implementation base. The following paths refer to
+this reviewed codebase; reverify them on that base. An application scenario's
+`specs/<scenario>/handoff.md` must live under its authorized application root,
+not in the distributed framework source after root isolation is integrated.
+
+### 1. Automatically maintained scenario handoff
+
+- Initialize `specs/<scenario>/handoff.md` from
+  `scripts/bootstrap/05-start-wizard.ps1` alongside `answers.md`, `spec.md`,
+  `plan.md`, and `tasks.md`. Show its location at the end of intake.
+- Define a versioned handoff contract in `docs/wizard-contract-v1.md`. Include
+  scenario identity, repository and current source revision, discovery mode,
+  execution mode, verification profile, confirmed scope, latest run ID, completed
+  and remaining stages, failed/uncertain operations, evidence links, limitations,
+  approval references, next permitted action, and separately owned human notes.
+- Treat `.wizard-metrics/runs/<scenario>/current-run.json` and `run-summary.json`
+  as execution evidence sources, not Markdown checkboxes. Project their actual
+  statuses into the handoff; never infer completion from a generated plan.
+- Add a narrowly scoped projection helper, proposed location
+  `scripts/bootstrap/helpers/wizard-scenario-handoff.ps1`. This helper does not
+  exist yet. Invoke it from `90-run-build.ps1` after durable stage checkpoints,
+  resume transitions, handled failures and final summary creation. Initialize
+  from intake separately; refresh stale handoffs on the next controlled entry.
+- Keep generated content in explicit owned sections and preserve all human notes
+  and unrecognized content. Use version checks, atomic file replacement and a
+  concurrent-edit check. If preservation cannot be guaranteed, report a conflict
+  without overwriting. Never replace the whole document on every checkpoint.
+- Do not mask the original build failure if handoff projection fails. Record
+  projection failure separately; recover from authoritative run state later.
+  A hard process termination cannot guarantee a final projection, so show source
+  run ID/timestamp and detect stale content rather than promising perfect sync.
+- Record approval provenance and scope without treating an old approval record
+  as authority for new actions. Exclude secrets and private customer records.
+- Update `.github/copilot-instructions.md`,
+  `.github/prompts/power-platform-demo-wizard.prompt.md`,
+  `.github/skills/power-platform-wizard-init/SKILL.md`, and
+  `.claude/skills/power-platform-vscode-wizard/SKILL.md` to discover and read the
+  selected scenario handoff before proposing continuation. Coordinate `CLAUDE.md`
+  and planning skills supplied by #5. Do not imply every third-party AI will
+  automatically obey repository guidance; manual users still supply the file.
+- Add projection tests for initialization, successful and failed stages, resume,
+  stale state, missing state, interrupted writes, concurrent edits, human-note
+  preservation, output-root isolation and secret redaction. Extend
+  `test-run-state-persistence.ps1` and add a dedicated handoff suite; verify
+  entrypoint guidance/parity through existing mode/skill checks.
+
+### 2. Generate only the tasks and approvals the scenario needs
+
+The current `05-start-wizard.ps1` templates include unconditional export/unpack
+and pack/import tasks, import validation, report reviews, and several separate
+approval items. Some generated instructions also name `70-build-web-resources.ps1`
+while the runner uses `65-build-web-resources.ps1`. Inspect and reconcile these
+actual templates rather than making the new handoff another conflicting list.
+
+- Generate `plan.md` workstreams, validation and `tasks.md` from confirmed
+  capabilities, profile, requested outputs and authorization, using stable task
+  identifiers and explicit dependencies. Keep these artifacts consistent with
+  the runner and handoff; changing only the Markdown checklist is insufficient.
+- Include export/unpack only when requested by policy or as a deliverable.
+  Include pack/import only for a separately requested deployment workflow with
+  an explicit target and approval. Export never implies permission to import.
+- For Demo, omit unselected second-pass/acceptance chores from the active task
+  list. Retain a short explanation of omitted optional work so a reader can see
+  the coverage boundary. Do not remove required framework CI or security checks.
+- Combine related approvals into a clear review checkpoint when policy allows,
+  and reuse valid approval for unchanged scope instead of repeatedly asking.
+  Retain separate approvals when target, data, cost, access, destructive impact
+  or other consequential scope changes. Never interpret "lean" as no approval.
+- Include data, roles, BPF, reporting and extended artifacts only when applicable;
+  preserve required dependency validation and explicitly selected deliverables.
+- Regenerate only owned task sections; preserve human tasks, annotations and
+  completion evidence. Do not mark a task complete because an AI claims it ran.
+- Extend `test-wizard-modes.ps1`, `test-docs-consistency.ps1` and
+  `test-script-order.ps1` with mode/capability/output combinations, command-path
+  accuracy, no implicit import and approval-boundary regressions.
+
+### 3. Make mind maps and extended reports optional outputs
+
+`80-post-build-analysis.ps1` currently generates mind-map artifacts tested by
+`test-post-build-analysis.ps1`. The repository also contains
+`81-build-progress-matrix.ps1`, `82-build-progress-report.ps1`,
+`08-report-wizard.ps1`, and `helpers/reporting-wizard.ps1`. These have different
+purposes; distinguish diagnostic outputs from application-facing report features.
+
+- Propose explicit output choices for mind maps and extended diagnostic reports,
+  separate from requested app charts, dashboards and report web resources.
+- Preserve minimal run status, errors, scope, safety evidence and the scenario
+  handoff even when decorative or extended outputs are disabled.
+- Demo should not generate every optional artifact automatically; preserve
+  legacy defaults for existing callers and document any deliberate migration.
+- Pass choices through intake, plan, runner and post-build analysis without
+  changing core validation. Add enabled/disabled output tests and ensure disabled
+  artifacts cannot be mistaken for fresh output from the current run.
+- Update `test-post-build-analysis.ps1`, reporting tests and contract/docs checks
+  only alongside the approved implementation; do not weaken tests merely to
+  remove inconvenient output requirements.
+
+### 4. Connect the experience and deepen meaningful verification
+
+- Map a confirmed Demo Builder choice in `05-start-wizard.ps1` and AI entrypoints
+  to an explicit Demo verification recommendation/invocation. Keep Preview as
+  default. Preserve a conscious Acceptance choice and legacy caller compatibility.
+  Do not silently select Apply from intake answers.
+- Keep API-first component authoring in existing stages (`20`, `30`, `40`, `50`,
+  `60`, `62`, `64`, `65`, `66`, `68`) with capability-specific validation and
+  membership evidence. Do not introduce a second competing authoring pipeline.
+- Design operation-aware, bounded recovery in
+  `helpers/dataverse-runtime.ps1` and affected component stages. Require exact
+  identity reconciliation before retrying uncertain creates; extend
+  `DataverseRuntime.Tests.ps1` and component rerun tests with lost-response cases.
+- Add separately authorized real journey checks informed by
+  `07-demo-dry-run.ps1`, app/form/view contracts and intended user roles. Verify
+  actual app opening, navigation, record save, lookups and required outputs.
+  A proposed new live-smoke harness needs its own contract and explicit failure
+  semantics; no existing dry-run document proves those live interactions ran.
+- Report focused live results in the scenario handoff separately from stubbed
+  CI, static checks and planned steps. Never upgrade a demo to "ready" while
+  required journey or publish checks are failed, unknown or unperformed.
+
+### Suggested implementation order after approval
+
+1. Reconcile the selected base with active PRs and define the handoff/task/output
+   contracts, ownership, migration and acceptance criteria in a read-only plan.
+2. Implement persistent handoff initialization/projection and preservation tests.
+3. Align conditional task generation and AI discovery with that contract.
+4. Connect confirmed intake to verification profile; add optional output controls
+   while preserving minimal evidence and legacy compatibility.
+5. Implement bounded recovery and real journey validation as separately reviewed
+   changes with suitable non-production authorization.
+6. Run focused and full framework CI on every final candidate and the actual
+   combined tree. Perform authorized live checks separately; update the handoff
+   with actual results. Merge/deployment remain separate decisions.
+
 ## Owner review decisions and next steps
 
 1. Review whether Demo's explicit opt-ins and unchanged default match the desired
