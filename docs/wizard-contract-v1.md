@@ -175,6 +175,8 @@ Required gate before execution:
   - `requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md`
   - `requirements/GithubInstructions_General.md`
 
+Additional gate for **new, expanded or inherited scenarios** (including when a project is already under way): apply [the scenario change impact planning contract](scenario-change-impact-gate.md) to produce a source-aware field/relationship reuse ledger, precise project-scoped dedicated forms/tabs/views/app routes, portal/HTML source and permission mapping, fixture/document/version contract and cross-layer acceptance tests. Link the impact register and unresolved decisions in all five scenario artifacts above, plus `demo-data-plan.json` when enabled. A generated screen must never be claimed connected when its table/field has no verified existing/approved identity. This is guidance for current planning; no new executable script behavior or tenant access is implied.
+
 ## Execution Contract
 
 ### Core Modules (always)

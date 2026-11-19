@@ -41,6 +41,8 @@ separate implementation.
 > terminal route, verify the clone in the VS Code Explorer, install
 > extensions, select the workload, and complete planning before a build.
 
+**Planning a new or expanded scenario in an existing app?** Use the [Scenario Change Impact Gate](docs/scenario-change-impact-gate.md) before building new native forms or HTML. It reconciles required fields/relationships, dedicated role forms and tabs, views, portal/report bindings, synthetic demo data and acceptance against actual existing assets, while preserving current work. This is planning guidance, not an installed automatic impact compiler.
+
 ### What happens when you use this starter
 
 1. You create a local **authoring workspace**: a full clone of this reusable
