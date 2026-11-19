@@ -323,6 +323,8 @@ Supported application profiles:
 - `dynamics-field-service-extension`
 - `generic-dataverse-solution`
 
+**Scenario expansion pre-build gate:** if an existing project receives new or changed personas, Cases, tables/fields, native forms/tabs, views, Power Pages/HTML, reports or demo data, follow [scenario-change-impact-gate.md](scenario-change-impact-gate.md) before building those components. Compare actual existing assets to proposed additions and update the same five scenario planning files, including field-to-form-to-view-to-HTML-to-data tests. This planning gate does not alter the authoritative setup script order or create tenant resources.
+
 ### Demo Builder (default)
 
 The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.

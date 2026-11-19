@@ -23,6 +23,8 @@ Wizard outcome:
 Mandatory rule:
 - Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
 
+**Extended-scenario gate:** not every wizard run starts a new build. Before implementing newly added personas, pages, fields or business branches in a working application, apply [the scenario change impact gate](../docs/scenario-change-impact-gate.md) and record every required standard/reused or additive column, relationship, dedicated form/tab, view, app route, portal/HTML binding, synthetic data and positive/negative acceptance test. Reconcile against current source/metadata; update the same scenario Spec Kit and report-mapping files. A read-only prepared preview can proceed while native permissions and schema remain explicitly blocked.
+
 ### 0A. End-to-end flow this wizard supports
 
 Use this sequence from first clone to final handoff:

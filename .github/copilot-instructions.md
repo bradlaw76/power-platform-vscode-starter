@@ -54,6 +54,12 @@ When a user says they already have a partial implementation ("I started building
 - Then use `plan.md` to capture only what **remains to be built**.
 - This ensures Spec Kit retrofitting works for mid-stream projects, not just greenfield builds.
 
+## New or Extended Scenario Impact Gate (Mandatory Planning)
+
+When a business scenario is added, extended or reassessed in an existing application, **do not jump from story to HTML or forms**. Run the source-aware [scenario change impact gate](../docs/scenario-change-impact-gate.md): diff accepted requirements/personas/episodes/checkpoints and inspect existing standard/custom schema, actual forms/views/app roots, activities, permissions, solution and seeded data before proposing additions. Generate/update the schema reuse ledger, exact new project-named forms/tabs/controls, views/subgrids/charts, native/portal/HTML field-source bindings, synthetic fixture and positive/negative tests; link them in `spec.md`, `plan.md`, `tasks.md`, `answers.md`, and `report-mappings.md`. Mark existing vs candidate vs prepared vs deployed clearly, and require native field and security proof before live UI binding. Preserve shared forms/views, other projects' same-name demo records, active writers and held packages. Continue independent ready work, and batch compatible existing H/workload IDs when assigned by the owner; Copilot must never allocate an H number.
+
+This is a pre-build documentation check, not authority to alter Dataverse, seed standard tables, add roles, publish, merge, skip accepted business decisions or start a second writer.
+
 ## Bootstrap Sequence Authority
 - **Single source of truth for bootstrap step order: `docs/onboarding.md`**
 - Always reference `docs/onboarding.md` for step ordering (00-prereq-check → 10-auth-connect → 20-build-tables, etc.).
