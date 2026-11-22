@@ -842,6 +842,10 @@ if ($Mode -eq 'demo-builder') {
         }
         $standardTables = @($mappedNames | Where-Object { Test-IsStandardTable $_ })
         $customTables = @($mappedNames | Where-Object { -not (Test-IsStandardTable $_) })
+        $acceptedPrefixes = @($customTables | ForEach-Object { ($_ -split '_', 2)[0] } | Sort-Object -Unique)
+        if ($acceptedPrefixes.Count -eq 1) {
+            $publisherPrefix = $acceptedPrefixes[0]
+        }
         $entryPointTable = $mappedNames[0]
     }
     $tableStrategy = if ($standardTables.Count -eq 0) { 'custom-only' } elseif ($customTables.Count -eq 0) { 'oob-only' } else { 'hybrid' }

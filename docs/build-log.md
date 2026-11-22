@@ -24,6 +24,9 @@ Use this to document what was planned, built, validated, and promoted.
 - Repairs: PowerShell automatic-variable mapping collision, incorrect default
   standard-table inference, stale status reporting and cached transient blocks.
   Detailed relationship contradictions now fail before planning writes.
+  A final persistent-pilot check also aligned the single accepted custom
+  namespace with the publisher-prefix recommendation; existence remains a
+  separate verification, not an inferred live fact.
   A missing `payloads` folder in the new integration fixture was corrected
   without weakening runtime preflight; retry counts are durably recorded.
 - CI now runs dependency-independent Python guardrails. Nine installed-runtime

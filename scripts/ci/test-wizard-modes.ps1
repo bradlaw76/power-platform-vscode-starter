@@ -216,6 +216,7 @@ try {
     $approvedSpec = Get-Content -LiteralPath (Join-Path $approvedWorkspace 'specs/account-work-coordination/spec.md') -Raw
     Assert-True -Condition ($approvedSpec.Contains('ppd_workitem -> ppd_workitem') -and $approvedSpec.Contains('one_to_many') -and $approvedSpec.Contains('ppd_accountid')) -Message 'Accepted custom identity and relationship intent must survive intake.'
     Assert-True -Condition ($approvedSpec.Contains('## Accepted Planning Source')) -Message 'Accepted planning provenance must be retained.'
+    Assert-True -Condition ($approvedSpec.Contains('- Publisher prefix: ppd')) -Message 'A unique accepted custom namespace must guide the publisher recommendation.'
     foreach ($fault in @('unaccepted', 'cardinality', 'endpoint')) {
         $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
         $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'

@@ -46,6 +46,12 @@ standard-table reuse, and records accepted input hashes. It does not verify
 live table availability, approve semantic field decisions or provision a
 solution.
 
+A single accepted custom-table namespace also guides the publisher-prefix
+recommendation. This preserves `ppd_` identities rather than proposing a
+different prefix; it does not prove that the publisher already exists.
+Multiple namespaces and existing/new publisher selection require explicit
+planning and environment verification.
+
 Detailed modes must match accepted table identities and use the exact compact
 accepted relationship JSON in both relationship fields (`none` for an empty
 selection). Free-text contradictions are rejected before planning writes,

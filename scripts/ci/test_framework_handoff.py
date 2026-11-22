@@ -177,6 +177,7 @@ class InstalledHandoff(unittest.TestCase):
         text = (project / "specs" / self.args.scenario / "spec.md").read_text()
         self.assertIn("Accepted Planning Source", text)
         self.assertIn("ppd_workitem", text)
+        self.assertIn("- Publisher prefix: ppd", text)
         self.assertFalse((project / ".git").exists())
         args = deepcopy(self.args)
         args.project, args.runtime = str(project), str(runtime)
