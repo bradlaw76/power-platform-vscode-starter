@@ -23,7 +23,8 @@ Always require planning before build implementation:
 - Only move to bootstrap scripts after requirements and tasks are clear.
 
 ## Wizard Modes
-Use `demo-builder` by default. Ask six business questions (idea/outcome, primary user/task, data, experience/lifecycle, success/sample data, environment/output), infer the technical design, then present one consolidated recommendation for confirmation. Do not ask acceptance, disposable-environment, retention, rerun-proof, source-tag, or cleanup questions in this mode.
+Before recommending automation, inspect the actual environment and tool availability. Guided delivery must work without WSL; suggest automated workers only when their expected time savings exceed setup, verification and recovery costs and the owner opts in. Production keeps all applicable security, CI and deployment gates, regardless of a short deadline. Persist delivery intent in the scenario's Spec Kit files. See `docs/delivery-pacing-and-tooling.md`.
+Use `demo-builder` by default. Ask six core business questions (idea/outcome, primary user/task, data, experience/lifecycle, success/sample data, environment/output) plus two short delivery questions (prototype/presentation-demo/connected-demo/pilot/production; user-specified deadline), then present one consolidated technical recommendation for confirmation. Reuse delivery answers already provided; do not ask twice. Do not ask acceptance, disposable-environment, retention, rerun-proof, source-tag, or cleanup questions in this mode.
 
 Use `advanced-builder` only when the user explicitly requests technical control or retrofit detail. Ask the core discovery and architecture questions directly, including table/form strategy, entry point, landing view, review app, mapping, relationships, reports, demo data, solution identity, and source control. Do not ask acceptance, disposable-environment, retention, rerun-proof, or cleanup questions.
 
