@@ -129,7 +129,12 @@ try {
     Assert-True -Condition ($modeNames -contains 'demo-builder' -and $modeNames -contains 'advanced-builder' -and $modeNames -contains 'framework-acceptance') -Message 'The required wizard modes are missing.'
 
     $demoMode = $profile.discovery.modes.'demo-builder'
-    Assert-True -Condition ($demoMode.questionBudget -ge 6 -and $demoMode.questionBudget -le 8) -Message 'Demo Builder must use at most 6-8 questions.'
+    Assert-True -Condition ($demoMode.questionBudget -eq 8 -and @($demoMode.questions).Count -eq 8) -Message 'Demo Builder must declare exactly six business and two delivery questions.'
+    foreach ($modeProperty in @($profile.discovery.modes.PSObject.Properties)) {
+        foreach ($question in @('delivery-goal', 'delivery-timeframe')) {
+            Assert-True -Condition (@($modeProperty.Value.questions) -contains $question) -Message "Mode '$($modeProperty.Name)' is missing '$question'."
+        }
+    }
     Assert-True -Condition ([bool]$demoMode.inferTechnicalDesign) -Message 'Demo Builder must infer technical design.'
     Assert-True -Condition ([bool]$demoMode.consolidatedRecommendationConfirmation) -Message 'Demo Builder must consolidate recommendations for confirmation.'
     foreach ($forbiddenPrompt in @('destructive-cleanup-approval', 'retention-policy', 'rerun-proof-engineering', 'disposable-environment-confirmation')) {

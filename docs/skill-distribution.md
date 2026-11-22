@@ -9,6 +9,14 @@ The repository ships two aligned skill families:
 
 A Markdown skill is instructions, not the wizard runtime. Copying `SKILL.md` alone does not install the PowerShell scripts, helpers, schemas, profile, or scenario contract it invokes.
 
+## Authorization policy inheritance
+
+Every shipped skill follows [authorization and execution](policies/authorization-and-execution.md). Full clones inherit its instruction, prompt and skill references. During the existing consumer compatibility review, include this policy or an explicitly reviewed equivalent and reference it from the project's existing instruction entry point. Preserve stricter local policies and do not overwrite another project's instructions automatically.
+
+`01-install-skills.ps1` bundles the canonical policy byte-for-byte into each installed Claude skill's `references/authorization-and-execution.md`. Reruns refresh the copy; a missing canonical policy blocks skill copying. Skills prefer project-local policy, then the bundled copy; if both are absent, mutating work is blocked. This installs no runtime, credentials, scheduler or project authorization.
+
+This baseline ships two skill families (wizard and reporting), four instruction files total, not the formatter family from the older integration branch. Do not import absent families merely to satisfy an obsolete count. Run `AuthorizationExecution.Tests.ps1` for policy decisions and real temporary-home install/rerun/missing-policy checks; no operator home or consumer project is used.
+
 ## Install options
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:

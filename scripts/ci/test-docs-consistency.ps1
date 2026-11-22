@@ -46,8 +46,8 @@ foreach ($requiredMode in @('demo-builder', 'advanced-builder', 'framework-accep
 }
 
 $demoMode = $wizardContract.discovery.modes.'demo-builder'
-if ([int]$demoMode.questionBudget -lt 6 -or [int]$demoMode.questionBudget -gt 8) {
-  throw 'Demo Builder question budget must remain between 6 and 8.'
+if ([int]$demoMode.questionBudget -ne 8 -or @($demoMode.questions).Count -ne 8) {
+  throw 'Demo Builder must declare exactly six business and two delivery questions.'
 }
 if (-not [bool]$demoMode.consolidatedRecommendationConfirmation) {
   throw 'Demo Builder must consolidate technical recommendations for confirmation.'

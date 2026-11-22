@@ -85,7 +85,7 @@ NON-NEGOTIABLES
     remaining work.
 
 .PARAMETER Mode
-    Selects discovery depth. Demo Builder is the seven-prompt default. Advanced
+    Selects discovery depth. Demo Builder uses eight questions and one confirmation. Advanced
     Builder exposes technical controls. Framework Acceptance adds explicit
     environment safety, isolation, rerun, retention, cleanup, and evidence
     controls.
@@ -1419,7 +1419,7 @@ $(if ($Retrofit) { "- retrofit: enabled" } else { "- retrofit: disabled" })
 - Required validation/CI: $($answers["SourceControlCiChecks"])
 - Pull request handoff: $($answers["SourceControlPullRequest"])
 - Merge strategy: $($answers["SourceControlMergeStrategy"])
-- Safety: inspect status and diff, stage explicit files, validate before commit, and require approval before commit or push.
+- Safety: inspect status and diff, stage explicit files, validate before commit; commit and push each require explicit permission. Reuse valid scoped permission already provided; ask only for missing scope.
 
 ## Optional Report Web Resources
 - Enabled: $($answers["IncludeHtmlReports"])
@@ -1708,6 +1708,7 @@ $(if ($Retrofit) { @"
 - Pull request handoff: $($answers["SourceControlPullRequest"])
 - Merge strategy: $($answers["SourceControlMergeStrategy"])
 - Keep remote operations human-approved and verify the remote commit after push.
+- Reuse valid scoped permission already provided; request only missing commit or push scope. Neither operation authorizes merge or deployment.
 
 ## Risks to Resolve
 - Confirm environment availability and permissions.
@@ -1768,6 +1769,7 @@ $tasksContent = @"
 
 - [ ] Review 'answers.md' with stakeholder
 - [ ] Confirm delivery goal '$($answers['DeliveryGoal'])' and timeframe '$($answers['DeliveryTimeframe'])'; resolve any unconfirmed scripted values
+- [ ] Classify the actual change under 'docs/scenario-change-impact-gate.md'; minor maintenance retains accepted planning and focused checks, while scenario deltas update affected contracts
 - [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
 - [ ] Consider automation only when a measured net time saving exceeds setup/verification cost and owner opts in; do not require WSL
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
@@ -1818,6 +1820,7 @@ $tasksContent = @"
 - [ ] Export and unpack solution
 - [ ] Create the final implementation commit after reviewing staged files and validation evidence
 - [ ] Push only after approval, verify the remote branch contains the local commit, and prepare the pull request when enabled
+- [ ] Reuse valid scoped commit/push permission already provided; ask only for missing scope and preserve required platform confirmations
 - [ ] Pack and import solution
 - [ ] Update 'docs/build-log.md'
 "@

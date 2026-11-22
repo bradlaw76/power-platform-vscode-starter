@@ -4,7 +4,7 @@
 
 Read [docs/onboarding.md](docs/onboarding.md), [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md), and the repository instructions. Keep scenario work under `specs/<scenario-slug>/` and `payloads/scenarios/<scenario-slug>/`; do not recreate scenario planning at the repository root.
 
-For behavior changes, update `spec.md`, `plan.md`, and `tasks.md` before implementation. Preserve payloads as the source of truth, idempotent behavior, 401 token refresh, 429 backoff, publishing, complete solution inventory, and the export gate.
+For new or changed application behavior, align affected `spec.md`, `plan.md`, and `tasks.md` before implementation under the [proportional scenario-impact gate](docs/scenario-change-impact-gate.md). Minor maintenance that restores accepted behavior retains accepted planning and runs focused checks; do not restart the full planning cycle. Preserve payloads as the source of truth, idempotent behavior, 401 token refresh, 429 backoff, publishing, complete solution inventory, and the export gate.
 
 ## Development workflow
 
@@ -14,7 +14,9 @@ For behavior changes, update `spec.md`, `plan.md`, and `tasks.md` before impleme
 4. Add credential-free tests, including rerun behavior when metadata mutation changes.
 5. Run the repository CI commands documented in [docs/onboarding.md](docs/onboarding.md).
 6. Review staged files for secrets, generated artifacts, customer data, and local workspace files.
-7. Request explicit approval before committing and separate approval before pushing.
+7. Commit and push each require explicit permission. Reuse valid scoped
+   permission already provided; ask only for missing scope, following
+   [authorization and execution](docs/policies/authorization-and-execution.md).
 
 Never run Dataverse integration tests against production. Use only an authorized disposable development environment and the manually triggered workflow confirmation.
 

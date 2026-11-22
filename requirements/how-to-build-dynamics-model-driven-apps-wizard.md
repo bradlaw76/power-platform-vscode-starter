@@ -6,6 +6,11 @@ Audience: Teams that want a guided, question-first process from idea to release
 
 ## 0. How This Wizard Works
 
+Follow [authorization and execution](../docs/policies/authorization-and-execution.md)
+for all workloads and generated projects. Reuse valid scoped permission without
+repeating approval questions; preserve planning, platform and environment gates.
+Carry the policy or a reviewed equivalent through existing distribution review.
+
 This document is designed as a facilitation wizard.
 
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
@@ -22,6 +27,8 @@ Wizard outcome:
 
 Mandatory rule:
 - Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+
+**Proportional scenario-impact gate:** classify the actual change under [the scenario change impact gate](../docs/scenario-change-impact-gate.md). Minor maintenance uses accepted planning and focused checks; do not regenerate the full matrix. A bounded scenario delta updates only affected contracts and dependent surfaces; a new or cross-cutting scenario reviews the applicable end-to-end chain before implementation. Preserve native field/security proof before live binding and continue independent prepared work without crossing blocked dependencies.
 
 ### 0A. End-to-end flow this wizard supports
 

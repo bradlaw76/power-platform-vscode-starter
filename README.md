@@ -45,6 +45,20 @@ separate implementation.
 > terminal route, verify the clone in the VS Code Explorer, install
 > extensions, select the workload, and complete planning before a build.
 
+**Planning a new or expanded scenario in an existing app?** Use the proportional [Scenario Change Impact Gate](docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas reconcile affected contracts and dependent surfaces; preserve native field/security proof before live binding. This is planning guidance, not an automatic impact compiler.
+
+Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
+
+### Enhancement registry
+
+| Enhancement | Contract and runtime scope |
+| --- | --- |
+| Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
+| Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
+| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
+
+For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
 ### What happens when you use this starter
 
 1. You create a local **authoring workspace**: a full clone of this reusable

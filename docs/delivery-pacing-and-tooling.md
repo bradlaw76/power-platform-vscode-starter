@@ -50,4 +50,6 @@ For a substantial multi-workstream build, automation can be valuable only after 
 
 Record the delivery goal and timeframe in `answers.md`, `spec.md`, `plan.md` and actionable `tasks.md` checks. For later changes, update the affected files **from accepted requirement decisions and actual source/deployment/verification evidence**; never overwrite human-authored intent based on an inferred status. A change in scenario, deadline, live-versus-prepared fidelity or production status requires impact reconciliation before generating new implementation tasks.
 
+Apply the proportional [scenario change impact gate](scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. A timeframe-only update changes delivery context, not unrelated schema or tasks; a changed delivery goal revisits applicable acceptance without waiving mandatory gates.
+
 This increment updates intake and generated planning artifacts. It **does not** implement an autonomous Spec Kit updater, activate CI, relax existing execution gates, validate a live tenant, change another project or implement an unattended worker.
