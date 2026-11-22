@@ -17,6 +17,10 @@ artifacts as part of its guided workflow.
 
 ---
 
+## Choose the delivery goal before the toolchain
+
+Before planning, the wizard asks whether this is a **prototype, presentation demo, connected demo, pilot, or production release**, and when it must be ready. It records that context in the scenario's Spec Kit files and proposes verification proportional to the goal without bypassing required security, data or deployment checks. The normal guided path does **not require WSL or unattended automation**. Tool selection is based on what the user actually has available; automation is optional and recommended only when it is expected to save net time after setup and verification. See [delivery pacing and tooling](docs/delivery-pacing-and-tooling.md).
+
 ## Supported workloads
 
 | Workload | Entry point | Use when |
