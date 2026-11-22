@@ -11,6 +11,12 @@ separately. Include the contract through the existing distribution review.
 
 Companion wizard:
 
+Optional starter-to-framework continuation follows
+[the installed H008 handoff](../docs/framework-handoff.md). Separate external
+project/runtime roots, accepted source contracts and explicit synchronization
+selection are required. Native Windows guided use needs neither consumer Git
+nor WSL; synthetic completion is not live deployment/UI acceptance.
+
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
   guided, question-by-question process that walks users from principles and
   Spec Kit setup through design, build, validation, and handoff.

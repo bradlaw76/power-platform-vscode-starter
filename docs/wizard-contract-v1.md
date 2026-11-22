@@ -65,6 +65,15 @@ Generate delivery context into `answers.md`, `spec.md`, `plan.md` and `tasks.md`
 
 ## Architecture Intent Contract
 
+Demo Builder reuses recognized standard Dataverse tables inside its consolidated
+recommendation; availability and view disposition still require verification.
+`-AcceptedContractPath` preserves exact accepted table/relationship identities
+and records source hashes rather than converting standard Account into a custom
+table. Detailed intake rejects contradictions instead of overriding decisions.
+Optional `-FrameworkRuntimeWorkspace` connects approved planning to the installed
+framework; synchronization remains a separate explicit opt-in. See
+[handoff and supported hosts](framework-handoff.md).
+
 First select one supported application profile:
 
 - `standalone-model-driven`

@@ -56,6 +56,7 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
+| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); explicit consumer paths, accepted table decisions, canonical tasks/journals and opt-in synchronization; no scheduler or live deployment |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 

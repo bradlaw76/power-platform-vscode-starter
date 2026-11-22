@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.7.0
+VERSION:      0.8.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-28
+LAST UPDATED: 2026-11-22
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -45,6 +45,7 @@ v0.4.0  2026-08-18  Added report scoping, mapping artifact, and critical-table g
 v0.5.0  2026-08-18  Added entry-table resolution and landing-view action planning.
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
+v0.8.0  2026-11-22  Preserve accepted native tables and opt-in framework handoff.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -116,11 +117,55 @@ param(
     [string]$AnswersFile,
     [string]$WorkspaceRoot,
     [string]$DeliveryGoal = '',
-    [string]$DeliveryTimeframe = ''
+    [string]$DeliveryTimeframe = '',
+    [string]$AcceptedContractPath,
+    [string]$FrameworkRuntimeWorkspace,
+    [string]$FrameworkPythonExecutable = 'python',
+    [switch]$EnableFrameworkSpecKitSync
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+. (Join-Path $PSScriptRoot 'helpers/table-detection.ps1')
+$acceptedContract = $null
+if ($EnableFrameworkSpecKitSync -and [string]::IsNullOrWhiteSpace($FrameworkRuntimeWorkspace)) {
+    throw 'Explicit framework sync requires a separate runtime workspace.'
+}
+if (-not [string]::IsNullOrWhiteSpace($FrameworkRuntimeWorkspace) -and [string]::IsNullOrWhiteSpace($AcceptedContractPath)) {
+    throw 'Framework handoff requires a separately accepted canonical contract; wizard prose is not approval.'
+}
+if (-not [string]::IsNullOrWhiteSpace($AcceptedContractPath)) {
+    $contractFile = Get-Item -LiteralPath $AcceptedContractPath
+    if ($contractFile.Length -gt 1MB) { throw 'Accepted planning input exceeds 1 MiB.' }
+    $acceptedContract = [IO.File]::ReadAllText($contractFile.FullName, [Text.Encoding]::UTF8) | ConvertFrom-Json -AsHashtable
+    if ($acceptedContract.schema_version -ne '1.0') { throw 'Unsupported accepted contract version.' }
+    $acceptedEvidence = @($acceptedContract.evidence | Where-Object { $_.accepted -eq $true -and $_.kind -in @('owner_requirement', 'owner_decision') } | ForEach-Object { $_.id })
+    foreach ($requirement in $acceptedContract.requirements) {
+        if ($requirement.status -ne 'accepted' -or @($requirement.evidence_ids | Where-Object { $_ -in $acceptedEvidence }).Count -eq 0) {
+            throw "Unaccepted requirement '$($requirement.id)' cannot change wizard architecture."
+        }
+    }
+    foreach ($component in $acceptedContract.components) {
+        if ($component.kind -eq 'table' -and ($component.name -notmatch '^[a-z][a-z0-9_]*$' -or @($component.requirement_ids).Count -eq 0)) {
+            throw 'Accepted tables require exact logical names and requirement references.'
+        }
+        foreach ($requirementId in $component.requirement_ids) {
+            if ($requirementId -notin @($acceptedContract.requirements | ForEach-Object { $_.id })) { throw 'Component references an unknown requirement.' }
+        }
+    }
+    foreach ($relationship in $acceptedContract.relationships) {
+        if ($relationship.cardinality -notin @('one_to_many', 'many_to_many')) { throw 'Unsupported relationship cardinality; retain an explicit decision.' }
+        if ($relationship.cardinality -eq 'one_to_many') {
+            $tableNames = @($acceptedContract.components | Where-Object { $_.kind -eq 'table' } | ForEach-Object { $_.name })
+            if ($relationship.parent -notin $tableNames -or $relationship.child -notin $tableNames -or $relationship.lookup -notmatch '^[a-z][a-z0-9_]*$') {
+                throw 'Accepted relationship endpoints and lookup must reference exact planned logical identities.'
+            }
+        }
+        if ($relationship.intent.status -ne 'accepted' -or @($relationship.intent.evidence_ids | Where-Object { $_ -in $acceptedEvidence }).Count -eq 0) {
+            throw "Relationship '$($relationship.id)' has unresolved owner intent."
+        }
+    }
+}
 
 $repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
     Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
@@ -285,14 +330,14 @@ function Convert-ToCustomLogicalName {
 }
 
 function Format-StandardTableMapping {
-    param([string]$Input)
+    param([string]$Value)
 
-    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value.Trim().ToLower() -eq "none") {
         return "- None"
     }
 
     $lines = @()
-    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $items = @($Value -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     foreach ($item in $items) {
         $logical = Resolve-StandardLogicalName $item
         $lines += "- $item -> $logical"
@@ -304,16 +349,16 @@ function Format-StandardTableMapping {
 
 function Format-CustomTableMapping {
     param(
-        [string]$Input,
+        [string]$Value,
         [string]$Prefix
     )
 
-    if ([string]::IsNullOrWhiteSpace($Input) -or $Input.Trim().ToLower() -eq "none") {
+    if ([string]::IsNullOrWhiteSpace($Value) -or $Value.Trim().ToLower() -eq "none") {
         return "- None"
     }
 
     $lines = @()
-    $items = @($Input -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $items = @($Value -split "," | ForEach-Object { $_.Trim() } | Where-Object { $_ })
     foreach ($item in $items) {
         $logical = Convert-ToCustomLogicalName -Name $item -Prefix $Prefix
         if (-not [string]::IsNullOrWhiteSpace($logical)) {
@@ -771,20 +816,43 @@ if ($Mode -eq 'demo-builder') {
     $environmentAndOutput = Read-RequiredValue "6. What Environment URL and solution output do you expect? (for example, https://your-org.crm.dynamics.com; unmanaged solution)" "Environment URL; unmanaged solution"
 
     $publisherPrefix = ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Substring(0, [Math]::Min(5, ([regex]::Replace($scenarioSlug, '[^a-z]', '') + 'app').Length))
-    $customTables = @(Split-ListValues -Value $dataToTrack)
-    $entryPointDisplayName = if ($customTables.Count -gt 0) { $customTables[0] } else { $scenarioName }
+    $inputTables = @(Split-ListValues -Value $dataToTrack)
+    $standardTables = @($inputTables | Where-Object { Test-IsStandardTable (Resolve-StandardLogicalName $_) })
+    $customTables = @($inputTables | Where-Object { -not (Test-IsStandardTable (Resolve-StandardLogicalName $_)) })
+    $entryPointDisplayName = if ($inputTables.Count -gt 0) { $inputTables[0] } else { $scenarioName }
     $entryPointPluralDisplayName = Get-PredictablePluralDisplayName -DisplayName $entryPointDisplayName
     if ([string]::IsNullOrWhiteSpace($entryPointPluralDisplayName)) {
         throw "Demo Builder cannot predict the Dataverse plural display name for '$entryPointDisplayName'. Rerun with -Mode advanced-builder and make an explicit view disposition decision."
     }
-    $entryPointTable = Convert-ToCustomLogicalName -Name $entryPointDisplayName -Prefix $publisherPrefix
+    $entryPointTable = if ($entryPointDisplayName -in $standardTables) {
+        Resolve-StandardLogicalName $entryPointDisplayName
+    } else { Convert-ToCustomLogicalName -Name $entryPointDisplayName -Prefix $publisherPrefix }
+    if ($null -ne $acceptedContract) {
+        $mappedNames = @()
+        foreach ($inputTable in $inputTables) {
+            $key = [regex]::Replace((Resolve-StandardLogicalName $inputTable), '[^a-z0-9]', '')
+            $candidates = @($acceptedContract.components | Where-Object {
+                $_.kind -eq 'table' -and (
+                    [regex]::Replace($_.name, '[^a-z0-9]', '') -eq $key -or
+                    (-not (Test-IsStandardTable $_.name) -and [regex]::Replace(($_.name -replace '^[^_]+_', ''), '[^a-z0-9]', '') -eq $key)
+                )
+            })
+            if ($candidates.Count -ne 1) { throw "Cannot unambiguously map '$inputTable' to accepted table decisions." }
+            $mappedNames += $candidates[0].name
+        }
+        $standardTables = @($mappedNames | Where-Object { Test-IsStandardTable $_ })
+        $customTables = @($mappedNames | Where-Object { -not (Test-IsStandardTable $_) })
+        $entryPointTable = $mappedNames[0]
+    }
+    $tableStrategy = if ($standardTables.Count -eq 0) { 'custom-only' } elseif ($customTables.Count -eq 0) { 'oob-only' } else { 'hybrid' }
     $solutionName = [regex]::Replace((Get-Culture).TextInfo.ToTitleCase($scenarioSlug.Replace('-', ' ')), '[^A-Za-z0-9]', '')
     $needsDemoData = if ($successAndData -match '(?i)\b(no|without)\s+(sample|synthetic|demo)\s+data\b') { 'No' } else { 'Yes' }
     $solutionType = if ($environmentAndOutput -match '(?i)\bunmanaged\b') { 'Unmanaged' } elseif ($environmentAndOutput -match '(?i)\bmanaged\b') { 'Managed' } else { 'Unmanaged' }
 
     Write-Host ""
     Write-Host "Recommended technical design:" -ForegroundColor Cyan
-    Write-Host "  Standalone model-driven app; custom tables; new forms"
+    Write-Host "  Standalone model-driven app; $tableStrategy tables; new forms"
+    if ($standardTables.Count -gt 0) { Write-Host "  Reuse standard Dataverse tables: $($standardTables -join ', '); availability still requires verification" }
     Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
@@ -796,7 +864,7 @@ if ($Mode -eq 'demo-builder') {
     $answers["ScenarioName"] = $scenarioName
     $answers["ScenarioSlug"] = $scenarioSlug
     $answers["ApplicationProfile"] = 'standalone-model-driven'
-    $answers["TableChoice"] = 'custom-only'
+    $answers["TableChoice"] = $tableStrategy
     $answers["FormStrategy"] = 'create-new-forms'
     $answers["EntryPointTable"] = $entryPointTable
     $answers["EntryPointLandingView"] = "Active $entryPointPluralDisplayName"
@@ -827,21 +895,25 @@ if ($Mode -eq 'demo-builder') {
     $answers["ReviewAppEnabled"] = 'yes'
     $answers["AppName"] = "$scenarioName Review App"
     $answers["AppUniqueName"] = "$publisherPrefix`_$($scenarioSlug.Replace('-', '_'))_app".ToLowerInvariant()
-    $answers["StandardTablesReused"] = 'none'
-    $answers["CustomTablesToCreate"] = $dataToTrack
+    $answers["StandardTablesReused"] = if ($standardTables.Count) { $standardTables -join ', ' } else { 'none' }
+    $answers["CustomTablesToCreate"] = if ($customTables.Count) { $customTables -join ', ' } else { 'none' }
     $answers["StandardFieldsReused"] = 'none'
     $answers["CustomFieldsToAdd"] = 'to be refined during planning'
-    $answers["RelationshipsToCreate"] = if ($customTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
+    $answers["RelationshipsToCreate"] = if ($inputTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
     $answers["IncludeHtmlReports"] = 'no'
     $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointPluralDisplayName | $successAndData"
     $answers["UserTaskOwnership"] = "$experienceAndLifecycle | app owner | $successAndData"
-    $answers["RelationshipRequirements"] = if ($customTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
+    $answers["RelationshipRequirements"] = if ($inputTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
+    if ($null -ne $acceptedContract) {
+        $answers["RelationshipRequirements"] = ConvertTo-Json -InputObject @($acceptedContract.relationships) -Depth 20 -Compress
+        $answers["RelationshipsToCreate"] = $answers["RelationshipRequirements"]
+    }
     $answers["CriticalReportTables"] = 'none'
     $answers["ReportMappings"] = 'none (reports explicitly disabled during intake)'
     $answers["ReportScopingStatus"] = 'approved-no-reports'
     $reportMappingRows = @()
     $answers["DemoDataScope"] = if ($needsDemoData -eq 'Yes') { 'all-created' } else { 'none' }
-    $answers["DemoDataTables"] = if ($needsDemoData -eq 'Yes') { $dataToTrack } else { 'none' }
+    $answers["DemoDataTables"] = if ($needsDemoData -eq 'Yes') { $customTables -join ', ' } else { 'none' }
     $answers["DemoDataStandardTableStrategy"] = 'none'
     $answers["DemoDataRecordCounts"] = if ($needsDemoData -eq 'Yes') { 'small synthetic set; counts to be confirmed during planning' } else { 'none' }
     $answers["DemoDataScenarios"] = if ($needsDemoData -eq 'Yes') { $successAndData } else { 'none' }
@@ -1177,8 +1249,22 @@ $answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Power Apps neutral' } else { 'Dynamics blue' }
 $answers["ReportSet"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
 
-$standardTableMapping = Format-StandardTableMapping -Input $answers["StandardTablesReused"]
-$customTableMapping = Format-CustomTableMapping -Input $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
+if ($null -ne $acceptedContract -and $Mode -ne 'demo-builder') {
+    $declaredTables = @(Get-PlannedTableLogicalNames -StandardTables $answers["StandardTablesReused"] -CustomTables $answers["CustomTablesToCreate"] -PublisherPrefix $answers["PublisherPrefix"])
+    $approvedTables = @($acceptedContract.components | Where-Object { $_.kind -eq 'table' } | ForEach-Object { $_.name } | Sort-Object -Unique)
+    if (@(Compare-Object $declaredTables $approvedTables).Count) { throw 'Detailed intake conflicts with accepted table decisions; no planning files were written.' }
+    $approvedRelationships = ConvertTo-Json -InputObject @($acceptedContract.relationships) -Depth 20 -Compress
+    foreach ($field in @('RelationshipsToCreate', 'RelationshipRequirements')) {
+        $matches = if (@($acceptedContract.relationships).Count -eq 0) {
+            $answers[$field] -in @('none', 'None', '[]')
+        } else { $answers[$field] -ceq $approvedRelationships }
+        if (-not $matches) {
+            throw 'Detailed intake conflicts with accepted relationship decisions. Supply the exact compact accepted relationship JSON for both relationship fields, or review an updated contract; no planning files were written.'
+        }
+    }
+}
+$standardTableMapping = Format-StandardTableMapping -Value $answers["StandardTablesReused"]
+$customTableMapping = Format-CustomTableMapping -Value $answers["CustomTablesToCreate"] -Prefix $answers["PublisherPrefix"]
 
 $scenarioFolder = Join-Path $repoRoot (Join-Path "specs" $scenarioSlug)
 New-Item -ItemType Directory -Path $scenarioFolder -Force | Out-Null
@@ -1825,6 +1911,16 @@ $tasksContent = @"
 - [ ] Update 'docs/build-log.md'
 "@
 
+if ($null -ne $acceptedContract) {
+    $planningProvenance = "`n## Accepted Planning Source`n`n" + (
+        [ordered]@{ path = [IO.Path]::GetFullPath($AcceptedContractPath); sha256 = (Get-FileHash -LiteralPath $AcceptedContractPath -Algorithm SHA256).Hash.ToLowerInvariant() } |
+            ConvertTo-Json -Compress
+    ) + "`n`nSource approval applies only to its declared requirements; observed deployment is not inferred.`n"
+    $answersContent += $planningProvenance
+    $specContent += $planningProvenance
+    $planContent += $planningProvenance
+    $tasksContent += $planningProvenance
+}
 Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
 Set-Content -Path $specPath -Value $specContent -Encoding UTF8
 Set-Content -Path $planPath -Value $planContent -Encoding UTF8
@@ -1870,4 +1966,11 @@ if ($Retrofit) {
 }
 if (Get-Command Complete-WizardStepTelemetry -ErrorAction SilentlyContinue) {
     Complete-WizardStepTelemetry -Message "Wizard files generated."
+}
+if (-not [string]::IsNullOrWhiteSpace($FrameworkRuntimeWorkspace)) {
+    & (Join-Path $PSScriptRoot '09-framework-handoff.ps1') -ProjectRoot $repoRoot `
+        -RuntimeWorkspace $FrameworkRuntimeWorkspace -ScenarioSlug $scenarioSlug `
+        -ContractPath $AcceptedContractPath -PythonExecutable $FrameworkPythonExecutable `
+        -EnableSpecKitSync:$EnableFrameworkSpecKitSync
+    if ($LASTEXITCODE -ne 0) { throw "Framework handoff blocked with exit $LASTEXITCODE; preserve its receipt and resume the same workspace." }
 }

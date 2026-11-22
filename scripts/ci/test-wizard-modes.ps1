@@ -64,7 +64,8 @@ function Invoke-WizardFixture {
         [string[]]$Answers,
         [string]$Mode,
         [string]$DeliveryGoal = '',
-        [string]$DeliveryTimeframe = ''
+        [string]$DeliveryTimeframe = '',
+        [string]$AcceptedContractPath = ''
     )
 
     $answersPath = Join-Path $Workspace 'scripted-answers.json'
@@ -78,6 +79,9 @@ function Invoke-WizardFixture {
     }
     if (-not [string]::IsNullOrWhiteSpace($DeliveryTimeframe)) {
         $arguments += @('-DeliveryTimeframe', $DeliveryTimeframe)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($AcceptedContractPath)) {
+        $arguments += @('-AcceptedContractPath', $AcceptedContractPath)
     }
 
     $output = @(& pwsh @arguments 2>&1)
@@ -177,6 +181,52 @@ try {
     $pendingAnswers = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/answers.md") -Raw -Encoding UTF8
     Assert-True -Condition ($pendingAnswers.Contains('- Goal: unconfirmed')) -Message 'Legacy scripted wizard input must not silently choose a demo/production goal.'
     Assert-True -Condition ($pendingAnswers.Contains('Automation: guided')) -Message 'Unattended automation must remain off by default.'
+    $customSpec = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/spec.md") -Raw
+    Assert-True -Condition ($customSpec -match 'Checkout Request -> [a-z]+_checkoutrequest') -Message 'Custom mapping must not disappear through the automatic $input variable.'
+
+    $standardWorkspace = New-WizardTestWorkspace -Name 'standard-reuse'
+    $standardAnswers = @(
+        'Account work coordination',
+        'Coordinator | coordinate work',
+        'Account, Work Item',
+        'Open an Account and save a linked Work Item',
+        'Verify two-parent separation with synthetic data',
+        'Synthetic rehearsal; unmanaged solution',
+        'yes'
+    )
+    $null = Invoke-WizardFixture -Workspace $standardWorkspace -Mode '' -Answers $standardAnswers -DeliveryGoal 'connected-demo'
+    $standardSpec = Get-Content -LiteralPath (Join-Path $standardWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($standardSpec.Contains('- Entry point: account') -and $standardSpec.Contains('- Account -> account')) -Message 'Default Account planning must reuse the standard identity.'
+    Assert-True -Condition ($standardSpec.Contains('- Table strategy: hybrid') -and $standardSpec.Contains('- Landing-view action: explicit-decision-required')) -Message 'Standard views require an explicit disposition.'
+
+    $approvedWorkspace = New-WizardTestWorkspace -Name 'accepted-reuse'
+    $approvedContract = @{
+        schema_version = '1.0'
+        evidence = @(@{ id = 'EV-owner'; kind = 'owner_requirement'; accepted = $true })
+        requirements = @(@{ id = 'R1'; status = 'accepted'; evidence_ids = @('EV-owner') })
+        components = @(
+            @{ id = 'C1'; kind = 'table'; name = 'account'; requirement_ids = @('R1') },
+            @{ id = 'C2'; kind = 'table'; name = 'ppd_workitem'; requirement_ids = @('R1') }
+        )
+        relationships = @(@{ id = 'REL1'; cardinality = 'one_to_many'; parent = 'account'; child = 'ppd_workitem'; lookup = 'ppd_accountid'; intent = @{ status = 'accepted'; evidence_ids = @('EV-owner') } })
+    }
+    $approvedPath = Join-Path $approvedWorkspace 'accepted-contract.json'
+    $approvedContract | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $approvedPath -Encoding UTF8
+    $null = Invoke-WizardFixture -Workspace $approvedWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $approvedPath
+    $approvedSpec = Get-Content -LiteralPath (Join-Path $approvedWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($approvedSpec.Contains('ppd_workitem -> ppd_workitem') -and $approvedSpec.Contains('one_to_many') -and $approvedSpec.Contains('ppd_accountid')) -Message 'Accepted custom identity and relationship intent must survive intake.'
+    Assert-True -Condition ($approvedSpec.Contains('## Accepted Planning Source')) -Message 'Accepted planning provenance must be retained.'
+    foreach ($fault in @('unaccepted', 'cardinality', 'endpoint')) {
+        $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
+        $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'
+        $negative = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+        if ($fault -eq 'unaccepted') { $negative.requirements[0].status = 'proposed' }
+        elseif ($fault -eq 'cardinality') { $negative.relationships[0].cardinality = 'guessed' }
+        else { $negative.relationships[0].parent = 'missing_table' }
+        $negative | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $negativePath -Encoding UTF8
+        $negativeOutput = @(& pwsh -NoProfile -File $wizardPath -WorkspaceRoot $negativeWorkspace -AcceptedContractPath $negativePath 2>&1)
+        Assert-True -Condition ($LASTEXITCODE -ne 0 -and -not (Test-Path (Join-Path $negativeWorkspace 'specs'))) -Message "Invalid accepted $fault intent must fail before planning writes: $($negativeOutput -join ' ')"
+    }
 
     $productionWorkspace = New-WizardTestWorkspace -Name 'production-delivery'
     $scriptedDemoAnswers = @(Get-Content -LiteralPath (Join-Path $demoWorkspace 'scripted-answers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
@@ -276,6 +326,23 @@ try {
     Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
     Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
+
+    $relationshipConflictWorkspace = New-WizardTestWorkspace -Name 'detailed-relationship-conflict'
+    $relationshipConflictContract = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+    $relationshipConflictContract.components = @(@{ id = 'C1'; kind = 'table'; name = 'dbv_labasset'; requirement_ids = @('R1') })
+    $relationshipConflictContract.relationships[0].parent = 'dbv_labasset'
+    $relationshipConflictContract.relationships[0].child = 'dbv_labasset'
+    $relationshipConflictContract.relationships[0].lookup = 'dbv_parentassetid'
+    $relationshipConflictPath = Join-Path $relationshipConflictWorkspace 'accepted-contract.json'
+    $relationshipConflictContract | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $relationshipConflictPath -Encoding UTF8
+    $relationshipConflictMessage = ''
+    try {
+        $null = Invoke-WizardFixture -Workspace $relationshipConflictWorkspace -Mode 'advanced-builder' -Answers $distinctAnswers -AcceptedContractPath $relationshipConflictPath
+    }
+    catch {
+        $relationshipConflictMessage = $_.Exception.Message
+    }
+    Assert-True -Condition ($relationshipConflictMessage.Contains('conflicts with accepted relationship decisions') -and -not (Test-Path (Join-Path $relationshipConflictWorkspace 'specs'))) -Message 'Detailed relationship contradictions must fail before planning writes.'
 
     $acceptanceAnswers = Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/answers.md') -Raw -Encoding UTF8
     Assert-True -Condition ($acceptanceAnswers -match 'Environment authorized: yes') -Message 'Framework Acceptance did not persist environment authorization.'

@@ -27,6 +27,11 @@ Use this behavior:
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
 - Treat Spec Kit as mandatory before implementation.
+- Preserve approved native table/relationship identities; never replace Account
+  reuse with a custom table. Optional installed-framework continuation follows
+  [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime
+  paths, accepted canonical contract and separate synchronization opt-in.
+  Missing Spec Kit is a no-op; do not install tooling or start a scheduler.
 - Supported application profiles are `standalone-model-driven`, `dynamics-sales-extension`, `dynamics-customer-service-extension`, `dynamics-field-service-extension`, and `generic-dataverse-solution`.
 - In Demo Builder, infer the application profile, table/form strategy, entry-point table, named landing view, required app artifacts, navigation group, and solution identity, then confirm them together. In detailed modes, ask them directly. The review app is required for new profile-based runs.
 - After explicit table mapping, validate that the entry-point logical name resolves to a reused standard table, planned custom table, or current retrofit inventory table. For a uniquely planned new custom table, record `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and `create-custom` for a distinct business view. Record `explicit-decision-required` for standard, hybrid-standard, shared, preexisting, retrofit, or ambiguous tables; never guess adoption. Treat the disposition as planning intent only and retain step 60's strict live provenance and metadata proof. Block app assembly until explicit decisions are resolved and the saved query resolves in Dataverse.

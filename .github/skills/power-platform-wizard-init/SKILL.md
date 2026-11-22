@@ -19,6 +19,12 @@ This skill starts the repository wizard safely through either chat or terminal, 
 
 This skill does not modify core wizard scripts.
 
+Optional continuation after accepted planning uses
+[the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
+table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
+native Windows supports guided continuation, not autonomous worker supervision.
+Do not install a framework, create a second task store or start a scheduler.
+
 ## Runtime Compatibility Preflight
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.

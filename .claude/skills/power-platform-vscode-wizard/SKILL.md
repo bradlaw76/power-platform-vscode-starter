@@ -18,6 +18,12 @@ do not overwrite local instructions. This applies to all workloads.
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
 
+Preserve approved native table/relationship decisions. Optional continuation
+uses project-root `docs/framework-handoff.md` and the installed framework's
+existing task store, locks and journals, with separate synchronization opt-in.
+Missing Spec Kit is a no-op. Native Windows guided use does not imply worker
+supervision, automatic installation, a new controller or a persistent scheduler.
+
 ## Runtime Compatibility Preflight
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.

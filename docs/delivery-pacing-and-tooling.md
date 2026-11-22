@@ -1,5 +1,10 @@
 # Delivery target, deadline and optional automation
 
+The optional [installed H008 handoff](framework-handoff.md) reuses canonical
+tasks, lessons and synchronization after accepted planning. Native Windows
+guided use does not require consumer Git or WSL; worker supervision remains
+POSIX-only and does not authorize an unattended scheduler or live deployment.
+
 This reusable starter serves first-time builders and experienced implementers. A demo, pilot and production release have different delivery needs, but a deadline never authorizes skipping a required platform or security check. The delivery context applies to Demo Builder, Advanced Builder and Framework Acceptance, for greenfield and existing-project adoption.
 
 ## Two plain-language questions

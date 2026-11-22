@@ -4,6 +4,38 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## H008 starter integration - 2026-11-22
+
+- Ownership: starter issue #12; canonical Automation Framework issue #24 and
+  merged PR #26 remain the original H008 implementation. Starter baseline:
+  `632d00cbe38bbee753f4c4e7f4b5d1fb8d4afc8a`; framework:
+  `a23096ec27de9bc1035b690dc9d49268a408d059`, installed package 0.2.1.
+- Scope: [optional installed handoff](framework-handoff.md), accepted native
+  tables/relationships, canonical task coordination, durable derived receipts,
+  bounded launch recovery, explicit host gates and synchronized guidance.
+- Verified locally: 13 installed integration tests; all 24 standalone suites;
+  104 Pester tests, zero failures/skips; configured changed-file analyzer,
+  contract integrity, 85 parsed JSON documents/60 schema-validated payloads,
+  changed-document Markdown lint and whitespace checks.
+- Integration exercised the actual PowerShell wizard, installed CLI and
+  25-operation synthetic rehearsal. Native consumer projects needed neither
+  Git nor WSL. Human text/aliases, conflict holds, disabled restart, interruption
+  recovery, stale receipts and unchanged no-write replay remained intact.
+- Repairs: PowerShell automatic-variable mapping collision, incorrect default
+  standard-table inference, stale status reporting and cached transient blocks.
+  Detailed relationship contradictions now fail before planning writes.
+  A missing `payloads` folder in the new integration fixture was corrected
+  without weakening runtime preflight; retry counts are durably recorded.
+- CI now runs dependency-independent Python guardrails. Nine installed-runtime
+  tests explicitly skip without the selected private framework and fixture;
+  local installed verification is separate, not implied by CI success.
+- Source/test proposal only at this checkpoint; commit/PR/hosted CI identifiers
+  are recorded in issue #12 and the external consolidated report on delivery.
+  No merge, scheduler, public release, live Dataverse, package deployment or UI
+  acceptance is claimed. Existing PR #11/#7 ownership and OneDrive/backups
+  remain untouched. No genuine human baseline exists, so no percentage speedup
+  is asserted.
+
 ## Local wizard integration proposal - 2026-11-22
 
 - Source baseline: main `4c9d2bfac675812a8fbe100b94c05ebe4c4bed1e`, PR #10 `362ebe991261e366a6aefc6af3aa514423d63338`, PR #9 `6c5c961955fd0d1697c74a351dbc148a9ac0c1b3`, and only PR #8's applicable own policy delta from `9f4910632d186f54262c49845ab6404a4726e950`.

@@ -1,6 +1,13 @@
 {
   "profileVersion": "1.4",
   "contractVersion": "1.10.0",
+  "frameworkHandoff": {
+    "defaultEnabled": false,
+    "script": "09-framework-handoff.ps1",
+    "frameworkVersion": "0.2.1",
+    "nativeWindowsGuided": true,
+    "workerHosts": ["Linux", "macOS", "WSL"]
+  },
   "applicationProfiles": [
     "standalone-model-driven",
     "dynamics-sales-extension",

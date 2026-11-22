@@ -15,6 +15,9 @@ the authoritative detailed sequence after the authoring workspace is open.
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Optional installed-framework continuation uses
+  [the H008 handoff](framework-handoff.md) after accepted planning, with separate
+  consumer/runtime folders. It is not another build stage or deployment command.
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.
