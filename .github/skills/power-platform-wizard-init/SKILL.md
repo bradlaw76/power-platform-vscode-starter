@@ -56,6 +56,10 @@ pwsh ./scripts/bootstrap/00-prereq-check.ps1
 
 Summarize pass/fail results in plain language. Resolve missing setup requirements before beginning discovery. Treat the check as non-destructive rather than read-only because local telemetry files may be updated.
 
+## Beginner-friendly delivery routing
+
+Capture or reuse the goal (`prototype`, `presentation-demo`, `connected-demo`, `pilot`, `production`) and user deadline before recommending a toolchain or acceptance depth. Treat WSL as optional, not part of basic prerequisites; if unavailable, continue with supported guided/native/editor paths. Automation is opt-in only if a measured setup-versus-savings comparison favors it. Do not turn a shorter deadline into permission to skip required security or production checks. See [delivery pacing](../../../docs/delivery-pacing-and-tooling.md).
+
 ## Procedure
 
 1. Confirm target repo
@@ -85,7 +89,7 @@ Summarize pass/fail results in plain language. Resolve missing setup requirement
 - Retrofit terminal path: `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit`
 
 4. Run the selected mode's intake (do not mix modes)
-- Demo Builder asks six business questions plus one consolidated technical recommendation confirmation. Infer application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, and solution identity. Do not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
+- Demo Builder asks six core business questions, two delivery-context questions (goal and timeframe), then one consolidated technical recommendation confirmation. Infer application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, and solution identity. Do not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 - Advanced Builder asks the 11 core questions and exposes architecture controls directly. Do not ask framework-acceptance or cleanup questions.
 - Framework Acceptance includes Advanced Builder plus explicit environment authorization, isolated timestamped names, acceptance source tags/hero labels, deterministic rerun evidence, retention, separately approved cleanup, and evidence capture.
 - All three modes emit compatible planning artifacts for the same shared build pipeline.
