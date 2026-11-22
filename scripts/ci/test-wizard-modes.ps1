@@ -16,7 +16,7 @@ the shared planning-artifact contract used by the build pipeline.
 -----------------------------------------------------------------------------
 TEST CASES
 -----------------------------------------------------------------------------
-✔ Demo Builder is the default and uses seven prompts.
+✔ Demo Builder is the default, with two delivery questions and a consolidated confirmation.
 ✔ Default output excludes acceptance, retention, and cleanup prompts.
 ✔ Demo Builder consolidates inferred recommendations for confirmation.
 ✔ Advanced Builder exposes technical controls.
@@ -62,7 +62,9 @@ function Invoke-WizardFixture {
     param(
         [string]$Workspace,
         [string[]]$Answers,
-        [string]$Mode
+        [string]$Mode,
+        [string]$DeliveryGoal = '',
+        [string]$DeliveryTimeframe = ''
     )
 
     $answersPath = Join-Path $Workspace 'scripted-answers.json'
@@ -70,6 +72,12 @@ function Invoke-WizardFixture {
     $arguments = @('-NoProfile', '-File', $wizardPath, '-Force', '-AnswersFile', $answersPath, '-WorkspaceRoot', $Workspace)
     if (-not [string]::IsNullOrWhiteSpace($Mode)) {
         $arguments += @('-Mode', $Mode)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($DeliveryGoal)) {
+        $arguments += @('-DeliveryGoal', $DeliveryGoal)
+    }
+    if (-not [string]::IsNullOrWhiteSpace($DeliveryTimeframe)) {
+        $arguments += @('-DeliveryTimeframe', $DeliveryTimeframe)
     }
 
     $output = @(& pwsh @arguments 2>&1)
@@ -161,6 +169,21 @@ try {
     Assert-True -Condition ($demoOutput -notmatch '(?i)A-acceptance|disposable|cleanup|retention') -Message 'Default Demo Builder output exposed acceptance or cleanup prompts.'
     $demoSlug = 'equipment-checkout-for-faster-accountable-lab-lending'
     Assert-ArtifactContract -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    $pendingAnswers = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/answers.md") -Raw -Encoding UTF8
+    Assert-True -Condition ($pendingAnswers.Contains('- Goal: unconfirmed')) -Message 'Legacy scripted wizard input must not silently choose a demo/production goal.'
+    Assert-True -Condition ($pendingAnswers.Contains('Automation: guided')) -Message 'Unattended automation must remain off by default.'
+
+    $productionWorkspace = New-WizardTestWorkspace -Name 'production-delivery'
+    $scriptedDemoAnswers = @(Get-Content -LiteralPath (Join-Path $demoWorkspace 'scripted-answers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
+    $productionOutput = Invoke-WizardFixture -Workspace $productionWorkspace -Mode '' -Answers $scriptedDemoAnswers -DeliveryGoal 'production' -DeliveryTimeframe '2026-12-15'
+    Assert-ArtifactContract -Workspace $productionWorkspace -ScenarioSlug $demoSlug -Mode 'demo-builder'
+    $productionPlan = Get-Content -LiteralPath (Join-Path $productionWorkspace "specs/$demoSlug/plan.md") -Raw -Encoding UTF8
+    Assert-True -Condition ($productionPlan.Contains('- Goal: production')) -Message 'Production goal was not preserved.'
+    Assert-True -Condition ($productionPlan.Contains('- Deadline/timeframe: 2026-12-15')) -Message 'User delivery timeframe was not preserved.'
+    Assert-True -Condition ($productionPlan.Contains('Full applicable CI, security')) -Message 'Production validation cannot silently downgrade to demo checks.'
+    Assert-True -Condition ($productionPlan.Contains('Execution: guided')) -Message 'Production delivery must not activate automation implicitly.'
+    Assert-True -Condition ($productionOutput -match 'Delivery profile: production') -Message 'Explicit delivery parameters were not applied.'
+
     $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
