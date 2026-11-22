@@ -5,6 +5,15 @@ description: Use when building Power Platform model-driven apps, Dynamics 365 de
 
 # Power Platform VS Code Wizard
 
+## Authorization and execution
+
+Load and follow project-root `docs/policies/authorization-and-execution.md`.
+Installed skills use bundled `references/authorization-and-execution.md` when
+project-local policy is absent. If neither exists, report BLOCKED for mutating
+work. During consumer compatibility review, include this policy or a reviewed
+equivalent and reference it from the project's existing instruction entry point;
+do not overwrite local instructions. This applies to all workloads.
+
 ## Overview
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
@@ -46,11 +55,15 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 
 ## Wizard Modes (Select First)
 
-- `demo-builder` is the default. Ask six business questions plus one consolidated recommendation confirmation. Infer technical design and do not ask disposable-environment, destructive-cleanup, retention, acceptance-source-tag, or rerun-proof questions.
+- `demo-builder` is the default. Ask six core business questions, two delivery-context questions (goal and timeframe), then one consolidated recommendation confirmation. Infer technical design and do not ask disposable-environment, destructive-cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - `advanced-builder` requires explicit selection. Expose application profile, table strategy, form strategy, entry point, landing view, entity mapping, user tasks, relationships, reporting, demo data, solution identity, and source-control controls. Do not ask framework-acceptance or cleanup questions.
 - `framework-acceptance` requires explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an acceptance evidence plan.
 
 All modes generate compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline.
+
+In every mode, capture or reuse the delivery goal (`prototype`, `presentation-demo`, `connected-demo`, `pilot`, `production`) and owner timeframe. Persist accepted delivery context in the scenario planning files. Guided execution does not require WSL. Automation remains off unless the owner opts in after a net-time comparison including setup, verification and recovery. Deadlines never weaken required CI, security, environment or deployment gates. See [delivery pacing and tooling](../../../docs/delivery-pacing-and-tooling.md).
+
+Use the proportional [scenario change impact gate](../../../docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas update affected contracts and dependent surfaces; preserve native field/security proof before live binding and every mandatory release gate.
 
 ## Advanced Discovery Questions
 
@@ -174,7 +187,7 @@ Ask me the discovery questions one at a time and help me write spec.md, plan.md,
 
 The shared Copilot skill is the primary entry point. It selects chat or terminal intake, enforces the planning gate, and can monitor progress from existing telemetry. Direct chat and terminal wizard paths remain supported.
 
-Source control follows the generated scenario, not just maintenance of this starter repository. Use coherent planning, metadata, experience, validation, and final unpacked-solution checkpoints. Before each commit, inspect status/diff, run applicable discovered validation, stage explicit files, and obtain approval. Push requires separate approval and remote commit verification.
+Source control follows the generated scenario, not just maintenance of this starter repository. Use coherent planning, metadata, experience, validation, and final unpacked-solution checkpoints. Before each commit, inspect status/diff, run applicable discovered validation and stage explicit files. Commit and push each require explicit permission; reuse valid scoped permission already provided and ask only for missing scope under the authorization and execution policy. Verify the remote commit after push.
 
 Available entry points:
 - `.github/skills/power-platform-wizard-init/SKILL.md` — primary shared Copilot skill

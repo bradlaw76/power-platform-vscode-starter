@@ -5,6 +5,14 @@ description: Use when creating, previewing, simulating, or deploying native Data
 
 # Dataverse Report Wizard
 
+## Authorization and execution
+
+Load and follow project-root `docs/policies/authorization-and-execution.md`.
+Installed skills use bundled `references/authorization-and-execution.md` when
+project-local policy is absent. If neither exists, report BLOCKED for mutating
+work. Require this policy or a reviewed equivalent in consumer projects through
+the existing compatibility review. Reuse valid scope; preserve deployment gates.
+
 ## Purpose
 
 Create native Dataverse charts and dashboards for an existing or planned

@@ -32,7 +32,7 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 
 ### Demo Builder (default)
 
-- Uses six business questions plus one consolidated recommendation confirmation.
+- Uses six core business questions plus two delivery questions and one consolidated recommendation confirmation.
 - Asks about the idea/outcome, primary user/task, data, experience/lifecycle, demo success/sample data, and target environment/output.
 - Infers the application profile, table/form strategy, entry point, landing view, review app, navigation, relationships/reports, solution name, and publisher prefix.
 - Shows those technical recommendations together for approval before writing planning artifacts.
@@ -51,6 +51,17 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 - Use with `pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance`.
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
+
+## Delivery target, timeframe and optional automation
+
+Every mode, including retrofit, first captures (or reuses) two plain-language answers:
+
+1. **Delivery goal:** `prototype`, `presentation-demo`, `connected-demo`, `pilot`, or `production`.
+2. **User timeframe:** a date or duration, or `no fixed deadline`.
+
+Demo Builder therefore uses **eight business/delivery questions plus its existing one consolidated design confirmation**. Advanced Builder and Framework Acceptance add the same two shared questions without changing their technical depth. Older scripted `-AnswersFile` fixtures keep their answer order; use `-DeliveryGoal` and `-DeliveryTimeframe` to supply these values explicitly. Otherwise, scripted delivery intent remains `unconfirmed` and must be settled before release.
+
+Generate delivery context into `answers.md`, `spec.md`, `plan.md` and `tasks.md` without inventing a completion estimate. Choose proportional testing based on delivery risk, but do not skip required validation or production gates due to an urgent deadline. Automation starts **off** and is considered only when measurable time saved exceeds setup, verification and recovery overhead and the user opts in. Detect optional tools without installing them; WSL is not a general prerequisite. See [delivery pacing and tooling](delivery-pacing-and-tooling.md).
 
 ## Architecture Intent Contract
 
@@ -142,7 +153,9 @@ Apply `requirements/GithubInstructions_General.md` throughout each end user's ap
 2. Record a scenario branch, related issue/spec/work item, commit strategy, applicable discovered validation, pull request preference, and merge strategy in scenario planning artifacts.
 3. Do not guess validation commands, stage unrelated files, or use the default branch as a scratch workspace.
 4. At coherent planning, implementation, validation, and final source checkpoints: inspect status and diff, run applicable validation, stage explicit intended files, and use a typed imperative commit message.
-5. Require explicit approval before commit and separate approval before push.
+5. Commit and push each require explicit permission; reuse valid scoped
+   authorization under [authorization and execution](policies/authorization-and-execution.md).
+   Ask only for missing scope; neither operation authorizes merge or deployment.
 6. After push, verify that the remote branch contains the local commit before reporting remote success.
 7. Distinguish modified locally, committed locally, pushed, pull request opened, merged, released, and deployed.
 
@@ -174,6 +187,8 @@ Required gate before execution:
   - `requirements/how-to-build-dynamics-model-driven-apps-wizard.md`
   - `requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md`
   - `requirements/GithubInstructions_General.md`
+
+Apply the proportional [scenario change impact planning contract](scenario-change-impact-gate.md) to new, expanded or inherited scenarios. Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas update only affected requirement/schema/binding/permission/fixture contracts and dependent surfaces; new or cross-cutting scenarios review the applicable end-to-end chain. Align affected planning files and link unchanged contracts. Native field/security proof before live binding and all mandatory release gates remain required; no new executable stage or tenant access is implied.
 
 ## Execution Contract
 

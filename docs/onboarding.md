@@ -15,6 +15,9 @@ the authoritative detailed sequence after the authoring workspace is open.
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Follow [authorization and execution](policies/authorization-and-execution.md)
+  across every workload and generated project. Reuse valid scoped permission;
+  required planning, platform, hash/signature and environment controls remain.
 
 ---
 
@@ -308,7 +311,7 @@ Validation checkpoint:
 
 ## Step 7: Run Discovery Questions (Wizard Intake)
 
-Before building anything, choose the discovery depth. The default is intentionally concise; all modes still capture or confirm architecture intent and create the same planning files.
+Before building anything, choose the discovery depth. Every mode asks what is being delivered (prototype, presentation demo, connected demo, pilot, or production) and the user's deadline or timeframe. This allows a proportional *verification plan*, not weaker platform or production safeguards. The default remains concise and all modes generate the same planning files. Automation stays guided/off unless the user explicitly opts in after a demonstrated net-time benefit; WSL is optional. See [delivery pacing and tooling](delivery-pacing-and-tooling.md).
 
 Canonical contract sources:
 
@@ -323,9 +326,11 @@ Supported application profiles:
 - `dynamics-field-service-extension`
 - `generic-dataverse-solution`
 
+**Proportional scenario-impact gate:** follow [scenario-change-impact-gate.md](scenario-change-impact-gate.md) for the actual delta. Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. New or changed scenarios compare affected existing assets, contracts and dependent surfaces before implementation; align affected planning files and preserve native field/security proof before live binding. This does not change the authoritative setup order, waive mandatory gates or create tenant resources.
+
 ### Demo Builder (default)
 
-The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six business questions plus one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
+The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six core business questions, two short delivery questions, and one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
 
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 
@@ -364,7 +369,7 @@ Then complete optional extension blocks based on profile and project needs:
 
 Validation checkpoint:
 
-- The selected mode's intake is complete and reviewed by the demo/app owner; Demo Builder stays within seven prompts, while Advanced Builder uses the 11 core questions and technical extensions.
+- The selected mode's intake is complete and reviewed by the demo/app owner; Demo Builder uses eight business/delivery prompts plus one consolidated recommendation confirmation, while Advanced Builder adds two delivery questions to its 11 core questions and technical extensions.
 - Selected extension blocks are complete.
 - For table-strategy, confirm which tables are standard (Contact, Case, Product, etc.) vs. custom — see `docs/standard-dataverse-tables.md` for reference.
 - Add an explicit entity mapping block before payload work:
@@ -436,7 +441,7 @@ Use coherent checkpoints as the app or demo progresses, such as planning, Datave
 3. Stage explicit intended files rather than using `git add .`.
 4. Review `git diff --staged` and confirm no secrets, local configuration, generated junk, or unrelated files are included.
 5. Use a typed imperative commit message, for example `feat: add case triage metadata`.
-6. Obtain explicit approval before committing.
+6. Confirm explicit commit permission, reusing valid scoped authorization already provided.
 
 Commit and push are distinct approvals. Push verification and pull request preparation happen during final handoff.
 
@@ -577,7 +582,11 @@ git rev-parse origin/feature/<scenario-slug>
 
 Use commands already supported by the repository. The test command above is a placeholder to replace with the validation discovered during preflight; do not invent a command.
 
-Before commit and again before push, obtain explicit approval. After push, the two commit IDs must match before reporting that the change is available remotely. Prepare a pull request with summary, reason, validation, impact, and the related scenario spec.
+Commit and push each require explicit permission; reuse valid scoped permission
+already provided under [authorization and execution](policies/authorization-and-execution.md).
+Ask only for missing scope. After push, the two commit IDs must match before
+reporting that the change is available remotely. Prepare a pull request with
+summary, reason, validation, impact, and the related scenario spec.
 
 Validation checkpoint:
 

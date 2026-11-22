@@ -10,7 +10,7 @@
   ],
   "discovery": {
     "defaultMode": "demo-builder",
-    "requiredQuestions": 6,
+    "requiredQuestions": 8,
     "coreQuestions": 11,
     "architectureIntakeQuestions": 7,
     "architectureIntakeRequired": false,
@@ -18,8 +18,10 @@
       "demo-builder": {
         "default": true,
         "explicitSelectionRequired": false,
-        "questionBudget": 6,
+        "questionBudget": 8,
         "questions": [
+          "delivery-goal",
+          "delivery-timeframe",
           "idea-and-business-outcome",
           "primary-user-and-top-task",
           "data-to-track",
@@ -50,6 +52,8 @@
         "explicitSelectionRequired": true,
         "questionBudget": 40,
         "questions": [
+          "delivery-goal",
+          "delivery-timeframe",
           "core-discovery",
           "architecture-intent",
           "entity-mapping",
@@ -86,6 +90,8 @@
         "explicitSelectionRequired": true,
         "questionBudget": 48,
         "questions": [
+          "delivery-goal",
+          "delivery-timeframe",
           "advanced-builder-intake",
           "authorized-environment",
           "isolation-and-naming",

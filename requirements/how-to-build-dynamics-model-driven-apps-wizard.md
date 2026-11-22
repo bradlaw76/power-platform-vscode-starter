@@ -6,6 +6,11 @@ Audience: Teams that want a guided, question-first process from idea to release
 
 ## 0. How This Wizard Works
 
+Follow [authorization and execution](../docs/policies/authorization-and-execution.md)
+for all workloads and generated projects. Reuse valid scoped permission without
+repeating approval questions; preserve planning, platform and environment gates.
+Carry the policy or a reviewed equivalent through existing distribution review.
+
 This document is designed as a facilitation wizard.
 
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
@@ -22,6 +27,8 @@ Wizard outcome:
 
 Mandatory rule:
 - Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+
+**Proportional scenario-impact gate:** classify the actual change under [the scenario change impact gate](../docs/scenario-change-impact-gate.md). Minor maintenance uses accepted planning and focused checks; do not regenerate the full matrix. A bounded scenario delta updates only affected contracts and dependent surfaces; a new or cross-cutting scenario reviews the applicable end-to-end chain before implementation. Preserve native field/security proof before live binding and continue independent prepared work without crossing blocked dependencies.
 
 ### 0A. End-to-end flow this wizard supports
 
@@ -50,7 +57,9 @@ Validation checkpoint:
 
 ### 0B. Discovery modes
 
-Use `demo-builder` by default. Ask six business questions and present one inferred technical recommendation for confirmation. Use `advanced-builder` explicitly to ask and capture the following detailed answers before Step 1. Use `framework-acceptance` explicitly to add environment authorization, isolated naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
+Use `demo-builder` by default. Ask six business questions and two delivery-context questions, then present one inferred technical recommendation for confirmation. Use `advanced-builder` explicitly to ask and capture the following detailed answers before Step 1. Use `framework-acceptance` explicitly to add environment authorization, isolated naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
+
+Every mode captures or reuses the delivery goal and owner timeframe under [delivery pacing and tooling](../docs/delivery-pacing-and-tooling.md). Guided execution does not require WSL; optional automation requires owner opt-in and a demonstrated net-time benefit. Required validation, security and deployment gates remain mandatory regardless of deadline.
 
 Advanced Builder questionnaire:
 
@@ -75,7 +84,7 @@ Optional extension blocks (profile-driven):
 - source-control (read-only target-repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
 
 Exit criteria:
-- The selected mode's intake is complete. Demo Builder stays within seven prompts; Advanced Builder completes the 11 core questions and selected extensions.
+- The selected mode's intake is complete. Demo Builder uses eight business/delivery questions plus one confirmation; Advanced Builder completes the 11 core questions, two delivery questions and selected extensions.
 - Selected extension blocks completed.
 - Stakeholder confirms the answers are complete enough to draft `spec.md`.
 - For table-strategy, standard tables have been identified using `docs/standard-dataverse-tables.md` as reference.

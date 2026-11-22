@@ -17,6 +17,10 @@ artifacts as part of its guided workflow.
 
 ---
 
+## Choose the delivery goal before the toolchain
+
+Before planning, the wizard asks whether this is a **prototype, presentation demo, connected demo, pilot, or production release**, and when it must be ready. It records that context in the scenario's Spec Kit files and proposes verification proportional to the goal without bypassing required security, data or deployment checks. The normal guided path does **not require WSL or unattended automation**. Tool selection is based on what the user actually has available; automation is optional and recommended only when it is expected to save net time after setup and verification. See [delivery pacing and tooling](docs/delivery-pacing-and-tooling.md).
+
 ## Supported workloads
 
 | Workload | Entry point | Use when |
@@ -40,6 +44,20 @@ separate implementation.
 > needed tools, create a local authoring workspace, choose a Copilot or
 > terminal route, verify the clone in the VS Code Explorer, install
 > extensions, select the workload, and complete planning before a build.
+
+**Planning a new or expanded scenario in an existing app?** Use the proportional [Scenario Change Impact Gate](docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas reconcile affected contracts and dependent surfaces; preserve native field/security proof before live binding. This is planning guidance, not an automatic impact compiler.
+
+Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
+
+### Enhancement registry
+
+| Enhancement | Contract and runtime scope |
+| --- | --- |
+| Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
+| Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
+| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
+
+For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 
 ### What happens when you use this starter
 
@@ -179,7 +197,7 @@ Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard
 | --- | --- | --- |
 | **VS Code shared skill (primary)** | `/power-platform-wizard-init` in Copilot Chat | Guided chat-or-terminal kickoff plus progress monitoring |
 | **VS Code Copilot Chat (direct wizard path)** | `/power-platform-demo-wizard` in Copilot Chat | Direct chat-first planning and Spec Kit generation |
-| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Seven-prompt Demo Builder by default; scaffold planning files |
+| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Eight business/delivery questions plus one confirmation by default; scaffold planning files |
 | **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
 
 All three paths converge on the same sequence:
@@ -302,7 +320,7 @@ pwsh ./scripts/bootstrap/01-install-skills.ps1
 pwsh ./scripts/bootstrap/05-start-wizard.ps1
 ```
 
-The default `demo-builder` asks six business questions and presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering.
+The default `demo-builder` asks six business questions and two delivery-context questions, then presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering. Both detailed modes also capture the delivery goal and timeframe.
 
 3. Optional chat-first path in VS Code Copilot Chat:
 
@@ -370,7 +388,7 @@ pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance
 /power-platform-demo-wizard
 ```
 
-All modes capture or confirm the same architecture contract, then scaffold compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files under `specs/<scenario-slug>/`. Demo Builder uses seven prompts; Advanced Builder exposes the 11 core discovery questions and technical extensions; Framework Acceptance adds environment safety and evidence controls.
+All modes capture or confirm the same architecture contract, then scaffold compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files under `specs/<scenario-slug>/`. Demo Builder uses eight business/delivery questions plus one confirmation; Advanced Builder exposes the 11 core discovery questions, two delivery questions and technical extensions; Framework Acceptance adds environment safety and evidence controls.
 
 Canonical source for discovery/planning/execution contract:
 

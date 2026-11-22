@@ -1,5 +1,15 @@
 # Project Guidelines
 
+## Authorization and execution
+
+Mandatory for framework work and all wizard-generated projects: load and follow
+[authorization and execution](../docs/policies/authorization-and-execution.md).
+Reuse valid scoped permission without redundant approval loops; preserve every
+required platform, planning, signature and environment gate. Include the policy
+or a reviewed equivalent in consumer projects through the existing distribution
+review. Report source, test, deployment, live verification and blocked outcomes
+separately.
+
 ## SpeckKit Integration
 This repository is registered with the SpeckKit registry using raw registry URLs so the repo can consume standards without duplicating the registry locally.
 
@@ -23,7 +33,8 @@ Always require planning before build implementation:
 - Only move to bootstrap scripts after requirements and tasks are clear.
 
 ## Wizard Modes
-Use `demo-builder` by default. Ask six business questions (idea/outcome, primary user/task, data, experience/lifecycle, success/sample data, environment/output), infer the technical design, then present one consolidated recommendation for confirmation. Do not ask acceptance, disposable-environment, retention, rerun-proof, source-tag, or cleanup questions in this mode.
+Before recommending automation, inspect the actual environment and tool availability. Guided delivery must work without WSL; suggest automated workers only when their expected time savings exceed setup, verification and recovery costs and the owner opts in. Production keeps all applicable security, CI and deployment gates, regardless of a short deadline. Persist delivery intent in the scenario's Spec Kit files. See `docs/delivery-pacing-and-tooling.md`.
+Use `demo-builder` by default. Ask six core business questions (idea/outcome, primary user/task, data, experience/lifecycle, success/sample data, environment/output) plus two short delivery questions (prototype/presentation-demo/connected-demo/pilot/production; user-specified deadline), then present one consolidated technical recommendation for confirmation. Reuse delivery answers already provided; do not ask twice. Do not ask acceptance, disposable-environment, retention, rerun-proof, source-tag, or cleanup questions in this mode.
 
 Use `advanced-builder` only when the user explicitly requests technical control or retrofit detail. Ask the core discovery and architecture questions directly, including table/form strategy, entry point, landing view, review app, mapping, relationships, reports, demo data, solution identity, and source control. Do not ask acceptance, disposable-environment, retention, rerun-proof, or cleanup questions.
 
@@ -53,6 +64,12 @@ When a user says they already have a partial implementation ("I started building
 - Generate `spec.md` to reflect their **actual current state**.
 - Then use `plan.md` to capture only what **remains to be built**.
 - This ensures Spec Kit retrofitting works for mid-stream projects, not just greenfield builds.
+
+## New or Extended Scenario Impact Gate (Mandatory Planning)
+
+Apply the proportional [scenario change impact gate](../docs/scenario-change-impact-gate.md) to the actual delta. Minor maintenance retains accepted planning and uses focused checks; do not regenerate the full matrix or repeat discovery. Scenario changes review affected requirements, schema/bindings, forms/views, permissions, data and dependent surfaces before implementation, keeping affected Spec Kit files aligned and linking unchanged contracts. Mark existing vs candidate vs prepared vs deployed clearly; native field and security proof is mandatory before live binding. Preserve shared assets and active writers, continue independent ready work, and use only owner-assigned H/workload IDs without allocating new ones.
+
+This is a pre-build documentation check, not authority to alter Dataverse, seed standard tables, add roles, publish, merge, skip accepted business decisions or start a second writer.
 
 ## Bootstrap Sequence Authority
 - **Single source of truth for bootstrap step order: `docs/onboarding.md`**

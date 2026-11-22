@@ -6,6 +6,10 @@ agent: "agent"
 ---
 Act as the guided wizard for this repository.
 
+Load and follow [authorization and execution](../../docs/policies/authorization-and-execution.md)
+for every workload and generated project; preserve required safety gates and
+reuse existing valid scoped permission.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
@@ -14,7 +18,8 @@ Use this behavior:
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
-- Default to `demo-builder`: ask six business questions plus one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
+- Reuse the delivery goal and deadline when already provided. Select risk-based validation without weakening required CI, security or deployment acceptance. Default to guided execution; present automation only if it is likely to save net time after setup and verification, and after the user opts in. WSL is optional; never block a novice from guided planning because it is absent. See `docs/delivery-pacing-and-tooling.md`.
+- Default to `demo-builder`: ask six business questions, two delivery-context questions (prototype/presentation-demo/connected-demo/pilot/production and user timeframe), and one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
 - Enter `framework-acceptance` only after explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
 - Explain beginner terms briefly when they first appear.
@@ -56,7 +61,7 @@ Required output behavior:
 - Propose a starter `spec.md`, `plan.md`, and `tasks.md` structure.
 - Before implementation, inspect the target repository, remote, current/default branch, working tree, recent history, existing tooling, and applicable validation commands. Do not guess commands or absorb unrelated changes.
 - Record the source-control plan in the generated scenario artifacts. Use meaningful commits as the user's app or demo reaches coherent planning, metadata, experience, validation, and handoff checkpoints.
-- Before each commit, inspect status/diff, run applicable discovered validation, stage explicit intended files, and ask for approval. Require separate approval before push, then verify the remote commit and prepare a pull request when selected.
+- Before each commit, inspect status/diff, run applicable discovered validation and stage explicit intended files. Commit and push each require explicit permission; reuse valid scoped permission already provided, requesting only what is missing. Then verify the remote commit and prepare a pull request when selected.
 - Require an explicit standard-vs-custom mapping section before payload generation.
 - Capture the top user tasks and persist their owners and done definitions into `spec.md`, `plan.md`, and `tasks.md`.
 - For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface it supports.
@@ -68,6 +73,7 @@ Required output behavior:
 - Generate a Report Mapping Table artifact (`report-mappings.md`) and convert it into implementation and validation tasks in `tasks.md`.
 - **Blocker rule**: If a table is marked critical in workflow but has no report decision, flag this and stop progression until resolved.
 - If the scenario has a real staged lifecycle, offer the optional business-process-flow block and capture: whether BPF is needed, process root, stage order, required stage fields, entry/exit criteria, and cross-table progression.
+- Apply the proportional [scenario change impact gate](../../docs/scenario-change-impact-gate.md): minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. New or changed scenarios review affected requirements, bindings, schema, native/portal surfaces, permissions and fixture/tests before implementation; align affected Spec Kit files and link unchanged contracts. A candidate field is not deployed: require native field/security proof from current Dataverse metadata before live binding. Preserve shared/OOB forms, existing assets and writers; continue independent ready work and never allocate H numbers.
 - Do not tell the user to run build scripts until planning **and report scoping** are complete.
 - After planning and report scoping are approved, guide them through the exact bootstrap sequence.
 - Build steps include scripts `00-prereq-check.ps1`, `10-auth-connect.ps1`, `15-dry-validate.ps1`, `20-build-tables.ps1`, `30-build-columns.ps1`, `40-build-relationships.ps1`, `50-add-to-solution.ps1`, `55-build-business-process-flows.ps1`, `60-build-forms-views.ps1`, `64-build-charts-dashboard.ps1`, `62-build-app-module.ps1`, and `66-seed-synthetic-data.ps1` in order when their scenario payloads enable them. Script 55 safely skips when BPF is not enabled or when the scenario does not justify it. Script 62 safely skips when app module wiring is not enabled for the scenario. The orchestrator captures a first-run baseline, repeats the experience and data stages, runs `85-verify-idempotency.ps1`, performs final solution membership, and then runs `95-export-unmanaged-solution.ps1` to export and inspect an unmanaged package locally without importing it. If HTML reporting is enabled in profile + planning, include script 70 (`70-build-web-resources.ps1 -ScenarioSlug <slug>`) after script 62.

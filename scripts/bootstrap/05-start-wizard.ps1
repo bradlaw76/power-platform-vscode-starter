@@ -85,7 +85,7 @@ NON-NEGOTIABLES
     remaining work.
 
 .PARAMETER Mode
-    Selects discovery depth. Demo Builder is the seven-prompt default. Advanced
+    Selects discovery depth. Demo Builder uses eight questions and one confirmation. Advanced
     Builder exposes technical controls. Framework Acceptance adds explicit
     environment safety, isolation, rerun, retention, cleanup, and evidence
     controls.
@@ -114,7 +114,9 @@ param(
     [ValidateSet('demo-builder', 'advanced-builder', 'framework-acceptance')]
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
-    [string]$WorkspaceRoot
+    [string]$WorkspaceRoot,
+    [string]$DeliveryGoal = '',
+    [string]$DeliveryTimeframe = ''
 )
 
 Set-StrictMode -Version Latest
@@ -731,11 +733,35 @@ if ($Retrofit) {
 
 Write-Host ""
 
+# Delivery intent is independent of wizard technical depth. Scripted legacy inputs
+# preserve their ordering and fail closed as unconfirmed until explicitly supplied.
+$deliveryOptions = @('prototype', 'presentation-demo', 'connected-demo', 'pilot', 'production')
+if (-not [string]::IsNullOrWhiteSpace($DeliveryGoal)) {
+    $deliveryGoalResolved = $DeliveryGoal.Trim().ToLowerInvariant()
+    if ($deliveryOptions -notcontains $deliveryGoalResolved) {
+        throw "Invalid DeliveryGoal '$DeliveryGoal'. Choose: $($deliveryOptions -join ', ')."
+    }
+} elseif ($null -ne $scriptedAnswers) {
+    $deliveryGoalResolved = 'unconfirmed'
+} else {
+    $deliveryGoalResolved = Read-ChoiceValue -Prompt 'Delivery goal: prototype, presentation-demo, connected-demo, pilot, or production?' -AllowedValues $deliveryOptions -Default 'connected-demo'
+}
+if (-not [string]::IsNullOrWhiteSpace($DeliveryTimeframe)) {
+    $deliveryTimeframeResolved = $DeliveryTimeframe.Trim()
+} elseif ($null -ne $scriptedAnswers) {
+    $deliveryTimeframeResolved = 'not supplied (scripted intake)'
+} else {
+    $deliveryTimeframeResolved = Read-RequiredValue -Prompt 'When must this be ready? Enter a date or timeframe, or no fixed deadline' -Default 'no fixed deadline'
+}
+if ($deliveryTimeframeResolved -match '[\r\n]') {
+    throw 'DeliveryTimeframe must be a single-line date or timeframe; line breaks are not allowed in generated planning values.'
+}
+
 if ($Mode -eq 'demo-builder') {
     $answers = [ordered]@{}
     $answers["WizardMode"] = $Mode
 
-    Write-Host "Demo Builder asks seven questions, then generates the same planning artifacts used by the shared build pipeline." -ForegroundColor Cyan
+    Write-Host "Demo Builder asks six business questions, two delivery questions, then confirms the technical recommendation." -ForegroundColor Cyan
     $scenarioName = Read-RequiredValue "1. Describe the app idea and business outcome"
     $scenarioSlug = ConvertTo-Slug $scenarioName
     $primaryUserTask = Read-RequiredValue "2. Who is the primary user, and what is their top task?"
@@ -1116,6 +1142,30 @@ if ($Mode -eq 'framework-acceptance') {
     $answers["AcceptanceEvidencePlan"] = 'not applicable'
 }
 
+# These choices affect planning and verification scope only; they never bypass
+# required platform checks, grant authority or dispatch background automation.
+$answers['DeliveryGoal'] = $deliveryGoalResolved
+$answers['DeliveryTimeframe'] = $deliveryTimeframeResolved
+$answers['AutomationMode'] = 'guided (no unattended automation activated)'
+$answers['AutomationPolicy'] = 'optional only after an evidence-based setup-time versus expected-time-saved comparison and owner opt-in'
+$toolPresence = @()
+foreach ($commandName in @('pwsh', 'git', 'pac', 'wsl.exe')) {
+    $status = if (Get-Command $commandName -ErrorAction SilentlyContinue) { 'detected' } else { 'not detected' }
+    $toolPresence += ('{0}: {1}' -f $commandName, $status)
+}
+$answers['LocalToolSnapshot'] = $toolPresence -join '; '
+$answers['LocalToolGuidance'] = 'Use available supported tools; WSL is optional, never a prerequisite for guided wizard use. Presence is not proof of configuration or access.'
+$answers['ValidationStrategy'] = switch ($deliveryGoalResolved) {
+    'prototype' { 'Focused changed-behavior checks plus required safety and data-integrity checks; no claim of production readiness' }
+    'presentation-demo' { 'Focused regression and rehearsed named user journey; live actions require exact save/reopen and role evidence' }
+    'connected-demo' { 'Affected-component integration checks, linked-record validation and intended-user live journey when required' }
+    'pilot' { 'Integration, permission and negative-path checks, environment readiness and representative user acceptance' }
+    'production' { 'Full applicable CI, security, data, integration and operational acceptance; deployment approval and recovery required' }
+    default { 'Conservative full applicable validation pending confirmed delivery goal; no automatic reductions' }
+}
+Write-Host "Delivery profile: $deliveryGoalResolved; timeframe: $deliveryTimeframeResolved" -ForegroundColor Cyan
+Write-Host "Execution: guided; optional automation not started. WSL is not required." -ForegroundColor Cyan
+
 $answers["EnableBusinessProcessFlow"] = if ($bpf.Enabled) { "yes" } else { "no" }
 $answers["BusinessProcessFlowName"] = $bpf.BusinessProcessFlowName
 $answers["PrimaryProcessEntity"] = $bpf.PrimaryProcessEntity
@@ -1304,6 +1354,15 @@ $answersContent = @"
 - Name: $($answers["ScenarioName"])
 - Slug: $($answers["ScenarioSlug"])
 
+## Delivery Context
+- Goal: $($answers['DeliveryGoal'])
+- User-specified timeframe: $($answers['DeliveryTimeframe'])
+- Validation strategy: $($answers['ValidationStrategy'])
+- Automation: $($answers['AutomationMode'])
+- Automation condition: $($answers['AutomationPolicy'])
+- Detected local tools: $($answers['LocalToolSnapshot'])
+- Tool guidance: $($answers['LocalToolGuidance'])
+
 ## Application Profile
 - Profile: $($answers["ApplicationProfile"])
 - Table Strategy: $($answers["TableChoice"])
@@ -1360,7 +1419,7 @@ $(if ($Retrofit) { "- retrofit: enabled" } else { "- retrofit: disabled" })
 - Required validation/CI: $($answers["SourceControlCiChecks"])
 - Pull request handoff: $($answers["SourceControlPullRequest"])
 - Merge strategy: $($answers["SourceControlMergeStrategy"])
-- Safety: inspect status and diff, stage explicit files, validate before commit, and require approval before commit or push.
+- Safety: inspect status and diff, stage explicit files, validate before commit; commit and push each require explicit permission. Reuse valid scoped permission already provided; ask only for missing scope.
 
 ## Optional Report Web Resources
 - Enabled: $($answers["IncludeHtmlReports"])
@@ -1426,6 +1485,13 @@ $specContent = @"
 
 ## Scenario Summary
 $($answers["ScenarioName"]) is a $($answers["AppType"]) for $($answers["PlatformArea"]).
+
+## Delivery and Acceptance Intent
+- Delivery goal: $($answers['DeliveryGoal'])
+- Delivery timeframe: $($answers['DeliveryTimeframe'])
+- Selected validation planning: $($answers['ValidationStrategy'])
+- Automation: opt-in only after time-saving justification; not enabled by intake
+- Unconfirmed scripted delivery intent must be resolved before release.
 
 ## Application Architecture
 - Wizard mode: $($answers["WizardMode"])
@@ -1551,6 +1617,17 @@ $($answers["SolutionType"])
 $planContent = @"
 # plan.md$retrofitPlanLabel
 
+## Delivery Pace and Execution Options
+- Goal: $($answers['DeliveryGoal'])
+- Deadline/timeframe: $($answers['DeliveryTimeframe'])
+- Risk-based validation: $($answers['ValidationStrategy'])
+- Execution: $($answers['AutomationMode'])
+- Automation decision: $($answers['AutomationPolicy'])
+- Tools observed locally: $($answers['LocalToolSnapshot'])
+- WSL is optional; manual/VS Code/native supported routes must remain available.
+- Treat the timeframe as an owner target, not an estimated or guaranteed completion date.
+- Do not bypass required tests, governance or production safeguards because of a short deadline.
+
 ## Build Approach
 - Wizard mode: $($answers["WizardMode"])
 - Application profile: $($answers["ApplicationProfile"])
@@ -1631,6 +1708,7 @@ $(if ($Retrofit) { @"
 - Pull request handoff: $($answers["SourceControlPullRequest"])
 - Merge strategy: $($answers["SourceControlMergeStrategy"])
 - Keep remote operations human-approved and verify the remote commit after push.
+- Reuse valid scoped permission already provided; request only missing commit or push scope. Neither operation authorizes merge or deployment.
 
 ## Risks to Resolve
 - Confirm environment availability and permissions.
@@ -1690,6 +1768,10 @@ $tasksContent = @"
 ## Ordered Tasks
 
 - [ ] Review 'answers.md' with stakeholder
+- [ ] Confirm delivery goal '$($answers['DeliveryGoal'])' and timeframe '$($answers['DeliveryTimeframe'])'; resolve any unconfirmed scripted values
+- [ ] Classify the actual change under 'docs/scenario-change-impact-gate.md'; minor maintenance retains accepted planning and focused checks, while scenario deltas update affected contracts
+- [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
+- [ ] Consider automation only when a measured net time saving exceeds setup/verification cost and owner opts in; do not require WSL
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
 - [ ] Confirm application profile '$($answers["ApplicationProfile"])' and architecture intent
 - [ ] Confirm entry point '$($answers["EntryPointTable"])' opens with '$($answers["EntryPointLandingView"])'
@@ -1738,6 +1820,7 @@ $tasksContent = @"
 - [ ] Export and unpack solution
 - [ ] Create the final implementation commit after reviewing staged files and validation evidence
 - [ ] Push only after approval, verify the remote branch contains the local commit, and prepare the pull request when enabled
+- [ ] Reuse valid scoped commit/push permission already provided; ask only for missing scope and preserve required platform confirmations
 - [ ] Pack and import solution
 - [ ] Update 'docs/build-log.md'
 "@

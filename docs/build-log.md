@@ -4,6 +4,14 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Local wizard integration proposal - 2026-11-22
+
+- Source baseline: main `4c9d2bfac675812a8fbe100b94c05ebe4c4bed1e`, PR #10 `362ebe991261e366a6aefc6af3aa514423d63338`, PR #9 `6c5c961955fd0d1697c74a351dbc148a9ac0c1b3`, and only PR #8's applicable own policy delta from `9f4910632d186f54262c49845ab6404a4726e950`.
+- Scope: eight-question delivery intake, proportional [scenario-impact planning](scenario-change-impact-gate.md), and [scoped authorization](policies/authorization-and-execution.md) through the existing wizard/report skills and installer. No absent formatter or update-advisor baseline was imported.
+- Complete local credential-free verification passed: all 24 standalone suites; 104 Pester tests, zero failed/skipped/not-run; 91 Markdown files; 66 PowerShell files parsed; zero configured analyzer findings; 85 JSON documents and 60 schema-validated payloads; contract integrity and whitespace.
+- Installer tests used temporary homes only; stage Apply messages in mocked tests are not live Dataverse operations. Original PR #8's historical counts remain separate from this proposal.
+- Status: LOCAL SOURCE PROPOSAL and TESTED. No integration commit, push, PR update, merge, deployment or live-tenant verification was performed. Existing application sessions, OneDrive checkout, main and backups were preserved.
+
 ## Federal FOIA Management - 2026-10-14
 
 | Field | Result |
