@@ -50,7 +50,9 @@ Validation checkpoints:
 
 ### 0B. Wizard discovery modes
 
-Use `demo-builder` by default: ask six business questions plus one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
+Use `demo-builder` by default: ask six business questions, two delivery-context questions and one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
+
+Every mode captures or reuses the delivery goal and owner timeframe under [delivery pacing and tooling](../docs/delivery-pacing-and-tooling.md). Guided execution does not require WSL; automation remains opt-in after net-time justification, and deadlines do not waive required validation, security or deployment acceptance.
 
 Advanced Builder questions:
 

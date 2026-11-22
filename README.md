@@ -183,7 +183,7 @@ Prefer a clickable visual guide? Open [docs/wizard-walkthrough.html](docs/wizard
 | --- | --- | --- |
 | **VS Code shared skill (primary)** | `/power-platform-wizard-init` in Copilot Chat | Guided chat-or-terminal kickoff plus progress monitoring |
 | **VS Code Copilot Chat (direct wizard path)** | `/power-platform-demo-wizard` in Copilot Chat | Direct chat-first planning and Spec Kit generation |
-| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Seven-prompt Demo Builder by default; scaffold planning files |
+| **Terminal wizard** | `pwsh ./scripts/bootstrap/05-start-wizard.ps1` | Eight business/delivery questions plus one confirmation by default; scaffold planning files |
 | **Claude Code skill** | Available after `01-install-skills.ps1` | AI-guided builds with full workflow and troubleshooting context |
 
 All three paths converge on the same sequence:
@@ -306,7 +306,7 @@ pwsh ./scripts/bootstrap/01-install-skills.ps1
 pwsh ./scripts/bootstrap/05-start-wizard.ps1
 ```
 
-The default `demo-builder` asks six business questions and presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering.
+The default `demo-builder` asks six business questions and two delivery-context questions, then presents one consolidated technical recommendation for approval. Use `-Mode advanced-builder` for direct architecture and mapping controls. Use `-Mode framework-acceptance` only for explicitly authorized framework acceptance engineering. Both detailed modes also capture the delivery goal and timeframe.
 
 3. Optional chat-first path in VS Code Copilot Chat:
 
@@ -374,7 +374,7 @@ pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode framework-acceptance
 /power-platform-demo-wizard
 ```
 
-All modes capture or confirm the same architecture contract, then scaffold compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files under `specs/<scenario-slug>/`. Demo Builder uses seven prompts; Advanced Builder exposes the 11 core discovery questions and technical extensions; Framework Acceptance adds environment safety and evidence controls.
+All modes capture or confirm the same architecture contract, then scaffold compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files under `specs/<scenario-slug>/`. Demo Builder uses eight business/delivery questions plus one confirmation; Advanced Builder exposes the 11 core discovery questions, two delivery questions and technical extensions; Framework Acceptance adds environment safety and evidence controls.
 
 Canonical source for discovery/planning/execution contract:
 

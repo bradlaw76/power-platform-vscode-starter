@@ -9,6 +9,8 @@ This reusable starter serves first-time builders and experienced implementers. A
 
 The guided terminal wizard asks both questions. Users with an existing scripted answers file can provide `-DeliveryGoal` and `-DeliveryTimeframe` without changing legacy ordered answer files. Without these values, a scripted run retains `unconfirmed` and must resolve the delivery goal before release. Chat and agent entry points ask the same two questions, honoring answers already given.
 
+The terminal timeframe must be a single line. Line breaks are rejected so a supplied deadline cannot introduce headings or tasks into generated planning contracts.
+
 ## Validation proportional to delivery purpose
 
 | Goal | Initial verification emphasis | Required evidence and non-waivable gates |

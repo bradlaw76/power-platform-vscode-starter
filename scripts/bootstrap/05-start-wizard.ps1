@@ -753,6 +753,9 @@ if (-not [string]::IsNullOrWhiteSpace($DeliveryTimeframe)) {
 } else {
     $deliveryTimeframeResolved = Read-RequiredValue -Prompt 'When must this be ready? Enter a date or timeframe, or no fixed deadline' -Default 'no fixed deadline'
 }
+if ($deliveryTimeframeResolved -match '[\r\n]') {
+    throw 'DeliveryTimeframe must be a single-line date or timeframe; line breaks are not allowed in generated planning values.'
+}
 
 if ($Mode -eq 'demo-builder') {
     $answers = [ordered]@{}

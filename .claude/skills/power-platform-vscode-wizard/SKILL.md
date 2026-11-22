@@ -46,11 +46,13 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 
 ## Wizard Modes (Select First)
 
-- `demo-builder` is the default. Ask six business questions plus one consolidated recommendation confirmation. Infer technical design and do not ask disposable-environment, destructive-cleanup, retention, acceptance-source-tag, or rerun-proof questions.
+- `demo-builder` is the default. Ask six core business questions, two delivery-context questions (goal and timeframe), then one consolidated recommendation confirmation. Infer technical design and do not ask disposable-environment, destructive-cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - `advanced-builder` requires explicit selection. Expose application profile, table strategy, form strategy, entry point, landing view, entity mapping, user tasks, relationships, reporting, demo data, solution identity, and source-control controls. Do not ask framework-acceptance or cleanup questions.
 - `framework-acceptance` requires explicit selection. Add authorized-environment confirmation, isolated timestamped naming, acceptance source tags and hero labels, deterministic rerun evidence, retention policy, separately approved cleanup, and an acceptance evidence plan.
 
 All modes generate compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline.
+
+In every mode, capture or reuse the delivery goal (`prototype`, `presentation-demo`, `connected-demo`, `pilot`, `production`) and owner timeframe. Persist accepted delivery context in the scenario planning files. Guided execution does not require WSL. Automation remains off unless the owner opts in after a net-time comparison including setup, verification and recovery. Deadlines never weaken required CI, security, environment or deployment gates. See [delivery pacing and tooling](../../../docs/delivery-pacing-and-tooling.md).
 
 ## Advanced Discovery Questions
 

@@ -184,6 +184,14 @@ try {
     Assert-True -Condition ($productionPlan.Contains('Execution: guided')) -Message 'Production delivery must not activate automation implicitly.'
     Assert-True -Condition ($productionOutput -match 'Delivery profile: production') -Message 'Explicit delivery parameters were not applied.'
 
+    $multilineWorkspace = New-WizardTestWorkspace -Name 'multiline-delivery'
+    $multilineAnswersPath = Join-Path $multilineWorkspace 'scripted-answers.json'
+    $scriptedDemoAnswers | ConvertTo-Json | Set-Content -LiteralPath $multilineAnswersPath -Encoding UTF8
+    $multilineOutput = @(& pwsh -NoProfile -File $wizardPath -Force -AnswersFile $multilineAnswersPath -WorkspaceRoot $multilineWorkspace -DeliveryGoal production -DeliveryTimeframe "next week`n## Unaccepted planning heading" 2>&1)
+    $multilineExitCode = $LASTEXITCODE
+    Assert-True -Condition ($multilineExitCode -ne 0 -and ($multilineOutput -join "`n") -match 'DeliveryTimeframe must be a single-line') -Message 'Multiline delivery context must fail explicitly instead of injecting planning headings.'
+    Assert-True -Condition (-not (Test-Path -LiteralPath (Join-Path $multilineWorkspace 'specs'))) -Message 'Rejected delivery context must not generate scenario artifacts.'
+
     $demoViews = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/views.json") -Raw -Encoding UTF8 | ConvertFrom-Json
     Assert-True -Condition ($demoViews.Views.Count -eq 1) -Message 'Demo Builder must emit one entry-point view intent.'
     Assert-True -Condition ($demoViews.Views[0].Name -eq 'Active Checkout Requests') -Message 'Demo Builder did not use the predictable generated Active Checkout Requests view name.'
