@@ -180,3 +180,17 @@ contained in #5 history with only semantic guidance adapted; #7/#11 are
 contained in candidate only. Closure/retarget/merge/activation remain owner
 decisions. Missing semantic runtime is explicit, not supplied by documentation.
 Final publication/check results are recorded externally; Q10 is not inferred.
+
+## Q12 finalization and next backlog
+
+- [x] Reconcile exact Q7-Q11 source/legacy/H009 states without duplicate work.
+- [x] Verify actual security/CI availability and installed protection limitations.
+- [x] Prepare accurate installation/adoption/version/recovery/release notes.
+- [x] Preserve historical ownership/audit and distinguish synthetic/live evidence.
+- [x] Prepare explicit release authority process and dependency-aware next scope.
+- [x] Prepare focused documentation checks and existing-PR publication handoff.
+
+These checked items are preparation, not a claim that the subsequent final
+commit/CI/push is already complete. Exact final publication and readbacks are
+recorded in the existing external report/ledger after verification. No tag,
+release, merge, live acceptance or H-number is authorized by this checklist.

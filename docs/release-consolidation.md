@@ -217,7 +217,7 @@ No automatic source upgrade, package install or protection-hook activation.
 | Path | Required operator behavior |
 | --- | --- |
 | New project | Follow authoritative onboarding; confirm architecture and scenario planning before build. Explicitly opt in to the installed handoff/synchronization. Custom payloads still need approved semantic field decisions. |
-| Existing app/solution | Use `05-start-wizard.ps1 -Retrofit`; inventory current tables/forms/views/relationships and solution first. Keep current state in spec and remaining work in plan. Review `-AdoptionPath` mappings without changing native identifiers. Source evidence is not live existence. |
+| Existing app/solution | Inventory current tables/forms/views/relationships, exact solution and publisher first. For technical retrofit control explicitly select `-Mode advanced-builder -Retrofit`; inspect actual generated identity/current-state fields before build. A flag or inferred recommendation is not metadata proof. Keep current state in spec and remaining work in plan; review `-AdoptionPath` without changing native identifiers. Source evidence is not live existence. |
 | Existing project without Git | Guided planning/adoption/rehearsal/Status do not create a repository. Keep accepted source contracts and stable external folders; consumer source-control choices remain explicit. |
 | Existing H008 adoption | Resume the same owner, files, IDs and roots. Keep synchronization disabled until explicit enable. Changed source invalidates old receipts; never rewrite them as current/live evidence. |
 | Build-profile migration | Preserve scenario, target, payload and effective verification policy; a mismatch requires separately reviewed fresh state, not deleting checkpoints. |
@@ -258,6 +258,121 @@ These existing controls do not enforce branch approvals or repair local hooks.
 The manual Dataverse integration workflow was not executed or live-certified;
 its confirmation/secrets gates do not replace current scoped deployment approval
 and validation of every current scenario/semantic contract.
+
+## Version and update status
+
+H009 is the existing documentation-only draft
+[PR #15](https://github.com/bradlaw76/power-platform-vscode-starter/pull/15) /
+[issue #14](https://github.com/bradlaw76/power-platform-vscode-starter/issues/14).
+It has not supplied an authoritative distribution manifest, installed-version
+startup display, official-release comparison, update/defer UI, protected file
+apply or recovery implementation. Do not present its illustrative 1.11.0 as
+installed or available.
+
+Current main baseline: profile 1.4, contract 1.10.0, intake component 0.7.0.
+Integrated candidate: profile 1.6, contract 1.10.0, intake component 0.8.2,
+separate automation package 0.2.1. Both lack verified wizard release identity.
+The observed release listing was empty; historical snapshot/rollback tags and
+a moving branch are not official update authority. Offline or unavailable
+advice never proves remote freshness. The optional cached repository advisor
+script/runbook is absent here; report unavailable rather than execute an
+invented fallback. Manual skill review is not transactional synchronization.
+
+Owner-approved implementation may begin with a bounded read-only slice, but
+Apply requires independently trusted provenance, explicit distributable
+ownership/target inventory and exact-plan authorization. A committed descriptor
+must not embed its own containing commit SHA; generated source-bound envelopes
+and file indexes must avoid self-hash cycles. PR #15 remains a proposal, not a
+trust root, release authority or another implementation owner's dispatch.
+
+## Q7-Q12 finalization and next backlog
+
+### Completed workstreams and delivered evidence
+
+| Workstream | Outcome |
+| --- | --- |
+| Q7 activation | Tested candidate preserved; PR #13 not merged without exact operation/head/target/method authority |
+| Q8 governance | Additive provenance/owner choices and isolated rejected-write recovery verified; canonical restoration and protection activation remain gated |
+| Q9 reconciliation | Exact #7/#11 candidate ancestry and #4-in-#5 preserved; independent semantic planning reference adapted without missing runtime claims |
+| Q10 H009 | Current design/version gaps and dependency/test handoff prepared in existing owner records; implementation remains gated |
+| Q11 operational acceptance | Five fresh native cases, exact human/metadata preservation and four actual WSL recovery tests passed within synthetic scope |
+| Q12 documentation | README, installation/adoption/version/recovery/release boundaries reconciled; one external final report/ledger and existing PR coordination retain exact final commit/CI |
+
+Q11 recorded 59 distinct native assertions (65 retained checks), zero unexpected
+failures and 47 commands. WSL ran four actual supervisor tests, zero failure/
+error/skip, with synthetic local executors. New-app rehearsal performed 34 memory
+operations. Retry exhaustion stayed blocked, a live orphan rejected duplicate
+dispatch, and normal post-executor-stop resume used a new lease and zero-launch
+replay. Process restart evidence does not establish boot persistence.
+
+All four supplied human prefixes/CRLF and existing table/form/view/column/
+relationship metadata survived. Publisher/solution IDs are not modeled by the
+memory adapter. The no-Git case's native `feder` proposal and later separate
+`ppd` contract require explicit pre-build alignment; that case verifies no-Git
+adoption/reporting, not custom-schema compatibility. A completed command receipt
+had zero completed native tasks; matching inputs did not clear a conflict hold,
+and stale evidence remained stale. Status exit0 is not acceptance.
+
+No new runtime API, stage, question or dependency was introduced by Q8-Q12
+documentation. Compatibility limits remain: pinned relationship endpoint/kind
+changes do not auto-migrate; partial planning/malformed inputs fail explicitly;
+native Windows workers are unsupported; changed build verification/target policy
+requires new reviewed state; H009 and real publisher/tenant/UI/reboot acceptance
+are not delivered. Read historical conflict counts against their named baseline:
+Q9's final semantic addition raised #4/#5 from eight to nine conflicts without
+rewriting prior observations. Final-source conflict analysis must follow any
+future source change, not assume this count forever.
+
+### Release authority process - prepared, not activated
+
+1. Select the exact source and review current owners/dirty state, reviews,
+   threads, CI and applicable repository gates. Normal edit/commit/push permission
+   does not grant main merge or publication.
+2. Obtain an explicit merge operation bound to current PR/head/target/strategy.
+   Use the existing head-SHA guard, no admin bypass/auto-merge/branch deletion.
+3. Verify resulting main ancestry/tree and warranted post-merge checks. Keep
+   source, installed package, synthetic, deployment and UI acceptance separate.
+4. Before a tag/package, obtain release identity/version/channel/source and
+   publish operation authority, independently reviewed provenance/trust and
+   a distributable file inventory. Do not package every tracked historical/
+   application file or assume H009's proposal is adopted.
+5. Validate exact tagged source, inventory/digests, notes, compatibility and
+   recovery expectations, then publish only through the explicitly approved
+   process. No tag name, new version or publication command is selected here.
+6. Read back immutable tag/artifact/source identities and record package and
+   installation verification separately. Never invoke Dataverse from a framework
+   release approval or silently overwrite an installed clone.
+
+### Concise PR disposition and dependency matrix
+
+| PR | Current disposition / next owner action |
+| --- | --- |
+| #13 | Open tested candidate; source/docs prepared, merge requires exact scoped authority |
+| #7 / #11 | Exact history incorporated in candidate, not main; no second merge; closure only after owner-approved integration/disposition |
+| #6 | Open H003 protection owner lane; staged/outgoing repairs and separate audit/adoption/activation decisions |
+| #5 / #4 | Open coupled package / draft intermediate vehicle; #4 in #5, independent guidance adapted; repair ZIP/history and coordinate compatibility/ownership before adoption |
+| #3 | Open, generic subset adapted; separate application/Choice-migration/old-runner scope; no whole-file transplant |
+| #15 | Draft H009 design; approve/refine a bounded slice and designate owner/base before implementation |
+
+Next backlog is **proposed work, not executable dispatch or allocated H-numbers**:
+
+| Next task | Dependencies and responsible owner |
+| --- | --- |
+| Preserve/review exact candidate and later post-merge evidence | Existing PR #13 owner/release approver; exact merge grant first |
+| Resolve canonical audit base versus fresh index | Repository owner selects authority; preserve all historical blobs |
+| Repair index/outgoing checks, then review protection adoption | Existing H003/#6 owner context; activation separately authorized |
+| Repair archive hidden entries/outgoing history and reconcile skills | Existing #5/#4 owner context; protection/compatibility and packaging choices |
+| Implement approved read-only H009 foundation, then planner/recovery | Existing #15/#14 owner/slice; authoritative identity/binding; trust/ownership before Apply |
+| Define typed solution/publisher alignment and evidence-aware fixtures | Proposed planning/runtime objective for existing governance/allocator review; no automatic reinterpretation of native decisions |
+| Implement missing semantic enforcement and verify functional surfaces | Approved scenario/type/runtime scope; planning reference is not validator code |
+| Run real target publisher/solution/app/UI acceptance | Environment/solution owner authorizes exact target/effects; source tests cannot substitute |
+
+Read-only owner review, requirements refinement and explicit scope selection can
+proceed independently; code/activation rows retain their actual dependencies.
+No current safe implementation task is created by listing these proposals.
+Do not allocate or infer another H-number. Exact commits, test counts/skips,
+security availability and owners' remaining decisions live in the one external
+report/ledger, not duplicated controllers or fabricated approval records.
 
 Recommended next objectives for owner/ChatGPT scoping, without allocating a
 number: controlled identity-safe relationship migration; repairs/adoption of

@@ -166,3 +166,15 @@ Run focused documentation checks and warranted exact-source CI; reuse unchanged
 installed/WSL evidence. Publish six definitive dispositions, superseded surfaces,
 dependency/owner decisions and preserved historical audit transfer through
 existing PR #13 and the one external report/ledger. Q10 is not inferred.
+
+## Q12 finalization from Q7-Q11
+
+Preserve current source/owner heads and fresh external Q11 evidence. Reconcile
+README, installed-vs-source versions, existing/no-Git architecture boundaries,
+human preservation, synthetic publisher limitations and real WSL recovery.
+Prepare release authority steps and dependency-aware unallocated backlog without
+tags, scheduler or source ownership changes. Update only directly related
+documentation, preserve historical audit bytes and run focused docs/link checks.
+Commit/push through existing PR13 under standing scoped permission, then verify
+exact-source CI and coordination. Reuse unchanged installed regression evidence;
+record new CI's installed skips honestly. Keep one external status/report.

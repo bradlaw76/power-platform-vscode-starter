@@ -64,6 +64,16 @@ different prefix; it does not prove that the publisher already exists.
 Multiple namespaces and existing/new publisher selection require explicit
 planning and environment verification.
 
+When adopting an independent contract into already generated planning, compare
+the actual solution unique name and publisher prefix in spec/plan with the
+selected canonical table namespaces. Preserve conflicting human decisions and
+resolve them explicitly before custom payloads/build; document synchronization
+alone does not establish full architecture compatibility. The memory adapter
+does not model publisher/solution metadata, so rehearsal cannot verify their
+real IDs or solution membership. A generated recommendation accepted by the
+operator is not the same as a name mentioned only in a free-text environment
+answer. Source-only existing-work adoption does not prove tenant existence.
+
 Detailed modes must match accepted table identities and use the exact compact
 accepted relationship JSON in both relationship fields (`none` for an empty
 selection). Free-text contradictions are rejected before planning writes,

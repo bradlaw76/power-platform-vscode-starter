@@ -58,6 +58,16 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 
 Distribute skills from a tagged release or a reviewed commit. Record the source commit and verify provenance with `git rev-parse HEAD`; release publishers may also publish SHA-256 checksums for packaged archives. To update, compare the installed folder and runtime contract, review changes, run `scripts/ci/SkillParity.Tests.ps1`, then replace only approved files.
 
+There is no installed H009 version/update manager in this candidate. Profile,
+contract, component header and automation package versions are not an
+authoritative wizard distribution release; a development checkout's release
+identity remains unknown. No official wizard release, trusted comparison,
+update choice, transactional apply or rollback was exercised. See
+[version/update status](release-consolidation.md#version-and-update-status).
+The cached repository advisor script/runbook is absent in this candidate:
+unavailable advice does not mean up-to-date. Do not copy a newer branch, overwrite
+local skill edits or install absent updater tooling automatically.
+
 To uninstall a user-installed Claude skill, remove its folder under `~/.claude/skills/`. The repo-shared Copilot skill is removed through a reviewed repository change. Uninstalling either skill does not remove the wizard runtime or generated scenario files.
 
 ## Clean acceptance test

@@ -4,6 +4,31 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q12 release finalization - 2026-11-23
+
+- Starting candidate `56fee3c6fd5a525f0392055422e5cab6a527e8e6`, main
+  `632d00cbe38bbee753f4c4e7f4b5d1fb8d4afc8a`, canonical `a23096ec` /
+  installed 0.2.1. All legacy/H009 heads preserved, no source owner overwrite.
+- Fresh Q11 A-E: 59 distinct assertions/65 retained checks, zero unexpected
+  failures, 47 commands and 34 new-app memory operations. Actual WSL recovery
+  four passed/0 failed/error/skip; retry exhaustion/orphan resume verified.
+  Original driver/fixtures/human docs remain intact; only an external evidence
+  pointer was corrected. Complete actual source IDs/logs remain external.
+- Publisher IDs/solution metadata unmodeled; native/canonical no-Git namespaces
+  need pre-build review. No real payload/Dataverse/UI/reboot acceptance. H009
+  version/updater runtime absent and skipped, not claimed current or released.
+- Source-only README/installation/adoption/version/recovery/release/backlog
+  updates preserve historical text and audit prefix. No new runtime, question,
+  stage, controller, package dependency or H-number. Focused docs/link checks and
+  exact final CI publication belong in existing PR13 and the one report/ledger.
+- Security metadata: open secret alerts count zero, secret scanning/push
+  protection enabled; main unprotected, zero rulesets, no local pre-commit/
+  pre-push hooks installed. Counts are not secret contents or a CVE/OS audit.
+  No settings, credentials, live workflow or protection activation changed.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains; additive proposal updated.
+  Main merge/tag/release and other owner decisions remain separate. Next backlog
+  is dependency-aware proposed scope, not unauthorized dispatch.
+
 ## Q9 legacy PR reconciliation - 2026-11-23
 
 - Fresh source/ownership/reviews for #3/#4/#5/#6/#7/#11; all owner heads unchanged.

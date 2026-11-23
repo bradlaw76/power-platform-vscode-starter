@@ -444,3 +444,30 @@ historical approval. Preserve all preceding sections and original owner records.
 11. **Publication:** existing #12/#13 and original PR coordination plus one
     external report/ledger. Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains;
     no source says these proposals are restored history or approved main.
+
+## Q12 additive finalization transfer - 2026-11-23
+
+Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains; this existing proposal is
+not restored canonical history. All prior bytes/attribution are retained.
+
+1. **Objective:** finalize Q7-Q11 release documentation and Q12 next backlog.
+2. **Source:** starting starter `56fee3c6fd5a525f0392055422e5cab6a527e8e6`,
+   main `632d00cbe38bbee753f4c4e7f4b5d1fb8d4afc8a`, canonical
+   `a23096ec27de9bc1035b690dc9d49268a408d059`; final commit/CI external.
+3. **Owner:** existing H008 session/PR13 and preserved original legacy/H009 lanes.
+4. **Changes:** directly related README/release/adoption/skill/migration/build/
+   planning/audit documentation only; no runtime or source controller.
+5. **Validation:** fresh Q11 native59 distinct checks/65 retained, WSL4 pass;
+   focused Q12 docs/link checks and exact final CI, separate installed skips.
+6. **Evidence:** one external consolidated report/status ledger, source commit/
+   diff and existing issue/PR readbacks; full project fixture data stays external.
+7. **Containment:** no consuming source/customer/tenant data, protected writes,
+   installed hooks/security or other owner branches altered.
+8. **Recovery:** evidence-pointer correction only in Q11; prior raw observation
+   retained. No product defect, unchanged failing retry or fabricated approval.
+9. **Limits:** publisher model/C namespace, H009 absent updater, native supervised
+   Windows, real target/UI/boot persistence and canonical authority remain.
+10. **Next scope:** owner-reviewed audit/protection/skills/H009/semantic and typed
+    identity proposals with exact dependencies; allocate no H-number here.
+11. **Delivery:** normal scoped docs commit/push/PR, never merge/tag/public release
+    or deployment; final exact-source CI and status are verified externally.
