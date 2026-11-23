@@ -4,6 +4,24 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q2 independent PR reconciliation - 2026-11-23
+
+- Baseline candidate: `5f8dce918910d2eed26637871087ae490184a36a`.
+  #11/#7 remain ancestors; #4 is contained in #5. No owner PR was merged,
+  closed or rewritten; newly observed H009 work is independent.
+- Adapted only #3's generic profile/schema/review-note functionality, using
+  optional arguments and existing A0 rather than mandatory new Demo Builder
+  questions. Native standard-table inference and accepted decisions remain.
+  Source notes are quoted, schema-checked and never fetched or auto-approved.
+- Adapted #5's explicit slug validation with case-sensitive checking; legacy
+  default scenario and navigation selection are unchanged.
+- Both missing behaviors were reproduced with focused tests before repair.
+  Final verification/commit/CI evidence is recorded in existing issue #12,
+  PR #13 and the consolidated external report/ledger.
+- #6 policy activation, #5/#4 coupled protections/installers/skills, and #3's
+  application payload/history and old runner remain owner-dependent. Canonical
+  audit restoration remains HANDOFF NOT WRITTEN - BLOCKED.
+
 ## H008 release consolidation - 2026-11-22
 
 - Baseline: `bc4f7c85ccb9a57df77da3b70fe02f27273c3cbb`; main still

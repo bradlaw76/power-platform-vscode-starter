@@ -2,6 +2,11 @@
 
 ## Preflight Validation
 
+An explicit `ScenarioSlug` passed to scenario context resolution must contain
+lowercase letters/numbers separated by single hyphens. Correct the caller's
+slug when this guard fails; do not normalize a different target silently.
+Legacy default scenario resolution remains unchanged.
+
 - Run `pwsh ./scripts/bootstrap/15-dry-validate.ps1` before mutation steps.
 - Review `.wizard-metrics/artifacts/validation/build-contract-validation.md` for the human summary.
 - Review `.wizard-metrics/artifacts/validation/build-contract-validation.json` for machine-readable consumers.

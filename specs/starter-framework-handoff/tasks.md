@@ -55,3 +55,26 @@ The isolated relationship increment affected 18 tasks after the label step;
 actual managed changes/dependencies and unrelated-section preservation were
 checked. Final documentation SHA/CI and owner-gated outcomes are recorded in
 issue #12 and the external release report, not inferred from these tests.
+
+## Q2 reconciliation
+
+- [x] Refresh all six PR heads/reviews and verify #11/#7 and #4/#5 ancestry.
+- [x] Analyze actual #3/#5 conflicts without changing owner refs or worktrees.
+- [x] Adapt optional new-Dynamics intent and reviewed-material notes safely.
+- [x] Adapt the independent explicit scenario-slug guard.
+- [x] Verify prompt compatibility, typed standard reuse, source quoting and invalid inputs.
+- [ ] Align runtime guidance and publish exact candidate/CI evidence.
+- [ ] Coordinate all six dispositions and the remaining owner-dependent sequence.
+
+Local combined-tree verification passed 25 standalone suites, 104 Pester tests,
+16 installed handoff tests, 105 Markdown documents and 68 PowerShell parses;
+the configured analyzer was clean. The native fixtures exercise both acceptance
+and rejection, unchanged prompt budgets, standard Contact/Case reuse, quoted
+source configuration parsing and invalid review input.
+
+Unresolved #5 archive/outgoing-history guards and #6 staged/outgoing-ref checks
+require their separately approved maintenance context and operation boundaries.
+Do not create or relabel a branch to bypass that context, activate their hooks,
+or treat the current PR-update grant as full protection-package adoption.
+The residual #3 Choice-migration finding remains outside the generic intake
+adaptation and requires separated application/migration scope.

@@ -169,6 +169,12 @@ Use and reference these files when relevant:
 
 ## Sustained execution after planning and authorization
 
+For explicit new-Dynamics intent or supplied source review notes, follow the
+[optional workload/source-note contract](../docs/wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Keep Demo Builder's prompt budget; no first-party provisioning, automatic source
+fetching or inferred material/architecture approval. Preserve quoted human notes
+and pending review tasks.
+
 The one-question-at-a-time **discovery** flow above still applies until the user has accepted the scenario plan and any required owner/environment decisions. After that, avoid repeated 2–5-minute implementation handoffs. Include the relevant downstream backlog, dependencies, accepted file/operation scope, tests, rollback, and stop conditions in one instruction.
 
 - Execute a meaningful sequence of separately authorized READY tasks: validate the saved baseline, apply the scoped change, run the right checks, correct routine errors within the approved budget, and continue the next eligible task without requiring a new prompt for each milestone.

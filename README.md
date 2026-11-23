@@ -58,6 +58,8 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
 | Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals and opt-in synchronization; no scheduler or live deployment |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
+| Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
+| Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 

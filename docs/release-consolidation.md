@@ -25,6 +25,11 @@ is implied by this candidate.
 
 ## Three independent mode selections
 
+Optional new-Dynamics workload and source-note inputs follow
+[the wizard contract](wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+They add no mandatory Demo Builder prompt or build stage and authorize no
+first-party product installation, existing-app mutation or source fetching.
+
 | Selection | Values | Meaning |
 | --- | --- | --- |
 | Discovery | Demo Builder, Advanced Builder, Framework Acceptance | Planning depth and existing confirmations |
@@ -75,16 +80,19 @@ SOURCE COMPLETE, TESTED, DEPLOYED, LIVE VERIFIED and BLOCKED separately.
 
 | Lane | Candidate outcome / prerequisite |
 | --- | --- |
-| #13 | H008 repairs and tested source; merge requires owner authorization/review and exact-head CI |
-| #11 | Sustained execution guidance incorporated into the owned candidate; does not grant operations |
-| #7 | Explicit verification profiles incorporated into the owned candidate; local history integration is not a GitHub/main merge |
-| #6 | Owner review of protection/CODEOWNERS/hooks; no activation or security-setting change in H008 |
-| #5 | Resolve source conflicts and strict Git identity versus no-Git guided planning before adopting coupled protection/install/skills changes |
-| #4 | Contained in #5; historical approvals do not approve a different combined head; owner decides supersession |
-| #3 | Separate generic intake from application artifacts; new workload/materials prompts conflict with current inferred Demo Builder budget and need contract reconciliation |
+| #13 | H008 repairs and eligible Q2 adaptations; merge requires explicit scoped permission, applicable repository gates and exact-head CI; PR permission alone is insufficient |
+| #11 | INCORPORATED ELSEWHERE: exact history is in candidate, not main; no additional integration or closure performed |
+| #7 | INCORPORATED ELSEWHERE: exact history/profiles are in candidate, not main; no duplicate integration or closure |
+| #6 | BLOCKED: protection adoption and approved maintenance context; unresolved pre-push outgoing-ref and staged-blob review findings must be fixed before activation |
+| #5 | BLOCKED, partial guard adapted: coupled protection/install/skills, strict Git identity/no-Git reconciliation and unresolved ZIP/outgoing-history review findings remain |
+| #4 | INCORPORATED ELSEWHERE in #5, not release/main: draft targets an intermediate branch; historical approvals do not approve #5; closure only proposed after owner disposition |
+| #3 | INCORPORATED ELSEWHERE, generic subset only: optional workload/schema/notes adapted; full PR remains blocked by application scope, old runner and unresolved Choice-migration sequencing |
 
 Normal main integration order is owner-approved #13 with candidate #11/#7,
 then owner-reviewed protection #6, reconciled #5/#4 and separately scoped #3.
+Q2's independent adaptations do not approve or supersede the original PRs.
+The #3 full merge has ten conflicting paths and #5 has six at the recorded
+Q1 candidate; do not resolve these by overwriting current runtime or policies.
 Do not auto-close another owner's PR, remove application history or infer
 authorization from mergeability, credentials, a deadline or absent rulesets.
 

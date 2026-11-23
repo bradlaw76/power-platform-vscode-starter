@@ -40,3 +40,21 @@ application/discovery-budget changes gated. Validate fresh independent native
 new/partial projects, exact Spec Kit updates, installed handoff, WSL workers and
 full applicable source regressions. Record final commits/CI/report in the same
 maintainer ledger and existing PR/issues; no new controller or main merge.
+
+## Q2 independent PR adaptations
+
+Reconfirm #11/#7 ancestry and retain their integrated candidate history.
+Adapt #3's generic new-Dynamics profile and schema-validated reviewed-material
+notes without its application payloads, extra mandatory Demo Builder prompts,
+or old runner. Explicit profile/file arguments are optional; detailed intake
+reuses A0. Preserve native table inference and quote every material field in
+generated Markdown. Materials are source notes, never architecture approval.
+Add the separable #5 explicit scenario-slug guard without adopting its Git-root,
+maintenance-branch, installer or protection policies. Preserve legacy default
+scenario resolution and navigation behavior.
+
+Verify both adaptations with focused native fixtures, then the affected
+handoff/planning/schema/documentation regressions and exact-head hosted CI.
+Keep #6 containment activation, #5/#4's coupled safeguards/skills and #3's
+application changes owner-gated. Record a disposition for each PR; never close,
+rewrite or merge another owner's PR. Keep newly observed H009 work independent.

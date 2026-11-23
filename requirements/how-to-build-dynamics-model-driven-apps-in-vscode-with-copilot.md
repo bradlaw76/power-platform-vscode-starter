@@ -74,6 +74,12 @@ Validation checkpoints:
 
 Use `demo-builder` by default: ask six business questions, two delivery-context questions and one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
 
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` use [the source-note contract](../docs/wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Keep existing discovery/confirmation, preserve quoted source status/questions,
+and confirm licensing and separate-app intent. The terminal does not fetch
+source content or provision first-party products; notes are not approval.
+
 Every mode captures or reuses the delivery goal and owner timeframe under [delivery pacing and tooling](../docs/delivery-pacing-and-tooling.md). Guided execution does not require WSL; automation remains opt-in after net-time justification, and deadlines do not waive required validation, security or deployment acceptance.
 
 Advanced Builder questions:

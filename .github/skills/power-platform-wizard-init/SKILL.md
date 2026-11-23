@@ -37,6 +37,14 @@ policy resume identity.
 
 ## Runtime Compatibility Preflight
 
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` follow the repo's wizard-contract source-note
+section and review schema. Preserve default prompt ordering; detailed modes
+use existing A0. Confirm separate-app intent and licensing, not first-party
+installation. Import only reviewed/redacted notes, keep unreviewed status and
+quote source text. The terminal fetches no documents/images/URLs. Missing notes
+are not approval; add no mandatory materials question.
+
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
 
 Before intake, inspect the target repository without modifying it. Report present, missing, and incompatible runtime files, including `wizard.profile.json`, `docs/onboarding.md`, `docs/wizard-contract-v1.md`, payload schemas, and every script named by the profile. If runtime files are missing, stop and offer a reviewed bootstrap plan. Never overwrite existing instructions, skills, scripts, specs, or payloads without explicit review and approval. Use [skill-distribution.md](../../../docs/skill-distribution.md) for installation and provenance checks.

@@ -12,6 +12,30 @@ All wizard entry points must follow this contract:
 - Onboarding documentation
 - Requirements guidance
 
+## Optional workload and reviewed-source input
+
+`05-start-wizard.ps1 -ApplicationProfile new-dynamics-365-app` explicitly plans
+a separate model-driven app, not an existing-app extension or first-party
+Dynamics installation. Confirm module dependencies/licensing before building.
+Without the argument, Demo Builder's existing inference is unchanged. Detailed
+modes include this value in A0; supplying the argument bypasses A0 only.
+
+`-RequirementsMaterialsFile <review.json>` consumes source-specific notes
+validated by [the review schema](../schemas/requirements-materials.schema.json).
+Use `decision: none` with an empty materials array, or `provided` with source,
+kind, reviewStatus, summary, planningImpact and openQuestions for each material.
+Only `reviewed` entries may have a nonempty summary; pending/inaccessible entries
+retain empty summaries and unfinished review tasks. No file means
+`not-collected`, not an implicit no-materials or approved decision.
+
+The terminal does not read source documents/images or fetch URLs; import only
+authorized, redacted human/chat review notes. All fields remain blockquoted in
+answers/spec/plan/tasks to prevent source text from injecting contract headings.
+Resolve or explicitly defer source questions before planning approval. Source
+notes never override accepted architecture, native identities or semantic gates.
+Use existing discovery/confirmation in chat; add no mandatory materials or
+workload question to Demo Builder.
+
 ## Canonical Flow
 
 1. Wizard mode selection (`demo-builder` by default)

@@ -88,6 +88,9 @@ function Get-WizardScenarioContext {
 
     $repoRootPath = [IO.Path]::GetFullPath($RepoRoot)
     $specsRoot = Join-Path $repoRootPath 'specs'
+    if (-not [string]::IsNullOrWhiteSpace($ScenarioSlug) -and $ScenarioSlug -cnotmatch '^[a-z0-9]+(?:-[a-z0-9]+)*$') {
+        throw "ScenarioSlug '$ScenarioSlug' must use lowercase letters, numbers, and single hyphens only."
+    }
     $resolvedPayloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
         Join-Path $repoRootPath 'payloads'
     } elseif ([IO.Path]::IsPathRooted($PayloadsFolder)) {

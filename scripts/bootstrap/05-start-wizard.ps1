@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.8.1
+VERSION:      0.8.2
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-11-22
+LAST UPDATED: 2026-11-23
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -108,6 +108,13 @@ NON-NEGOTIABLES
 
 .EXAMPLE
     pwsh ./scripts/bootstrap/05-start-wizard.ps1 -Mode advanced-builder -Retrofit
+.PARAMETER ApplicationProfile
+    Optional explicit profile, including new-dynamics-365-app. Does not add a
+    Demo Builder question; detailed modes otherwise use their existing A0 prompt.
+
+.PARAMETER RequirementsMaterialsFile
+    Optional schema-validated JSON review notes. No source documents, images or
+    URLs are fetched. Notes do not approve architecture or deployment.
 #>
 
 param(
@@ -122,7 +129,10 @@ param(
     [string]$AcceptedContractPath,
     [string]$FrameworkRuntimeWorkspace,
     [string]$FrameworkPythonExecutable = 'python',
-    [switch]$EnableFrameworkSpecKitSync
+    [switch]$EnableFrameworkSpecKitSync,
+    [ValidateSet('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution')]
+    [string]$ApplicationProfile,
+    [string]$RequirementsMaterialsFile
 )
 
 Set-StrictMode -Version Latest
@@ -250,6 +260,20 @@ function Read-ChoiceValue {
 
         Write-Host "Choose one of: $($AllowedValues -join ', ')." -ForegroundColor Yellow
     }
+}
+
+function Read-RequirementsMaterials {
+    if ([string]::IsNullOrWhiteSpace($RequirementsMaterialsFile)) {
+        return [pscustomobject]@{ decision = 'not-collected'; materials = @() }
+    }
+    $materialFile = Get-Item -LiteralPath $RequirementsMaterialsFile
+    if ($materialFile.Length -gt 1MB) { throw 'Requirements-material review exceeds 1 MiB.' }
+    $json = Get-Content -LiteralPath $materialFile.FullName -Raw -Encoding UTF8
+    $schemaPath = Join-Path (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) 'schemas/requirements-materials.schema.json'
+    if (-not (Test-Json -Json $json -SchemaFile $schemaPath -ErrorAction Stop)) {
+        throw 'Requirements-material review notes do not match the intake schema.'
+    }
+    return ($json | ConvertFrom-Json)
 }
 
 function ConvertTo-Slug {
@@ -783,6 +807,31 @@ if ($Retrofit) {
 
 Write-Host ""
 
+$requirementsMaterials = Read-RequirementsMaterials
+$requirementsMaterialsBlock = "`n## Requirements Materials`n`n- Decision: $($requirementsMaterials.decision)`n"
+if ($requirementsMaterials.decision -eq 'not-collected') {
+    $requirementsMaterialsBlock += "- No review notes supplied; do not infer review or approval from their absence.`n"
+}
+$requirementsMaterialsTasks = ''
+$materialNumber = 0
+foreach ($material in $requirementsMaterials.materials) {
+    $materialNumber++
+    $materialNotes = @"
+Source: $($material.source)
+Kind: $($material.kind)
+Review status: $($material.reviewStatus)
+Reviewed summary: $($material.summary)
+Discovery/planning impact: $($material.planningImpact)
+Open questions: $($material.openQuestions)
+"@
+    $requirementsMaterialsBlock += "`n" + (($materialNotes -split '\r\n|\r|\n' | ForEach-Object { "> $_" }) -join "`n") + "`n"
+    $requirementsMaterialsTasks += "- [ ] Resolve material $materialNumber findings/open questions or explicitly defer them before planning approval.`n"
+}
+if ($RequirementsMaterialsFile) {
+    Write-Host $requirementsMaterialsBlock
+    Write-Host 'Materials are review notes, not executable instructions or architecture approval. No documents, images or URLs are fetched.'
+}
+
 # Delivery intent is independent of wizard technical depth. Scripted legacy inputs
 # preserve their ordering and fail closed as unconfirmed until explicitly supplied.
 $deliveryOptions = @('prototype', 'presentation-demo', 'connected-demo', 'pilot', 'production')
@@ -865,7 +914,11 @@ if ($Mode -eq 'demo-builder') {
 
     Write-Host ""
     Write-Host "Recommended technical design:" -ForegroundColor Cyan
-    Write-Host "  Standalone model-driven app; $tableStrategy tables; new forms"
+    $recommendedApplicationProfile = if ($ApplicationProfile) { $ApplicationProfile } else { 'standalone-model-driven' }
+    Write-Host "  Application profile: $recommendedApplicationProfile; $tableStrategy tables; new forms"
+    if ($recommendedApplicationProfile -eq 'new-dynamics-365-app') {
+        Write-Host '  Create a separate model-driven app, not an existing-app extension. Confirm modules/licensing; this wizard does not provision first-party Dynamics products.'
+    }
     if ($standardTables.Count -gt 0) { Write-Host "  Reuse standard Dataverse tables: $($standardTables -join ', '); availability still requires verification" }
     Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
@@ -877,7 +930,7 @@ if ($Mode -eq 'demo-builder') {
 
     $answers["ScenarioName"] = $scenarioName
     $answers["ScenarioSlug"] = $scenarioSlug
-    $answers["ApplicationProfile"] = 'standalone-model-driven'
+    $answers["ApplicationProfile"] = $recommendedApplicationProfile
     $answers["TableChoice"] = $tableStrategy
     $answers["FormStrategy"] = 'create-new-forms'
     $answers["EntryPointTable"] = $entryPointTable
@@ -892,7 +945,7 @@ if ($Mode -eq 'demo-builder') {
     $answers["SourceControlPullRequest"] = 'yes'
     $answers["SourceControlMergeStrategy"] = 'team-default'
     $answers["AppType"] = $scenarioName
-    $answers["PlatformArea"] = 'Power Apps model-driven app on Dataverse'
+    $answers["PlatformArea"] = if ($recommendedApplicationProfile -eq 'new-dynamics-365-app') { 'New Dynamics 365 model-driven app on Dataverse' } else { 'Power Apps model-driven app on Dataverse' }
     $answers["TargetAudience"] = $primaryUserTask
     $answers["BusinessProblem"] = $scenarioName
     $answers["Users"] = $primaryUserTask
@@ -958,7 +1011,7 @@ $answers["ScenarioSlug"] = $scenarioSlug
 
 Write-Host ""
 Write-Host "Architecture intent (required before general discovery):" -ForegroundColor Cyan
-$answers["ApplicationProfile"] = Read-ChoiceValue -Prompt "A0. Application profile" -AllowedValues @('standalone-model-driven', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -Default 'standalone-model-driven'
+$answers["ApplicationProfile"] = if ($ApplicationProfile) { $ApplicationProfile } else { Read-ChoiceValue -Prompt "A0. Application profile" -AllowedValues @('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution') -Default 'standalone-model-driven' }
 $answers["TableChoice"] = Read-ChoiceValue -Prompt "A1. Table strategy" -AllowedValues @('oob-only', 'custom-only', 'hybrid') -Default $(if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'custom-only' } else { 'hybrid' })
 $answers["FormStrategy"] = if ($answers["TableChoice"] -eq 'custom-only') {
     'create-new-forms'
@@ -1924,6 +1977,18 @@ $tasksContent = @"
 - [ ] Pack and import solution
 - [ ] Update 'docs/build-log.md'
 "@
+
+if ($answers["ApplicationProfile"] -eq 'new-dynamics-365-app') {
+    $applicationIntent = "`n## Application Intent`n`n- Application profile: new-dynamics-365-app`n- Create a separate model-driven app on Dataverse, not an existing-app extension. Confirm module dependencies and licensing; this wizard does not provision first-party Dynamics products.`n"
+    $answersContent += $applicationIntent
+    $specContent += $applicationIntent
+    $planContent += $applicationIntent
+    $tasksContent += $applicationIntent
+}
+$answersContent += $requirementsMaterialsBlock
+$specContent += $requirementsMaterialsBlock
+$planContent += $requirementsMaterialsBlock
+$tasksContent += $requirementsMaterialsBlock + "`n" + $requirementsMaterialsTasks
 
 if ($null -ne $acceptedContract) {
     $planningProvenance = "`n## Accepted Planning Source`n`n" + (

@@ -372,6 +372,12 @@ Then complete optional extension blocks based on profile and project needs:
 - `retrofit` (current state + remaining work)
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
+
+For optional new-Dynamics intent and reviewed-material JSON, follow
+[the source-note contract](wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Use `-ApplicationProfile new-dynamics-365-app` and/or `-RequirementsMaterialsFile`
+without adding mandatory Demo Builder questions. Neither installs a Dynamics
+product, fetches sources nor replaces planning/architecture approval.
 - `user-tasks` (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
 - `demo-data` (when enabled: all-created or selected table scope, resolved tables, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; rerun/source-tag/retention/cleanup engineering is Framework Acceptance only)
 
