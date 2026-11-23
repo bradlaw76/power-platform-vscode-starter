@@ -286,7 +286,10 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
             and previous["observed_hashes"] == observed_snapshot(observed, runtime)):
         return {**previous, "replayed": True, "source_changed": False}, 0
     if (previous and previous["status"] == "blocked" and previous["intent"] == intent
-            and previous.get("category") == "deterministic"
+            and (previous.get("category") == "deterministic"
+                 or (previous.get("category") == "conflict-or-incomplete"
+                     and previous.get("current_command") == ["spec-kit", "sync"]
+                     and previous.get("exit_code") == 3))
             and previous.get("observed_hashes") == observed_snapshot(observed, runtime)):
         return {**previous, "replayed": True, "source_changed": False}, int(previous["exit_code"])
     commands: list[list[str]] = []

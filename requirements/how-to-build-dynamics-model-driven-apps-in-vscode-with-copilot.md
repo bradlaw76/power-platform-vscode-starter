@@ -24,6 +24,8 @@ re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
 Read-only Status projects canonical task counts, native IDs, dependencies,
 owner/lease holds and timestamped next actions. It does not dispatch, persist
 lease expiry or substitute coordinator eligibility for worker authorization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
 
 Keep discovery mode, delivery goal and build verification independent. Follow
 [release operating modes](../docs/release-consolidation.md): `Legacy` defaults,

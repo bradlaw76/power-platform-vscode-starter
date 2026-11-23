@@ -114,6 +114,8 @@ Read-only Status `task_summary` projects canonical counts,
 IDs, dependencies, owner/lease holds, timestamps and next actions without
 dispatch or stored lease mutation. Coordinator eligibility is not worker
 authorization, and missing/corrupt records never become zero-count success.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes; changed inputs resume and other incomplete steps retry.
 
 Explicit canonical delivery updates also apply to existing adoptions without
 re-enabling disabled synchronization. The installed CLI protocol is UTF-8 on

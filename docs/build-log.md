@@ -4,6 +4,33 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q5 isolated acceptance - 2026-11-23
+
+- Starting candidate: `a108d23d3332559ec4ccf1ca1f88497d0b3a0d9f`;
+  canonical framework unchanged at `a23096ec27de9bc1035b690dc9d49268a408d059`
+  / 0.2.1. Existing PR #13 remains the only source integration vehicle.
+- New benefits intake, partial-source assessment/native alias preservation,
+  no-Git/opt-out/disable/enable, compatible incremental changes, human conflict
+  holds and production delivery gates passed using installed commands.
+  The memory recipe ran 34 synthetic operations; the extra custom table was
+  planning-only. No tenant, package deployment or intended-user UI acceptance.
+- Retained the blocked pinned-endpoint change as a protection result rather
+  than rewriting its identity. Automatic endpoint migration remains unsupported.
+- Reproduced unchanged conflict-hold history writes with a failing installed
+  regression; fixed only stable `spec-kit sync` exit-3 replay. Changed-input
+  independent updates and non-sync incomplete retries remain supported.
+- Targeted tests: two passed in 5.006 seconds after the red regression.
+  Complete installed suite: 20 passed in 55.885 seconds. Actual WSL targeted
+  tests: two passed in 8.392 seconds; prior unchanged worker evidence retained.
+- Real controlled process exits 87/86 resumed adoption/journal work. A transient
+  launch retried, duplicate writer was blocked, Status remained read-only under
+  lock, stale receipts were not accepted and missing interpreter caused no install.
+- Corrected campaign assumptions about native folder slug, inventory envelope,
+  task prose versus exact dependency/resource mapping, locked-byte measurement
+  and blocked Status exit 3. Original and failed fixtures/logs remain external.
+- Exact source/CI/publication evidence belongs in the existing external
+  consolidation report and durable ledger; no merge, scheduler or host restart.
+
 ## Q4 runtime reliability - 2026-11-23
 
 - Starting candidate: `24e77394018ce6dd28a38c10db54dae256551283`;

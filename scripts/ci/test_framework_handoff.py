@@ -267,6 +267,30 @@ class InstalledHandoff(unittest.TestCase):
         self.assertEqual(result["status"], "blocked")
         self.assertIn(b"Human conflict", path.read_bytes())
         self.assertIn(b"Independent update.", path.read_bytes())
+        before = {file: file.read_bytes() for root in (self.project, self.runtime)
+                  for file in root.rglob("*") if file.is_file()}
+        replay, code = handoff.execute(self.args)
+        self.assertEqual(code, 3, replay)
+        self.assertTrue(replay.get("replayed"), replay)
+        self.assertEqual(before, {file: file.read_bytes() for root in (self.project, self.runtime)
+                                 for file in root.rglob("*") if file.is_file()})
+        contract["requirements"][1]["description"] += " Further independent update."
+        (self.inputs / "contract.json").write_text(json.dumps(contract))
+        resumed, code = handoff.execute(self.args)
+        self.assertEqual(code, 3, resumed)
+        self.assertNotIn("replayed", resumed)
+        self.assertIn(b"Human conflict", path.read_bytes())
+        self.assertIn(b"Further independent update.", path.read_bytes())
+
+    def test_incomplete_non_sync_step_remains_retryable(self):
+        incomplete = subprocess.CompletedProcess(["run"], 3, "", "Controlled incomplete assessment.")
+        with patch.object(handoff, "launch", return_value=(incomplete, 1)) as launch:
+            first, code = handoff.execute(self.args)
+            self.assertEqual(code, 3, first)
+            retry, code = handoff.execute(self.args)
+            self.assertEqual(code, 3, retry)
+            self.assertNotIn("replayed", retry)
+            self.assertEqual(launch.call_count, 2)
 
     def test_interrupted_journal_recovers_without_duplicating_tasks(self):
         self.start()

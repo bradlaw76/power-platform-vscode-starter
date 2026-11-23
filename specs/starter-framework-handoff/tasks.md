@@ -114,3 +114,24 @@ The actual read-only snapshot preserved all 67 selected project/runtime files
 and honestly retained stale completion; original five fixture hashes match.
 Report/ledger and existing starter/canonical issue/PR checkpoint readbacks are
 verified. Merge/audit/protection/reboot/live-acceptance gates remain separate.
+
+## Q5 end-to-end acceptance
+
+- [x] Reconcile source/runtime/ownership and preserve earlier fixture/results.
+- [x] Execute new benefits intake and standard/custom/relationship planning.
+- [x] Assess partial work, preserve native aliases and distinguish missing work.
+- [x] Verify native no-Git planning/adoption/reporting and safe continuation.
+- [x] Exercise proportional changes, delivery, conflict holds and no-write replay.
+- [x] Exercise actual interruption, transient/duplicate lock, stale and missing tools.
+- [x] Repair newly demonstrated owned defects with focused regressions if needed.
+- [x] Publish the reproducible acceptance matrix and remaining gates.
+
+Q5 A-E passed their supported synthetic contracts. An immutable endpoint change
+remained blocked; compatible relationship intent/dependencies were verified.
+One owned defect was reproduced and repaired: unchanged synchronization holds
+now preserve all bytes/exit 3 without caching other incomplete work. Targeted
+native tests passed two; the complete installed suite passed 20/0 in 55.885
+seconds; actual WSL targeted cases passed two/0 in 8.392 seconds.
+Project-specific fixtures/logs and the consolidated matrix remain in the
+existing isolated external workspace. Exact publication/CI is recorded in its
+single ledger and existing PR #13. Deployment/UI/reboot and owner gates remain.

@@ -98,3 +98,34 @@ POSIX orphan/duplicate/retry cases separately from native Windows. Do not restar
 the shared host, install services, enable workers or claim persistent execution.
 Update existing operator guidance, runtime enhancement surfaces and the single
 external status report/ledger with exact source/CI and supported limitations.
+
+## Q5 isolated end-to-end acceptance
+
+The campaign demonstrated an unchanged conflict-hold replay defect. Extend only
+the existing adapter cache for hash-identical `spec-kit sync` exit 3; preserve
+changed-input continuation and other incomplete retries. Retain immutable
+relationship endpoint protection, test a compatible relationship-intent delta,
+and report automatic endpoint migration as unverified rather than bypassing it.
+
+Use candidate a108d23 and the existing installed canonical 0.2.1 runtime.
+Prepare new immutable synthetic benefits requirements plus independent A-E
+working copies outside both source trees. Preserve prior campaigns and files.
+Select Contact/Case/Task reuse and a separately justified custom benefit-review
+table for planning; do not fabricate live availability, semantic approval or
+column payloads. Native source, memory rehearsal and tenant/UI proof stay separate.
+
+Exercise actual intake, canonical assessment/adoption/task coordination,
+four-document Spec Kit preview/sync, compile/rehearse/status and safe recovery.
+For partial work, use explicit local source and selected synthetic inventory,
+native aliases, accepted architecture and source-stage evidence; do not claim
+that arbitrary files or a memory inventory prove live components. No-Git
+projects remain no-Git. Independently exercise label/relationship/component/
+delivery changes, managed-section conflicts, unchanged replay, opt-out, actual
+process interruption, lock contention and missing optional interpreter.
+
+A finite local test harness records exact command argv, input hashes, output,
+elapsed command time, artifact/task comparisons and failures in one new external
+campaign folder. It is not a controller or scheduler. Continue independent cases,
+repair owned defects with focused regressions, and preserve failed attempts.
+Update the existing consolidated report, ledger, additive audit and issue/PR
+coordination with the acceptance matrix and exact source/CI. Do not invent Q6.

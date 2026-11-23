@@ -65,7 +65,9 @@ resume skips already completed stages.
 
 H008 recovery separately uses canonical tasks/journals and input hashes. An
 adapter crash does not permit reclaiming another owner or overwriting human
-edits. Native Windows guided execution supports Unicode/spaced paths and
+edits. Unchanged synchronization conflict holds preserve exit 3 and all document,
+journal and adapter bytes; changed inputs resume independent work. Incomplete
+non-sync steps are not cached as conflicts. Native Windows guided execution supports Unicode/spaced paths and
 child-local UTF-8. POSIX/WSL workers are bounded, explicitly configured local
 subprocesses with lease/checkpoint/orphan safeguards, not an OS sandbox or an
 installed unattended service. Linux PowerShell was not installed in the tested
@@ -82,6 +84,14 @@ Source and synthetic tests cannot establish native lifecycle, permission,
 connector, package deployment or intended-user UI proof. Use the existing
 [authorization policy](policies/authorization-and-execution.md) and report
 SOURCE COMPLETE, TESTED, DEPLOYED, LIVE VERIFIED and BLOCKED separately.
+
+Q5's isolated new/partial/no-Git/evolving/recovery campaign exercised installed
+commands and 34 synthetic memory operations. Its custom review table remained
+planning-only. A pinned relationship endpoint change was correctly blocked by
+the canonical immutable identity guard; a compatible relationship-intent change
+revisited native dependencies. Automatic endpoint migration is not verified.
+The new conflict-replay regression passed with changed-input continuation and
+non-sync retry coverage; full project logs remain outside the framework source.
 
 ## Dependency-aware PR sequence
 

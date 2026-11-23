@@ -132,6 +132,10 @@ An ordinary `start` replay does not re-enable disabled synchronization.
 Completed, hash-unchanged replay writes neither documents nor a new receipt.
 Changed inputs or canonical records invalidate cached completion. A
 deterministic unchanged failure is retained; changed blockers permit resume.
+An unchanged `spec-kit sync` document-conflict hold also returns its retained
+exit 3 without rewriting documents, journals or adapter history. Changed inputs
+resume synchronization and independent updates; other incomplete steps remain
+retryable rather than being cached as document conflicts.
 Interrupted work is reconciled by existing canonical tasks/journals, not copied
 into a second executable backlog.
 

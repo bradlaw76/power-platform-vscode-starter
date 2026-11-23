@@ -31,6 +31,8 @@ Retain every accepted table exactly once and explicit relationship business
 meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
 Use explicit canonical delivery JSON for handoff resume, not an inferred
 deadline. Preserve Unicode and disabled synchronization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
 
 Build verification is separate from discovery and delivery goals. Follow
 [release operating modes](../../../docs/release-consolidation.md): keep `Legacy`

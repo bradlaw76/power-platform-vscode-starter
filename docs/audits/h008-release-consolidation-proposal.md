@@ -252,3 +252,42 @@ additive proposal does not adopt a historical approval or change source owners.
 11. **Publication:** existing PR #13 only, no main merge or public release.
     Final exact commit, CI, changed-file manifest, logs and sanitized issue
     readbacks belong in the single external report/ledger.
+
+## Q5 additive acceptance handoff - 2026-11-23
+
+**HANDOFF NOT WRITTEN - BLOCKED** remains the canonical destination's status.
+This section is additive owned-branch evidence, not historical restoration.
+
+1. **Issue:** existing starter H008 #12/PR #13; canonical Automation Framework
+   `bradlaw76/Power-Platform-vs-code-starter-automation-pipeline#24`.
+2. **Scope/source:** starter began at `a108d23d3332559ec4ccf1ca1f88497d0b3a0d9f`;
+   canonical source/package stayed `a23096ec27de9bc1035b690dc9d49268a408d059`
+   / 0.2.1. External synthetic pilot only; no consuming customer projects.
+3. **Outcome:** A-E supported acceptance contracts passed with installed
+   commands. New/partial/no-Git planning, native aliases, independent changes,
+   disabled synchronization and mandatory production delivery controls survived.
+4. **Functional evidence:** 34 memory operations; custom review table planning
+   only. Source/component metadata is not tenant discovery or live acceptance.
+   Protected endpoint migration remained blocked; compatible intent/dependencies
+   were exercised without silently changing a pinned relationship.
+5. **Repair:** unchanged document-conflict replay previously reran sync/history.
+   A failing installed regression identified the adapter's missing exit-3 cache.
+   Stable sync holds now replay without writes; changed inputs resume independent
+   work and other incomplete steps remain retryable.
+6. **Tests:** targeted native 2/0 in 5.006 seconds; complete installed 20/0 in
+   55.885 seconds; actual WSL targeted 2/0 in 8.392 seconds. The initial explicit
+   fixture-free check skipped two tests and was not counted as verification.
+7. **Recovery:** controlled actual exits 87/86, bounded transient launch, duplicate
+   lock, read-only Status under lock, stale receipt and missing interpreter.
+   Original fixtures, prior results and failed working copies remain preserved.
+8. **Remaining:** automatic immutable-endpoint migration, real custom payload
+   execution, deployment/intended-user UI and OS-reboot persistence unverified.
+   Existing merge/audit/protection ownership decisions remain.
+9. **Diagnosis:** campaign errors involved folder slug, inventory envelope,
+   prose-based mapping predicate, locked-byte hashing and Status exit convention.
+   Those were corrected in the external driver, not disguised as product repairs.
+10. **Next actions:** review existing PR and owner gates; propose any separately
+    controlled endpoint-migration objective for ChatGPT allocation, without a new
+    H-number, identity rewrite, scheduler or deployment. Q6 scope is not supplied.
+11. **Publication:** existing PR #13 only. Exact commit, full CI and sanitized
+    coordination readbacks are recorded in the single external report/ledger.
