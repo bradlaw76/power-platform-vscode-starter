@@ -63,11 +63,11 @@ issue #12 and the external release report, not inferred from these tests.
 - [x] Adapt optional new-Dynamics intent and reviewed-material notes safely.
 - [x] Adapt the independent explicit scenario-slug guard.
 - [x] Verify prompt compatibility, typed standard reuse, source quoting and invalid inputs.
-- [ ] Align runtime guidance and publish exact candidate/CI evidence.
-- [ ] Coordinate all six dispositions and the remaining owner-dependent sequence.
+- [x] Align runtime guidance and publish exact candidate/CI evidence.
+- [x] Coordinate all six dispositions and the remaining owner-dependent sequence.
 
 Local combined-tree verification passed 25 standalone suites, 104 Pester tests,
-16 installed handoff tests, 105 Markdown documents and 68 PowerShell parses;
+16 installed handoff tests, Markdown lint and 68 PowerShell parses;
 the configured analyzer was clean. The native fixtures exercise both acceptance
 and rejection, unchanged prompt budgets, standard Contact/Case reuse, quoted
 source configuration parsing and invalid review input.

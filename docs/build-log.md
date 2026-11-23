@@ -6,6 +6,15 @@ Use this to document what was planned, built, validated, and promoted.
 
 ## Q2 independent PR reconciliation - 2026-11-23
 
+- Runtime checkpoint: `54942e3e1a5687096d2fc45be19174191a9118c6`;
+  [exact-head CI 45174080150](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/45174080150)
+  passed. Fresh checks: 25 standalone suites, 104 Pester tests (zero failed),
+  16 installed handoff tests, JSON/schema validation, 68 PowerShell parses,
+  configured analyzer and Markdown lint.
+- [Issue #12 disposition record](https://github.com/bradlaw76/power-platform-vscode-starter/issues/12#issuecomment-7101172953)
+  and PR #13 retain the final source/CI checkpoint. Owner coordination on #3,
+  #5 and #6 records exact remaining defects/gates without resolving unfixed
+  threads, changing their branches or activating protection/release behavior.
 - Baseline candidate: `5f8dce918910d2eed26637871087ae490184a36a`.
   #11/#7 remain ancestors; #4 is contained in #5. No owner PR was merged,
   closed or rewritten; newly observed H009 work is independent.
