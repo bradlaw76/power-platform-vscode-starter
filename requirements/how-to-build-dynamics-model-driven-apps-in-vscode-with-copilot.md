@@ -22,6 +22,12 @@ lookup, while one-to-many requires it.
 Existing handoff adoptions accept explicit canonical delivery updates without
 re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
 
+Keep discovery mode, delivery goal and build verification independent. Follow
+[release operating modes](../docs/release-consolidation.md): `Legacy` defaults,
+explicit `Demo`/`Acceptance`, independent rerun/export options and unchanged
+mandatory gates. Resume requires the same execution mode/effective policy;
+none of these selections authorizes Apply or installs automation.
+
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
   guided, question-by-question process that walks users from principles and
   Spec Kit setup through design, build, validation, and handoff.

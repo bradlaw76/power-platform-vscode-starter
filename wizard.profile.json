@@ -158,6 +158,15 @@
     ]
   },
   "execution": {
+    "verificationProfiles": {
+      "default": "Legacy",
+      "intakeModeIndependent": true,
+      "supported": ["Legacy", "Demo", "Acceptance"],
+      "demoIdempotencySwitch": "VerifyIdempotency",
+      "demoExportSwitch": "ExportSolution",
+      "resumeRequiresSameModeAndEffectivePolicy": true,
+      "requiredMembershipAndSecurityGatesPreserved": true
+    },
     "coreModules": [
       "00-prereq-check.ps1",
       "10-auth-connect.ps1",

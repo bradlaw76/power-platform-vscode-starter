@@ -26,3 +26,17 @@ Repair the outstanding accepted-table coverage finding first. Preserve other
 PR ownership; merge, security-policy changes and live execution require their
 actual applicable gates. Keep scenario data and the single maintainer ledger
 in the existing external pilot root.
+
+## Release consolidation
+
+Use tested `bc4f7c85ccb9a57df77da3b70fe02f27273c3cbb` as the baseline.
+Integrate compatible #11 guidance and #7 verification profiles only into the
+owned H008 candidate, preserve Legacy/default gates and align existing guides.
+Resolve already-repaired review threads without inventing merge approval.
+Trace divergent canonical audit records and prepare the requested additive
+proposal pending owner selection, not a fabricated historical restoration.
+Keep #6 protection, #5/#4 identity-policy reconciliation and #3's mixed
+application/discovery-budget changes gated. Validate fresh independent native
+new/partial projects, exact Spec Kit updates, installed handoff, WSL workers and
+full applicable source regressions. Record final commits/CI/report in the same
+maintainer ledger and existing PR/issues; no new controller or main merge.

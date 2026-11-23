@@ -21,6 +21,11 @@ Important process rule:
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.
+- Discovery mode, delivery goal and build verification profile are independent.
+  `90-run-build.ps1` defaults to `Legacy`; explicitly selected `Demo` skips
+  optional second-pass/export deliverables, not first-pass/security/membership
+  gates. See [release operating modes](release-consolidation.md). No profile
+  authorizes Apply, maps from intake automatically or installs a worker.
 
 ---
 

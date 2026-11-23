@@ -52,6 +52,16 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
 
+Build verification is independently selected with `90-run-build.ps1
+-VerificationProfile Legacy|Demo|Acceptance`; `Legacy` remains the default.
+`Demo` skips optional second-pass checks/export unless `-VerifyIdempotency` or
+`-ExportSolution` is explicitly selected. Existing payload prerequisites and
+final membership/security gates remain; `Acceptance` retains the legacy
+payload-dependent coverage, not a new exhaustive verifier. Profile selection
+never grants Apply authorization or follows automatically from discovery mode/
+delivery goal. Resume binds execution mode and effective verification policy.
+See [release operating modes](release-consolidation.md).
+
 ## Delivery target, timeframe and optional automation
 
 Every mode, including retrofit, first captures (or reuses) two plain-language answers:

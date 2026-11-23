@@ -36,3 +36,13 @@ on its recorded candidate tree, not merged. Protection/no-Git reconciliation,
 live deployment/security/lifecycle/UI proof and unattended persistence remain
 owner-gated or unverified, not completed consumer tasks. See issue #12 and the
 external consolidated follow-on report for exact evidence and next actions.
+
+## Release consolidation
+
+- [x] Reconcile main/reviews and resolve the verified repaired review thread.
+- [x] Incorporate eligible #11/#7 into the owned candidate without main/owner writes.
+- [x] Trace divergent audit provenance and prepare an additive proposal.
+- [x] Align installation/adoption/mode/recovery guidance and profile metadata.
+- [ ] Validate fresh independent native new/partial projects and Spec Kit deltas.
+- [ ] Run warranted complete regressions and actual WSL worker recovery.
+- [ ] Persist final candidate/CI/report and all unresolved owner gates.

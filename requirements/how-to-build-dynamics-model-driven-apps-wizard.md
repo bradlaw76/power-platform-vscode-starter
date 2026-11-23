@@ -23,6 +23,12 @@ lookup, while one-to-many requires it.
 Existing handoff adoptions accept explicit canonical delivery updates without
 re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
 
+Keep discovery mode, delivery goal and build verification independent. Follow
+[release operating modes](../docs/release-consolidation.md): `Legacy` defaults,
+explicit `Demo`/`Acceptance`, independent rerun/export options and unchanged
+mandatory gates. Resume requires the same execution mode/effective policy;
+none of these selections authorizes Apply or installs automation.
+
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
 
 - Ask each question block in order.

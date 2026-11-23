@@ -29,6 +29,12 @@ meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
 Use explicit canonical delivery JSON for handoff resume, not an inferred
 deadline. Preserve Unicode and disabled synchronization.
 
+Build verification is separate from discovery and delivery goals. Follow
+[release operating modes](../../../docs/release-consolidation.md): keep `Legacy`
+by default; explicitly select `Demo`/`Acceptance` and independent rerun/export
+options only within accepted scope. Preserve mandatory gates and same-mode/
+policy resume identity.
+
 ## Runtime Compatibility Preflight
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.

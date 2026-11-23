@@ -7,6 +7,12 @@ mandatory discovery question, build stage, installation or deployment.
 
 ## Before starting
 
+Use the [release consolidation guide](release-consolidation.md) to distinguish
+the selected installed source/package from an unmerged candidate. A copied
+skill or repository link is not installation. Build verification profiles are
+separate from this handoff's delivery JSON and do not grant synchronization,
+worker, Apply or deployment authorization.
+
 - Select an external consumer project and a separate external runtime folder.
   Neither may be inside either framework source tree or overlap the other.
 - Complete the selected `specs/<slug>/spec.md`, `plan.md` and `tasks.md`.

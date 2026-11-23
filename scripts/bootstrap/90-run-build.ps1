@@ -2,16 +2,17 @@
 =============================================================================
 COMPONENT:    Orchestrated Wizard Build
 FILE:         scripts/bootstrap/90-run-build.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-24
+LAST UPDATED: 2026-11-22
 ENVIRONMENT:  PowerShell 7 | Power Platform Bootstrap Runtime
 
 -----------------------------------------------------------------------------
 OVERVIEW
 -----------------------------------------------------------------------------
 Plans or runs a scenario build in contract order with fail-fast gates, resume
-state, and machine-readable plus human-readable summaries.
+state, explicit verification profiles, and machine-readable plus human-readable
+summaries. Legacy remains the default; Demo options never authorize Apply.
 
 -----------------------------------------------------------------------------
 ARCHITECTURE

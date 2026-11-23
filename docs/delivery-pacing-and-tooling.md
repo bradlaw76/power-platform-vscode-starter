@@ -29,6 +29,13 @@ The terminal timeframe must be a single line. Line breaks are rejected so a supp
 
 These are **planning profiles**, not executable bypass switches. Existing CI requirements, environment authorization, safety, security, exact-identity, backup and deployment checks still apply. Nightly full regressions are optional only where an actual runner/scheduler exists and the task warrants it; no scheduler is installed by these instructions.
 
+The independently selected build verification profile is described in
+[release operating modes](release-consolidation.md). `Legacy` is the default;
+`Demo` explicitly skips optional rerun/export deliverables, with independent
+opt-ins and unchanged mandatory gates. `Acceptance` retains existing
+payload-dependent verification. Do not translate a delivery goal into a runtime
+profile without the existing consolidated confirmation.
+
 ## Beginner-safe tool discovery
 
 - Check what is already installed and authorized before recommending setup. Explain missing tools in plain language.

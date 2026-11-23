@@ -36,6 +36,11 @@ Use this behavior:
   meaning. Native many-to-many has no child lookup; one-to-many requires it.
   Use explicit canonical delivery JSON for handoff resume, not an inferred
   deadline. Preserve Unicode and disabled synchronization.
+- Keep discovery mode, delivery goal and build verification independent.
+  Follow [release operating modes](../../docs/release-consolidation.md):
+  `Legacy` is default; `Demo`/`Acceptance` and rerun/export options require
+  explicit selection, never waive mandatory gates or authorize Apply, and
+  changed execution/verification policy cannot reuse old resume evidence.
 - Supported application profiles are `standalone-model-driven`, `dynamics-sales-extension`, `dynamics-customer-service-extension`, `dynamics-field-service-extension`, and `generic-dataverse-solution`.
 - In Demo Builder, infer the application profile, table/form strategy, entry-point table, named landing view, required app artifacts, navigation group, and solution identity, then confirm them together. In detailed modes, ask them directly. The review app is required for new profile-based runs.
 - After explicit table mapping, validate that the entry-point logical name resolves to a reused standard table, planned custom table, or current retrofit inventory table. For a uniquely planned new custom table, record `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and `create-custom` for a distinct business view. Record `explicit-decision-required` for standard, hybrid-standard, shared, preexisting, retrofit, or ambiguous tables; never guess adoption. Treat the disposition as planning intent only and retain step 60's strict live provenance and metadata proof. Block app assembly until explicit decisions are resolved and the saved query resolves in Dataverse.

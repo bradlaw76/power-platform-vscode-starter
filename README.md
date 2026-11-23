@@ -57,8 +57,16 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
 | Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals and opt-in synchronization; no scheduler or live deployment |
+| Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+The [release consolidation guide](docs/release-consolidation.md) distinguishes
+installed functionality from unmerged candidate capabilities, explains native
+Windows/WSL recovery, and records the dependency-aware PR integration sequence.
+The [additive audit proposal](docs/audits/h008-release-consolidation-proposal.md)
+locates historical handoffs without selecting or rewriting their divergent
+branch records.
 
 ### What happens when you use this starter
 

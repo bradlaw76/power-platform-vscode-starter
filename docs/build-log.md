@@ -4,6 +4,34 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## H008 release consolidation - 2026-11-22
+
+- Baseline: `bc4f7c85ccb9a57df77da3b70fe02f27273c3cbb`; main still
+  `632d00cbe38bbee753f4c4e7f4b5d1fb8d4afc8a`. The repaired accepted-table
+  review thread was resolved. No approving review/scoped main-merge permission
+  was recorded; mergeability and successful checks are not authorization.
+- Incorporated #11/#7 history only into the owned candidate through
+  `7909606f42d4e1ea4b2e869f7bc8fb692c5635ef` and
+  `2dea71075d5f30ae46585ffd7c2a38c8319ec3bc`.
+  All 154 profile assertions passed on this actual candidate; stage bodies
+  were synthetic stubs. Other PR branches and main were not changed.
+- [Release operating modes](release-consolidation.md) align existing guidance
+  and profile metadata. Legacy stays default; explicitly selected Demo skips
+  optional second-pass/export, retaining first-pass/security/membership gates.
+  Resume binds execution mode/effective policy; old/cross-policy state is rejected.
+- Canonical audit destination was found in divergent unmerged #5/#6 history.
+  The [additive proposal](audits/h008-release-consolidation-proposal.md) preserves
+  exact provenance and owner recovery steps without inventing historical records.
+  Canonical restoration remains HANDOFF NOT WRITTEN - BLOCKED until the
+  historical base and adopted protection/authorization path are selected.
+- #6 protection adoption, #5/#4 strict Git versus no-Git compatibility, and
+  #3's generic/application separation and added discovery-prompt budget require
+  owner reconciliation. No hooks, security settings or application artifacts
+  were adopted by inference.
+- Initial contract integrity and full 104-file Markdown lint passed. Fresh
+  journey, complete regression and final exact-SHA CI/report receipts follow
+  in the existing PR/issue and external single status record.
+
 ## H008 follow-on review and recovery - 2026-11-22
 
 - Reproduced PR #13's accepted-table subset finding before fixing it. Intake
