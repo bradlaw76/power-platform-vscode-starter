@@ -129,3 +129,15 @@ campaign folder. It is not a controller or scheduler. Continue independent cases
 repair owned defects with focused regressions, and preserve failed attempts.
 Update the existing consolidated report, ledger, additive audit and issue/PR
 coordination with the acceptance matrix and exact source/CI. Do not invent Q6.
+
+## Q6 final release hardening
+
+Pin the Q5 runtime candidate, reconcile current owner heads and reuse unchanged
+native/WSL/regression evidence. Check documentation links, profile files,
+installed dependency consistency and workflow/containment controls read-only.
+Validate documented commands without installing into the operator home. Prepare
+dated release notes, onboarding/migration/host limits and an explicit five-row
+assessment of the existing source spec; do not substitute task or speed metrics.
+Publish documentation only through existing PR #13 with exact-head CI. Record
+all remaining merge, audit, protection, deployment and restart decisions in the
+single external report/ledger; no tag or public release without owner authority.

@@ -135,3 +135,17 @@ seconds; actual WSL targeted cases passed two/0 in 8.392 seconds.
 Project-specific fixtures/logs and the consolidated matrix remain in the
 existing isolated external workspace. Exact publication/CI is recorded in its
 single ledger and existing PR #13. Deployment/UI/reboot and owner gates remain.
+
+## Q6 final release hardening
+
+- [x] Reconcile exact source, PR dispositions, reviews and owner gates.
+- [x] Verify warranted docs/configuration/security checks and preserve test evidence.
+- [x] Publish release notes and accurate new/existing/no-Git onboarding limits.
+- [x] Assess existing source criteria with an explicit denominator and evidence.
+- [x] Commit/push existing candidate, verify exact-head CI and coordination.
+- [x] Finalize the one report/ledger; stop with only external decisions remaining.
+
+The final documentation-only delivery uses existing PR #13 and the unchanged
+Q5 runtime. Exact publication SHA, CI and readbacks are recorded in the existing
+external report/ledger. Source coverage is 5/5; promotion and live/reboot controls
+remain distinct owner gates. No tag, merge, public release or new workstream.

@@ -4,6 +4,31 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q6 release hardening - 2026-11-23
+
+- Q5 runtime pin: `563aa7361cc3a1648827dd6d8bc765f5eb77bd10`; canonical
+  `a23096ec27de9bc1035b690dc9d49268a408d059` / 0.2.1 unchanged. Only release
+  documentation/planning/audit additions; no new runtime/controller or tag.
+- Reused exact Q5 native 20/20, WSL targeted 2/2 and CI 45187350143 (Pester
+  104/0; hosted Python four passed/16 installed skipped). Earlier unchanged
+  WSL worker/status recovery remains separate retained evidence.
+- Read-only local link/profile/workflow/filename checks passed. Dependency
+  consistency passed; the installed framework declares no runtime dependencies.
+  The documented direct SkillParity command actually passed 60/0 in 2.41s;
+  no command defect was assumed from inspecting only its opening test blocks.
+- Source/workflow controls are bounded evidence: read-only token permissions,
+  immutable action pins, non-persisted checkout credentials and a manual mutation
+  confirmation. Secret scanning/push protection already enabled; main remains
+  unprotected with no rulesets. No credential values, alert contents or live
+  workflow inspected/executed; no comprehensive CVE/OS/security certification.
+- Dated release notes cover new/partial/no-Git adoption, versions, scope,
+  disabled-sync/resume migration and native Windows/WSL/macOS/reboot limits.
+  The existing five source spec statements are met, 5/5 (100% source coverage),
+  not deployment, task-completion, development-speed or promotion approval.
+- Exact final documentation commit/CI/readbacks are recorded in existing PR #13
+  and the single external report/ledger. Main merge, audit destination authority
+  and original protection decisions remain; no public package/tag is authorized.
+
 ## Q5 isolated acceptance - 2026-11-23
 
 - Starting candidate: `a108d23d3332559ec4ccf1ca1f88497d0b3a0d9f`;

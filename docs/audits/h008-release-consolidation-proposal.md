@@ -291,3 +291,42 @@ This section is additive owned-branch evidence, not historical restoration.
     H-number, identity rewrite, scheduler or deployment. Q6 scope is not supplied.
 11. **Publication:** existing PR #13 only. Exact commit, full CI and sanitized
     coordination readbacks are recorded in the single external report/ledger.
+
+## Q6 additive release handoff - 2026-11-23
+
+**HANDOFF NOT WRITTEN - BLOCKED** remains the canonical-path result. Preserve
+every previous section and source attribution; no approval record is fabricated.
+
+1. **Issue:** existing starter #12/PR #13 and canonical
+   `bradlaw76/Power-Platform-vs-code-starter-automation-pipeline#24`.
+2. **Source:** Q5 runtime `563aa7361cc3a1648827dd6d8bc765f5eb77bd10`; canonical
+   `a23096ec27de9bc1035b690dc9d49268a408d059` / 0.2.1. Q6 is documentation-only.
+3. **Readiness:** five existing source spec statements met, 5/5 (100% source
+   coverage), not live acceptance, task completion or permission to promote.
+4. **Benefits:** preserved architecture/IDs/docs, proportional synchronization,
+   UTF-8/delivery/disable behavior, bounded process recovery and read-only status.
+5. **Reconciliation:** existing owner PR heads/H009 unchanged; #11/#7 in
+   candidate, #3/#5 generic subsets only; #4/#5/#6 original policy gates remain.
+   No original PR closure, merge, rewrite or competing writer.
+6. **Verification:** reuse Q5 native 20/0, WSL targeted 2/0, exact CI/Pester
+   104/0; hosted installed cases skipped explicitly. New documentation command
+   check passed SkillParity 60/0 (overlaps CI, not an additional distinct suite).
+   Scoped link/profile/parameter/workflow/dependency checks are recorded externally.
+7. **Security/containment:** existing CI/boundary proof retained; read-only
+   permissions, action pins and manual integration gates inspected. Server
+   secret scanning/push protection enabled; main unprotected/no rulesets.
+   No comprehensive secret/CVE/OS audit or live workflow certification.
+8. **Remaining:** exact promotion authority, canonical audit base/index,
+   original protection adoption/repair and actual deployment/UI/reboot evidence.
+   macOS and Linux PowerShell were not exercised.
+9. **Repairs/retries:** no new runtime defect or installation. Release notes
+   clarify supported scope and provenance; no unchanged failed retry or duplicate
+   full installed campaign. One external AST probe used a process-relative path;
+   correcting it to the absolute source path passed without source edits.
+   Bounded existing CI is required for publication.
+10. **Next objectives:** owner/ChatGPT scopes controlled identity migration,
+    original protection repairs, canonical audit restoration, real live acceptance
+    and persistence through the existing controller. No H-number assigned.
+11. **Delivery:** owner-review candidate only in existing PR #13; no tag/public
+    release. Final source/CI, sanitized milestone readbacks, criterion matrix and
+    the precise remaining decisions belong in the one external report/ledger.

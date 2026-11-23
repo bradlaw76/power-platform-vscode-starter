@@ -66,6 +66,8 @@ For changes to these enhancements, keep the profile, prompt, both shipped skill 
 The [release consolidation guide](docs/release-consolidation.md) distinguishes
 installed functionality from unmerged candidate capabilities, explains native
 Windows/WSL recovery, and records the dependency-aware PR integration sequence.
+Its [release-candidate notes](docs/release-consolidation.md#release-candidate-notes---2026-11-23)
+cover verified features, adoption/migration limits and outstanding owner gates.
 The [additive audit proposal](docs/audits/h008-release-consolidation-proposal.md)
 locates historical handoffs without selecting or rewriting their divergent
 branch records.

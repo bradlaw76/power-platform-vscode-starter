@@ -137,3 +137,88 @@ hashes are recovery evidence, not a backup of dirty files or tenant data.
 Historical task-specific backup exceptions do not carry forward. Rollback
 requires reviewed scope and applicable commit/push or deployment authorization;
 no automatic reset, full-workspace restore or import is provided.
+
+## Release candidate notes - 2026-11-23
+
+**Status:** reviewable H008 source/synthetic candidate in existing PR #13, not
+merged main, a published package/tag, a deployed app or an unattended service.
+Runtime baseline is `563aa7361cc3a1648827dd6d8bc765f5eb77bd10`; final documentation
+commit/CI and the full acceptance matrix are recorded in the single external
+consolidation report and maintainer ledger. No new H-number is allocated.
+
+### User-facing changes
+
+- Accepted standard/custom table selection and relationship meaning survive
+  intake; existing components and source-only evidence are distinguished from
+  missing work and live metadata.
+- Native task IDs, manual documents and accepted decisions remain intact through
+  explicit four-document Spec Kit adoption, proportional updates and local holds.
+- UTF-8 Windows transport, explicit delivery updates and disabled-sync persistence
+  remove avoidable correction/reapproval cycles without granting deployment.
+- Durable receipts and canonical journals support interrupted-process resume;
+  bounded retries and independent eligibility avoid global stalls.
+- Read-only task/lease/dependency Status exposes concrete next actions without
+  dispatch. Unchanged sync holds now preserve exit 3 and all bytes/history.
+- Explicit `Legacy`/`Demo`/`Acceptance` verification and independent rerun/export
+  switches preserve required security/membership gates. Optional workload/source
+  notes and strict explicit slugs do not add mandatory business questions.
+
+### Installation, onboarding and migration
+
+Acquire the full authoring runtime at an owner-reviewed commit, not a lone skill
+or an assumed latest `main`. Git is needed to acquire a clone, but consumer
+projects using an already installed guided runtime need not initialize Git.
+Use a non-OneDrive isolated checkout and separate consumer/runtime roots.
+No automatic source upgrade, package install or protection-hook activation.
+
+| Path | Required operator behavior |
+| --- | --- |
+| New project | Follow authoritative onboarding; confirm architecture and scenario planning before build. Explicitly opt in to the installed handoff/synchronization. Custom payloads still need approved semantic field decisions. |
+| Existing app/solution | Use `05-start-wizard.ps1 -Retrofit`; inventory current tables/forms/views/relationships and solution first. Keep current state in spec and remaining work in plan. Review `-AdoptionPath` mappings without changing native identifiers. Source evidence is not live existence. |
+| Existing project without Git | Guided planning/adoption/rehearsal/Status do not create a repository. Keep accepted source contracts and stable external folders; consumer source-control choices remain explicit. |
+| Existing H008 adoption | Resume the same owner, files, IDs and roots. Keep synchronization disabled until explicit enable. Changed source invalidates old receipts; never rewrite them as current/live evidence. |
+| Build-profile migration | Preserve scenario, target, payload and effective verification policy; a mismatch requires separately reviewed fresh state, not deleting checkpoints. |
+| Relationship migration | Compatible intent changes revisit dependencies; pinned endpoint/kind changes remain protected. No automatic identity migration, deletion/recreation or managed-component rewrite. |
+
+Requirements: PowerShell 7 for native guided commands; explicitly selected
+`power-platform-demo-builder` 0.2.1 with Python 3.11+ for H008; full profile,
+helpers, schemas and guides. The framework declares no third-party runtime
+dependencies; `setuptools>=68` is a build-time dependency, not an auto-install
+step. Wizard profile 1.6, contract 1.10.0 and package 0.2.1 are different versions.
+PAC CLI/authentication and approved target/semantic contracts are needed for
+actual Dataverse work, which was not performed in this campaign.
+
+| Host | Evidence and limits |
+| --- | --- |
+| Native Windows | Guided new/partial/no-Git intake, handoff, UTF-8, sync, synthetic rehearsal and read-only status verified. Supervised native Windows workers unsupported. |
+| WSL/POSIX | Existing bounded worker/orphan/timeout/fair-retry recovery and new conflict replay verified separately. Linux PowerShell was absent; Windows PowerShell tests do not prove Linux equivalents. |
+| macOS | Listed as a worker host in the profile; not exercised by this campaign. |
+| Machine reboot | No persistent startup controller established, host restart or service enabled; process recovery does not prove reboot persistence. |
+
+### Acceptance and owner decisions
+
+The five source acceptance statements in
+[the existing H008 spec](../specs/starter-framework-handoff/spec.md) have
+evidence-backed outcomes: **5/5 (100%) source-contract coverage**. This is not
+development speed, canonical task completion, promotion authorization, live
+application completeness or production readiness. Deployment/public release/
+native Windows worker supervision were excluded by that spec, not silently
+treated as passed.
+
+Exact main merge authority, canonical audit base/index authority and original
+protection repair/adoption decisions remain outstanding. Main is currently
+unprotected; passing CI is not enforcement or approval. Do not claim the
+uninstalled #6 staged/outgoing hooks or #5 coupled archives are fixed/enabled.
+Repository metadata reports secret scanning and push protection enabled, but
+alert contents were not inspected and no comprehensive CVE/OS audit was performed.
+These existing controls do not enforce branch approvals or repair local hooks.
+The manual Dataverse integration workflow was not executed or live-certified;
+its confirmation/secrets gates do not replace current scoped deployment approval
+and validation of every current scenario/semantic contract.
+
+Recommended next objectives for owner/ChatGPT scoping, without allocating a
+number: controlled identity-safe relationship migration; repairs/adoption of
+original protection packages; authorized canonical audit restoration; real
+deployment/UI/managed-ownership acceptance; and persistent recovery through the
+existing canonical controller with separate restart authorization. No competing
+controller, automatic cleanup, credential change or public release is proposed.
