@@ -104,3 +104,19 @@ different maintenance records. The
 records immutable provenance and the required owner selection without inventing
 or combining historical approvals/results. No canonical audit restoration or
 protection bypass is claimed.
+
+Q3's [governance baseline](audits/h008-release-consolidation-proposal.md#q3-evidence-based-governance-baseline---2026-11-23)
+records immutable audit blob IDs, historical versus current authority,
+H-number/writer ownership and tested versus unavailable protections. Five
+current installed boundary tests passed; direct uninstalled #6 hooks in a
+synthetic repository demonstrated six rejections, but the staged-blob and
+outgoing-ref gaps were reproduced unfixed. No hook or server protection was
+enabled. Passing CI does not enforce an unprotected main branch.
+
+Use an explicit non-OneDrive isolated checkout, inspect its exact branch/full
+SHA/remotes/dirty state and preserve other writers. Keep project/runtime roots
+separate from framework source. Retained source commits and original fixture
+hashes are recovery evidence, not a backup of dirty files or tenant data.
+Historical task-specific backup exceptions do not carry forward. Rollback
+requires reviewed scope and applicable commit/push or deployment authorization;
+no automatic reset, full-workspace restore or import is provided.

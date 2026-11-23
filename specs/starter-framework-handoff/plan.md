@@ -58,3 +58,20 @@ handoff/planning/schema/documentation regressions and exact-head hosted CI.
 Keep #6 containment activation, #5/#4's coupled safeguards/skills and #3's
 application changes owner-gated. Record a disposition for each PR; never close,
 rewrite or merge another owner's PR. Keep newly observed H009 work independent.
+
+## Q3 governance reconciliation
+
+Inspect immutable canonical-audit blobs and their policy lineage on main and
+the existing PR branches. Preserve original dates, attribution and bytes;
+do not select an unapproved historical base or copy a handoff as restoration.
+Append an evidence-based governance baseline to the existing additive proposal.
+Reuse main's authorization policy and existing H-number/one-writer guidance.
+
+Verify current H008 write/lock boundaries with existing installed tests.
+Exercise unadopted #6 ownership/hooks only by direct invocation in a separate
+synthetic Git fixture, with no hook installation or network publication.
+Report demonstrated rejections separately from known staged-index/outgoing-ref
+gaps. Do not repair or adopt another owner's protection package under a
+manufactured maintenance context. Recheck current CI/rules/local activation,
+document isolated non-OneDrive and non-destructive recovery boundaries, and
+retain the existing external report/ledger and PR #13 coordination.

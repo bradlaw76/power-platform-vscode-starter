@@ -78,3 +78,18 @@ Do not create or relabel a branch to bypass that context, activate their hooks,
 or treat the current PR-update grant as full protection-package adoption.
 The residual #3 Choice-migration finding remains outside the generic intake
 adaptation and requires separated application/migration scope.
+
+## Q3 governance reconciliation
+
+- [x] Refresh audit-path/policy history and immutable owner branch heads.
+- [x] Verify canonical H008/H009 ownership and current handoff authority limits.
+- [x] Exercise supported write/lock boundaries and isolated proposed hook checks.
+- [x] Reconcile the existing additive proposal without replacing historical blobs.
+- [x] Document active versus proposed protections and recovery/backup limitations.
+- [x] Publish verified governance evidence and precise owner decisions.
+
+Five current installed boundary tests passed. Direct invocation of immutable
+PR #6 hooks in an isolated synthetic repository demonstrated six rejections
+and one valid baseline; staged-blob and outgoing-ref gaps were reproduced
+unfixed, not counted as protection successes. No hooks were installed, refs
+pushed, approval records fabricated or application repositories changed.

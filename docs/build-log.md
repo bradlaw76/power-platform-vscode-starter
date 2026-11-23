@@ -4,6 +4,26 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q3 governance reconciliation - 2026-11-23
+
+- Starting candidate: `487b56a939807b7409c474f255fa31c5d1faa2ec`.
+  Immutable audit/policy histories were inspected without changing their
+  original content, dates, attribution, branches or allocation.
+- Existing additive audit proposal extended with a governance baseline and
+  complete transferable handoff. Canonical restoration remains
+  **HANDOFF NOT WRITTEN - BLOCKED** pending explicit base/index authority.
+- Fresh tests: five installed write/lock/owner/conflict/replay boundaries
+  passed. Direct invocation of proposed #6 hooks in a synthetic repository
+  verified one baseline and six rejections; staged-blob/outgoing-ref violations
+  were accepted and recorded **REPRODUCED UNFIXED**, not as protection success.
+- No local hook installation, server rule/security change, network push from
+  fixtures, application modification, backup change or live deployment.
+  Original five fixture hashes and source recovery commits remain intact.
+- Exact final source/CI/publication and owner decisions remain in existing
+  [issue #12](https://github.com/bradlaw76/power-platform-vscode-starter/issues/12#issuecomment-7101630766)/PR #13
+  and the single external report/ledger. Owner coordination on #5/#6 preserves
+  the historical audit snapshots and records unfixed guard reproductions.
+
 ## Q2 independent PR reconciliation - 2026-11-23
 
 - Runtime checkpoint: `54942e3e1a5687096d2fc45be19174191a9118c6`;
