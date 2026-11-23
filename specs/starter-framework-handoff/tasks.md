@@ -102,4 +102,15 @@ pushed, approval records fabricated or application repositories changed.
 - [x] Verify native no-write status, leases, recovery, retries and stale evidence.
 - [x] Verify targeted actual WSL supervision separately; record reboot limits.
 - [x] Align status operating guide and runtime enhancement documentation.
-- [ ] Publish exact source/CI and the single operational report/ledger.
+- [x] Publish exact source/CI and the single operational report/ledger.
+
+Runtime source `8f3b414b3ac3e43417285766460a5727a9cdc3a9` and exact-head
+[CI 45181712529](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/45181712529)
+passed. Native installed suite: 19; targeted WSL process recovery: four;
+new WSL status cases: three. Hosted CI passed 104 Pester tests and all configured
+checks; its four independent handoff guards passed, with 15 installed cases
+explicitly skipped rather than misrepresented as installed verification.
+The actual read-only snapshot preserved all 67 selected project/runtime files
+and honestly retained stale completion; original five fixture hashes match.
+Report/ledger and existing starter/canonical issue/PR checkpoint readbacks are
+verified. Merge/audit/protection/reboot/live-acceptance gates remain separate.
