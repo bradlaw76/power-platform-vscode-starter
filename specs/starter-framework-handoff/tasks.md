@@ -43,6 +43,15 @@ external consolidated follow-on report for exact evidence and next actions.
 - [x] Incorporate eligible #11/#7 into the owned candidate without main/owner writes.
 - [x] Trace divergent audit provenance and prepare an additive proposal.
 - [x] Align installation/adoption/mode/recovery guidance and profile metadata.
-- [ ] Validate fresh independent native new/partial projects and Spec Kit deltas.
-- [ ] Run warranted complete regressions and actual WSL worker recovery.
-- [ ] Persist final candidate/CI/report and all unresolved owner gates.
+- [x] Validate fresh independent native new/partial projects and Spec Kit deltas.
+- [x] Run warranted complete regressions and actual WSL worker recovery.
+- [x] Persist final candidate/CI/report and all unresolved owner gates.
+
+Release executable checkpoint:
+`d5a36e2876157ed6d5329d11b3aa76279600c68d`. Fresh verification passed
+34 pilot assertions/34 synthetic operations, 16 installed native tests,
+16 actual POSIX worker tests, 25 standalone suites and 104 Pester tests.
+The isolated relationship increment affected 18 tasks after the label step;
+actual managed changes/dependencies and unrelated-section preservation were
+checked. Final documentation SHA/CI and owner-gated outcomes are recorded in
+issue #12 and the external release report, not inferred from these tests.

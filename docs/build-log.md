@@ -31,6 +31,26 @@ Use this to document what was planned, built, validated, and promoted.
 - Initial contract integrity and full 104-file Markdown lint passed. Fresh
   journey, complete regression and final exact-SHA CI/report receipts follow
   in the existing PR/issue and external single status record.
+- Fresh isolated candidate verification at
+  `d5a36e2876157ed6d5329d11b3aa76279600c68d` passed: 34 pilot assertions/
+  34 synthetic operations, including both native intake paths; 16 installed
+  native handoff tests in 53.421 seconds; 16 actual POSIX worker tests in
+  9.989 seconds; 25 standalone suites; 104 Pester tests (zero failed/skipped);
+  all 68 PowerShell files parsed and configured analyzer clean.
+- Exact isolated increments: the label affected two view tasks with minor/no
+  full-replan classification; the subsequent relationship change affected
+  18 tasks. The earlier follow-on's 20 count compared the combined label-plus-
+  relationship pair; fresh evidence now isolates each step. Actual managed
+  label/meaning, relationship implementation dependencies, unrelated sections,
+  native aliases and zero document/canonical/journal replay writes were checked.
+- Read-only merge-tree analysis found six current #5 conflict paths: Copilot
+  instructions, prompt, init skill, native intake, wizard tests and profile.
+  It changed no refs/worktree. Existing alternate-key/BPF helper capabilities
+  already match that branch; no duplicate implementation was added.
+- All runtime/fixture checks are source/synthetic evidence, not live lifecycle,
+  permissions, connectors, tenant deployment or browser acceptance. Final
+  documentation-only publication and exact-head hosted CI are recorded on
+  the existing PR; owner approvals and canonical audit restoration stay gated.
 
 ## H008 follow-on review and recovery - 2026-11-22
 

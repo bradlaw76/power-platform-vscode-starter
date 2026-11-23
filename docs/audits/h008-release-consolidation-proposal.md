@@ -18,7 +18,7 @@ and the accepted H008 baseline
 `bc4f7c85ccb9a57df77da3b70fe02f27273c3cbb`.
 It exists in branch history, not in an approved merged release:
 
-- [Original canonical maintenance handoff](https://github.com/bradlaw76/power-platform-vscode-starter/commit/c37d9d7)
+- [Original canonical maintenance handoff](https://github.com/bradlaw76/power-platform-vscode-starter/commit/c37d9d79a40fb27df772be0ddf0b0bb4e69ae57f)
   contains preserved Skills 1-2 records and explicitly authorized historical
   branch-specific copies. Their publication/validation statements retain their
   original time and scope.
@@ -58,6 +58,11 @@ restoration or change the stronger protection boundary.
 - #11 and #7 were incorporated only into the owned H008 candidate branch;
   owner branches and main were not changed. Profile tests passed 154 assertions
   on that candidate, with synthetic stage bodies, not tenant validation.
+- Fresh native new/partial-project verification at
+  `d5a36e2876157ed6d5329d11b3aa76279600c68d` passed 34 assertions and
+  34 synthetic operations, 16 installed handoff tests, 16 actual POSIX worker
+  tests, 25 standalone suites and 104 Pester tests. Actual scoped Spec Kit
+  projections/dependencies and zero-write replay were verified.
 - Native Windows guided execution, accepted architecture, opt-in Spec Kit,
   recovery and stale-evidence boundaries remain unchanged. Candidate profiles
   keep Legacy default and required membership/security gates.
