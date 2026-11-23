@@ -4,6 +4,27 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q9 legacy PR reconciliation - 2026-11-23
+
+- Fresh source/ownership/reviews for #3/#4/#5/#6/#7/#11; all owner heads unchanged.
+  Exact #7/#11 ancestry is in candidate only, #4 ancestry in #5 only.
+- Per-path immutable deltas distinguish missing, identical and later-divergent
+  files. Original PR comparison bases do not establish current main freshness.
+  #4/#7 are drafts; #4 targets an intermediate branch and its head approvals
+  do not approve #5 or new main integration.
+- Mechanical analysis: #3 ten conflicts, #4/#5 eight each, #6 clean. This is
+  analysis only, not integration or authorization. Existing code findings and
+  protection contexts remain gated; no original owner branch/thread changed.
+- Independently adapted #4's semantic field planning reference with current
+  approval-artifact and unsupported-runtime boundaries; README links it.
+  No payload, field, migration, skill/preflight installation or runtime changed.
+- Existing H008 and Q8 tests are retained. Focused documentation checks cover
+  this adaptation; exact publication/CI and six final dispositions belong in
+  existing PR #13 and the one external report/ledger. No duplicate H008 run.
+- Canonical handoff remains **HANDOFF NOT WRITTEN - BLOCKED**. No merge,
+  supersession/closure, retarget, release, hook/security activation or H-number
+  allocation occurred. Q10 requires its actual supplied scope.
+
 ## Q8 governance reconciliation - 2026-11-23
 
 - Starting Q7 candidate `793e1f15bb9dc461d2ccc0b9d709c0c43490fc51`;

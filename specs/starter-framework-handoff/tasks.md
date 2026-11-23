@@ -165,3 +165,18 @@ the full copied candidate passed the proposed checker. The two missing
 staged/outgoing protections remain unfixed owner-gated findings, not passes.
 Canonical handoff restoration remains blocked; exact resulting commit/CI and
 coordination receipts belong in the one external ledger. Q9 is not inferred.
+
+## Q9 legacy PR source reconciliation
+
+- [x] Refresh all six owner heads, targets/drafts, reviews and actual file deltas.
+- [x] Verify #7/#11 ancestry and #4's containment in #5 without duplicate merges.
+- [x] Analyze current candidate conflicts and superseded/overlapping surfaces.
+- [x] Adapt independent semantic planning guidance without runtime/protection changes.
+- [x] Prepare focused checks, six final dispositions and dependency/owner actions.
+- [x] Preserve source owners/history and use the existing PR/report/ledger.
+
+Exact original heads remain unchanged. #3/#5/#6 residuals are BLOCKED; #4 is
+contained in #5 history with only semantic guidance adapted; #7/#11 are
+contained in candidate only. Closure/retarget/merge/activation remain owner
+decisions. Missing semantic runtime is explicit, not supplied by documentation.
+Final publication/check results are recorded externally; Q10 is not inferred.

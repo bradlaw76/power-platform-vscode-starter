@@ -47,6 +47,12 @@ separate implementation.
 
 **Planning a new or expanded scenario in an existing app?** Use the proportional [Scenario Change Impact Gate](docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas reconcile affected contracts and dependent surfaces; preserve native field/security proof before live binding. This is planning guidance, not an automatic impact compiler.
 
+For field design, use the [Semantic Field Type Standard](docs/semantic-field-type-standard.md):
+business meaning determines native type, with approved categorical/date/currency
+decisions and dependent surfaces. This independent planning reference does not
+install semantic validation gates, migrate columns or adopt legacy protection
+packages; its runtime limitations are explicit.
+
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
 ### Enhancement registry

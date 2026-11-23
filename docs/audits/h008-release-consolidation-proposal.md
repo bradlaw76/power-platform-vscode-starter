@@ -407,3 +407,40 @@ proposal and complete external transfer are the only current destinations.
     its scope is supplied. No next H-number or new objective was invented.
 11. **Publication:** existing PR #13 only. Final SHA/CI and sanitized #12/#13/#6
     coordination are in the one external report/ledger, not fabricated history.
+
+## Q9 legacy reconciliation transfer - 2026-11-23
+
+This is another authorized additive outcome, not canonical restoration or
+historical approval. Preserve all preceding sections and original owner records.
+
+1. **Date/task/outcome:** Q9, 2026-11-23; six source-specific dispositions and
+   independent semantic planning reference prepared in existing PR #13.
+2. **Errors/findings:** original #3 migration, #5 ZIP/history and #6 index/ref
+   findings remain unresolved. Mechanical conflicts are integration findings,
+   not passing merges or permission to overwrite current source.
+3. **Context:** starting candidate
+   `7a3e15669ebc957d54ba66bb71053377854f90f7`; main unchanged; all six exact
+   original heads remain as recorded in the release guide.
+4. **Changes:** independent semantic planning documentation, README link and
+   additive release/build-log/scenario/audit outcomes only. No application
+   payload, runtime, old skill/package, original branch or controller adopted.
+5. **Validation:** exact #7/#11 candidate and #4-in-#5 ancestry, immutable
+   per-path deltas and review/target applicability. Fresh mechanical analysis
+   found #3 ten conflicts, #4/#5 eight each and #6 clean. Focused document checks
+   and warranted final CI are recorded with exact publication externally.
+6. **Worktree:** clean on intake; explicit owned files only. Git merge-tree
+   analysis produced local tree objects, not a branch, commit or source merge.
+7. **Completed:** definitive dispositions, superseded whole-file surfaces,
+   useful residual capabilities, independent semantic reference and ordering.
+8. **Remaining:** full skill/source-protection/no-Git/package reconciliation,
+   owned original defect contexts, canonical audit authority and separate
+   closure/retarget/merge/activation decisions. Semantic enforcement runtime
+   remains absent; planning guidance does not manufacture it.
+9. **Recovery:** no identical failed test rerun or forced merge, branch switch,
+   protection bypass, original review resolution or application operation.
+10. **Next:** select exact owner contexts, preserve current #13/#7/#11 source,
+    repair #6 and coupled #5/#4 before adoption, separate #3 application
+    migration scope. Advance to Q10 when supplied; allocate no new H-number.
+11. **Publication:** existing #12/#13 and original PR coordination plus one
+    external report/ledger. Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains;
+    no source says these proposals are restored history or approved main.

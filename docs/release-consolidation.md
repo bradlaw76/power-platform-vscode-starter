@@ -113,6 +113,41 @@ Q1 candidate; do not resolve these by overwriting current runtime or policies.
 Do not auto-close another owner's PR, remove application history or infer
 authorization from mergeability, credentials, a deadline or absent rulesets.
 
+### Q9 definitive legacy dispositions - 2026-11-23
+
+Fresh ancestry is against Q8 candidate
+`7a3e15669ebc957d54ba66bb71053377854f90f7` and main
+`632d00cbe38bbee753f4c4e7f4b5d1fb8d4afc8a`, not a cached PR comparison base.
+All six original heads are unchanged. Full source/file/ownership evidence and
+final publication identifiers remain in the one external report/ledger.
+
+| PR / exact head | Definitive disposition and remaining action |
+| --- | --- |
+| #3 `c95e02bb750bb84cb5da14217efd9513b3d7795f` | **BLOCKED; generic subset incorporated.** Workload/review-note adaptation is retained, and the requirements-material schema matches. Do not restore old intake/runner/payloads. Separate application ownership and approved Choice migration; cutover-before-schema and absent stage 32 remain unresolved. The approving review was for earlier `8aa1fad640caaea820d7bc2efe9538f37f735dd0`, not authority for a new merge. |
+| #4 `8d35b723852dbc0a218a29cebd877d6bc1cc128a` | **INCORPORATED ELSEWHERE in #5 history, not release/main.** A draft targets `copilot/extend-use-case-isolation-remediation`, with three approvals at its head. Its independently reusable semantic planning reference is adapted here; full skills/preflight adoption remains gated. Owner selects whether to retain this historical review vehicle or later close it in favor of repaired #5. |
+| #5 `241983d60983df52dc5101310e3037e63e72d5ca` | **BLOCKED; independent subsets adapted.** Explicit-slug guard and semantic planning guidance only. Skills/installer/source protection remain valuable but coupled; retain actual target/no-Git compatibility review and exact repair context. Fix ZIP hidden entries and all-outgoing-history path validation before adoption/release. |
+| #6 `e226f0857a8304fafa726db7c60ce846299a0249` | **BLOCKED.** Nine proposed additions are unadopted; mechanically clean does not authorize canonical audit restoration, hooks or CODEOWNERS. Use Q8's exact owner decisions and repair staged/outgoing validation before activation. |
+| #7 `d1c96edc1ddb8ab9b6022f62a25e0b7c1f52f7de` | **INCORPORATED ELSEWHERE in candidate, not main.** Exact ancestry, original audit and profile test blobs are retained; current runner extends the same profile policy. Original PR is a draft. No second merge; closure is only proposed after authorized #13 integration and owner disposition. |
+| #11 `3b1bafd748a51bf980f73af912d6fbad497a6721` | **INCORPORATED ELSEWHERE in candidate, not main.** Exact ancestry and sustained-execution section remain; later authorization/hand-off guidance supersedes whole-file replacement. No second merge or implicit closure. |
+
+Fresh mechanical merge analysis found ten conflicting paths for #3 and eight
+each for #4/#5 against the Q8 candidate; #6 had none. No branch, commit or
+worktree merge was created. A divergent blob is not proof of missing behavior,
+and an ancestor is not proof of main integration.
+
+The [semantic planning reference](semantic-field-type-standard.md) is the
+independently eligible documentation adaptation; it deliberately preserves the
+current decision-artifact policy rather than reviving the old field catalog.
+It does not install missing semantic validation runtime, add four skills,
+activate a protection package or fix application migration.
+
+Order: preserve the tested #13 candidate/#7/#11 history; obtain exact-head
+merge authority separately; approve and repair H003/#6; reconcile repaired
+PR #5/#4 against current source, no-Git and audit authority; scope #3's residual
+application/migration independently. Unblocked planning-reference work need
+not wait for these gates. Original PR closure, retargeting, ready-for-review,
+merge and protection activation are prepared decisions, not executed actions.
+
 ## Audit provenance
 
 The historical canonical path is identifiable, but unmerged #5 and #6 contain

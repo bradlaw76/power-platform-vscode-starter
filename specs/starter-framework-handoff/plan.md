@@ -153,3 +153,16 @@ containment and append exact owner choices to the existing audit proposal.
 Publish documentation only through PR #13 with exact-source CI and the one
 external report/ledger. Canonical restoration, protection repair/adoption and
 activation require their selected owner contexts; Q9 is not inferred.
+
+## Q9 legacy source reconciliation
+
+Pin Q8 source and fresh legacy owner heads, review applicability, actual target
+branches and per-path Git blobs. Verify #7/#11 candidate ancestry and #4-in-#5
+before any proposed integration. Analyze conflicts without worktree merges.
+Adapt only independent semantic planning documentation, preserving current
+decision artifacts and explicit missing-runtime gates. Do not transplant old
+intake/runner/instructions or activate coupled skills/protection packages.
+Run focused documentation checks and warranted exact-source CI; reuse unchanged
+installed/WSL evidence. Publish six definitive dispositions, superseded surfaces,
+dependency/owner decisions and preserved historical audit transfer through
+existing PR #13 and the one external report/ledger. Q10 is not inferred.
