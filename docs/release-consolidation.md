@@ -130,6 +130,14 @@ synthetic repository demonstrated six rejections, but the staged-blob and
 outgoing-ref gaps were reproduced unfixed. No hook or server protection was
 enabled. Passing CI does not enforce an unprotected main branch.
 
+Q8's [ownership reconciliation](audits/h008-release-consolidation-proposal.md#q8-ownership-and-audit-reconciliation---2026-11-23)
+adds exact owner decision paths and fresh rejection-to-retry evidence without
+installing protections. The isolated full candidate passed the proposed #6
+checker and preserved all 71 frozen historical blobs; its unresolved index and
+outgoing-ref gaps still block adoption. Historical base restoration and a fresh
+canonical index are alternative owner choices, not interchangeable approvals.
+Bounded source/credential checks do not certify ignored files or live identity.
+
 Use an explicit non-OneDrive isolated checkout, inspect its exact branch/full
 SHA/remotes/dirty state and preserve other writers. Keep project/runtime roots
 separate from framework source. Retained source commits and original fixture

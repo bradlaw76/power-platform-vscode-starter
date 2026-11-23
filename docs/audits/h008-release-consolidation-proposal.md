@@ -330,3 +330,80 @@ every previous section and source attribution; no approval record is fabricated.
 11. **Delivery:** owner-review candidate only in existing PR #13; no tag/public
     release. Final source/CI, sanitized milestone readbacks, criterion matrix and
     the precise remaining decisions belong in the one external report/ledger.
+
+## Q8 ownership and audit reconciliation - 2026-11-23
+
+This is an additive update to the existing proposal, not a new audit authority,
+restoration, H-number, controller or protection-package adoption. All earlier
+sections and the four historical canonical blobs listed above remain unchanged.
+
+### Actual protection and recovery evidence
+
+- PR #6 remains open at `e226f0857a8304fafa726db7c60ce846299a0249`.
+  Both staged-blob and outgoing-ref review threads remain unresolved. Its owner
+  coordination requires an approved repair context before repair/adoption.
+- A fresh external test copy of Q7 candidate
+  `793e1f15bb9dc461d2ccc0b9d709c0c43490fc51`, with immutable proposed controls
+  overlaid only in that copy, passed the current #6 checker. All 71 frozen
+  historical blobs match. This is compatibility with its existing checks,
+  not proof that the known missing protections work.
+- Four actual hook invocations verified two rejection-to-retry sequences:
+  changed frozen worktree rejected, restored fixture accepted; incorrect actual
+  push destination rejected, corrected destination accepted with ref-update
+  stdin. Each invocation preserved every test-copy source file and index tree.
+  No hook was installed and no ref was pushed. The destination URL was synthetic
+  test metadata, not proof of authenticated repository identity.
+- Reuse unchanged installed single-writer, overlapping/protected-root,
+  interruption and post-lock continuation evidence from Q3-Q5. Do not rerun
+  their unchanged failures or count the two known #6 gaps as passing tests.
+- Both real source clones were clean before these additions. The candidate adds
+  no payload/solution artifacts versus main; its only scenario-path additions
+  are the three generic `starter-framework-handoff` planning documents.
+  The canonical framework remains at
+  `a23096ec27de9bc1035b690dc9d49268a408d059`. No sensitive tracked filename or
+  limited known credential/private-key pattern was found in the checked scope.
+  This is not an exhaustive secret scan or an assertion about ignored files.
+- Neither clone configures `core.hooksPath`. Main remains unprotected with no
+  rulesets. Source isolation, runtime leases, passing CI and existing secret
+  scanning/push protection are different layers, not global writer enforcement.
+  Historical application files remain frozen, not removed or migrated.
+
+### Exact unresolved owner choices
+
+| Operation | Owner decision required before execution |
+| --- | --- |
+| Canonical audit restoration at `docs/audits/chatgpt-review-handoff.md` | Select the exact historical commit/blob from the immutable map, preserving its bytes and linking competing records; **or** authorize a fresh dated canonical index linking all four records. Name its role relative to this proposal, branch/full starting SHA, local-write/commit/push scope and applicable maintenance preflight. No choice is inferred from Q8. |
+| H003 repairs | Designate the owned repair context for `.githooks/pre-commit`, `.githooks/pre-push` and `scripts/ci/test-framework-ownership.ps1`. Require index/blob validation and actual outgoing ref/commit validation, including other branches, multiple updates and refspecs. Do not rewrite the original owner branch or resolve its threads without authority. |
+| H003 adoption | Separately approve integration of `.github/policies/framework-ownership-baseline.json`, `.github/CODEOWNERS`, the ownership instructions/documentation and repaired hooks/checker. Keep the frozen 71-file baseline intact; do not treat passing candidate compatibility as adoption or widen exceptions to hide drift. |
+| Hook/server activation | Explicitly select clones for `core.hooksPath` installation and repository rules/review/check settings. No local Git configuration or administrative setting was changed here. |
+| Other lanes | #5 exact maintenance/ZIP/outgoing-history scope, original application cleanup, real backup/reboot verification and PR #13 merge/strategy remain separate decisions. |
+
+Canonical outcome: **HANDOFF NOT WRITTEN - BLOCKED**. The authorized additive
+proposal and complete external transfer are the only current destinations.
+
+### Q8 transferable all-outcomes handoff
+
+1. **Date/task/outcome:** 2026-11-23, Q8; eligible additive governance and
+   isolated verification complete; historical restoration and adoption gated.
+2. **Errors:** no new recovery/checker failure. The two unchanged H003 defects
+   remain reproduced-unfixed Q3 evidence; no identical failed attempt repeated.
+3. **Context:** existing `feature/h008-starter-integration`/PR #13, starting
+   `793e1f15bb9dc461d2ccc0b9d709c0c43490fc51`; main unchanged.
+4. **Changes:** this proposal, release guide, build log and existing scenario
+   plan/tasks only. Full fixture data and logs remain external.
+5. **Validation:** four recovery observations, current-candidate checker and
+   all 71 frozen blobs; immutable audit identities, bounded source containment,
+   reused installed/WSL evidence and warranted exact-source documentation/CI.
+6. **Worktree:** clean at intake; final scoped commit/push/remote state is
+   independently recorded in the existing external ledger and PR receipt.
+7. **Completed:** current owner/review/policy reconciliation, historical-source
+   preservation, rejected-write recovery and exact decision paths.
+8. **Remaining:** choices in the table; no canonical restoration, protection
+   activation, live acceptance or disaster restore is represented as completed.
+9. **Recovery:** only deliberate synthetic fixture corrections followed rejects;
+   rejected operations changed no source/index. No bypass, forced retry, lock
+   removal, original writer rewrite or application repository write.
+10. **Next:** execute selected owner decisions when valid; advance to Q9 when
+    its scope is supplied. No next H-number or new objective was invented.
+11. **Publication:** existing PR #13 only. Final SHA/CI and sanitized #12/#13/#6
+    coordination are in the one external report/ledger, not fabricated history.

@@ -4,6 +4,26 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q8 governance reconciliation - 2026-11-23
+
+- Starting Q7 candidate `793e1f15bb9dc461d2ccc0b9d709c0c43490fc51`;
+  #6 owner head and all four historical canonical audit blobs unchanged.
+  Canonical destination remains absent and restoration authority unresolved.
+- Fresh isolated actual hooks: two verified rejections and two successful
+  corrected retries, preserving files/index. Full candidate plus immutable
+  proposed controls passed the checker; all 71 frozen baseline blobs match.
+  Known staged/outgoing defects remain unfixed; no unchanged failed rerun.
+- Reused unchanged Q3-Q5 single-writer, protected-root and interrupted/rejected
+  continuation evidence. Both real source trees were clean; no new consuming
+  payload/solution files or bounded credential indicators were found.
+  This is not exhaustive ignored-file/secret/tenant assurance.
+- Added exact canonical-base/index, repair-context, adoption and activation
+  owner choices to the existing proposal. No historical rewrite, hooksPath,
+  server rules, owner branch, scheduler, application write or merge changed.
+- **HANDOFF NOT WRITTEN - BLOCKED** for the canonical path. Existing PR #13
+  carries only additive documentation; source SHA/CI and full evidence remain
+  in the one external report/ledger. Q9 requires its actual supplied scope.
+
 ## Q6 release hardening - 2026-11-23
 
 - Q5 runtime pin: `563aa7361cc3a1648827dd6d8bc765f5eb77bd10`; canonical

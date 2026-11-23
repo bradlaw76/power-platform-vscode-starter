@@ -149,3 +149,19 @@ The final documentation-only delivery uses existing PR #13 and the unchanged
 Q5 runtime. Exact publication SHA, CI and readbacks are recorded in the existing
 external report/ledger. Source coverage is 5/5; promotion and live/reboot controls
 remain distinct owner gates. No tag, merge, public release or new workstream.
+
+## Q8 ownership and audit reconciliation
+
+- [x] Refresh H003 owner/reviews, immutable audit blobs and actual protection state.
+- [x] Preserve historical sources and the existing proposal's complete prefix.
+- [x] Exercise actual rejected-write/corrected-retry hooks in fresh external copies.
+- [x] Verify candidate compatibility and all 71 frozen blobs without adoption.
+- [x] Reuse supported single-writer/recovery evidence and check bounded containment.
+- [x] Document exact restoration/index, repair, adoption and activation choices.
+- [x] Prepare scoped additive documentation and existing-PR publication evidence.
+
+Q8 verified two rejects and two corrected retries with no source/index writes;
+the full copied candidate passed the proposed checker. The two missing
+staged/outgoing protections remain unfixed owner-gated findings, not passes.
+Canonical handoff restoration remains blocked; exact resulting commit/CI and
+coordination receipts belong in the one external ledger. Q9 is not inferred.

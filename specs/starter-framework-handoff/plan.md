@@ -141,3 +141,15 @@ assessment of the existing source spec; do not substitute task or speed metrics.
 Publish documentation only through existing PR #13 with exact-head CI. Record
 all remaining merge, audit, protection, deployment and restart decisions in the
 single external report/ledger; no tag or public release without owner authority.
+
+## Q8 ownership and audit reconciliation
+
+Reuse the Q7 candidate and existing H003 owner lane. Refresh immutable audit
+blobs/reviews and current controls; preserve historical bytes and source writers.
+Invoke proposed hooks only in fresh external copies to verify rejected-write
+recovery and compatibility, never install them or claim missing index/outgoing
+checks pass. Reuse unchanged runtime recovery tests. Verify bounded source
+containment and append exact owner choices to the existing audit proposal.
+Publish documentation only through PR #13 with exact-source CI and the one
+external report/ledger. Canonical restoration, protection repair/adoption and
+activation require their selected owner contexts; Q9 is not inferred.
