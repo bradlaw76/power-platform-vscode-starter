@@ -34,6 +34,43 @@ Use this to document what was planned, built, validated, and promoted.
   CLI encoding is now child-local UTF-8; accepted delivery changes use canonical
   `spec-kit delivery` without re-enabling disabled synchronization.
   The expanded installed suite passed all 16 tests in 42.713 seconds.
+- Final executable checkpoint:
+  `b600c1dae8f0d1c21d2e9ff3b8f7fd2941d9b32e`; hosted run
+  [45095492018](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/45095492018)
+  passed on that exact SHA. POSIX handoff verification passed 14 tests in
+  56.143 seconds, excluding two PowerShell cases because WSL has no native
+  `pwsh`. Dependency-independent verification passed four tests and explicitly
+  skipped twelve installed-runtime cases.
+- Independent benefits new/partial workspaces passed 32 assertions and 34
+  synthetic operations with standard Contact/Case/Task reuse, preserved form/
+  view identities, explicit bounded row bindings, native aliases and original
+  UTF-8/CRLF human text. The six final verification commands totaled 9.851
+  seconds; this excludes intake, development, repair and review time.
+- Accepted cosmetic impact affected two view tasks, classified as minor with
+  no full replan. Relationship impact affected twenty scoped/dependent tasks,
+  preserved native IDs and unrelated requirements, and left source evidence
+  historical rather than live. Consecutive replay made zero canonical,
+  journal or document writes. Lesson applications identify projection guidance/
+  checks, not executed live security, deployment or UI verification.
+- The isolated PR #11/#7 candidate passed 154 verification-profile assertions
+  on tree `78da3deabcbc43fb97e1f8fd7254557a4dbf5e1d`, based on review-repair
+  checkpoint `8b80843abde8210f84e17b5b742f3b4416c68105`. It remains an
+  uncommitted review proposal; mocked stage Apply output is not live execution.
+  PR #5's protection/no-Git conflict needs owner reconciliation; PR #4 is
+  contained in #5; PR #6 requires protection adoption review; PR #3 needs
+  generic/application ownership separation. No owner branch or main changed.
+- Existing GitHub secret-scanning alerts returned zero. A local targeted
+  implementation-diff scan found zero private-key, GitHub-token or AWS-key
+  patterns; this is not a comprehensive security audit. Framework 0.2.1 declares
+  no runtime dependencies. All 24 standalone suites, 104 Pester tests, full
+  configured analyzer, syntax, contract and Markdown checks passed at their
+  recorded checkpoints; exact later CI/doc checkpoints remain in issue #12.
+- Conditional source-level opt-in readiness only: approved merge is still
+  required. Native N:N mutation, Case lifecycle/assignment, business rules,
+  security, Pages/Automate, deployment and intended-user UI acceptance were
+  not demonstrated. No genuine human baseline or full-development-time
+  measurement exists; no percentage speedup, scheduler/reboot persistence,
+  live rollout or public release is claimed.
 
 ## H008 starter integration - 2026-11-22
 
