@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.8.2
+VERSION:      0.9.0
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-11-23
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
@@ -47,6 +47,7 @@ v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 v0.8.0  2026-11-22  Preserve accepted native tables and opt-in framework handoff.
 v0.8.1  2026-11-22  Gate accepted table coverage and relationship semantics.
+v0.9.0  2026-11-23  Show nonblocking offline H009 version status before intake.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -132,11 +133,20 @@ param(
     [switch]$EnableFrameworkSpecKitSync,
     [ValidateSet('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution')]
     [string]$ApplicationProfile,
-    [string]$RequirementsMaterialsFile
+    [string]$RequirementsMaterialsFile,
+    [switch]$VersionOnly
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
+$runtimeRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+try {
+    . (Join-Path $PSScriptRoot 'helpers/wizard-version.ps1')
+    Show-WizardVersion -RuntimeRoot $runtimeRoot
+} catch {
+    Write-Warning "Wizard version status unavailable: $($_.Exception.Message). Discovery can continue; no update authorized."
+}
+if ($VersionOnly) { return }
 . (Join-Path $PSScriptRoot 'helpers/table-detection.ps1')
 $acceptedContract = $null
 if ($EnableFrameworkSpecKitSync -and [string]::IsNullOrWhiteSpace($FrameworkRuntimeWorkspace)) {

@@ -13,6 +13,13 @@ Carry the policy or a reviewed equivalent through existing distribution review.
 
 This document is designed as a facilitation wizard.
 
+Before discovery, use the confirmed runtime's shared offline
+`04-check-wizard-update.ps1 -Action Status` banner. Terminal startup does this
+without an extra question; agents offer Review changes / Update wizard / Skip
+for now through the same command. Skip continues unchanged. Follow
+[H009 version/update safeguards](../docs/wizard-updates.md); no release identity
+from profile versions, no network by default or Apply without publisher trust.
+
 Optional accepted-planning continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
 table identities and relationship evidence. Missing Spec Kit is a no-op;

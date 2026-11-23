@@ -25,6 +25,16 @@ This repository is registered with the SpeckKit registry using raw registry URLs
 - When SpeckKit guidance and repo-local workflow guidance overlap, prefer the repo-local process in `docs/onboarding.md`, `README.md`, and `requirements/`.
 
 ## Primary Workflow
+
+H009 version/update status uses the confirmed runtime's
+`scripts/bootstrap/04-check-wizard-update.ps1 -Action Status` (offline,
+read-only). Both agent families and terminal share Review changes / Update
+wizard / Skip for now; Skip continues unchanged. Do not equate copied skills,
+profile/contract versions or main commits with a verified release. Never
+implement agent-specific pull/copy updating. Official Apply is fail-closed
+without independently verified publisher policy, immutable identity, integrity,
+compatibility and file ownership. See `docs/wizard-updates.md`.
+
 This repository is a guided Power Platform and Dynamics 365 wizard for VS Code.
 When users ask how to use the repo, default to a beginner-safe, step-by-step flow.
 Always require planning before build implementation:

@@ -11,6 +11,13 @@ separately. Include the contract through the existing distribution review.
 
 Companion wizard:
 
+The confirmed runtime exposes shared offline version/status through
+`04-check-wizard-update.ps1 -Action Status`. Both skills and terminal use
+Review changes / Update wizard / Skip for now without another intake question;
+Skip preserves the current wizard. Follow
+[H009 version/update safeguards](../docs/wizard-updates.md); copied skills are
+not runtime installations, and official Apply stays publisher-policy gated.
+
 Optional starter-to-framework continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Separate external
 project/runtime roots, accepted source contracts and explicit synchronization

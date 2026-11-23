@@ -8,8 +8,10 @@ This guide covers migration to the contract-driven wizard baseline introduced in
 
 The historical v1.0.0/1.x terminology below describes a contract baseline, not
 verified installed distribution identity. Profile 1.6, contract 1.10.0 and
-automation package 0.2.1 are independent versions. H009 is a draft design, not
-a released updater; no automatic download, apply or rollback is provided.
+automation package 0.2.1 are independent versions. H009 implements offline startup
+identity and explicit update planning/recovery, but no official release or
+publisher policy exists. Live Apply remains blocked, and no automatic source
+update is performed. See [H009 operations](docs/wizard-updates.md).
 Use [current release/adoption notes](docs/release-consolidation.md) and
 [skill distribution](docs/skill-distribution.md) for reviewed manual provenance
 and compatibility. Preserve local edits, native task IDs and original evidence.

@@ -1,6 +1,15 @@
 {
   "profileVersion": "1.6",
   "contractVersion": "1.10.0",
+  "wizardUpdates": {
+    "descriptor": "wizard.release.json",
+    "command": "04-check-wizard-update.ps1",
+    "startupNetwork": false,
+    "channel": "stable",
+    "skipPersistence": "session",
+    "publisherPolicyAvailable": false,
+    "consumerApplyEnabled": false
+  },
   "frameworkHandoff": {
     "defaultEnabled": false,
     "script": "09-framework-handoff.ps1",

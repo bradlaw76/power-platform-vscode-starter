@@ -40,6 +40,21 @@ accepted scope. Preserve mandatory gates and same-mode/policy resume identity.
 
 ## Runtime Compatibility Preflight
 
+### Installed wizard and updates (H009)
+
+After confirming the runtime path, run
+`pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`
+from that runtime, not the consuming project. Display its installed release,
+source revision, contract/profile and update state before discovery. This shared
+command is offline and read-only; a copied skill without it is not an installed
+runtime. Report unavailable rather than inventing a version or installing it.
+Offer Review changes, Update wizard, or Skip for now; use the same command's
+Review/Update/Skip actions, never agent-authored pull/copy logic. Skip continues
+unchanged with no new intake question. Online checking requires explicit opt-in.
+Official Apply remains blocked until publisher trust, immutable release identity,
+integrity, compatibility and ownership are verified. Preserve local instructions,
+Spec Kit, credentials and native IDs. See `docs/wizard-updates.md` in the runtime.
+
 Optional `-ApplicationProfile new-dynamics-365-app` and
 `-RequirementsMaterialsFile` follow the repo's wizard-contract source-note
 section and review schema. Preserve default prompt ordering; detailed modes

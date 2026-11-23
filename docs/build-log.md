@@ -4,6 +4,22 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q14 H009 source implementation - 2026-11-23
+
+- Base main `57f54fbf6b2c88e391100c001ba0b3f8834e190b`; existing design PR15
+  `5098769d2786fbf366b8e2e8ecb7fd8912bd84ce`, issue14 ownership claim.
+- Isolated `feature/h009-wizard-update-manager` source lane; design owner/history,
+  H008 evidence and legacy PRs preserved. No new H-number or controller.
+- Nullable development distribution descriptor, offline version-only terminal
+  startup and shared agent commands; optional updater does not gate discovery.
+- Exact file planning/recovery is separate from application/Spec Kit data.
+  Official Apply remains blocked without independent publisher policy.
+- H009-focused Windows/Linux results, final exact commits/CI and demonstrations
+  are recorded in the linked implementation PR and issue14 final report; no
+  pending or synthetic test is described as live release/deployment acceptance.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** unchanged. No release/tag, tenant
+  operation, security activation, persistent service or unrelated PR merge.
+
 ## Q12 release finalization - 2026-11-23
 
 - Starting candidate `56fee3c6fd5a525f0392055422e5cab6a527e8e6`, main

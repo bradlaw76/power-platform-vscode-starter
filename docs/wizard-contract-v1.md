@@ -14,6 +14,15 @@ All wizard entry points must follow this contract:
 
 ## Optional workload and reviewed-source input
 
+H009 is an additive startup notification, not another discovery question or
+bootstrap stage. `05-start-wizard.ps1 -VersionOnly` prints the actual offline
+runtime identity and returns without telemetry/intake writes. Terminal and
+supported agents use `04-check-wizard-update.ps1` for Status/Check/Review/Update/
+Skip/Recover; see [safe update operations](wizard-updates.md). Keep distribution,
+profile, contract and component versions distinct. Official Apply is blocked
+without independent publisher trust, integrity, exact identity/ownership and
+compatibility. Missing optional updater tooling must not block ordinary discovery.
+
 `05-start-wizard.ps1 -ApplicationProfile new-dynamics-365-app` explicitly plans
 a separate model-driven app, not an existing-app extension or first-party
 Dynamics installation. Confirm module dependencies/licensing before building.

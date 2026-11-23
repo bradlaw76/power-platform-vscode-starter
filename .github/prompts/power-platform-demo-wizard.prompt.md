@@ -13,6 +13,12 @@ reuse existing valid scoped permission.
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- After runtime confirmation, use `04-check-wizard-update.ps1 -Action Status`
+  from the runtime for the shared offline version/status banner. Offer Review
+  changes / Update wizard / Skip for now through its shared actions; Skip
+  continues unchanged. Missing runtime is unavailable, not an installed skill
+  release. No network without opt-in or Apply without verified publisher trust,
+  exact release/ownership/compatibility. Follow `docs/wizard-updates.md`.
 - When setup has not already been completed, use the headings `Initial setup`, `Before discovery`, `What will change`, and `First decision` in the first response.
 - Under those headings, explain that after confirmation you will inspect the target repository without modifying tracked project files, run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`, explain any missing requirements, and only then begin discovery.
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.

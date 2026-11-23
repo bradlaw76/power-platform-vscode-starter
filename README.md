@@ -66,7 +66,7 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
 | Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
-| H009 version/update proposal | [Version and update status](docs/release-consolidation.md#version-and-update-status); existing PR #15 is design-only, not an installed updater or authoritative release manifest |
+| H009 version/update manager | [Version and safe updates](docs/wizard-updates.md); offline startup identity, shared explicit choices, stable-only discovery, exact ownership-aware preview and guarded fixture recovery; official Apply remains blocked without publisher policy |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 
@@ -84,8 +84,12 @@ not deploy Dataverse or complete every canonical task. Publisher metadata is not
 modeled by the memory adapter; independent native/framework namespaces must be
 reconciled before a custom build. Read the [final acceptance boundaries and
 next backlog](docs/release-consolidation.md#q7-q12-finalization-and-next-backlog).
-There is no automatic wizard updater: profile 1.6, contract 1.10.0 and installed
-automation package 0.2.1 are separate versions, not a wizard release number.
+H009 now provides offline version/status and opt-in update planning, not automatic
+updates or an official release. Profile 1.6, contract 1.10.0 and installed
+automation package 0.2.1 remain separate versions. Try
+`pwsh .\scripts\bootstrap\05-start-wizard.ps1 -VersionOnly` or the agent-shared
+`pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`.
+An unreleased clone shows `release unknown - development checkout`.
 
 ### What happens when you use this starter
 

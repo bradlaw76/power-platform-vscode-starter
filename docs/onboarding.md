@@ -4,6 +4,13 @@
 
 Use this document when setting up this repo for the first time in VS Code.
 
+The terminal shows the [H009 installed-version banner](wizard-updates.md) before
+discovery, offline and without another question or build stage. Chat agents use
+the confirmed runtime's `04-check-wizard-update.ps1 -Action Status`. Review
+changes / Update wizard / Skip for now share that command; Skip continues
+unchanged. A development checkout has unknown release identity. Network checks
+are opt-in; official Apply stays blocked without verified publisher policy.
+
 Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
 
 This is the beginner-safe, step-by-step path for building standalone model-driven Power Apps and Dynamics 365 extensions from VS Code.

@@ -261,29 +261,31 @@ and validation of every current scenario/semantic contract.
 
 ## Version and update status
 
-H009 is the existing documentation-only draft
+H009 implements the existing
 [PR #15](https://github.com/bradlaw76/power-platform-vscode-starter/pull/15) /
 [issue #14](https://github.com/bradlaw76/power-platform-vscode-starter/issues/14).
-It has not supplied an authoritative distribution manifest, installed-version
-startup display, official-release comparison, update/defer UI, protected file
-apply or recovery implementation. Do not present its illustrative 1.11.0 as
-installed or available.
+design under Q14 source authorization. See [current H009 operations](wizard-updates.md)
+for offline startup identity, shared explicit choices, trusted-fixture comparison,
+ownership-aware preview and guarded recovery. Official publisher policy and
+distributed release identity remain unavailable; live Apply fails closed.
+Do not present the proposal's illustrative 1.11.0 as installed or available.
 
-Current main baseline: profile 1.4, contract 1.10.0, intake component 0.7.0.
-Integrated candidate: profile 1.6, contract 1.10.0, intake component 0.8.2,
-separate automation package 0.2.1. Both lack verified wizard release identity.
+Historical pre-H008 main: profile 1.4, contract 1.10.0, intake component 0.7.0.
+Merged H008 baseline: profile 1.6, contract 1.10.0, intake component 0.8.2;
+H009 intake component 0.9.0. Separate automation package remains 0.2.1.
+These versions do not establish wizard release identity.
 The observed release listing was empty; historical snapshot/rollback tags and
 a moving branch are not official update authority. Offline or unavailable
 advice never proves remote freshness. The optional cached repository advisor
 script/runbook is absent here; report unavailable rather than execute an
 invented fallback. Manual skill review is not transactional synchronization.
 
-Owner-approved implementation may begin with a bounded read-only slice, but
-Apply requires independently trusted provenance, explicit distributable
+Official Apply requires independently trusted provenance, explicit distributable
 ownership/target inventory and exact-plan authorization. A committed descriptor
 must not embed its own containing commit SHA; generated source-bound envelopes
-and file indexes must avoid self-hash cycles. PR #15 remains a proposal, not a
-trust root, release authority or another implementation owner's dispatch.
+and file indexes must avoid self-hash cycles. PR #15 remains a design reference,
+not a trust root or release authority. Q7-Q12 entries below are historical
+checkpoints, not the current H009 implementation state.
 
 ## Q7-Q12 finalization and next backlog
 

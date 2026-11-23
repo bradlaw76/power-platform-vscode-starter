@@ -56,6 +56,11 @@ $failures = [System.Collections.Generic.List[string]]::new()
 $parsedCount = 0
 $validatedPayloadCount = 0
 
+$releaseDescriptor = Get-Content (Join-Path $repoRoot 'wizard.release.json') -Raw
+if (-not (Test-Json -Json $releaseDescriptor -SchemaFile (Join-Path $repoRoot 'schemas/wizard-release.schema.json'))) {
+    throw 'Wizard distribution descriptor does not match its contract.'
+}
+
 foreach ($schemaPath in $schemaByFamily.Values) {
     if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
         $failures.Add("Missing payload schema: $schemaPath") | Out-Null

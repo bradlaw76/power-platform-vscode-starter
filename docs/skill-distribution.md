@@ -58,12 +58,15 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 
 Distribute skills from a tagged release or a reviewed commit. Record the source commit and verify provenance with `git rev-parse HEAD`; release publishers may also publish SHA-256 checksums for packaged archives. To update, compare the installed folder and runtime contract, review changes, run `scripts/ci/SkillParity.Tests.ps1`, then replace only approved files.
 
-There is no installed H009 version/update manager in this candidate. Profile,
-contract, component header and automation package versions are not an
-authoritative wizard distribution release; a development checkout's release
-identity remains unknown. No official wizard release, trusted comparison,
-update choice, transactional apply or rollback was exercised. See
-[version/update status](release-consolidation.md#version-and-update-status).
+H009 supplies [offline identity and safe update planning](wizard-updates.md).
+Both skills invoke the runtime's `04-check-wizard-update.ps1`, not agent-specific
+pull/copy logic. Profile, contract, component and automation package versions
+are not a distribution release; development release identity remains unknown.
+Official Apply remains blocked without approved independent publisher policy.
+Copied Copilot and installed Claude skills are classified separately; consumer/
+skill Apply remains read-only until exact bundle ownership is approved.
+The existing installer is not H009 transactional Apply and must not be used to
+bypass local-edit conflicts or trust gates.
 The cached repository advisor script/runbook is absent in this candidate:
 unavailable advice does not mean up-to-date. Do not copy a newer branch, overwrite
 local skill edits or install absent updater tooling automatically.
