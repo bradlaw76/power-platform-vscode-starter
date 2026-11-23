@@ -16,6 +16,9 @@ Optional starter-to-framework continuation follows
 project/runtime roots, accepted source contracts and explicit synchronization
 selection are required. Native Windows guided use needs neither consumer Git
 nor WSL; synthetic completion is not live deployment/UI acceptance.
+Accepted table coverage must be complete and unique. Preserve accepted
+relationship endpoints and business meaning; native many-to-many has no child
+lookup, while one-to-many requires it.
 
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
   guided, question-by-question process that walks users from principles and

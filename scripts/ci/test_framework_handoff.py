@@ -265,6 +265,52 @@ class InstalledHandoff(unittest.TestCase):
         self.assertEqual(json.loads((self.runtime / "spec-kit-state.json").read_text())["pending"], {})
         self.assertEqual(task_bytes, (self.runtime / "tasks.json").read_bytes())
 
+    def test_adapter_crash_after_adoption_resumes_without_reclaim_or_duplicates(self):
+        helper = ROOT / "scripts" / "bootstrap" / "helpers" / "framework-handoff.py"
+        code = (
+            "import argparse,importlib.util,json,os,sys\n"
+            "spec=importlib.util.spec_from_file_location('handoff',sys.argv[1])\n"
+            "module=importlib.util.module_from_spec(spec); spec.loader.exec_module(module)\n"
+            "original=module.launch\n"
+            "def crash(command):\n"
+            " result=original(command)\n"
+            " if command[:2]==['spec-kit','adopt'] and result[0].returncode==0: os._exit(87)\n"
+            " return result\n"
+            "module.launch=crash\n"
+            "module.execute(argparse.Namespace(**json.loads(sys.argv[2])))\n"
+        )
+        process = subprocess.run(
+            [sys.executable, "-c", code, str(helper), json.dumps(vars(self.args))],
+            capture_output=True, text=True, timeout=60,
+        )
+        self.assertEqual(process.returncode, 87, process.stdout + process.stderr)
+        receipt = json.loads((self.runtime / "starter-handoff-status.json").read_text())
+        self.assertEqual(receipt["status"], "running")
+        self.assertEqual(receipt["current_command"], ["spec-kit", "adopt"])
+        task_ids = [task["id"] for task in json.loads((self.runtime / "tasks.json").read_text())["tasks"]]
+        selection = (self.runtime / "spec-kit.json").read_bytes()
+        owner = (self.project / ".spec-kit-owner.json").read_bytes()
+        command = [
+            sys.executable, str(helper), "--project", str(self.project),
+            "--runtime", str(self.runtime), "--scenario", self.args.scenario,
+            "--contract", self.args.contract, "--recipe", self.args.recipe,
+            "--enable-sync",
+        ]
+        resumed = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        self.assertEqual(resumed.returncode, 0, resumed.stdout + resumed.stderr)
+        self.assertEqual(selection, (self.runtime / "spec-kit.json").read_bytes())
+        self.assertEqual(owner, (self.project / ".spec-kit-owner.json").read_bytes())
+        self.assertEqual(task_ids, [
+            task["id"] for task in json.loads((self.runtime / "tasks.json").read_text())["tasks"]
+        ])
+        before = {path: path.read_bytes() for path in self.runtime.rglob("*") if path.is_file()}
+        documents = {path: path.read_bytes() for path in self.project.rglob("*.md")}
+        replay = subprocess.run(command, capture_output=True, text=True, timeout=60)
+        self.assertEqual(replay.returncode, 0, replay.stdout + replay.stderr)
+        self.assertTrue(json.loads(replay.stdout)["replayed"])
+        self.assertEqual(before, {path: path.read_bytes() for path in self.runtime.rglob("*") if path.is_file()})
+        self.assertEqual(documents, {path: path.read_bytes() for path in self.project.rglob("*.md")})
+
     def test_active_runtime_lock_and_stale_plan_are_not_bypassed(self):
         from demo_builder.workspace import locked_workspace
         self.start()

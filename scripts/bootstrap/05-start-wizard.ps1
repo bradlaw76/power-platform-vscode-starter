@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.8.0
+VERSION:      0.8.1
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-11-22
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
@@ -46,6 +46,7 @@ v0.5.0  2026-08-18  Added entry-table resolution and landing-view action plannin
 v0.6.0  2026-08-26  Added Demo, Advanced, and Framework Acceptance modes.
 v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 v0.8.0  2026-11-22  Preserve accepted native tables and opt-in framework handoff.
+v0.8.1  2026-11-22  Gate accepted table coverage and relationship semantics.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -155,13 +156,17 @@ if (-not [string]::IsNullOrWhiteSpace($AcceptedContractPath)) {
     }
     foreach ($relationship in $acceptedContract.relationships) {
         if ($relationship.cardinality -notin @('one_to_many', 'many_to_many')) { throw 'Unsupported relationship cardinality; retain an explicit decision.' }
-        if ($relationship.cardinality -eq 'one_to_many') {
-            $tableNames = @($acceptedContract.components | Where-Object { $_.kind -eq 'table' } | ForEach-Object { $_.name })
-            if ($relationship.parent -notin $tableNames -or $relationship.child -notin $tableNames -or $relationship.lookup -notmatch '^[a-z][a-z0-9_]*$') {
-                throw 'Accepted relationship endpoints and lookup must reference exact planned logical identities.'
-            }
+        $tableNames = @($acceptedContract.components | Where-Object { $_.kind -eq 'table' } | ForEach-Object { $_.name })
+        if ($relationship.parent -notin $tableNames -or $relationship.child -notin $tableNames) {
+            throw 'Accepted relationship endpoints must reference exact planned logical identities.'
         }
-        if ($relationship.intent.status -ne 'accepted' -or @($relationship.intent.evidence_ids | Where-Object { $_ -in $acceptedEvidence }).Count -eq 0) {
+        if ($relationship.cardinality -eq 'one_to_many' -and $relationship.lookup -notmatch '^[a-z][a-z0-9_]*$') {
+            throw 'Accepted one-to-many relationships require an exact child lookup identity.'
+        }
+        if ($relationship.cardinality -eq 'many_to_many' -and $relationship.lookup) {
+            throw 'Accepted native many-to-many relationships cannot use a child lookup; model junctions separately.'
+        }
+        if ($relationship.intent.status -ne 'accepted' -or [string]::IsNullOrWhiteSpace($relationship.intent.business_meaning) -or @($relationship.intent.evidence_ids | Where-Object { $_ -in $acceptedEvidence }).Count -eq 0) {
             throw "Relationship '$($relationship.id)' has unresolved owner intent."
         }
     }
@@ -839,6 +844,11 @@ if ($Mode -eq 'demo-builder') {
             })
             if ($candidates.Count -ne 1) { throw "Cannot unambiguously map '$inputTable' to accepted table decisions." }
             $mappedNames += $candidates[0].name
+        }
+        $approvedNames = @($acceptedContract.components | Where-Object { $_.kind -eq 'table' } | ForEach-Object { $_.name } | Sort-Object -Unique)
+        $selectedNames = @($mappedNames | Sort-Object -Unique)
+        if ($selectedNames.Count -ne $mappedNames.Count -or @(Compare-Object $selectedNames $approvedNames).Count) {
+            throw 'Accepted table coverage is incomplete or duplicated; retain all accepted identities before planning writes.'
         }
         $standardTables = @($mappedNames | Where-Object { Test-IsStandardTable $_ })
         $customTables = @($mappedNames | Where-Object { -not (Test-IsStandardTable $_) })

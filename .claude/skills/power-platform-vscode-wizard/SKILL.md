@@ -23,6 +23,8 @@ uses project-root `docs/framework-handoff.md` and the installed framework's
 existing task store, locks and journals, with separate synchronization opt-in.
 Missing Spec Kit is a no-op. Native Windows guided use does not imply worker
 supervision, automatic installation, a new controller or a persistent scheduler.
+Retain every accepted table exactly once and explicit relationship business
+meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
 
 ## Runtime Compatibility Preflight
 

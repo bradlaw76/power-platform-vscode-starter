@@ -4,6 +4,31 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## H008 follow-on review and recovery - 2026-11-22
+
+- Reproduced PR #13's accepted-table subset finding before fixing it. Intake
+  now rejects missing or duplicate accepted table selections before planning.
+- Additional regression exposed missing relationship business meaning.
+  Both cardinalities now validate accepted endpoints and owner intent.
+  Native many-to-many rejects a child lookup; one-to-many requires it.
+- Current installed verification: 14 tests passed in 38.577 seconds, including
+  an actual adapter exit immediately after canonical adoption, fresh-process
+  resume without reclaiming documents/task IDs, and unchanged no-write replay.
+  Native wizard modes, configured changed-file analyzer, contract integrity,
+  changed-document Markdown lint and whitespace checks passed.
+- An operator-created isolated WSL environment installed the pinned 0.2.1 wheel
+  offline, without system packages or security changes. All 16 actual POSIX
+  worker tests passed in 8.909 seconds, including orphan exclusion, process-tree
+  timeout, lease drift, verification failure and independent-task recovery.
+  Executors were synthetic local programs; no paid AI calls were made.
+- PR #13 remains reviewable, not merged by inference. Exact submitted SHA/CI,
+  remaining PR outcomes and the expanded pilot are recorded in issue #12 and
+  the external follow-on acceptance report when finalized. Historical evidence
+  below remains attributed to its original checkpoint.
+- The canonical review-handoff file is absent from this approved checkout.
+  HANDOFF NOT WRITTEN - BLOCKED: do not import an unapproved protection/handoff
+  branch or bypass its preflight to write it.
+
 ## H008 starter integration - 2026-11-22
 
 - Ownership: starter issue #12; canonical Automation Framework issue #24 and

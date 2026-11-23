@@ -11,3 +11,14 @@
 Local evidence: 13 installed integration tests, 24 standalone suites and 104
 Pester tests passed. Published PR/CI results and final source identifiers remain
 in issue #12 and the external operational report. No live acceptance is implied.
+
+## Follow-on cycle
+
+- [ ] Resolve the accepted-table coverage review finding and exact-SHA CI.
+- [ ] Inventory remaining PRs and record dependency/approval outcomes.
+- [ ] Exercise installation and new/partial/absent/inconsistent project paths.
+- [ ] Validate accepted architecture, relationships, identities and ownership.
+- [ ] Verify extended Spec Kit lifecycle and canonical recovery boundaries.
+- [ ] Test Windows paths/encoding and available POSIX prerequisites.
+- [ ] Exercise a separate synthetic benefits new/partial-project fixture.
+- [ ] Complete quality/security checks, aligned guidance and readiness report.

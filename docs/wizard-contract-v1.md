@@ -70,6 +70,9 @@ recommendation; availability and view disposition still require verification.
 `-AcceptedContractPath` preserves exact accepted table/relationship identities
 and records source hashes rather than converting standard Account into a custom
 table. Detailed intake rejects contradictions instead of overriding decisions.
+Accepted table selection must be complete and unique. Relationships require
+accepted endpoints, business meaning and owner evidence; native many-to-many
+has no child lookup, while one-to-many requires that lookup.
 Optional `-FrameworkRuntimeWorkspace` connects approved planning to the installed
 framework; synchronization remains a separate explicit opt-in. See
 [handoff and supported hosts](framework-handoff.md).

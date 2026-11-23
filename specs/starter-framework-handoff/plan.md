@@ -15,3 +15,14 @@ standard Dataverse identities are reused, unresolved relationship intent remains
 unresolved. Synchronization requires a separately selected accepted framework
 contract, not inferred Markdown approval. Update shipped guidance and focused
 tests, then run affected regression/lint checks and publish a review PR.
+
+## Authorized follow-on reliability cycle
+
+Continue issue #12 and PR #13, without another H-number/controller. Evaluate the
+ten requested phases: PR gates, remaining PR dependencies, new/existing intake,
+architecture, Spec Kit lifecycle, canonical recovery, host compatibility,
+isolated synthetic benefits workflow, quality/security and release readiness.
+Repair the outstanding accepted-table coverage finding first. Preserve other
+PR ownership; merge, security-policy changes and live execution require their
+actual applicable gates. Keep scenario data and the single maintainer ledger
+in the existing external pilot root.

@@ -24,6 +24,8 @@ Optional continuation after accepted planning uses
 table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
 native Windows supports guided continuation, not autonomous worker supervision.
 Do not install a framework, create a second task store or start a scheduler.
+Retain every accepted table exactly once and explicit relationship business
+meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
 
 ## Runtime Compatibility Preflight
 

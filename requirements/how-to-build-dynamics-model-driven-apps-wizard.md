@@ -17,6 +17,9 @@ Optional accepted-planning continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
 table identities and relationship evidence. Missing Spec Kit is a no-op;
 synchronization is explicit opt-in, without a new controller or scheduler.
+Accepted table coverage must be complete and unique. Preserve accepted
+relationship endpoints and business meaning; native many-to-many has no child
+lookup, while one-to-many requires it.
 
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
 

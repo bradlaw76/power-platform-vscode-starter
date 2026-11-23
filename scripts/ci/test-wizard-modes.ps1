@@ -208,7 +208,7 @@ try {
             @{ id = 'C1'; kind = 'table'; name = 'account'; requirement_ids = @('R1') },
             @{ id = 'C2'; kind = 'table'; name = 'ppd_workitem'; requirement_ids = @('R1') }
         )
-        relationships = @(@{ id = 'REL1'; cardinality = 'one_to_many'; parent = 'account'; child = 'ppd_workitem'; lookup = 'ppd_accountid'; intent = @{ status = 'accepted'; evidence_ids = @('EV-owner') } })
+        relationships = @(@{ id = 'REL1'; cardinality = 'one_to_many'; parent = 'account'; child = 'ppd_workitem'; lookup = 'ppd_accountid'; intent = @{ status = 'accepted'; evidence_ids = @('EV-owner'); business_meaning = 'Each Work Item belongs to one Account.' } })
     }
     $approvedPath = Join-Path $approvedWorkspace 'accepted-contract.json'
     $approvedContract | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $approvedPath -Encoding UTF8
@@ -217,6 +217,42 @@ try {
     Assert-True -Condition ($approvedSpec.Contains('ppd_workitem -> ppd_workitem') -and $approvedSpec.Contains('one_to_many') -and $approvedSpec.Contains('ppd_accountid')) -Message 'Accepted custom identity and relationship intent must survive intake.'
     Assert-True -Condition ($approvedSpec.Contains('## Accepted Planning Source')) -Message 'Accepted planning provenance must be retained.'
     Assert-True -Condition ($approvedSpec.Contains('- Publisher prefix: ppd')) -Message 'A unique accepted custom namespace must guide the publisher recommendation.'
+    $subsetWorkspace = New-WizardTestWorkspace -Name 'accepted-subset'
+    $subsetAnswers = @($standardAnswers)
+    $subsetAnswers[2] = 'Account'
+    $subsetMessage = ''
+    try {
+        $null = Invoke-WizardFixture -Workspace $subsetWorkspace -Mode '' -Answers $subsetAnswers -AcceptedContractPath $approvedPath
+    }
+    catch {
+        $subsetMessage = $_.Exception.Message
+    }
+    Assert-True -Condition ($subsetMessage.Contains('Accepted table coverage') -and -not (Test-Path (Join-Path $subsetWorkspace 'specs'))) -Message 'A subset must not silently omit accepted relationship tables.'
+    $manyWorkspace = New-WizardTestWorkspace -Name 'accepted-many'
+    $manyPath = Join-Path $manyWorkspace 'accepted-contract.json'
+    $many = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+    $many.relationships[0].cardinality = 'many_to_many'
+    $many.relationships[0].lookup = $null
+    $many.relationships[0].intent.business_meaning = 'Accounts may share Work Items, and a Work Item may support several Accounts.'
+    $many | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manyPath -Encoding UTF8
+    $null = Invoke-WizardFixture -Workspace $manyWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $manyPath
+    $manySpec = Get-Content -LiteralPath (Join-Path $manyWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($manySpec.Contains('many_to_many')) -Message 'Accepted native many-to-many intent must remain available without inventing a child lookup.'
+    foreach ($fault in @('meaning', 'many-lookup', 'many-endpoint')) {
+        $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
+        $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'
+        $negative = $many | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+        if ($fault -eq 'meaning') { $negative.relationships[0].intent.business_meaning = '' }
+        elseif ($fault -eq 'many-lookup') { $negative.relationships[0].lookup = 'ppd_accountid' }
+        else { $negative.relationships[0].parent = 'missing_table' }
+        $negative | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $negativePath -Encoding UTF8
+        $failure = ''
+        try {
+            $null = Invoke-WizardFixture -Workspace $negativeWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $negativePath
+        }
+        catch { $failure = $_.Exception.Message }
+        Assert-True -Condition ($failure -and -not (Test-Path (Join-Path $negativeWorkspace 'specs'))) -Message "Invalid accepted $fault intent must fail before planning writes."
+    }
     foreach ($fault in @('unaccepted', 'cardinality', 'endpoint')) {
         $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
         $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'

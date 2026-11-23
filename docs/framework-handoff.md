@@ -57,6 +57,13 @@ accepted relationship JSON in both relationship fields (`none` for an empty
 selection). Free-text contradictions are rejected before planning writes,
 not silently substituted for accepted dependency decisions.
 
+Demo Builder must retain every accepted table exactly once. Subset or duplicate
+selections fail before planning writes. Both relationship cardinalities require
+accepted endpoints, explicit business meaning and accepted owner evidence.
+One-to-many requires the child lookup; native many-to-many prohibits that lookup.
+An explicit junction remains separate one-to-many relationships, not an inferred
+change to accepted architecture.
+
 Use the same project/runtime/scenario/interpreter parameters with `-Action`:
 
 | Action | Meaning |
@@ -74,6 +81,13 @@ deterministic unchanged failure is retained; changed blockers permit resume.
 Interrupted work is reconciled by existing canonical tasks/journals, not copied
 into a second executable backlog.
 
+If the adapter terminates after canonical adoption but before acknowledging the
+command, resume the same accepted inputs/project/runtime. The existing document
+selection and owner claim remain authoritative; replay does not reclaim them or
+duplicate task identities. Resolve an active owner or uncertain native operation
+before retrying. Interrupted Git operations belong to the selected repository's
+normal recovery process, not automatic reset/abort by this adapter.
+
 ## Hosts, recovery and acceptance
 
 Native Windows supports the PowerShell guided path and requires neither Git
@@ -81,6 +95,13 @@ in the consumer project nor WSL. Native Windows worker supervision is rejected.
 Linux/macOS/explicit WSL can use the framework's existing worker interface;
 host availability alone does not prove the package is installed. Never start
 an unattended scheduler merely because worker support exists.
+
+The tested POSIX worker runs bounded, explicitly configured subprocesses. It
+provides checkpoints, lease checks and orphan exclusion; it is not an OS sandbox.
+An explicit WSL worker is the practical supported option when native supervision
+is unavailable. The adapter never installs WSL/PowerShell/packages or enables
+startup services. Machine reboot and VS Code-close continuation are not proven
+by process-restart tests; no persistent scheduler is supplied by this handoff.
 
 `starter-handoff-status.json` is a derived receipt containing timestamps,
 source revision, input hashes, command results, bounded retry counts and the
