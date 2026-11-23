@@ -1,14 +1,34 @@
 {
-  "profileVersion": "1.4",
+  "profileVersion": "1.6",
   "contractVersion": "1.10.0",
+  "frameworkHandoff": {
+    "defaultEnabled": false,
+    "script": "09-framework-handoff.ps1",
+    "frameworkVersion": "0.2.1",
+    "nativeWindowsGuided": true,
+    "workerHosts": ["Linux", "macOS", "WSL"],
+    "readOnlyTaskStatus": {
+      "action": "status",
+      "outputField": "task_summary",
+      "canonicalEligibilityOnly": true,
+      "persistsLeaseChanges": false
+    }
+  },
   "applicationProfiles": [
     "standalone-model-driven",
+    "new-dynamics-365-app",
     "dynamics-sales-extension",
     "dynamics-customer-service-extension",
     "dynamics-field-service-extension",
     "generic-dataverse-solution"
   ],
   "discovery": {
+    "requirementsMaterials": {
+      "inputSchema": "schemas/requirements-materials.schema.json",
+      "optionalFileParameter": "RequirementsMaterialsFile",
+      "additionalMandatoryPrompts": false,
+      "fetchExternalSources": false
+    },
     "defaultMode": "demo-builder",
     "requiredQuestions": 8,
     "coreQuestions": 11,
@@ -151,6 +171,15 @@
     ]
   },
   "execution": {
+    "verificationProfiles": {
+      "default": "Legacy",
+      "intakeModeIndependent": true,
+      "supported": ["Legacy", "Demo", "Acceptance"],
+      "demoIdempotencySwitch": "VerifyIdempotency",
+      "demoExportSwitch": "ExportSolution",
+      "resumeRequiresSameModeAndEffectivePolicy": true,
+      "requiredMembershipAndSecurityGatesPreserved": true
+    },
     "coreModules": [
       "00-prereq-check.ps1",
       "10-auth-connect.ps1",

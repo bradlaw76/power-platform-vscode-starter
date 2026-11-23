@@ -1,5 +1,10 @@
 # Delivery target, deadline and optional automation
 
+The optional [installed H008 handoff](framework-handoff.md) reuses canonical
+tasks, lessons and synchronization after accepted planning. Native Windows
+guided use does not require consumer Git or WSL; worker supervision remains
+POSIX-only and does not authorize an unattended scheduler or live deployment.
+
 This reusable starter serves first-time builders and experienced implementers. A demo, pilot and production release have different delivery needs, but a deadline never authorizes skipping a required platform or security check. The delivery context applies to Demo Builder, Advanced Builder and Framework Acceptance, for greenfield and existing-project adoption.
 
 ## Two plain-language questions
@@ -23,6 +28,13 @@ The terminal timeframe must be a single line. Line breaks are rejected so a supp
 | Unconfirmed | Conservative applicable verification | Resolve the owner's delivery intent before release; no silent downgrade |
 
 These are **planning profiles**, not executable bypass switches. Existing CI requirements, environment authorization, safety, security, exact-identity, backup and deployment checks still apply. Nightly full regressions are optional only where an actual runner/scheduler exists and the task warrants it; no scheduler is installed by these instructions.
+
+The independently selected build verification profile is described in
+[release operating modes](release-consolidation.md). `Legacy` is the default;
+`Demo` explicitly skips optional rerun/export deliverables, with independent
+opt-ins and unchanged mandatory gates. `Acceptance` retains existing
+payload-dependent verification. Do not translate a delivery goal into a runtime
+profile without the existing consolidated confirmation.
 
 ## Beginner-safe tool discovery
 

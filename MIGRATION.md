@@ -4,6 +4,26 @@
 
 This guide covers migration to the contract-driven wizard baseline introduced in v1.0.0.
 
+## Current release and adoption boundary
+
+The historical v1.0.0/1.x terminology below describes a contract baseline, not
+verified installed distribution identity. Profile 1.6, contract 1.10.0 and
+automation package 0.2.1 are independent versions. H009 is a draft design, not
+a released updater; no automatic download, apply or rollback is provided.
+Use [current release/adoption notes](docs/release-consolidation.md) and
+[skill distribution](docs/skill-distribution.md) for reviewed manual provenance
+and compatibility. Preserve local edits, native task IDs and original evidence.
+
+Existing solution/publisher identity must be confirmed explicitly, not inferred
+from a scenario title or free-text answer. If selecting technical retrofit
+control, use the explicitly chosen Advanced Builder with `-Retrofit` and inspect
+the generated identity/current-state fields before build. Independent
+native/canonical namespaces require reconciliation; synthetic memory evidence
+does not verify real publishers, solution membership or intended-user UI.
+Disabled synchronization remains disabled until explicit enable. Existing
+build resume cannot change target or effective verification policy; preserve
+the old run and prepare a reviewed new run rather than deleting its state.
+
 ## Breaking Changes
 
 - Discovery is now defined as 11 required questions plus optional extension blocks.

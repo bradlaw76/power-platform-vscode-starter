@@ -47,6 +47,12 @@ separate implementation.
 
 **Planning a new or expanded scenario in an existing app?** Use the proportional [Scenario Change Impact Gate](docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas reconcile affected contracts and dependent surfaces; preserve native field/security proof before live binding. This is planning guidance, not an automatic impact compiler.
 
+For field design, use the [Semantic Field Type Standard](docs/semantic-field-type-standard.md):
+business meaning determines native type, with approved categorical/date/currency
+decisions and dependent surfaces. This independent planning reference does not
+install semantic validation gates, migrate columns or adopt legacy protection
+packages; its runtime limitations are explicit.
+
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
 ### Enhancement registry
@@ -56,8 +62,30 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
+| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or live deployment |
+| Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
+| Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
+| Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
+| H009 version/update proposal | [Version and update status](docs/release-consolidation.md#version-and-update-status); existing PR #15 is design-only, not an installed updater or authoritative release manifest |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+The [release consolidation guide](docs/release-consolidation.md) distinguishes
+installed functionality from unmerged candidate capabilities, explains native
+Windows/WSL recovery, and records the dependency-aware PR integration sequence.
+Its [release-candidate notes](docs/release-consolidation.md#release-candidate-notes---2026-11-23)
+cover verified features, adoption/migration limits and outstanding owner gates.
+The [additive audit proposal](docs/audits/h008-release-consolidation-proposal.md)
+locates historical handoffs without selecting or rewriting their divergent
+branch records.
+
+Q11's fresh native/WSL acceptance preserved source and human documents, but did
+not deploy Dataverse or complete every canonical task. Publisher metadata is not
+modeled by the memory adapter; independent native/framework namespaces must be
+reconciled before a custom build. Read the [final acceptance boundaries and
+next backlog](docs/release-consolidation.md#q7-q12-finalization-and-next-backlog).
+There is no automatic wizard updater: profile 1.6, contract 1.10.0 and installed
+automation package 0.2.1 are separate versions, not a wizard release number.
 
 ### What happens when you use this starter
 

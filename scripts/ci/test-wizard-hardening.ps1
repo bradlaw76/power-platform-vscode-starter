@@ -107,6 +107,15 @@ try {
   }
 
   $expected = New-WizardExpectedArtifacts -RepoRoot $testRepo -ScenarioSlug 'test-scenario' -PublisherPrefix 'tst'
+  foreach ($invalidSlug in @('../outside', 'Test-scenario', 'test--scenario')) {
+    $rejected = $false
+    try {
+      Get-WizardScenarioContext -RepoRoot $testRepo -ScenarioSlug $invalidSlug | Out-Null
+    } catch {
+      $rejected = $_.Exception.Message -match 'ScenarioSlug'
+    }
+    if (-not $rejected) { throw "Invalid explicit ScenarioSlug '$invalidSlug' was accepted." }
+  }
   if ($expected.Tables -notcontains 'tst_agent') {
     throw 'Expected custom table in expected artifact set.'
   }

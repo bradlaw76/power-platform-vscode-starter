@@ -15,9 +15,21 @@ the authoritative detailed sequence after the authoring workspace is open.
 Important process rule:
 
 - Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Optional installed-framework continuation uses
+  [the H008 handoff](framework-handoff.md) after accepted planning, with separate
+  consumer/runtime folders. It is not another build stage or deployment command.
+  Its read-only Status action reports canonical task counts, dependencies,
+  owner/lease holds and next actions without dispatch or stored lease changes.
+  Unchanged synchronization conflict holds retain exit 3 without document,
+  journal or history writes; changed inputs resume and other incomplete steps retry.
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.
+- Discovery mode, delivery goal and build verification profile are independent.
+  `90-run-build.ps1` defaults to `Legacy`; explicitly selected `Demo` skips
+  optional second-pass/export deliverables, not first-pass/security/membership
+  gates. See [release operating modes](release-consolidation.md). No profile
+  authorizes Apply, maps from intake automatically or installs a worker.
 
 ---
 
@@ -364,6 +376,12 @@ Then complete optional extension blocks based on profile and project needs:
 - `retrofit` (current state + remaining work)
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
+
+For optional new-Dynamics intent and reviewed-material JSON, follow
+[the source-note contract](wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Use `-ApplicationProfile new-dynamics-365-app` and/or `-RequirementsMaterialsFile`
+without adding mandatory Demo Builder questions. Neither installs a Dynamics
+product, fetches sources nor replaces planning/architecture approval.
 - `user-tasks` (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
 - `demo-data` (when enabled: all-created or selected table scope, resolved tables, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; rerun/source-tag/retention/cleanup engineering is Framework Acceptance only)
 

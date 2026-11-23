@@ -12,6 +12,30 @@ All wizard entry points must follow this contract:
 - Onboarding documentation
 - Requirements guidance
 
+## Optional workload and reviewed-source input
+
+`05-start-wizard.ps1 -ApplicationProfile new-dynamics-365-app` explicitly plans
+a separate model-driven app, not an existing-app extension or first-party
+Dynamics installation. Confirm module dependencies/licensing before building.
+Without the argument, Demo Builder's existing inference is unchanged. Detailed
+modes include this value in A0; supplying the argument bypasses A0 only.
+
+`-RequirementsMaterialsFile <review.json>` consumes source-specific notes
+validated by [the review schema](../schemas/requirements-materials.schema.json).
+Use `decision: none` with an empty materials array, or `provided` with source,
+kind, reviewStatus, summary, planningImpact and openQuestions for each material.
+Only `reviewed` entries may have a nonempty summary; pending/inaccessible entries
+retain empty summaries and unfinished review tasks. No file means
+`not-collected`, not an implicit no-materials or approved decision.
+
+The terminal does not read source documents/images or fetch URLs; import only
+authorized, redacted human/chat review notes. All fields remain blockquoted in
+answers/spec/plan/tasks to prevent source text from injecting contract headings.
+Resolve or explicitly defer source questions before planning approval. Source
+notes never override accepted architecture, native identities or semantic gates.
+Use existing discovery/confirmation in chat; add no mandatory materials or
+workload question to Demo Builder.
+
 ## Canonical Flow
 
 1. Wizard mode selection (`demo-builder` by default)
@@ -52,6 +76,16 @@ Every entry point supports exactly three modes. Mode selection changes discovery
 
 All modes emit compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` artifacts and use the shared execution contract below.
 
+Build verification is independently selected with `90-run-build.ps1
+-VerificationProfile Legacy|Demo|Acceptance`; `Legacy` remains the default.
+`Demo` skips optional second-pass checks/export unless `-VerifyIdempotency` or
+`-ExportSolution` is explicitly selected. Existing payload prerequisites and
+final membership/security gates remain; `Acceptance` retains the legacy
+payload-dependent coverage, not a new exhaustive verifier. Profile selection
+never grants Apply authorization or follows automatically from discovery mode/
+delivery goal. Resume binds execution mode and effective verification policy.
+See [release operating modes](release-consolidation.md).
+
 ## Delivery target, timeframe and optional automation
 
 Every mode, including retrofit, first captures (or reuses) two plain-language answers:
@@ -64,6 +98,28 @@ Demo Builder therefore uses **eight business/delivery questions plus its existin
 Generate delivery context into `answers.md`, `spec.md`, `plan.md` and `tasks.md` without inventing a completion estimate. Choose proportional testing based on delivery risk, but do not skip required validation or production gates due to an urgent deadline. Automation starts **off** and is considered only when measurable time saved exceeds setup, verification and recovery overhead and the user opts in. Detect optional tools without installing them; WSL is not a general prerequisite. See [delivery pacing and tooling](delivery-pacing-and-tooling.md).
 
 ## Architecture Intent Contract
+
+Demo Builder reuses recognized standard Dataverse tables inside its consolidated
+recommendation; availability and view disposition still require verification.
+`-AcceptedContractPath` preserves exact accepted table/relationship identities
+and records source hashes rather than converting standard Account into a custom
+table. Detailed intake rejects contradictions instead of overriding decisions.
+Accepted table selection must be complete and unique. Relationships require
+accepted endpoints, business meaning and owner evidence; native many-to-many
+has no child lookup, while one-to-many requires that lookup.
+Optional `-FrameworkRuntimeWorkspace` connects approved planning to the installed
+framework; synchronization remains a separate explicit opt-in. See
+[handoff and supported hosts](framework-handoff.md).
+Read-only Status `task_summary` projects canonical counts,
+IDs, dependencies, owner/lease holds, timestamps and next actions without
+dispatch or stored lease mutation. Coordinator eligibility is not worker
+authorization, and missing/corrupt records never become zero-count success.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes; changed inputs resume and other incomplete steps retry.
+
+Explicit canonical delivery updates also apply to existing adoptions without
+re-enabling disabled synchronization. The installed CLI protocol is UTF-8 on
+Windows and POSIX; do not strip Unicode from accepted requirements or paths.
 
 First select one supported application profile:
 

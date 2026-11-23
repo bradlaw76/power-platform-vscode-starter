@@ -19,7 +19,36 @@ This skill starts the repository wizard safely through either chat or terminal, 
 
 This skill does not modify core wizard scripts.
 
+Optional continuation after accepted planning uses
+[the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
+table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
+native Windows supports guided continuation, not autonomous worker supervision.
+Its read-only Status action projects canonical task counts, eligible IDs and
+dependency/owner holds with timestamps and next actions. Never dispatch from
+that projection, persist lease expiry or turn a missing store into zero success.
+Do not install a framework, create a second task store or start a scheduler.
+Retain every accepted table exactly once and explicit relationship business
+meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
+Use explicit canonical delivery JSON for handoff resume, not an inferred
+deadline. Preserve Unicode and disabled synchronization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
+
+Build verification is separate from discovery and delivery goals. Follow
+[release operating modes](../../../docs/release-consolidation.md): keep `Legacy`
+by default; explicitly select `Demo`/`Acceptance` and independent rerun/export
+options only within accepted scope. Preserve mandatory gates and same-mode/
+policy resume identity.
+
 ## Runtime Compatibility Preflight
+
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` follow the repo's wizard-contract source-note
+section and review schema. Preserve default prompt ordering; detailed modes
+use existing A0. Confirm separate-app intent and licensing, not first-party
+installation. Import only reviewed/redacted notes, keep unreviewed status and
+quote source text. The terminal fetches no documents/images/URLs. Missing notes
+are not approval; add no mandatory materials question.
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
 

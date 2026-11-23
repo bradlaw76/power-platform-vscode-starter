@@ -18,7 +18,35 @@ do not overwrite local instructions. This applies to all workloads.
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
 
+Preserve approved native table/relationship decisions. Optional continuation
+uses project-root `docs/framework-handoff.md` and the installed framework's
+existing task store, locks and journals, with separate synchronization opt-in.
+Read-only `status` projects canonical task counts, eligible IDs, dependency/
+owner holds and timestamps without dispatch or persisted lease changes.
+Eligibility is not worker authorization; missing/corrupt records are explicit.
+Missing Spec Kit is a no-op. Native Windows guided use does not imply worker
+supervision, automatic installation, a new controller or a persistent scheduler.
+Retain every accepted table exactly once and explicit relationship business
+meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
+Use explicit canonical delivery JSON for handoff resume, not an inferred
+deadline. Preserve Unicode and disabled synchronization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
+
+Build verification is separate from discovery and delivery goals. Follow
+project-root `docs/release-consolidation.md`: keep `Legacy` by default; explicitly
+select `Demo`/`Acceptance` and independent rerun/export options only within
+accepted scope. Preserve mandatory gates and same-mode/policy resume identity.
+
 ## Runtime Compatibility Preflight
+
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` follow the repo's wizard-contract source-note
+section and review schema. Preserve default prompt ordering; detailed modes
+use existing A0. Confirm separate-app intent and licensing, not first-party
+installation. Import only reviewed/redacted notes, keep unreviewed status and
+quote source text. The terminal fetches no documents/images/URLs. Missing notes
+are not approval; add no mandatory materials question.
 
 Skill availability is not runtime installation. A copied `SKILL.md` does not provide the PowerShell scripts, helpers, schemas, profile, or canonical docs it references.
 

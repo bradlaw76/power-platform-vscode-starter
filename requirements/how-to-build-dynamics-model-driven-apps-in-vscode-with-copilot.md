@@ -11,6 +11,28 @@ separately. Include the contract through the existing distribution review.
 
 Companion wizard:
 
+Optional starter-to-framework continuation follows
+[the installed H008 handoff](../docs/framework-handoff.md). Separate external
+project/runtime roots, accepted source contracts and explicit synchronization
+selection are required. Native Windows guided use needs neither consumer Git
+nor WSL; synthetic completion is not live deployment/UI acceptance.
+Accepted table coverage must be complete and unique. Preserve accepted
+relationship endpoints and business meaning; native many-to-many has no child
+lookup, while one-to-many requires it.
+Existing handoff adoptions accept explicit canonical delivery updates without
+re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
+Read-only Status projects canonical task counts, native IDs, dependencies,
+owner/lease holds and timestamped next actions. It does not dispatch, persist
+lease expiry or substitute coordinator eligibility for worker authorization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
+
+Keep discovery mode, delivery goal and build verification independent. Follow
+[release operating modes](../docs/release-consolidation.md): `Legacy` defaults,
+explicit `Demo`/`Acceptance`, independent rerun/export options and unchanged
+mandatory gates. Resume requires the same execution mode/effective policy;
+none of these selections authorizes Apply or installs automation.
+
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
   guided, question-by-question process that walks users from principles and
   Spec Kit setup through design, build, validation, and handoff.
@@ -56,6 +78,12 @@ Validation checkpoints:
 ### 0B. Wizard discovery modes
 
 Use `demo-builder` by default: ask six business questions, two delivery-context questions and one consolidated technical recommendation confirmation. Use `advanced-builder` explicitly for the following 11 core questions and technical extension blocks. Use `framework-acceptance` explicitly for authorized-environment, isolation, deterministic-rerun, retention, cleanup-approval, and evidence controls.
+
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` use [the source-note contract](../docs/wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Keep existing discovery/confirmation, preserve quoted source status/questions,
+and confirm licensing and separate-app intent. The terminal does not fetch
+source content or provision first-party products; notes are not approval.
 
 Every mode captures or reuses the delivery goal and owner timeframe under [delivery pacing and tooling](../docs/delivery-pacing-and-tooling.md). Guided execution does not require WSL; automation remains opt-in after net-time justification, and deadlines do not waive required validation, security or deployment acceptance.
 

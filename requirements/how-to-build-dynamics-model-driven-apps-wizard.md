@@ -13,6 +13,27 @@ Carry the policy or a reviewed equivalent through existing distribution review.
 
 This document is designed as a facilitation wizard.
 
+Optional accepted-planning continuation follows
+[the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
+table identities and relationship evidence. Missing Spec Kit is a no-op;
+synchronization is explicit opt-in, without a new controller or scheduler.
+Accepted table coverage must be complete and unique. Preserve accepted
+relationship endpoints and business meaning; native many-to-many has no child
+lookup, while one-to-many requires it.
+Existing handoff adoptions accept explicit canonical delivery updates without
+re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
+Read-only Status projects canonical task counts, native IDs, dependencies,
+owner/lease holds and timestamped next actions. It does not dispatch, persist
+lease expiry or substitute coordinator eligibility for worker authorization.
+Unchanged synchronization conflict holds retain exit 3 without document,
+journal or history writes. Changed inputs resume; other incomplete steps retry.
+
+Keep discovery mode, delivery goal and build verification independent. Follow
+[release operating modes](../docs/release-consolidation.md): `Legacy` defaults,
+explicit `Demo`/`Acceptance`, independent rerun/export options and unchanged
+mandatory gates. Resume requires the same execution mode/effective policy;
+none of these selections authorizes Apply or installs automation.
+
 For this repository, start with `/power-platform-wizard-init` in Copilot Chat. The shared skill lets the builder choose guided chat or terminal intake, enforces the planning gate, and can monitor existing progress telemetry. Direct routes remain supported: `/power-platform-demo-wizard` and `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. See `docs/wizard-walkthrough.html` for the clickable end-to-end guide.
 
 - Ask each question block in order.
@@ -58,6 +79,12 @@ Validation checkpoint:
 ### 0B. Discovery modes
 
 Use `demo-builder` by default. Ask six business questions and two delivery-context questions, then present one inferred technical recommendation for confirmation. Use `advanced-builder` explicitly to ask and capture the following detailed answers before Step 1. Use `framework-acceptance` explicitly to add environment authorization, isolated naming, acceptance source tags and hero labels, rerun evidence, retention, separately approved cleanup, and evidence planning.
+
+Optional `-ApplicationProfile new-dynamics-365-app` and
+`-RequirementsMaterialsFile` use [the source-note contract](../docs/wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Keep existing discovery/confirmation, preserve quoted source status/questions,
+and confirm licensing and separate-app intent. The terminal does not fetch
+source content or provision first-party products; notes are not approval.
 
 Every mode captures or reuses the delivery goal and owner timeframe under [delivery pacing and tooling](../docs/delivery-pacing-and-tooling.md). Guided execution does not require WSL; optional automation requires owner opt-in and a demonstrated net-time benefit. Required validation, security and deployment gates remain mandatory regardless of deadline.
 

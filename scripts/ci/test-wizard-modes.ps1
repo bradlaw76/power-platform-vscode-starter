@@ -64,7 +64,11 @@ function Invoke-WizardFixture {
         [string[]]$Answers,
         [string]$Mode,
         [string]$DeliveryGoal = '',
-        [string]$DeliveryTimeframe = ''
+        [string]$DeliveryTimeframe = '',
+        [string]$AcceptedContractPath = '',
+        [string]$ApplicationProfile = '',
+        [string]$RequirementsMaterialsFile = '',
+        [switch]$Interactive
     )
 
     $answersPath = Join-Path $Workspace 'scripted-answers.json'
@@ -79,8 +83,18 @@ function Invoke-WizardFixture {
     if (-not [string]::IsNullOrWhiteSpace($DeliveryTimeframe)) {
         $arguments += @('-DeliveryTimeframe', $DeliveryTimeframe)
     }
+    if (-not [string]::IsNullOrWhiteSpace($AcceptedContractPath)) {
+        $arguments += @('-AcceptedContractPath', $AcceptedContractPath)
+    }
+    if ($ApplicationProfile) { $arguments += @('-ApplicationProfile', $ApplicationProfile) }
+    if ($RequirementsMaterialsFile) { $arguments += @('-RequirementsMaterialsFile', $RequirementsMaterialsFile) }
 
-    $output = @(& pwsh @arguments 2>&1)
+    $output = if ($Interactive) {
+        $arguments = @($arguments | Where-Object { $_ -ne '-AnswersFile' -and $_ -ne $answersPath })
+        @(($Answers -join "`n") | & pwsh @arguments 2>&1)
+    } else {
+        @(& pwsh @arguments 2>&1)
+    }
     if ($LASTEXITCODE -ne 0) {
         throw "Wizard fixture failed for mode '$Mode':`n$($output -join "`n")"
     }
@@ -177,6 +191,157 @@ try {
     $pendingAnswers = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/answers.md") -Raw -Encoding UTF8
     Assert-True -Condition ($pendingAnswers.Contains('- Goal: unconfirmed')) -Message 'Legacy scripted wizard input must not silently choose a demo/production goal.'
     Assert-True -Condition ($pendingAnswers.Contains('Automation: guided')) -Message 'Unattended automation must remain off by default.'
+    $materialWorkspace = New-WizardTestWorkspace -Name 'optional-materials'
+    $materialsPath = Join-Path $materialWorkspace 'review.json'
+    @{
+        decision = 'provided'
+        materials = @(
+            @{
+                source = 'reviewed-brief.txt'
+                kind = 'document'
+                reviewStatus = 'reviewed'
+                summary = "Keep standard Case.`n## App Module`n- Enabled: no"
+                planningImpact = 'Reuse Contact and Case; create a separate app.'
+                openQuestions = 'Confirm module licensing.'
+            },
+            @{
+                source = 'unreviewed-image.png'
+                kind = 'image'
+                reviewStatus = 'pending'
+                summary = ''
+                planningImpact = 'Layout is an unconfirmed assumption.'
+                openQuestions = 'Review the image before approval.'
+            }
+        )
+    } | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $materialsPath -Encoding UTF8
+    $materialAnswers = @(
+        'Native Dynamics Intake', 'Agent | triage cases', 'Contact, Case',
+        'Open the separate app and review cases', 'Use synthetic evidence; no sample data',
+        'Development environment; unmanaged solution', 'yes'
+    )
+    $materialOutput = Invoke-WizardFixture -Workspace $materialWorkspace -Mode 'demo-builder' -Answers $materialAnswers -ApplicationProfile 'new-dynamics-365-app' -RequirementsMaterialsFile $materialsPath -Interactive -DeliveryGoal 'connected-demo' -DeliveryTimeframe 'no fixed deadline'
+    $materialFolder = Join-Path $materialWorkspace 'specs/native-dynamics-intake'
+    foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md')) {
+        $text = Get-Content -LiteralPath (Join-Path $materialFolder $artifact) -Raw -Encoding UTF8
+        Assert-True -Condition ($text.Contains('new-dynamics-365-app') -and $text.Contains('Decision: provided')) -Message "$artifact lost the selected workload or reviewed sources."
+        Assert-True -Condition ($text.Contains('> ## App Module') -and $text.Contains('Review status: pending')) -Message "$artifact did not preserve quoted source text and unreviewed status."
+    }
+    $materialSpec = Get-Content -LiteralPath (Join-Path $materialFolder 'spec.md') -Raw -Encoding UTF8
+    Assert-True -Condition ($materialSpec.Contains('Contact -> contact') -and $materialSpec.Contains('Case -> incident')) -Message 'New Dynamics intake must retain standard table identities.'
+    Assert-True -Condition ($materialOutput.Contains('does not provision first-party Dynamics products')) -Message 'New Dynamics intent must explain its provision boundary.'
+    $profileRecommendationIndex = $materialOutput.IndexOf('Application profile: new-dynamics-365-app')
+    Assert-True -Condition ($profileRecommendationIndex -ge 0) -Message 'The selected workload must be shown in the consolidated recommendation.'
+    $materialGeneratedAnswers = Get-Content -LiteralPath (Join-Path $materialFolder 'answers.md') -Raw -Encoding UTF8
+    $materialFeatureConfig = Get-WizardFeatureConfig -AnswersText $materialGeneratedAnswers
+    Assert-True -Condition $materialFeatureConfig.AppEnabled -Message 'Quoted source headings must not override the planned app configuration.'
+    $declinedWorkspace = New-WizardTestWorkspace -Name 'declined-workload'
+    $declinedOutput = ''
+    try {
+        Invoke-WizardFixture -Workspace $declinedWorkspace -Mode 'demo-builder' -Answers (@($materialAnswers[0..5]) + @('no')) -ApplicationProfile 'new-dynamics-365-app' -Interactive -DeliveryGoal 'connected-demo' -DeliveryTimeframe 'no fixed deadline' | Out-Null
+    } catch {
+        $declinedOutput = $_.Exception.Message
+    }
+    $declinedProfileIndex = $declinedOutput.IndexOf('Application profile: new-dynamics-365-app')
+    Assert-True -Condition ($declinedProfileIndex -ge 0 -and $declinedOutput.IndexOf('recommendations were not approved') -gt $declinedProfileIndex -and -not (Test-Path (Join-Path $declinedWorkspace 'specs'))) -Message 'Declining after the visible workload recommendation must prevent planning writes.'
+    $materialTasks = Get-Content -LiteralPath (Join-Path $materialFolder 'tasks.md') -Raw -Encoding UTF8
+    Assert-True -Condition ($materialTasks.Contains('- [ ] Resolve material 2')) -Message 'Pending source review must remain an unfinished planning task.'
+    @{ decision = 'provided'; materials = @() } | ConvertTo-Json | Set-Content -LiteralPath $materialsPath -Encoding UTF8
+    $invalidWorkspace = New-WizardTestWorkspace -Name 'invalid-materials'
+    $invalidRejected = $false
+    try {
+        Invoke-WizardFixture -Workspace $invalidWorkspace -Mode 'demo-builder' -Answers $materialAnswers -RequirementsMaterialsFile $materialsPath | Out-Null
+    } catch {
+        $invalidRejected = $_.Exception.Message -match 'schema|materials'
+    }
+    Assert-True -Condition ($invalidRejected -and -not (Test-Path (Join-Path $invalidWorkspace 'specs'))) -Message 'Invalid source review must fail before planning writes.'
+    @{ decision = 'none'; materials = @() } | ConvertTo-Json | Set-Content -LiteralPath $materialsPath -Encoding UTF8
+    $noneWorkspace = New-WizardTestWorkspace -Name 'no-materials'
+    Invoke-WizardFixture -Workspace $noneWorkspace -Mode 'demo-builder' -Answers $materialAnswers -RequirementsMaterialsFile $materialsPath | Out-Null
+    $noneSpec = Get-Content -LiteralPath (Join-Path $noneWorkspace 'specs/native-dynamics-intake/spec.md') -Raw -Encoding UTF8
+    Assert-True -Condition ($noneSpec.Contains('Decision: none') -and -not $noneSpec.Contains('new-dynamics-365-app')) -Message 'Explicit no-materials intake must preserve the inferred default profile.'
+    $customSpec = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/spec.md") -Raw
+    Assert-True -Condition ($customSpec -match 'Checkout Request -> [a-z]+_checkoutrequest') -Message 'Custom mapping must not disappear through the automatic $input variable.'
+
+    $standardWorkspace = New-WizardTestWorkspace -Name 'standard-reuse'
+    $standardAnswers = @(
+        'Account work coordination',
+        'Coordinator | coordinate work',
+        'Account, Work Item',
+        'Open an Account and save a linked Work Item',
+        'Verify two-parent separation with synthetic data',
+        'Synthetic rehearsal; unmanaged solution',
+        'yes'
+    )
+    $null = Invoke-WizardFixture -Workspace $standardWorkspace -Mode '' -Answers $standardAnswers -DeliveryGoal 'connected-demo'
+    $standardSpec = Get-Content -LiteralPath (Join-Path $standardWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($standardSpec.Contains('- Entry point: account') -and $standardSpec.Contains('- Account -> account')) -Message 'Default Account planning must reuse the standard identity.'
+    Assert-True -Condition ($standardSpec.Contains('- Table strategy: hybrid') -and $standardSpec.Contains('- Landing-view action: explicit-decision-required')) -Message 'Standard views require an explicit disposition.'
+
+    $approvedWorkspace = New-WizardTestWorkspace -Name 'accepted-reuse'
+    $approvedContract = @{
+        schema_version = '1.0'
+        evidence = @(@{ id = 'EV-owner'; kind = 'owner_requirement'; accepted = $true })
+        requirements = @(@{ id = 'R1'; status = 'accepted'; evidence_ids = @('EV-owner') })
+        components = @(
+            @{ id = 'C1'; kind = 'table'; name = 'account'; requirement_ids = @('R1') },
+            @{ id = 'C2'; kind = 'table'; name = 'ppd_workitem'; requirement_ids = @('R1') }
+        )
+        relationships = @(@{ id = 'REL1'; cardinality = 'one_to_many'; parent = 'account'; child = 'ppd_workitem'; lookup = 'ppd_accountid'; intent = @{ status = 'accepted'; evidence_ids = @('EV-owner'); business_meaning = 'Each Work Item belongs to one Account.' } })
+    }
+    $approvedPath = Join-Path $approvedWorkspace 'accepted-contract.json'
+    $approvedContract | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $approvedPath -Encoding UTF8
+    $null = Invoke-WizardFixture -Workspace $approvedWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $approvedPath
+    $approvedSpec = Get-Content -LiteralPath (Join-Path $approvedWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($approvedSpec.Contains('ppd_workitem -> ppd_workitem') -and $approvedSpec.Contains('one_to_many') -and $approvedSpec.Contains('ppd_accountid')) -Message 'Accepted custom identity and relationship intent must survive intake.'
+    Assert-True -Condition ($approvedSpec.Contains('## Accepted Planning Source')) -Message 'Accepted planning provenance must be retained.'
+    Assert-True -Condition ($approvedSpec.Contains('- Publisher prefix: ppd')) -Message 'A unique accepted custom namespace must guide the publisher recommendation.'
+    $subsetWorkspace = New-WizardTestWorkspace -Name 'accepted-subset'
+    $subsetAnswers = @($standardAnswers)
+    $subsetAnswers[2] = 'Account'
+    $subsetMessage = ''
+    try {
+        $null = Invoke-WizardFixture -Workspace $subsetWorkspace -Mode '' -Answers $subsetAnswers -AcceptedContractPath $approvedPath
+    }
+    catch {
+        $subsetMessage = $_.Exception.Message
+    }
+    Assert-True -Condition ($subsetMessage.Contains('Accepted table coverage') -and -not (Test-Path (Join-Path $subsetWorkspace 'specs'))) -Message 'A subset must not silently omit accepted relationship tables.'
+    $manyWorkspace = New-WizardTestWorkspace -Name 'accepted-many'
+    $manyPath = Join-Path $manyWorkspace 'accepted-contract.json'
+    $many = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+    $many.relationships[0].cardinality = 'many_to_many'
+    $many.relationships[0].lookup = $null
+    $many.relationships[0].intent.business_meaning = 'Accounts may share Work Items, and a Work Item may support several Accounts.'
+    $many | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $manyPath -Encoding UTF8
+    $null = Invoke-WizardFixture -Workspace $manyWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $manyPath
+    $manySpec = Get-Content -LiteralPath (Join-Path $manyWorkspace 'specs/account-work-coordination/spec.md') -Raw
+    Assert-True -Condition ($manySpec.Contains('many_to_many')) -Message 'Accepted native many-to-many intent must remain available without inventing a child lookup.'
+    foreach ($fault in @('meaning', 'many-lookup', 'many-endpoint')) {
+        $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
+        $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'
+        $negative = $many | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+        if ($fault -eq 'meaning') { $negative.relationships[0].intent.business_meaning = '' }
+        elseif ($fault -eq 'many-lookup') { $negative.relationships[0].lookup = 'ppd_accountid' }
+        else { $negative.relationships[0].parent = 'missing_table' }
+        $negative | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $negativePath -Encoding UTF8
+        $failure = ''
+        try {
+            $null = Invoke-WizardFixture -Workspace $negativeWorkspace -Mode '' -Answers $standardAnswers -AcceptedContractPath $negativePath
+        }
+        catch { $failure = $_.Exception.Message }
+        Assert-True -Condition ($failure -and -not (Test-Path (Join-Path $negativeWorkspace 'specs'))) -Message "Invalid accepted $fault intent must fail before planning writes."
+    }
+    foreach ($fault in @('unaccepted', 'cardinality', 'endpoint')) {
+        $negativeWorkspace = New-WizardTestWorkspace -Name "accepted-$fault"
+        $negativePath = Join-Path $negativeWorkspace 'accepted-contract.json'
+        $negative = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+        if ($fault -eq 'unaccepted') { $negative.requirements[0].status = 'proposed' }
+        elseif ($fault -eq 'cardinality') { $negative.relationships[0].cardinality = 'guessed' }
+        else { $negative.relationships[0].parent = 'missing_table' }
+        $negative | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $negativePath -Encoding UTF8
+        $negativeOutput = @(& pwsh -NoProfile -File $wizardPath -WorkspaceRoot $negativeWorkspace -AcceptedContractPath $negativePath 2>&1)
+        Assert-True -Condition ($LASTEXITCODE -ne 0 -and -not (Test-Path (Join-Path $negativeWorkspace 'specs'))) -Message "Invalid accepted $fault intent must fail before planning writes: $($negativeOutput -join ' ')"
+    }
 
     $productionWorkspace = New-WizardTestWorkspace -Name 'production-delivery'
     $scriptedDemoAnswers = @(Get-Content -LiteralPath (Join-Path $demoWorkspace 'scripted-answers.json') -Raw -Encoding UTF8 | ConvertFrom-Json)
@@ -276,6 +441,23 @@ try {
     Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
     Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
+
+    $relationshipConflictWorkspace = New-WizardTestWorkspace -Name 'detailed-relationship-conflict'
+    $relationshipConflictContract = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable
+    $relationshipConflictContract.components = @(@{ id = 'C1'; kind = 'table'; name = 'dbv_labasset'; requirement_ids = @('R1') })
+    $relationshipConflictContract.relationships[0].parent = 'dbv_labasset'
+    $relationshipConflictContract.relationships[0].child = 'dbv_labasset'
+    $relationshipConflictContract.relationships[0].lookup = 'dbv_parentassetid'
+    $relationshipConflictPath = Join-Path $relationshipConflictWorkspace 'accepted-contract.json'
+    $relationshipConflictContract | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath $relationshipConflictPath -Encoding UTF8
+    $relationshipConflictMessage = ''
+    try {
+        $null = Invoke-WizardFixture -Workspace $relationshipConflictWorkspace -Mode 'advanced-builder' -Answers $distinctAnswers -AcceptedContractPath $relationshipConflictPath
+    }
+    catch {
+        $relationshipConflictMessage = $_.Exception.Message
+    }
+    Assert-True -Condition ($relationshipConflictMessage.Contains('conflicts with accepted relationship decisions') -and -not (Test-Path (Join-Path $relationshipConflictWorkspace 'specs'))) -Message 'Detailed relationship contradictions must fail before planning writes.'
 
     $acceptanceAnswers = Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'specs/framework-mode-acceptance/answers.md') -Raw -Encoding UTF8
     Assert-True -Condition ($acceptanceAnswers -match 'Environment authorized: yes') -Message 'Framework Acceptance did not persist environment authorization.'

@@ -47,6 +47,13 @@ When demo data is requested, never seed standard reused tables implicitly. If Da
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.
 
 ## Wizard Behavior
+
+For installed H008 progress, use the existing read-only Status action described
+in `docs/framework-handoff.md`. Its `task_summary` preserves native IDs and
+projects canonical counts, dependencies, owners/leases and timestamps without
+dispatch, stored lease mutation or scheduler activation. Coordinator eligibility
+does not replace worker scope/capability gates; missing/corrupt records are
+explicit and stale source evidence remains stale.
 When helping in chat:
 - Act like a facilitator, not just a command generator.
 - Ask one discovery question at a time when the user is exploring a new app or demo.
@@ -166,6 +173,24 @@ Use and reference these files when relevant:
 - `docs/build-log.md`
 - `requirements/how-to-build-dynamics-model-driven-apps-wizard.md`
 - `requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md`
+
+## Sustained execution after planning and authorization
+
+For explicit new-Dynamics intent or supplied source review notes, follow the
+[optional workload/source-note contract](../docs/wizard-contract-v1.md#optional-workload-and-reviewed-source-input).
+Keep Demo Builder's prompt budget; no first-party provisioning, automatic source
+fetching or inferred material/architecture approval. Preserve quoted human notes
+and pending review tasks.
+
+The one-question-at-a-time **discovery** flow above still applies until the user has accepted the scenario plan and any required owner/environment decisions. After that, avoid repeated 2–5-minute implementation handoffs. Include the relevant downstream backlog, dependencies, accepted file/operation scope, tests, rollback, and stop conditions in one instruction.
+
+- Execute a meaningful sequence of separately authorized READY tasks: validate the saved baseline, apply the scoped change, run the right checks, correct routine errors within the approved budget, and continue the next eligible task without requiring a new prompt for each milestone.
+- Record an unchanged access/ownership/Dataverse blocker once with its exact decision-maker; mark that lane BLOCKED and proceed with other safe work. Do not repeatedly rerun completed tests or ask already-answered setup questions.
+- Persist progress in the existing planning, build-log and task records; use checkpoint recovery rather than restarting the wizard or overwriting prior work. Make one consolidated delivery report with verified changes, outstanding decisions, and explicit live-vs-fixture evidence.
+- Never infer approval to run build/publish scripts, commit/push/merge, create security roles, or write Dataverse from this cadence rule. Honor all planning gates, business requirements, actual permissions and required approval steps already defined above.
+- After VS Code closes, claim automatic continuation only if a real persistent worker is installed, enabled, authorized, and has valid READY tasks. A timer, scheduled monitor, or written instruction is not a coding agent.
+
+This reusable behavior is consistent with the proposed [Sustained Execution Standard](https://github.com/bradlaw76/Work-items-standards-/pull/5) and SpeckKit's [agent-default update](https://github.com/bradlaw76/SpeckKit-Project-Development/pull/1). Existing consumers must update and load reviewed guidance; links or open PRs do not change active jobs automatically.
 
 ## Editing Expectations
 Keep repo changes minimal and practical.
