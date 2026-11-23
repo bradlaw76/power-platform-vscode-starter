@@ -71,6 +71,13 @@ subprocesses with lease/checkpoint/orphan safeguards, not an OS sandbox or an
 installed unattended service. Linux PowerShell was not installed in the tested
 WSL environment; native PowerShell-specific tests run on Windows.
 
+Read-only [Status](framework-handoff.md#one-read-only-operational-status) now
+projects native task counts, dependencies, resource/owner holds, lease expiry
+and timestamped next actions through the existing coordinator. No task-state
+write or dispatch occurs. Projected eligibility is not worker authorization;
+receipt completion is not completion of every task. Reboot/startup persistence
+remains unverified: no persistent Windows controller was established or enabled.
+
 Source and synthetic tests cannot establish native lifecycle, permission,
 connector, package deployment or intended-user UI proof. Use the existing
 [authorization policy](policies/authorization-and-execution.md) and report

@@ -22,6 +22,9 @@ relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
 Existing handoff adoptions accept explicit canonical delivery updates without
 re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
+Read-only Status projects canonical task counts, native IDs, dependencies,
+owner/lease holds and timestamped next actions. It does not dispatch, persist
+lease expiry or substitute coordinator eligibility for worker authorization.
 
 Keep discovery mode, delivery goal and build verification independent. Follow
 [release operating modes](../docs/release-consolidation.md): `Legacy` defaults,

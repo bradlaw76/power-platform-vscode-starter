@@ -110,6 +110,11 @@ has no child lookup, while one-to-many requires that lookup.
 Optional `-FrameworkRuntimeWorkspace` connects approved planning to the installed
 framework; synchronization remains a separate explicit opt-in. See
 [handoff and supported hosts](framework-handoff.md).
+Read-only Status `task_summary` projects canonical counts,
+IDs, dependencies, owner/lease holds, timestamps and next actions without
+dispatch or stored lease mutation. Coordinator eligibility is not worker
+authorization, and missing/corrupt records never become zero-count success.
+
 Explicit canonical delivery updates also apply to existing adoptions without
 re-enabling disabled synchronization. The installed CLI protocol is UTF-8 on
 Windows and POSIX; do not strip Unicode from accepted requirements or paths.

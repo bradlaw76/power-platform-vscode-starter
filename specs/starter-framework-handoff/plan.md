@@ -75,3 +75,26 @@ gaps. Do not repair or adopt another owner's protection package under a
 manufactured maintenance context. Recheck current CI/rules/local activation,
 document isolated non-OneDrive and non-destructive recovery boundaries, and
 retain the existing external report/ledger and PR #13 coordination.
+
+## Q4 reliability and operational status
+
+Reuse the canonical installed task coordinator, worker supervisor, locks,
+journals, checkpoints and bounded repair logic. Canonical main/package remain
+unchanged unless a genuine defect needs a separately owned fix; preserve open
+framework #21/#23 proposal branches. Native Windows supports guided execution,
+not supervised workers or verified reboot continuation.
+
+Improve the existing read-only Status action with a canonical task projection:
+completed/running/blocked/pending counts, native IDs, coordinator-eligible
+tasks, unmet dependencies, lease/owner and event timestamps, and next actions.
+Call canonical ready_tasks on a copy, not a second dependency selector or task
+store. Projected lease expiry must never mutate persisted state or authorize
+dispatch; worker scope/capability checks still apply. Missing/corrupt task
+records must be explicit, not zero-count success.
+
+Verify mixed dependencies/resource holds and projection-only expiry with
+focused tests; retain unchanged recovery evidence and exercise targeted actual
+POSIX orphan/duplicate/retry cases separately from native Windows. Do not restart
+the shared host, install services, enable workers or claim persistent execution.
+Update existing operator guidance, runtime enhancement surfaces and the single
+external status report/ledger with exact source/CI and supported limitations.

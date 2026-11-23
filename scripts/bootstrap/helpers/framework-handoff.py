@@ -1,4 +1,4 @@
-"""Component: installed framework handoff, version 0.1.1.
+"""Component: installed framework handoff, version 0.1.2.
 
 File: scripts/bootstrap/helpers/framework-handoff.py
 Environment: Python 3.11+; canonical power-platform-demo-builder 0.2.1.
@@ -7,6 +7,7 @@ The status receipt is a derived view, not a task store or scheduler.
 from __future__ import annotations
 
 import argparse
+from copy import deepcopy
 from datetime import datetime
 import errno
 import hashlib
@@ -143,6 +144,67 @@ def source_head() -> dict:
         return {"status": "unavailable", "sha": None, "diagnostic": type(exc).__name__}
 
 
+def canonical_task_status(runtime: Path) -> dict:
+    from demo_builder import tasks
+    from demo_builder.errors import BuildError
+    from demo_builder.workspace import child, digest, read_json
+    try:
+        path = child(runtime, "tasks.json")
+        if not path.exists():
+            return {"status": "unavailable", "observed_at": clock(), "counts": None,
+                    "projection_only": True, "diagnostic": "Canonical tasks.json is absent.",
+                    "next_action": "Reconcile interrupted initialization in the original canonical workspace."}
+        stored = read_json(path)
+        state = deepcopy(stored)
+        eligible = [task["id"] for task in tasks.ready_tasks(state)]
+    except (BuildError, KeyError, TypeError) as exc:
+        raise ValueError(f"Cannot report canonical tasks: {exc}") from exc
+    by_id = {task["id"]: task for task in state["tasks"]}
+    original = {task["id"]: task for task in stored["tasks"]}
+    events = state.get("history", [])
+    if any(not isinstance(event, dict) or (
+            event.get("task") is not None and not isinstance(event["task"], str)) for event in events):
+        raise ValueError("Cannot report malformed canonical task history.")
+    last_events = {event.get("task"): event.get("at") for event in events}
+    counts = dict(completed=0, running=0, blocked=0, pending=0, eligible=len(eligible))
+    records = []
+    for task in state["tasks"]:
+        status = task.get("status")
+        if not isinstance(status, str) or status not in {"completed", "running", "blocked", "ready"}:
+            raise ValueError(f"Unsupported canonical status for task {task['id']}; reconcile its task record.")
+        counts["pending" if status == "ready" else status] += 1
+        waiting = [{"task_id": dependency, "status": by_id[dependency]["status"]}
+                   for dependency in task.get("depends_on", [])
+                   if by_id[dependency]["status"] != "completed"]
+        if task["id"] in eligible:
+            action = "Use the canonical coordinator with an explicitly authorized worker scope."
+        elif status == "running":
+            action = "Preserve the owner; verify the current lease before any write."
+        elif status == "completed":
+            action = "Review evidence separately; coordination completion is not live acceptance."
+        elif status == "blocked":
+            action = "Resolve the recorded blocker without resetting canonical state."
+        elif waiting:
+            action = "Resolve the listed prerequisites; independent eligible tasks can continue."
+        else:
+            action = "Inspect canonical resource and external ownership holds before claiming."
+        records.append({"id": task["id"], "status": status,
+                        "stored_status": original[task["id"]].get("status"),
+                        "owner": task.get("owner"), "lease_until": task.get("lease_until"),
+                        "last_event_at": last_events.get(task["id"]),
+                        "blocked_reason": task.get("blocked_reason"),
+                        "waiting_for": waiting,
+                        "lease_reconciliation_required": (
+                            original[task["id"]].get("status") == "running" and status != "running"),
+                        "next_action": action})
+    return {"status": "observed", "observed_at": clock(), "updated_at": stored.get("updated_at"),
+            "task_state_digest": digest(stored), "projection_only": True,
+            "eligibility_scope": "coordinator-only-not-worker-authorization",
+            "counts": counts, "eligible_task_ids": eligible, "tasks": records,
+            "next_action": ("Continue independent eligible tasks through the configured canonical coordinator."
+                            if eligible else "Inspect owners, blockers and dependencies; do not dispatch outside scope.")}
+
+
 def execute(args: argparse.Namespace) -> tuple[dict, int]:
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", args.scenario):
         raise ValueError("Use a normalized scenario slug, not a path.")
@@ -191,9 +253,10 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     if args.action == "status":
         if previous is None:
             return {"status": "not-started", "next_action": "Run start with the accepted contract.",
-                    "scheduler_started": False}, 0
+                    "task_summary": canonical_task_status(runtime), "scheduler_started": False}, 0
         value = previous.copy()
         value["recorded_status"] = value["status"]
+        value["recorded_exit_code"] = value["exit_code"]
         value["current_inputs_match"] = (
             value.get("observed_hashes") == observed_snapshot(
                 [Path(name) for name in value.get("observed_hashes", {})], runtime)
@@ -203,6 +266,10 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
             value["next_action"] = "Resume with the accepted inputs; recorded completion is not current evidence."
         value["canonical_tasks"] = str(runtime / "tasks.json")
         value["scheduler_started"] = False
+        value["task_summary"] = canonical_task_status(runtime)
+        if value["task_summary"]["status"] == "unavailable":
+            value.update(status="blocked", exit_code=2, next_action=value["task_summary"]["next_action"])
+            return value, 2
         return value, int(value["exit_code"])
     observed = sources + documents + [runtime / name for name in (
         "contract.json", "tasks.json", "identity-map.json", "spec-kit.json",

@@ -360,6 +360,82 @@ class InstalledHandoff(unittest.TestCase):
         self.assertTrue(replay["replayed"])
         self.assertEqual(before, {p: p.read_bytes() for p in self.runtime.rglob("*") if p.is_file()})
 
+    def test_status_projects_native_dependencies_and_resource_holds_without_writes(self):
+        from demo_builder import tasks
+        from demo_builder.workspace import read_json, write_json
+        self.start()
+        planned = [
+            {"id": "NATIVE-DONE", "status": "completed", "depends_on": [], "resources": []},
+            {"id": "NATIVE-OWNER", "status": "ready", "depends_on": [], "resources": ["shared"]},
+            {"id": "NATIVE-BLOCK", "status": "blocked", "blocked_reason": "Owner decision", "depends_on": [], "resources": []},
+            {"id": "NATIVE-DEPENDENT", "status": "ready", "depends_on": ["NATIVE-BLOCK"], "resources": []},
+            {"id": "NATIVE-RESOURCE", "status": "ready", "depends_on": [], "resources": ["shared"]},
+            {"id": "NATIVE-INDEPENDENT", "status": "ready", "depends_on": [], "resources": []},
+        ]
+        state = tasks.reconcile({}, planned, read_json(self.runtime / "contract.json"), [])
+        tasks.claim(state, "existing-owner", "NATIVE-OWNER")
+        write_json(self.runtime / "tasks.json", state)
+        before = {p: p.read_bytes() for p in self.runtime.rglob("*") if p.is_file()}
+        with patch.object(handoff, "launch", side_effect=AssertionError("Status must not dispatch")):
+            report, code = self.action("status")
+        self.assertEqual(code, 0)
+        summary = report["task_summary"]
+        self.assertEqual(summary["counts"], {"completed": 1, "running": 1, "blocked": 1, "pending": 3, "eligible": 1})
+        self.assertEqual(summary["eligible_task_ids"], ["NATIVE-INDEPENDENT"])
+        by_id = {task["id"]: task for task in summary["tasks"]}
+        self.assertEqual(by_id["NATIVE-DEPENDENT"]["waiting_for"], [{"task_id": "NATIVE-BLOCK", "status": "blocked"}])
+        self.assertEqual(by_id["NATIVE-OWNER"]["owner"], "existing-owner")
+        self.assertIsNotNone(by_id["NATIVE-OWNER"]["last_event_at"])
+        self.assertTrue(summary["projection_only"])
+        self.assertFalse(report["scheduler_started"])
+        self.assertEqual(before, {p: p.read_bytes() for p in self.runtime.rglob("*") if p.is_file()})
+
+    def test_status_lease_expiry_is_projection_only_and_corrupt_graph_is_explicit(self):
+        from demo_builder import tasks
+        from demo_builder.workspace import read_json, write_json
+        self.start()
+        state = tasks.reconcile({}, [{"id": "NATIVE-LEASE", "status": "ready", "depends_on": [], "resources": []}],
+                                read_json(self.runtime / "contract.json"), [])
+        tasks.claim(state, "existing-owner", "NATIVE-LEASE")
+        state["tasks"][0]["lease_until"] = "2000-01-01T00:00:00+00:00"
+        write_json(self.runtime / "tasks.json", state)
+        before = (self.runtime / "tasks.json").read_bytes()
+        report, code = self.action("status")
+        self.assertEqual(code, 0)
+        task = report["task_summary"]["tasks"][0]
+        self.assertEqual((task["stored_status"], task["status"]), ("running", "ready"))
+        self.assertTrue(task["lease_reconciliation_required"])
+        self.assertEqual(before, (self.runtime / "tasks.json").read_bytes())
+        state["tasks"][0]["depends_on"] = ["unknown-native-id"]
+        write_json(self.runtime / "tasks.json", state)
+        with self.assertRaisesRegex(ValueError, "unknown dependency"):
+            self.action("status")
+        for field, value in (("status", []), ("depends_on", None)):
+            with self.subTest(field=field):
+                malformed = read_json(self.runtime / "tasks.json")
+                malformed["tasks"][0]["depends_on"] = []
+                malformed["tasks"][0][field] = value
+                write_json(self.runtime / "tasks.json", malformed)
+                with self.assertRaises(ValueError):
+                    self.action("status")
+        state["tasks"][0]["depends_on"] = []
+        state["history"] = [{"task": ["invalid-native-id"], "at": "2000-01-01T00:00:00+00:00"}]
+        write_json(self.runtime / "tasks.json", state)
+        with self.assertRaisesRegex(ValueError, "history"):
+            self.action("status")
+
+    def test_status_missing_task_store_is_unavailable_not_zero_count_success(self):
+        self.start()
+        (self.runtime / "tasks.json").unlink()
+        report, code = self.action("status")
+        self.assertEqual(code, 2)
+        self.assertEqual(report["status"], "blocked")
+        self.assertEqual(report["exit_code"], code)
+        self.assertEqual(report["recorded_exit_code"], 0)
+        self.assertEqual(report["task_summary"]["status"], "unavailable")
+        self.assertIsNone(report["task_summary"]["counts"])
+        self.assertIn("reconcile", report["task_summary"]["next_action"].lower())
+
     def test_transient_block_clears_without_input_change_and_native_worker_is_rejected(self):
         self.start()
         original_run = handoff.subprocess.run

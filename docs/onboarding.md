@@ -18,6 +18,8 @@ Important process rule:
 - Optional installed-framework continuation uses
   [the H008 handoff](framework-handoff.md) after accepted planning, with separate
   consumer/runtime folders. It is not another build stage or deployment command.
+  Its read-only Status action reports canonical task counts, dependencies,
+  owner/lease holds and next actions without dispatch or stored lease changes.
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.

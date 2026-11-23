@@ -208,3 +208,47 @@ review threads and owner branches remain unchanged.
     Exact resulting source SHA, CI and remote receipts are recorded on
     existing #12/#13 and in the single external ledger/report; no self-hash or
     fictional approval record is embedded here.
+
+## Q4 additive reliability handoff - 2026-11-23
+
+Canonical restoration remains **HANDOFF NOT WRITTEN - BLOCKED**. This authorized
+additive proposal does not adopt a historical approval or change source owners.
+
+1. **Issue:** existing starter H008 #12/#13; canonical Automation Framework
+   H008 is already merged through its #26 and closed issue #24.
+2. **Intent:** make existing task progress, dependency/lease holds and repair
+   next actions observable without a competing controller, writer or queue.
+3. **Context:** owned `feature/h008-starter-integration`, starting full HEAD
+   `24e77394018ce6dd28a38c10db54dae256551283`; canonical source remains
+   `a23096ec27de9bc1035b690dc9d49268a408d059`, installed package 0.2.1.
+4. **Changes:** existing adapter/tests, profile, registry, both skills, prompt,
+   instructions, onboarding/contract/requirements, operating/build guides and
+   scenario plan/tasks. The coordinator's selector operates on a copy; native
+   IDs, canonical state, task ownership and disabled synchronization survive.
+5. **Validation:** three expected missing-status repro failures; final native
+   19/19, WSL recovery 4/4, WSL status 3/3 and focused malformed-record checks.
+   An actual native Status snapshot showed 0 completed, 0 running, 2 blocked,
+   26 pending/eligible tasks; all 67 selected project/runtime files unchanged.
+   Root status remained stale despite an old completed receipt. Exact-head CI
+   and publication are recorded on the existing issue/PR and external ledger.
+6. **Worktree:** scoped source/doc changes only; commit/push/clean readbacks
+   are required before final completion. No other owner branch is rewritten.
+7. **Completed:** no-write task projection, honest unavailable/errors,
+   stored-versus-projected lease expiry, dependency/resource eligibility,
+   interruption/orphan guards, fair bounded retry and independent-task tests.
+8. **Remaining:** merge and canonical audit authority, original protection
+   adoption/repair gates, machine-reboot/startup persistence and live/native
+   application acceptance. No installed Windows controller was established;
+   no shared-host restart was attempted.
+9. **Recovery:** WSL CRLF transport failed before tests; LF normalization
+   repaired the command, not the worker. An unpinned Markdown lookup failed;
+   the existing cached pinned 0.18.1 tool passed. Fixed the new unavailable
+   status's current-versus-recorded exit-code distinction and explicit malformed
+   record diagnostics. No unchanged failing command was repeated.
+10. **Next actions:** inspect native task next actions and continue only through
+    existing authorized worker scope/configuration. Owner decisions from Q1-Q3
+    remain; Q5 scope has not been supplied. Do not turn eligible or synthetic
+    outcomes into dispatch, deployment or intended-user UI acceptance.
+11. **Publication:** existing PR #13 only, no main merge or public release.
+    Final exact commit, CI, changed-file manifest, logs and sanitized issue
+    readbacks belong in the single external report/ledger.

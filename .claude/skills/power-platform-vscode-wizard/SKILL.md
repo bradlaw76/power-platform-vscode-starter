@@ -21,6 +21,9 @@ A wizard-guided workflow for building Power Platform model-driven apps from VS C
 Preserve approved native table/relationship decisions. Optional continuation
 uses project-root `docs/framework-handoff.md` and the installed framework's
 existing task store, locks and journals, with separate synchronization opt-in.
+Read-only `status` projects canonical task counts, eligible IDs, dependency/
+owner holds and timestamps without dispatch or persisted lease changes.
+Eligibility is not worker authorization; missing/corrupt records are explicit.
 Missing Spec Kit is a no-op. Native Windows guided use does not imply worker
 supervision, automatic installation, a new controller or a persistent scheduler.
 Retain every accepted table exactly once and explicit relationship business

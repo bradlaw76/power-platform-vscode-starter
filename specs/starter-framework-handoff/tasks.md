@@ -93,3 +93,13 @@ PR #6 hooks in an isolated synthetic repository demonstrated six rejections
 and one valid baseline; staged-blob and outgoing-ref gaps were reproduced
 unfixed, not counted as protection successes. No hooks were installed, refs
 pushed, approval records fabricated or application repositories changed.
+
+## Q4 runtime reliability
+
+- [x] Inventory installed canonical worker/coordinator and current ownership.
+- [x] Reproduce missing aggregate status/dependency diagnostics.
+- [x] Add read-only canonical task projection with explicit unavailable/errors.
+- [x] Verify native no-write status, leases, recovery, retries and stale evidence.
+- [x] Verify targeted actual WSL supervision separately; record reboot limits.
+- [x] Align status operating guide and runtime enhancement documentation.
+- [ ] Publish exact source/CI and the single operational report/ledger.

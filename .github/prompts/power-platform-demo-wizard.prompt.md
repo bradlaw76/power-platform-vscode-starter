@@ -32,6 +32,8 @@ Use this behavior:
   [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime
   paths, accepted canonical contract and separate synchronization opt-in.
   Missing Spec Kit is a no-op; do not install tooling or start a scheduler.
+  Read-only Status exposes canonical task/lease/dependency progress and next
+  actions; projection eligibility is not worker authority or live evidence.
   Retain every accepted table exactly once and accepted relationship business
   meaning. Native many-to-many has no child lookup; one-to-many requires it.
   Use explicit canonical delivery JSON for handoff resume, not an inferred

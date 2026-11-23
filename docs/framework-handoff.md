@@ -86,6 +86,48 @@ Use the same project/runtime/scenario/interpreter parameters with `-Action`:
 | `status` | Read-only recorded status and current-input applicability |
 | `worker` | Explicit existing configuration on a supported POSIX host only |
 
+### One read-only operational status
+
+Use the same explicit project/runtime/scenario/interpreter arguments with
+`-Action status`. `task_summary` reads the canonical `tasks.json` through
+the installed coordinator and reports:
+
+- Completed, running, blocked and pending active-task counts, plus coordinator
+  eligible IDs. Pending includes ready tasks waiting on dependencies/resources.
+- Native task IDs, owners/leases, latest retained event timestamps, unmet
+  prerequisites, recorded blockers and each task's next action.
+- Canonical task-state digest, stored update time and observation time.
+  Missing retained event times are null, not invented.
+
+Eligibility uses canonical `ready_tasks` on a copy, including external/retired
+ownership and resource holds. It is not a second queue or worker selection
+engine: configured task kinds, verifier capability, authority, process guards
+and retry/run limits still determine whether a worker may launch.
+
+`projection_only: true` means expired-lease normalization is view-only.
+`stored_status` and `lease_reconciliation_required` distinguish it from
+persisted state. Status never claims tasks, renews/expires stored leases,
+dispatches, re-enables synchronization or writes journals/receipts.
+
+Handoff `recorded_status`/`recorded_exit_code` describe a prior command receipt,
+not total project completion. Stale source/input evidence remains stale even
+when the current task projection shows progress. A missing canonical store is
+explicitly unavailable with null counts; an established receipt then reports
+blocked/exit 2. Malformed records fail with a diagnostic, not empty success.
+
+For recovery, preserve the original roots, IDs, owner and document selection.
+Resolve an active/orphan executor before dispatch; inspect recorded blockers
+and continue independent eligible tasks only through the existing scoped
+coordinator/worker. Do not clear state or locks to make the report green.
+Transient launches retry at most three times; deterministic unchanged errors
+do not retry. Worker repairs use configured attempt/task/time budgets and
+pass prior failure diagnostics to the next attempt.
+
+There is no installed reboot/startup controller in this integration. Native
+Windows supervised workers and Windows restart recovery are not verified;
+no host restart, service or scheduler installation is part of Status.
+POSIX subprocess recovery is separate from machine-reboot persistence.
+
 An ordinary `start` replay does not re-enable disabled synchronization.
 Completed, hash-unchanged replay writes neither documents nor a new receipt.
 Changed inputs or canonical records invalidate cached completion. A

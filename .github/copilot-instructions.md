@@ -47,6 +47,13 @@ When demo data is requested, never seed standard reused tables implicitly. If Da
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.
 
 ## Wizard Behavior
+
+For installed H008 progress, use the existing read-only Status action described
+in `docs/framework-handoff.md`. Its `task_summary` preserves native IDs and
+projects canonical counts, dependencies, owners/leases and timestamps without
+dispatch, stored lease mutation or scheduler activation. Coordinator eligibility
+does not replace worker scope/capability gates; missing/corrupt records are
+explicit and stale source evidence remains stale.
 When helping in chat:
 - Act like a facilitator, not just a command generator.
 - Ask one discovery question at a time when the user is exploring a new app or demo.

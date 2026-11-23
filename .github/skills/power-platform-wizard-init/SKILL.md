@@ -23,6 +23,9 @@ Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
 table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
 native Windows supports guided continuation, not autonomous worker supervision.
+Its read-only Status action projects canonical task counts, eligible IDs and
+dependency/owner holds with timestamps and next actions. Never dispatch from
+that projection, persist lease expiry or turn a missing store into zero success.
 Do not install a framework, create a second task store or start a scheduler.
 Retain every accepted table exactly once and explicit relationship business
 meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.

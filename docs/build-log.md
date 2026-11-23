@@ -4,6 +4,27 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q4 runtime reliability - 2026-11-23
+
+- Starting candidate: `24e77394018ce6dd28a38c10db54dae256551283`;
+  canonical framework/package unchanged at `a23096ec27de9bc1035b690dc9d49268a408d059`
+  / 0.2.1. Existing PR #13 remains the sole source integration vehicle.
+- Reproduced three missing status contracts before adding the read-only
+  canonical task projection. It preserves IDs and reports dependencies,
+  owner/resource holds, stored/projected leases, timestamps and next actions.
+  Unavailable stores fail explicitly; receipt exit codes remain distinguished.
+- Final affected native suite: 19 passed in 62.334 seconds. Targeted actual
+  WSL orphan/duplicate guard, fair retry, descendant timeout and independent
+  verifier work: four passed in 5.643 seconds. New WSL status cases: three
+  passed in 16.887 seconds. These are test runtime, not development speed.
+- One WSL transport attempt ran no tests due CRLF stdin arguments; stripping
+  CR before Bash interpretation fixed transport without changing worker tests.
+- No canonical worker change, dispatch, new queue/controller, persisted status
+  projection, disabled-sync activation, scheduler/service, host restart,
+  security change or deployment. Machine-reboot persistence remains unverified.
+- Publication, exact-head CI, task snapshot and full transferable blocked
+  audit handoff remain in the existing issue/PR and single external ledger/report.
+
 ## Q3 governance reconciliation - 2026-11-23
 
 - Starting candidate: `487b56a939807b7409c474f255fa31c5d1faa2ec`.

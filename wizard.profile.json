@@ -1,12 +1,18 @@
 {
-  "profileVersion": "1.5",
+  "profileVersion": "1.6",
   "contractVersion": "1.10.0",
   "frameworkHandoff": {
     "defaultEnabled": false,
     "script": "09-framework-handoff.ps1",
     "frameworkVersion": "0.2.1",
     "nativeWindowsGuided": true,
-    "workerHosts": ["Linux", "macOS", "WSL"]
+    "workerHosts": ["Linux", "macOS", "WSL"],
+    "readOnlyTaskStatus": {
+      "action": "status",
+      "outputField": "task_summary",
+      "canonicalEligibilityOnly": true,
+      "persistsLeaseChanges": false
+    }
   },
   "applicationProfiles": [
     "standalone-model-driven",
