@@ -14,11 +14,11 @@ in issue #12 and the external operational report. No live acceptance is implied.
 
 ## Follow-on cycle
 
-- [ ] Resolve the accepted-table coverage review finding and exact-SHA CI.
-- [ ] Inventory remaining PRs and record dependency/approval outcomes.
+- [x] Resolve the accepted-table coverage review finding and exact-SHA CI.
+- [x] Inventory remaining PRs and record dependency/approval outcomes.
 - [ ] Exercise installation and new/partial/absent/inconsistent project paths.
 - [ ] Validate accepted architecture, relationships, identities and ownership.
-- [ ] Verify extended Spec Kit lifecycle and canonical recovery boundaries.
+- [x] Verify extended Spec Kit lifecycle and canonical recovery boundaries.
 - [ ] Test Windows paths/encoding and available POSIX prerequisites.
 - [ ] Exercise a separate synthetic benefits new/partial-project fixture.
 - [ ] Complete quality/security checks, aligned guidance and readiness report.

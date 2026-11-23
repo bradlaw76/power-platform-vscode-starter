@@ -38,6 +38,12 @@ lessons, and `-RecipePath` compiles the selected recipe. The framework remains
 responsible for validation, aliases, canonical `tasks.json`, dependency
 coordination and synchronization transactions.
 
+On an existing adoption, an explicitly changed delivery JSON is validated and
+applied through canonical `spec-kit delivery` before synchronization. Identical
+delivery does not add a delivery write, and disabled synchronization stays
+disabled. Wizard goal/timeframe text is not automatically converted into an
+accepted ISO deadline or evidence assertion; supply the canonical JSON explicitly.
+
 After planning, wizard intake can explicitly invoke the same entry point with
 `-AcceptedContractPath`, `-FrameworkRuntimeWorkspace`,
 `-FrameworkPythonExecutable` and optional `-EnableFrameworkSpecKitSync`.
@@ -95,6 +101,11 @@ in the consumer project nor WSL. Native Windows worker supervision is rejected.
 Linux/macOS/explicit WSL can use the framework's existing worker interface;
 host availability alone does not prove the package is installed. Never start
 an unattended scheduler merely because worker support exists.
+
+The installed Python CLI subprocess uses explicit UTF-8 input/output settings,
+including on Windows consoles configured for a legacy encoding. Unicode paths,
+requirement text and previews must not be rewritten into ASCII to avoid failures.
+The settings are child-process-local, not a system or console-policy change.
 
 The tested POSIX worker runs bounded, explicitly configured subprocesses. It
 provides checkpoints, lease checks and orphan exclusion; it is not an OS sandbox.

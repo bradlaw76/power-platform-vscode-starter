@@ -228,6 +228,32 @@ class InstalledHandoff(unittest.TestCase):
         self.action("sync")
         self.assertIn(b"Accepted fixture clarification.", path.read_bytes())
 
+    def test_utf8_projection_survives_legacy_windows_child_encoding(self):
+        contract = json.loads((self.inputs / "contract.json").read_text())
+        contract["requirements"][0]["description"] += " Accepted clarification \u03a9."
+        (self.inputs / "contract.json").write_text(json.dumps(contract))
+        with patch.dict(os.environ, {"PYTHONIOENCODING": "ascii", "PYTHONUTF8": "0"}):
+            self.start()
+        path = self.project / "specs" / self.args.scenario / "spec.md"
+        self.assertIn("Accepted clarification \u03a9.".encode("utf-8"), path.read_bytes())
+
+    def test_explicit_delivery_updates_existing_adoption_without_reenabling(self):
+        self.start()
+        self.action("disable")
+        documents = {path: path.read_bytes() for path in self.project.rglob("*.md")}
+        delivery = {"goal": "connected-demo", "deadline": None, "evidence_ids": ["EV-account-journey"]}
+        path = self.inputs / "delivery.json"
+        path.write_text(json.dumps(delivery))
+        self.args.delivery = str(path)
+        self.start()
+        config = json.loads((self.runtime / "spec-kit.json").read_text())
+        self.assertEqual(config["delivery"], delivery)
+        self.assertFalse(config["enabled"])
+        self.assertEqual(documents, {path: path.read_bytes() for path in self.project.rglob("*.md")})
+        before = {path: path.read_bytes() for path in self.runtime.rglob("*.json")}
+        self.assertTrue(self.start()["replayed"])
+        self.assertEqual(before, {path: path.read_bytes() for path in self.runtime.rglob("*.json")})
+
     def test_conflict_hold_preserves_human_text_and_updates_independent_section(self):
         self.start()
         contract = json.loads((self.inputs / "contract.json").read_text())

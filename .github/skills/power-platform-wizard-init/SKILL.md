@@ -26,6 +26,8 @@ native Windows supports guided continuation, not autonomous worker supervision.
 Do not install a framework, create a second task store or start a scheduler.
 Retain every accepted table exactly once and explicit relationship business
 meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
+Use explicit canonical delivery JSON for handoff resume, not an inferred
+deadline. Preserve Unicode and disabled synchronization.
 
 ## Runtime Compatibility Preflight
 

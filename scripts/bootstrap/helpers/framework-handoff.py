@@ -1,4 +1,4 @@
-"""Component: installed framework handoff, version 0.1.0.
+"""Component: installed framework handoff, version 0.1.1.
 
 File: scripts/bootstrap/helpers/framework-handoff.py
 Environment: Python 3.11+; canonical power-platform-demo-builder 0.2.1.
@@ -12,6 +12,7 @@ import errno
 import hashlib
 import importlib.metadata
 import json
+import os
 from pathlib import Path
 import re
 import subprocess
@@ -84,11 +85,12 @@ def classify(exc: BaseException) -> str:
 
 
 def launch(arguments: list[str]) -> tuple[subprocess.CompletedProcess, int]:
+    environment = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
     for attempt in range(1, MAX_LAUNCH_ATTEMPTS + 1):
         try:
             return subprocess.run([sys.executable, "-m", "demo_builder", *arguments],
                                   capture_output=True, text=True, encoding="utf-8",
-                                  timeout=180, check=False), attempt
+                                  timeout=180, check=False, env=environment), attempt
         except OSError as exc:
             if classify(exc) != "transient" or attempt == MAX_LAUNCH_ATTEMPTS:
                 raise
@@ -247,6 +249,9 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
             config = load_json(runtime / "spec-kit.json")
             if config["project"] != str(project) or config["files"] != selected:
                 raise ValueError("Resume the original document selection; do not reclaim another adoption.")
+            if args.delivery and config.get("delivery") != load_json(Path(args.delivery)):
+                commands.append(["spec-kit", "delivery", "--workspace", str(runtime),
+                                 "--delivery-context", args.delivery])
             # A start replay never re-enables a disabled existing adoption.
             commands.append(["spec-kit", "sync", "--workspace", str(runtime)])
         if args.recipe:

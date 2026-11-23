@@ -19,6 +19,8 @@ nor WSL; synthetic completion is not live deployment/UI acceptance.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
+Existing handoff adoptions accept explicit canonical delivery updates without
+re-enabling synchronization. Preserve Unicode through the UTF-8 CLI protocol.
 
 - Use `how-to-build-dynamics-model-driven-apps-wizard.md` when you want a
   guided, question-by-question process that walks users from principles and

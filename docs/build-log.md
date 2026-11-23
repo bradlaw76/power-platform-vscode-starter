@@ -11,7 +11,7 @@ Use this to document what was planned, built, validated, and promoted.
 - Additional regression exposed missing relationship business meaning.
   Both cardinalities now validate accepted endpoints and owner intent.
   Native many-to-many rejects a child lookup; one-to-many requires it.
-- Current installed verification: 14 tests passed in 38.577 seconds, including
+- Review-repair checkpoint: 14 installed tests passed in 38.577 seconds, including
   an actual adapter exit immediately after canonical adoption, fresh-process
   resume without reclaiming documents/task IDs, and unchanged no-write replay.
   Native wizard modes, configured changed-file analyzer, contract integrity,
@@ -28,6 +28,12 @@ Use this to document what was planned, built, validated, and promoted.
 - The canonical review-handoff file is absent from this approved checkout.
   HANDOFF NOT WRITTEN - BLOCKED: do not import an unapproved protection/handoff
   branch or bypass its preflight to write it.
+- The extended benefits pilot exposed two more bounded defects: Windows legacy
+  child encoding broke Unicode previews, and existing adoptions ignored supplied
+  delivery JSON. Both focused regressions failed before repair and then passed.
+  CLI encoding is now child-local UTF-8; accepted delivery changes use canonical
+  `spec-kit delivery` without re-enabling disabled synchronization.
+  The expanded installed suite passed all 16 tests in 42.713 seconds.
 
 ## H008 starter integration - 2026-11-22
 

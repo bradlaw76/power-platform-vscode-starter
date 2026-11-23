@@ -76,6 +76,9 @@ has no child lookup, while one-to-many requires that lookup.
 Optional `-FrameworkRuntimeWorkspace` connects approved planning to the installed
 framework; synchronization remains a separate explicit opt-in. See
 [handoff and supported hosts](framework-handoff.md).
+Explicit canonical delivery updates also apply to existing adoptions without
+re-enabling disabled synchronization. The installed CLI protocol is UTF-8 on
+Windows and POSIX; do not strip Unicode from accepted requirements or paths.
 
 First select one supported application profile:
 

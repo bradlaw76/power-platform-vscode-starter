@@ -25,6 +25,8 @@ Missing Spec Kit is a no-op. Native Windows guided use does not imply worker
 supervision, automatic installation, a new controller or a persistent scheduler.
 Retain every accepted table exactly once and explicit relationship business
 meaning. Native many-to-many prohibits a child lookup; one-to-many requires it.
+Use explicit canonical delivery JSON for handoff resume, not an inferred
+deadline. Preserve Unicode and disabled synchronization.
 
 ## Runtime Compatibility Preflight
 
