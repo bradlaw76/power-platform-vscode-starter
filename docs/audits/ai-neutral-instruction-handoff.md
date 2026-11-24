@@ -1,5 +1,57 @@
 # AI-neutral instruction and implementation handoff
 
+## Q13-Q14 reconciliation and classification - current continuation
+
+Continues the same campaign and PRs, not Q01-Q12 reinvestigation. The three
+campaign branches were clean at Starter `0034864`, Automation `31506d4` and
+Standards `c521fb8`; their open PR heads matched. No intervening campaign-source
+mutation or overlapping writer was observed in the available process/session
+view. Repository labels on application sessions are not evidence of actual
+framework writes; visibility is bounded, not proof that every writer is absent.
+The dirty original checkout, its nested standards clone and H010 worktrees were
+preserved. Do not infer authorship or revert them from routing metadata.
+
+Fixed purpose-based classification was applied to both exact retained baselines:
+Starter `56442b0`, Automation `55e95e5`, Standards `d84f507`. The inventory includes
+all tracked Markdown and the executable lesson catalog. A is active instructions
+and operator references; B is functional/design/scenario contracts; C is
+operational evidence, indexes and record templates (some manually curated, not
+claimed automatically generated); D is historical reference/proposals. The
+non-default-loaded lesson register is B; executable catalog instructions are A.
+Whole mixed A documents are counted conservatively, including necessary
+functional/security/recovery content and markup. Roles do not change to inflate
+the reduction. Consumer source content is not exported by the inventory.
+
+| Repository | A documents before / after | A words before / after |
+| --- | ---: | ---: |
+| Starter | 31 / 31 | 58,592 / 53,935 |
+| Automation | 16 / 16 | 24,369 / 21,697 |
+| Standards | 3 / 3 | 1,265 / 804 |
+| Total | 50 / 50 | 84,226 / 76,436 |
+
+The complete mixed active/reference set decreased **9.25%**, not 60%. The six
+governing policy/loader entry points below achieved **69.36%**. Physical loader
+files remain necessary. Cutting functional bootstrap, native security, worker
+protocol or recovery references to force a broader percentage is not authorized.
+Per-file A/B/C/D classifications and both word/hash snapshots are retained in
+external campaign evidence; this handoff is an evidence index, not another policy.
+
+Remaining source gaps were closed in existing files: contributor maintenance
+uses only affected prerequisites/contracts; migration counts are explicitly
+historical; Automation operator references point to its canonical AGENTS policy;
+legacy H001-AUTO provenance is quoted as history, not current allocation or
+component ownership. The H identity standard names execution continuity as the
+execution policy. Historical H assignments, URLs and registry bytes are retained.
+No application/tenant writes, merge, release or new H allocation are authorized.
+
+Focused validation: **30 canonical-policy/installation tests passed**, including
+the newly covered migration entry point; seven changed Markdown files passed.
+The changed test passes existing CI analyzer settings; two warnings from a
+broader ad hoc analyzer profile also occur in the identical file-based baseline.
+The requested cached repository-update script is absent on this candidate;
+advice is unavailable, not assumed current. PR-head reads are separate evidence.
+Unchanged runtime/security/synthetic acceptance evidence below is reused.
+
 ## Development-first consolidation - current continuation
 
 Originating initiative: H109-Q09; no new repository-specific H allocation.
