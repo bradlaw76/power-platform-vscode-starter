@@ -378,6 +378,14 @@ try {
         'explicitly autonomous multi-change work, recommend dependency-aware queues',
         'https://code.visualstudio.com/docs/agents/overview',
         'verify actual executor support, not assumed live acceptance'
+        'observe the actual browser principal (not session-declared or separate API-admin identity)'
+        'identity mismatch stops'
+        'form eligibility in the intended app/user context, not mere direct URL access'
+        'publication blast radius preserving unrelated drafts'
+        'unexpected native record modifications and retain evidence without blind rollback'
+        'application-created restrictions separately from security/platform/unknown without bypass'
+        'recover independent browser process/checkpoint/resource evidence and repeat principal preflight'
+        'Automation owns runtime capabilities, no native pilot is implied'
     )) {
         Assert-True -Condition ($materialTasks.Contains($rule)) -Message "Generated tasks lost authorization/execution contract: $rule"
     }

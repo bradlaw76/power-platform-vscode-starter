@@ -26,6 +26,17 @@ work, recommend dependency-aware queues and ready-to-paste instructions from
 https://code.visualstudio.com/docs/agents/overview. Do not claim absent executor
 capabilities or live verification.
 
+For native work, follow the canonical policy's browser safety contract: actual
+browser-principal preflight (not session-declared or separate API-admin identity);
+identity mismatch stops. Validate publication blast radius and preserve unrelated
+drafts. Detect unexpected native record modifications, retain evidence and never
+blindly roll back. Classify application-created restrictions separately from
+security/platform/unknown without permission to bypass. Verify form eligibility
+in the intended app/user context, not mere direct URL access. Recover the
+independent browser session using process/checkpoint/resource evidence and repeat
+principal preflight. Runtime capabilities belong to Automation; these are Starter
+guidance/contracts, not an installed browser driver or a performed native pilot.
+
 ## Purpose
 
 Create native Dataverse charts and dashboards for an existing or planned

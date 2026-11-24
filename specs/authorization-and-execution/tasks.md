@@ -31,3 +31,14 @@ Owner Q01-R1 authorizes bounded implementation despite pending allocator review.
 
 No H allocation, central standards mutation, original-worktree change, merge,
 release or live/native acceptance is authorized or claimed.
+
+### Q09–Q12 follow-up
+
+- [x] Confirm clean isolated Starter baseline and reuse accepted campaign context.
+- [x] Add six generic native safety obligations to the existing canonical policy.
+- [x] Align directly applicable skills/instructions/task templates and parity cases.
+- [x] Run focused validation and update the existing handoff with exact evidence.
+- [x] Inspect explicit staged diff and commit; do not push until parent requests.
+
+Automation runtime/synthetic end-to-end work remains separate. No native pilot,
+H allocation, central standards or H009/H010 branch mutation is claimed.

@@ -150,6 +150,17 @@ After minimum gates, implement the smallest demonstrable vertical slice; test vi
 
 ### Existing Dataverse web resource / contact UI repair
 
+Apply the canonical policy's
+[native application safety and browser acceptance](policies/authorization-and-execution.md#native-application-safety-and-browser-acceptance)
+before this path: observe the actual browser principal (not declared session or
+API-admin identity), stop on mismatch, validate publication blast radius while
+preserving unrelated drafts, retain unexpected native record change evidence
+without blind rollback, classify restrictions without bypass, and verify
+intended app/user form eligibility rather than direct URL access alone. Recover
+the independent browser process/session from current checkpoint/resource evidence
+and repeat principal preflight. Missing native support stays partial/unverified;
+this guide does not supply Automation runtime or claim a native pilot.
+
 1. Capture exact organization/environment, solution, app/form selection, record test fixture, resource name/id, published/unpublished versions, references and hashes; export a verified rollback copy. Confirm active writer ownership and protected features.
 2. Record a **short change contract**: current behavior, desired behavior, protected interfaces/handlers, tests and rollback. Identify Contact field/record effects separately from HTML edits. A web resource rewrite is not authorization to rewrite Contact data.
 3. Edit the source (or, when explicitly approved, the target resource directly with captured before-state). Use supported concurrency checks, publish only the selected authorized scope, reload the right form and verify the actual runtime content/version.

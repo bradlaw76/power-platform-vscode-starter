@@ -49,6 +49,32 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    It '<Path> inherits native safety without claiming an installed runtime' -ForEach @(
+        @{ Path = '.github\skills\power-platform-wizard-init\SKILL.md' }
+        @{ Path = '.claude\skills\power-platform-vscode-wizard\SKILL.md' }
+        @{ Path = '.github\skills\dataverse-report-wizard\SKILL.md' }
+        @{ Path = '.claude\skills\dataverse-report-wizard\SKILL.md' }
+        @{ Path = '.github\copilot-instructions.md' }
+        @{ Path = '.github\prompts\power-platform-demo-wizard.prompt.md' }
+    ) {
+        $content = (Get-Content -LiteralPath (Join-Path $repoRoot $Path) -Raw) -replace '\s+', ' '
+        foreach ($rule in @(
+            'actual browser-principal preflight',
+            'not session-declared or separate API-admin identity',
+            'identity mismatch stops',
+            'publication blast radius and preserve unrelated drafts',
+            'unexpected native record modifications, retain evidence and never blindly roll back',
+            'application-created restrictions separately from security/platform/unknown without permission to bypass',
+            'form eligibility in the intended app/user context, not mere direct URL access',
+            'independent browser session using process/checkpoint/resource evidence',
+            'repeat principal preflight',
+            'Runtime capabilities belong to Automation',
+            'not an installed browser driver or a performed native pilot'
+        )) {
+            $content | Should -Match ([regex]::Escape($rule)) -Because "$Path must preserve $rule"
+        }
+    }
+
     It '<Skill> uses docs/onboarding.md as the authoritative sequence' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }

@@ -1,5 +1,52 @@
 # AI-neutral instruction and implementation handoff
 
+## Q09–Q12 native safety continuation — 2026-11-24
+
+Same authorized **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION** campaign,
+continued from Starter `a0e7d6743cb5120104531e517253c142ac73fc3d` in the clean
+isolated `D:\GitRepos\starter-execution-simplification` worktree, existing PR #17.
+No Q01–Q08 restart, H allocation, central standards mutation or H009/H010 branch
+change. Local implementation/tests/commit only; no push until the parent asks.
+
+The existing canonical authorization policy now requires six generic native
+safety obligations: actual observed browser principal rather than a declared
+session/API-admin identity (mismatch stops), publication blast-radius validation
+preserving unrelated drafts, unexpected native record modification detection and
+retained evidence without blind rollback, application/security/platform/unknown
+restriction classification without bypass, form eligibility in intended app/user
+context rather than direct URL access, and independent browser process/checkpoint/
+resource recovery with renewed principal preflight.
+
+Directly applicable Copilot/prompt/four skills, portable policy distribution,
+generated task template, README registry/checklist, queue/framework handoff and
+existing planning artifacts are aligned. No competing policy, browser driver,
+runtime feature, live pilot or native acceptance run is installed/claimed here.
+Automation runtime and external synthetic end-to-end implementation/evidence
+remain the parent's separate scope; synthetic results do not prove a native pilot.
+
+### Focused evidence
+
+- Pester 5.7.1:
+  `Invoke-Pester -Path '.\scripts\ci\AuthorizationExecution.Tests.ps1','.\scripts\ci\SkillParity.Tests.ps1' -Output Normal -PassThru`:
+  **96 passed / 0 failed / 0 skipped / 0 not-run**. Includes AUTH-15–AUTH-20,
+  native safety evidence/stop rules, all six distributed entry-point parity cases,
+  and real worktree-local fixture policy installer byte equality/rerun/rejection.
+- `pwsh -NoProfile -File .\scripts\ci\test-wizard-modes.ps1`,
+  `pwsh -NoProfile -File .\scripts\ci\test-wizard-source-control-acceptance.ps1`,
+  `pwsh -NoProfile -File .\scripts\ci\test-contract-integrity.ps1`: all passed.
+- Changed PowerShell parser/PSScriptAnalyzer 1.24.0 with repository settings:
+  four files passed, no findings. Changed Markdown:
+  `npx --yes markdownlint-cli2@0.18.1` with explicit changed paths, zero errors.
+- Initial focused run exposed a newly nested Pester `It` declaration; corrected
+  its scope before the final 96/0 run. No safety gate was weakened to pass tests.
+- Fixtures used process-local `TEMP`/`TMP` under the isolated worktree; no operator
+  home or tenant was used. Full publication CI remains required.
+
+**SOURCE COMPLETE / TESTED locally**, not DEPLOYED or LIVE VERIFIED. These checks
+cover instructions, distribution and generated tasks, not actual browser identity,
+native publication/record readback, live form eligibility or browser-process
+recovery. No live calls, authentication or native pilot were performed.
+
 ## Continuation: development execution simplification — 2026-11-24
 
 Temporary identifier: **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION**.

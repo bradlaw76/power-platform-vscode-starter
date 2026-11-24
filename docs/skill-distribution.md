@@ -34,6 +34,14 @@ in full clones; portable skills use the bundled policy contract when it is
 absent and must verify actual executor support. No new installer payload,
 scheduler or live/native acceptance capability is claimed.
 
+Native safety inheritance also covers actual browser-principal proof (not
+session-declared or separate API-admin identity), mismatch stops, publication
+blast-radius preservation of unrelated drafts, unexpected record change evidence
+without blind rollback, restriction classification without bypass, intended
+app/user form eligibility and independent browser process/checkpoint recovery.
+Keep these obligations in both skill families and their portable byte-identical
+policy. Runtime implementation belongs to Automation; no native pilot is implied.
+
 ## Install options
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:

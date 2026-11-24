@@ -196,6 +196,60 @@ message queueing is not proof of durable recovery or unattended permission.
 
 ## Completion and evidence
 
+### Native application safety and browser acceptance
+
+These are generic safety obligations for authorized native application work,
+not a browser driver, runtime installation or evidence that a pilot has run.
+Automation runtime capabilities and their tests belong to the Automation
+repository; Starter supplies guidance and instruction/distribution contracts.
+
+1. **Actual browser principal preflight:** before browser acceptance or native
+   writes, observe the actual authenticated browser principal using supported
+   application/session evidence and compare it with the owner-selected intended
+   user, target and access scope. A session-declared identity, displayed persona
+   switch or separate API administrator identity is not browser-principal proof.
+   Identity mismatch stops the affected operation before writes; missing or
+   unverifiable principal evidence blocks it. Recheck after login, target or
+   session changes. Retain sanitized principal/target evidence, never credentials.
+2. **Publication blast radius:** inspect the supported publication mechanism,
+   dependencies and current published/unpublished state before publishing.
+   Validate that the actual publication scope preserves unrelated drafts, not
+   merely that the edited component is authorized. Broad table/app publication
+   can promote unrelated pending changes. If scoped publication cannot be proven,
+   stop that publication and report the unsupported/uncertain boundary; do not
+   widen scope or claim partial publication as complete.
+3. **Unexpected native record modification:** capture permitted before-state,
+   stable record identity/version and the expected write set; compare native
+   readback after the operation. Distinguish authorized effects and explicitly
+   expected platform changes from unexpected record/field modifications. On an
+   unexpected change, stop further affected writes and retain sanitized before/
+   after, diff, timing, operation and principal evidence for owner investigation.
+   Do not blindly roll back, overwrite concurrent changes or delete records;
+   recovery needs reconciled state and its applicable explicit authority.
+4. **Restriction classification:** classify observed restrictions separately as
+   application-created, security/access, platform-enforced or unknown, recording
+   the supporting evidence. Application-created does not mean safe to bypass:
+   a business rule may protect data or enforce an approved contract. Only an
+   authorized scoped repair with applicable planning/security gates may change
+   it. Security/platform restrictions retain their established controls; unknown
+   restrictions block the affected action until understood. Classification is
+   diagnosis, never permission to bypass a control.
+5. **Form eligibility in app/user context:** verify the intended form's published
+   app membership, user/role eligibility, table/form type and supported selection/
+   fallback behavior in the intended app. Mere direct URL access is not proof of
+   form eligibility in the intended app/user context. Retain evidence of the
+   actual selected form and representative user path; report direct-access-only
+   or missing native support as partial/unverified rather than accepted.
+6. **Independent browser-session recovery:** maintain the owner-selected browser
+   session's independent process/owner, target, observed principal and durable
+   checkpoint evidence, separate from an API worker or its administrator session.
+   Before recovery/restart, reconcile active browser processes, outstanding
+   writes and actual resource state; lease expiry or a stale session declaration
+   cannot release its writer. Reattach/recover through supported mechanisms,
+   repeat browser-principal preflight and read back uncertain effects before
+   continuing. If support/evidence is missing, hold that session/resource and
+   continue only independent authorized work; never launch a conflicting writer.
+
 When deployment is requested and authorized, complete implementation, focused
 testing, authorized deployment and live verification. Source changes alone are
 not the requested deployment outcome. Verify the actual target identity,
@@ -262,3 +316,9 @@ not a new runtime authorization engine or proof of autonomous agent compliance.
 | AUTH-12 | A writer lease expires while its process, checkpoint or target write state is uncertain. | Recover before restart; lease expiry alone does not release the writer. |
 | AUTH-13 | A historical H outcome touched the component but no conflicting writer remains. | Check current ownership evidence; preserve the H ID, do not treat it as permanent ownership. |
 | AUTH-14 | Explicitly autonomous multi-change work has one blocked dependency. | Queue dependency-ready authorized work; preserve the hold and verify actual executor support. |
+| AUTH-15 | Browser identity is session-declared or belongs to a separate API administrator, not the observed intended browser user. | Block before writes; actual browser-principal preflight is required and identity mismatch stops the operation. |
+| AUTH-16 | Publishing an authorized form through its table/app would promote unrelated drafts. | Stop broad publication; validate actual blast radius and preserve unrelated drafts. |
+| AUTH-17 | Native readback shows an unexpected record/field modification. | Stop affected writes, retain before/after evidence and investigate; no blind rollback. |
+| AUTH-18 | A restriction appears application-created but its purpose or authority is unresolved. | Classify separately from security/platform/unknown; diagnosis does not permit bypass. |
+| AUTH-19 | A form opens by direct URL but intended app/user eligibility is unproven. | Report partial/unverified; verify app membership, eligibility and the actual selected form. |
+| AUTH-20 | Browser acceptance resumes after its independent process/session was interrupted. | Reconcile process/checkpoint/resource evidence, repeat principal preflight and recover uncertain writes before continuing. |

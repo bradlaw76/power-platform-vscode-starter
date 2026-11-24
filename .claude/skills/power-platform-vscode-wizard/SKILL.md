@@ -29,6 +29,17 @@ https://code.visualstudio.com/docs/agents/overview. If the guide is absent, use
 the bundled policy's queue contract and verify installed controls; do not claim
 absent executor capabilities or live verification.
 
+For native work, follow the canonical policy's browser safety contract: actual
+browser-principal preflight (not session-declared or separate API-admin identity);
+identity mismatch stops. Validate publication blast radius and preserve unrelated
+drafts. Detect unexpected native record modifications, retain evidence and never
+blindly roll back. Classify application-created restrictions separately from
+security/platform/unknown without permission to bypass. Verify form eligibility
+in the intended app/user context, not mere direct URL access. Recover the
+independent browser session using process/checkpoint/resource evidence and repeat
+principal preflight. Runtime capabilities belong to Automation; these are Starter
+guidance/contracts, not an installed browser driver or a performed native pilot.
+
 ## Overview
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**

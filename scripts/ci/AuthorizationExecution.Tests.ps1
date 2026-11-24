@@ -72,6 +72,12 @@ Describe 'Authorization and execution policy contract' {
         @{ Id = 'AUTH-12'; Expected = 'Recover before restart; lease expiry alone does not release the writer'; Rule = 'Lease expiry alone is insufficient evidence of release' }
         @{ Id = 'AUTH-13'; Expected = 'Check current ownership evidence; preserve the H ID, do not treat it as permanent ownership'; Rule = 'H IDs track outcomes, not permanent component ownership' }
         @{ Id = 'AUTH-14'; Expected = 'Queue dependency-ready authorized work; preserve the hold and verify actual executor support'; Rule = 'native message queueing is not proof of durable recovery or unattended permission' }
+        @{ Id = 'AUTH-15'; Expected = 'Block before writes; actual browser-principal preflight is required and identity mismatch stops the operation'; Rule = 'A session-declared identity, displayed persona switch or separate API administrator identity is not browser-principal proof' }
+        @{ Id = 'AUTH-16'; Expected = 'Stop broad publication; validate actual blast radius and preserve unrelated drafts'; Rule = 'If scoped publication cannot be proven, stop that publication' }
+        @{ Id = 'AUTH-17'; Expected = 'Stop affected writes, retain before/after evidence and investigate; no blind rollback'; Rule = 'Do not blindly roll back, overwrite concurrent changes or delete records' }
+        @{ Id = 'AUTH-18'; Expected = 'Classify separately from security/platform/unknown; diagnosis does not permit bypass'; Rule = 'Classification is diagnosis, never permission to bypass a control' }
+        @{ Id = 'AUTH-19'; Expected = 'Report partial/unverified; verify app membership, eligibility and the actual selected form'; Rule = 'Mere direct URL access is not proof of form eligibility in the intended app/user context' }
+        @{ Id = 'AUTH-20'; Expected = 'Reconcile process/checkpoint/resource evidence, repeat principal preflight and recover uncertain writes before continuing'; Rule = 'separate from an API worker or its administrator session' }
     ) {
         $row = @($policy -split '\r?\n' | Where-Object { $_ -match "^\| $Id \|" })
         $row.Count | Should -Be 1
@@ -115,6 +121,32 @@ Describe 'Authorization and execution policy contract' {
             'actual resource state and in-flight writes',
             'Do not delete locks or reset state merely to force a restart',
             'a fresh session does not reset that budget'
+        )) {
+            $contract | Should -Match ([regex]::Escape($rule))
+        }
+
+    }
+
+    It 'retains native evidence and stops uncertain or conflicting browser operations' {
+        $contract = $policy -replace '\s+', ' '
+        foreach ($rule in @(
+            'missing or unverifiable principal evidence blocks it',
+            'Recheck after login, target or session changes',
+            'Retain sanitized principal/target evidence, never credentials',
+            'current published/unpublished state before publishing',
+            'Broad table/app publication can promote unrelated pending changes',
+            'stable record identity/version and the expected write set',
+            'explicitly expected platform changes from unexpected record/field modifications',
+            'stop further affected writes and retain sanitized before/ after, diff, timing, operation and principal evidence',
+            'a business rule may protect data or enforce an approved contract',
+            'unknown restrictions block the affected action until understood',
+            'published app membership, user/role eligibility, table/form type',
+            'report direct-access-only or missing native support as partial/unverified',
+            "owner-selected browser session's independent process/owner",
+            'reconcile active browser processes, outstanding writes and actual resource state',
+            'repeat browser-principal preflight and read back uncertain effects',
+            'never launch a conflicting writer',
+            'Starter supplies guidance and instruction/distribution contracts'
         )) {
             $contract | Should -Match ([regex]::Escape($rule))
         }

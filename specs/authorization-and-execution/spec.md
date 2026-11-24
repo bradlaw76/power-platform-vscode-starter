@@ -68,3 +68,20 @@ Q02/Q05/Q07 Starter acceptance:
   contract/distribution behavior, not live/native acceptance.
 - Prepare separate STARTER and AUTO mappings for ChatGPT allocator review;
   allocate no H number, preserve H008/H009/H010 and all original worktrees.
+
+### Authorized Q09–Q12 follow-up
+
+Continue the same accepted campaign from Starter `a0e7d6743cb5120104531e517253c142ac73fc3d`;
+do not restart Q01–Q08. Extend only generic native safety guidance and directly
+applicable distributed contracts: actual observed browser principal (not
+session-declared/API-admin identity), mismatch stops, publication blast-radius
+and unrelated-draft preservation, unexpected native record modification
+detection/evidence without blind rollback, application/security/platform/unknown
+restriction classification without bypass, form eligibility in the intended
+app/user context rather than direct URL access, and independent browser-session
+process/checkpoint recovery.
+
+Parent owns Automation runtime and external synthetic end-to-end work; Starter
+does not install that runtime or claim a native pilot. Local implementation,
+focused tests and commit are authorized; no push until requested. No live calls,
+H allocation, central standards mutation or H009/H010 branch changes.
