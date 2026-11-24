@@ -36,6 +36,7 @@ BeforeAll {
         'docs\wizard-contract-v1.md'
         'docs\skill-distribution.md'
         'CONTRIBUTING.md'
+        'MIGRATION.md'
         'README.md'
         'requirements\GithubInstructions_General.md'
         'requirements\how-to-build-dynamics-model-driven-apps-wizard.md'
