@@ -1,5 +1,81 @@
 # AI-neutral instruction and implementation handoff
 
+## Continuation: development execution simplification — 2026-11-24
+
+Temporary identifier: **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION**.
+Owner Q01-R1 supersedes the campaign's read-only allocation block and authorizes
+implementation before H allocation. ChatGPT remains the designated allocator.
+This section is additive; all earlier snapshots and H008/H009/H010 evidence
+remain historical, unchanged and distinct from this work.
+
+- Isolated Starter worktree: `D:\GitRepos\starter-execution-simplification`.
+- Branch / existing review: `campaign/development-execution-simplification`,
+  [PR #17](https://github.com/bradlaw76/power-platform-vscode-starter/pull/17).
+- Starting head: `6a5e7de9331299e24480d2f5751e4a3ed045b97e`.
+- Local scope: Q02/Q05/Q07 Starter implementation, credential-free validation
+  and commit. Parent coordinates both repositories' push/PR-body updates; this
+  execution does not push, alter the PR body, merge, release or deploy.
+- No original OneDrive checkout, original worktree, Automation runtime helper
+  or central standards repository was inspected or modified for this change.
+- [Separate STARTER and AUTO mapping proposal](development-execution-simplification-registration-proposal.md):
+  prepared for allocator review, not registered/allocated outcomes.
+
+### Implemented surfaces
+
+Extended the existing canonical `docs/policies/authorization-and-execution.md`,
+not a competing policy: standing scoped nonproduction authority, accepted
+requirements reuse, proportional planning/checks, mandatory controls versus
+recoverable administration, and retrospective narrative documentation for
+routine authorized existing-component repairs before closure. Semantic/report/
+hash/FAST/security approvals and enforced repository controls remain mandatory.
+
+Registration, H numbering and documentation do not block independently
+authorized implementation absent real authority, enforced policy or conflicting
+writers. H IDs track outcomes, not permanent component ownership. Writer release
+requires current process/session, checkpoint and actual resource/in-flight-write
+evidence; lease expiry alone is insufficient. Recover before restart, bound
+repairs, reconcile uncertain writes and continue independent dependency-ready
+work. This is guidance, not a new fencing or authorization runtime.
+
+Aligned Copilot instructions, prompt, all four shipped skill files, generated
+task template, README enhancement registry/checklist, onboarding, wizard contract,
+engineering/distribution/impact/delivery/recovery guides and existing scenario
+planning artifacts. The existing queue guide recommends dependency-aware queues
+for explicitly autonomous multi-change work, includes independently copyable
+prompts and https://code.visualstudio.com/docs/agents/overview, and distinguishes
+installed queue controls from durable unattended execution.
+
+### Local validation and limitations
+
+All fixture scratch paths were placed under the isolated worktree using
+process-local `TEMP`/`TMP`; no operator home or tenant was used.
+
+| Command/check | Result / scope |
+| --- | --- |
+| Pester 5.7.1: `Invoke-Pester -Path .\scripts\ci\AuthorizationExecution.Tests.ps1, .\scripts\ci\SkillParity.Tests.ps1 -PassThru` | 83 passed, 0 failed/skipped. Includes AUTH-01 through AUTH-14, distribution/gate/queue contracts and real fixture installer byte equality, refresh and missing-policy rejection. |
+| `pwsh -NoProfile -File .\scripts\ci\test-wizard-modes.ps1` | Passed; real scripted intake emits repair/authority/recovery/queue instructions without introducing another intake question. |
+| `pwsh -NoProfile -File .\scripts\ci\test-wizard-source-control-acceptance.ps1` | Passed; generated source-control guidance preserves non-mutation during intake. |
+| `pwsh -NoProfile -File .\scripts\ci\test-contract-integrity.ps1` | Passed; existing module/link/profile/sequence contracts. |
+| PowerShell parser and PSScriptAnalyzer 1.24.0 with repository settings, changed `.ps1` files | Passed, 3 files, no findings. |
+| `npx --yes markdownlint-cli2@0.18.1` with changed Markdown paths and new registration proposal | Passed, 0 errors. |
+
+Two initial focused runs found documentation propagation gaps (accepted
+requirements wording and the distribution guide's queue link); corrected before
+the final 83/0 run. Existing installer implementation is unchanged and its copied
+canonical policy remains byte-identical.
+
+**SOURCE COMPLETE / TESTED (local)**, not DEPLOYED or LIVE VERIFIED. These are
+behavioral instruction/distribution contracts and local fixture regressions,
+not proof of agent compliance, native VS Code queue execution, runtime lease
+recovery, hosted CI or live Dataverse acceptance. No native/live acceptance run,
+production action or tenant authentication was performed. Full repository CI
+remains required at publication; only affected local checks were run here.
+
+Cached repository-update advice was unavailable: this baseline has no
+`scripts\bootstrap\check-repository-updates.ps1`. No network fetch/update or
+remote-freshness claim was made. Existing historical release/updater
+limitations remain unchanged.
+
 ## Review snapshot: 2026-11-10 UTC
 
 This document is for a person or any AI helping generate instructions, implement

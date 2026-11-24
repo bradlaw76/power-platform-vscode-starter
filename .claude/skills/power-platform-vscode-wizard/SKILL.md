@@ -14,6 +14,21 @@ work. During consumer compatibility review, include this policy or a reviewed
 equivalent and reference it from the project's existing instruction entry point;
 do not overwrite local instructions. This applies to all workloads.
 
+Reuse accepted requirements and standing scoped nonproduction authorization.
+Registration, H numbering and narrative documentation must not block independently
+authorized implementation unless required for real authority, enforced policy or
+conflicting writers. H IDs track outcomes, not permanent component ownership.
+Check active process, checkpoint and actual resource evidence before writer
+release; lease expiry alone is insufficient. Recover before restart, bound repairs
+and continue independent work. Routine authorized nonproduction existing-component
+repairs may finish narrative documentation retrospectively before closure, never
+semantic/report/hash/FAST/security approvals. For explicitly autonomous multi-change
+work, recommend dependency-aware queues and ready-to-paste instructions from
+project-root `docs/QUEUED_AUTONOMOUS_DELIVERY.md` when available, including
+https://code.visualstudio.com/docs/agents/overview. If the guide is absent, use
+the bundled policy's queue contract and verify installed controls; do not claim
+absent executor capabilities or live verification.
+
 ## Overview
 
 A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**

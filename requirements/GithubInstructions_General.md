@@ -11,6 +11,18 @@ throughout framework and generated-project work. Commit and push each need
 explicit permission; reuse valid scope without redundant approval prompts.
 Existing security, platform and repository protections remain mandatory.
 
+Reuse accepted requirements and standing scoped nonproduction authorization
+under that policy. Registration, H numbering and narrative documentation must
+not block independently authorized implementation unless required for real
+authority, enforced policy or conflicting writers; reconcile them before closure.
+H IDs track outcomes, not permanent component ownership. Before writer release,
+inspect active process, checkpoint and actual resource evidence; lease expiry
+alone is insufficient. Recover before restart, bound repairs and continue
+independent work. Routine repair documentation may be retrospective, not
+semantic/report/hash/FAST/security approval or real authority. Recommend
+[dependency-aware queues](../docs/QUEUED_AUTONOMOUS_DELIVERY.md) for explicitly
+autonomous multi-change work; do not claim unsupported executor capabilities.
+
 The repository is the authoritative engineering record for the project.
 
 ---

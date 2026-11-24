@@ -245,6 +245,22 @@ try {
     Assert-True -Condition ($declinedProfileIndex -ge 0 -and $declinedOutput.IndexOf('recommendations were not approved') -gt $declinedProfileIndex -and -not (Test-Path (Join-Path $declinedWorkspace 'specs'))) -Message 'Declining after the visible workload recommendation must prevent planning writes.'
     $materialTasks = Get-Content -LiteralPath (Join-Path $materialFolder 'tasks.md') -Raw -Encoding UTF8
     Assert-True -Condition ($materialTasks.Contains('- [ ] Resolve material 2')) -Message 'Pending source review must remain an unfinished planning task.'
+    foreach ($rule in @(
+        'docs/policies/authorization-and-execution.md',
+        'reuse accepted requirements and valid standing scoped nonproduction authorization',
+        'unless required for real authority, enforced policy or conflicting writers',
+        'routine authorized nonproduction existing-component repairs',
+        'minimum change contract and rollback before editing',
+        'before closure, never defer semantic/report/hash/FAST/security gates',
+        'active process, checkpoint and actual resource evidence',
+        'lease expiry alone is insufficient; recover before restart',
+        'H IDs track outcomes, not permanent component ownership',
+        'explicitly autonomous multi-change work, recommend dependency-aware queues',
+        'https://code.visualstudio.com/docs/agents/overview',
+        'verify actual executor support, not assumed live acceptance'
+    )) {
+        Assert-True -Condition ($materialTasks.Contains($rule)) -Message "Generated tasks lost authorization/execution contract: $rule"
+    }
     @{ decision = 'provided'; materials = @() } | ConvertTo-Json | Set-Content -LiteralPath $materialsPath -Encoding UTF8
     $invalidWorkspace = New-WizardTestWorkspace -Name 'invalid-materials'
     $invalidRejected = $false

@@ -23,7 +23,39 @@ blocked. No conversational permission overrides those restrictions.
 
 Use the [scenario change impact gate](../scenario-change-impact-gate.md) to classify the actual delta. Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario changes update affected contracts and dependent surfaces; new or cross-cutting scenarios review the applicable end-to-end chain. Mandatory CI, production, signed-approval, environment and live field/security gates are never waived.
 
+Reuse accepted requirements, architecture decisions, bindings and evidence while
+they remain applicable. Ask only for a missing material decision, not a replay of
+discovery. A new component or changed requirement still needs its affected
+planning contracts before implementation; an existing-component repair that
+restores accepted behavior does not need a new planning dossier.
+
 Reuse accepted delivery answers and valid explicit automation opt-in only while its scope remains unchanged. A deadline is a target, not permission; guided execution remains available without WSL and no unattended work starts implicitly. This policy preserves configured safeguards; it does not install features absent from the current baseline or grant execution authority.
+
+## Mandatory controls and recoverable administration
+
+Production authorization, security/access boundaries, secret handling, signing,
+platform confirmations and enforced repository controls are mandatory. Never
+disable a protection, manufacture approval or reinterpret an explicit owner
+restriction as administrative inconvenience. Preserve semantic-field and
+report-definition approvals, hash/signature gates, FAST restrictions, solution
+membership and required validation even for urgent nonproduction repairs.
+
+Project registration, H numbering, task bookkeeping and documentation are
+recoverable project administration unless they establish real authority, satisfy
+an enforced policy or resolve conflicting writers. Administrative registration,
+H-number allocation and documentation must not block independently authorized
+implementation when none of those exceptions applies. Record the missing
+administration and reconcile it in the existing task/PR before closure; do not
+silently waive it or create a competing approval ledger. An explicit read-only
+allocation restriction still binds until its authorized owner supersedes it.
+
+H IDs track outcomes, not permanent component ownership. Preserve historical
+H008/H009/H010 and all accepted identifiers; never invent, rename or reuse an H
+ID. Use the existing temporary work identifier while authorized allocation is
+pending. Where ChatGPT is the designated allocator, submit separate STARTER and
+AUTO outcome mappings for review; a proposal is not an allocation or permission.
+Component writer ownership is established by current resource/process evidence,
+not inferred from an old H label.
 
 ## Reuse valid authorization
 
@@ -48,6 +80,40 @@ permit push; push/PR permission does not permit merge, release or deployment.
 A deployment request is usable only when its target and effects are explicit.
 Required platform prompts and signed approvals must still be satisfied through
 their established mechanisms; never simulate or auto-sign human approval.
+
+### Standing scoped nonproduction authorization
+
+An owner may explicitly authorize a standing scope for routine development,
+repair, testing and, only if specified, nonproduction publish/deployment.
+Record or reference it in existing planning/task/PR evidence: owner, permitted
+operations/effects, exact repository/branch or environment/tenant/solution,
+components, exclusions, validity/revocation conditions and required verification.
+Nonproduction status and credentials alone never constitute authorization.
+
+Reuse that authority without repeated confirmation while all scope checks above
+still pass. A scope change, expiration, revocation, production target, destructive
+effect or newly required gate stops only the affected operation for a decision.
+Standing permission cannot approve a semantic/report definition or sign an
+artifact hash by implication; satisfy those separate gates through their
+established mechanisms. It does not activate a scheduler, expand privileges or
+authorize commit, push, merge or release unless explicitly included.
+
+### Routine repairs and retrospective documentation
+
+For a routine authorized nonproduction existing-component repair, first verify
+the target, accepted behavior, writer, bounded effect, applicable gates and
+recoverable before-state/rollback. Keep a minimum change contract in the existing
+task/PR/checkpoint: defect, intended correction, protected behavior and focused
+checks. Then implement, run targeted regression/readback checks and, only when
+already authorized, publish and verify the actual target.
+
+Full narrative documentation and administrative registration may follow the
+repair rather than delay it. Reconcile exact accepted source, hashes, tests,
+authorization reference, rollback and remaining limitations in existing records
+before closure. Retrospective documentation is not retrospective permission,
+semantic/report approval, hash approval or security review. New requirements,
+schema/type changes, report meaning, security boundaries and protected/OOB
+components retain their applicable pre-change planning and approval gates.
 
 ## Discover and reuse deployment patterns
 
@@ -112,6 +178,22 @@ operation is blocked, continue independent authorized work only when it does not
 depend on that operation or change the blocked target. Record dependencies and
 do not claim completion for downstream work that could not be verified.
 
+Before releasing or taking over a writer, inspect active process/session state,
+latest durable checkpoint/journal, current branch/PR and actual resource state
+and in-flight writes. Lease expiry alone is insufficient evidence of release.
+Attach to or recover the existing owner first; do not start a duplicate writer.
+Use the executor's supported fencing/recovery protocol where available. If
+ownership or an uncertain write cannot be reconciled, hold only that resource
+and its dependents, record the missing evidence and continue independent work.
+Do not delete locks or reset state merely to force a restart. Repair within the
+bounded budget above; a fresh session does not reset that budget.
+
+For explicitly autonomous multi-change work, recommend a dependency-aware queue
+with ready items, owner/resource scope, checkpoints and blocked reasons. Follow
+[queued delivery](../QUEUED_AUTONOMOUS_DELIVERY.md), including ready-to-paste VS
+Code instructions. Verify the installed executor's actual capabilities; native
+message queueing is not proof of durable recovery or unattended permission.
+
 ## Completion and evidence
 
 When deployment is requested and authorized, complete implementation, focused
@@ -174,3 +256,9 @@ not a new runtime authorization engine or proof of autonomous agent compliance.
 | AUTH-06 | One operation is blocked but an authorized local test is independent. | Continue the independent test; report the blocked dependency separately. |
 | AUTH-07 | Source and mock tests pass but there is no target verification. | Report SOURCE COMPLETE and TESTED, not DEPLOYED or LIVE VERIFIED. |
 | AUTH-08 | A write times out or the same deterministic failure recurs. | Reconcile uncertain writes; no unchanged deterministic retries; bound transient attempts. |
+| AUTH-09 | Standing owner permission covers this exact nonproduction repair and remains valid. | Reuse standing scope; verify target and effects, retain separate required approvals. |
+| AUTH-10 | Independently authorized repair awaits H registration or narrative documentation, without an authority/policy/writer conflict. | Implement the bounded repair; reconcile administration and documentation before closure. |
+| AUTH-11 | A routine repair would change a field type, report definition, signed hash or FAST gate. | Stop the affected operation for its required pre-change gate; retrospective documentation is not approval. |
+| AUTH-12 | A writer lease expires while its process, checkpoint or target write state is uncertain. | Recover before restart; lease expiry alone does not release the writer. |
+| AUTH-13 | A historical H outcome touched the component but no conflicting writer remains. | Check current ownership evidence; preserve the H ID, do not treat it as permanent ownership. |
+| AUTH-14 | Explicitly autonomous multi-change work has one blocked dependency. | Queue dependency-ready authorized work; preserve the hold and verify actual executor support. |

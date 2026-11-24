@@ -36,3 +36,35 @@ repository protections and solution membership/export gates remain mandatory.
    on the original PR #8 integration baseline). Installed Claude skills receive
    byte-identical policy copies; consumer projects retain a local contract.
 7. An isolated PR contains only this enhancement and reports validation limits.
+
+## 2026-11-24 bounded continuation: PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION
+
+Owner Q01-R1 supersedes the campaign's read-only allocation block and authorizes
+implementation under this temporary identifier. Continue PR #17 from
+`6a5e7de9331299e24480d2f5751e4a3ed045b97e` in the isolated
+`campaign/development-execution-simplification` worktree. This Starter assignment
+permits local implementation, validation and commit only for this execution;
+the coordinating parent synchronizes publication. No push, PR-body update,
+merge, release, tenant access or central standards mutation is part of this run.
+Original PR #8 permission above remains historical.
+
+Q02/Q05/Q07 Starter acceptance:
+
+- Extend the existing canonical policy, not a competing authorization system:
+  standing scoped nonproduction authority, accepted-requirements reuse,
+  proportional checks and routine existing-component repair documentation.
+- Separate mandatory production/security/signing/repository and semantic/report/
+  hash/FAST gates from recoverable registration, H numbering and documentation.
+  Administration must not block independently authorized implementation absent
+  real authority, enforced policy or writer conflict.
+- Treat H IDs as outcomes, not permanent component ownership. Inspect process,
+  checkpoint and actual resource evidence before writer release; lease expiry
+  alone is insufficient. Recover before restart, bound repair and advance
+  independent work.
+- Recommend dependency-aware queues for explicitly autonomous multi-change work
+  with ready-to-paste VS Code instructions and the official agent overview.
+- Align instructions, distributed skills/prompts/task templates and existing
+  review handoff; preserve installer byte equality. Validate credential-free
+  contract/distribution behavior, not live/native acceptance.
+- Prepare separate STARTER and AUTO mappings for ChatGPT allocator review;
+  allocate no H number, preserve H008/H009/H010 and all original worktrees.
