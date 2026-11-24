@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Wizard Modes Contract Test
 FILE:         scripts/ci/test-wizard-modes.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-26
+LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Credential-Free CI
 
 -----------------------------------------------------------------------------
@@ -22,6 +22,7 @@ TEST CASES
 ✔ Advanced Builder exposes technical controls.
 ✔ Framework Acceptance requires explicit selection.
 ✔ All modes emit the same core planning artifact names.
+✔ H010 Contoso reporting consent is consistent across artifacts and mode fixtures.
 =============================================================================
 #>
 
@@ -133,6 +134,47 @@ function Assert-Step60ConsumesViewsContract {
     Assert-True -Condition ($contract.Views[0].Disposition -eq $ExpectedDisposition) -Message "Step 60 read an unexpected disposition for '$ScenarioSlug'."
 }
 
+function Assert-ReportingSelection {
+    param(
+        [string]$Workspace,
+        [string]$ScenarioSlug,
+        [string]$Decision,
+        [string]$Selection,
+        [string]$Native,
+        [string]$Html,
+        [string]$ScopingStatus
+    )
+
+    foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md')) {
+        $text = Get-Content -LiteralPath (Join-Path $Workspace "specs/$ScenarioSlug/$artifact") -Raw -Encoding UTF8
+        foreach ($expected in @(
+            '## Reporting Selection',
+            "- Decision: $Decision",
+            "- Selected scope: $Selection",
+            "- Native dashboards: $Native",
+            "- HTML reports: $Html",
+            "- Mapping status: $ScopingStatus"
+        )) {
+            Assert-True -Condition $text.Contains($expected) -Message "$artifact lost reporting consent '$expected'."
+        }
+        if ($Decision -ne 'explicitly-declined') {
+            Assert-True -Condition ($text -notmatch 'reports explicitly disabled|Reports were explicitly disabled|customer declined') -Message "$artifact fabricated a reporting decline."
+        }
+    }
+    $answersText = Get-Content -LiteralPath (Join-Path $Workspace "specs/$ScenarioSlug/answers.md") -Raw -Encoding UTF8
+    $featureConfig = Get-WizardFeatureConfig -AnswersText $answersText
+    Assert-True -Condition ($featureConfig.ReportEnabled -eq ($Html -eq 'yes')) -Message 'Legacy HTML feature configuration disagrees with reporting selection.'
+    Assert-True -Condition ($featureConfig.NativeReportingEnabled -eq ($Native -eq 'yes') -and $featureConfig.ReportingDecision -eq $Decision -and $featureConfig.ReportingScope -eq $Selection) -Message 'Runtime configuration lost native scope or decision provenance.'
+    $buildContract = Test-WizardBuildContract -RepoRoot $Workspace -ScenarioSlug $ScenarioSlug
+    $consentErrors = @($buildContract.Errors | Where-Object { $_ -like 'Reporting consent or mappings remain unresolved:*' })
+    Assert-True -Condition (($consentErrors.Count -gt 0) -eq ($ScopingStatus -in @('pending-review', 'pending-confirmation'))) -Message 'Build planning gate must reject unresolved reporting scope/mappings without rejecting confirmed or not-applicable scope.'
+    if ($ScopingStatus -eq 'pending-review') {
+        Assert-True -Condition ($featureConfig.SelectedReports.Count -eq 0) -Message 'Pending mapping text must not become an executable report identity.'
+    }
+    $reportPayloads = @(Get-ChildItem -LiteralPath (Join-Path $Workspace 'payloads') -Recurse -File | Where-Object { $_.Name -match '^reporting-.*\.json$|\.html$' })
+    Assert-True -Condition ($reportPayloads.Count -eq 0) -Message 'Discovery must not generate executable reporting payloads or HTML before mapping approval.'
+}
+
 try {
     $originalSkipMain = [Environment]::GetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN')
     [Environment]::SetEnvironmentVariable('WIZARD_FORMS_VIEWS_SKIP_MAIN', 'true')
@@ -191,6 +233,58 @@ try {
     $pendingAnswers = Get-Content -LiteralPath (Join-Path $demoWorkspace "specs/$demoSlug/answers.md") -Raw -Encoding UTF8
     Assert-True -Condition ($pendingAnswers.Contains('- Goal: unconfirmed')) -Message 'Legacy scripted wizard input must not silently choose a demo/production goal.'
     Assert-True -Condition ($pendingAnswers.Contains('Automation: guided')) -Message 'Unattended automation must remain off by default.'
+    Assert-ReportingSelection -Workspace $demoWorkspace -ScenarioSlug $demoSlug -Decision 'explicitly-approved' -Selection 'none' -Native 'no' -Html 'no' -ScopingStatus 'approved-no-reports'
+
+    # Recreate F-01 using the fictional H009 customer, not the retained consumer.
+    $contosoAnswers = @(
+        'Contoso Municipal Permit and Inspection Management',
+        'Permit officers review submissions daily; residents submit applications; inspectors schedule and record inspections; supervisors monitor outstanding permits and violations',
+        'Permit, Inspection, Applicant, Review',
+        'Model-driven application: residents submit; officers review; inspectors schedule and record; supervisors use outstanding-permit and violation views. Lifecycle: Submitted, Under Review, Inspection Scheduled, Inspected, Approved or Rejected; violations tracked on inspections.',
+        'Success: trace a fictional applicant through permit review and inspection, then show outstanding permits and violations to a supervisor. Synthetic sample data only; no real records.',
+        'https://contoso-permits.invalid; unmanaged solution planning only; no production environment; no authentication, application creation or deployment authorized'
+    )
+    $contosoSlug = 'contoso-municipal-permit-and-inspection-management'
+    $reportCases = @(
+        @{ Name = 'confirmed'; Answer = 'yes'; Decision = 'explicitly-approved'; Selection = 'html'; Native = 'no'; Html = 'yes'; Status = 'pending-review' },
+        @{ Name = 'declined'; Answer = 'none'; Decision = 'explicitly-declined'; Selection = 'none'; Native = 'no'; Html = 'no'; Status = 'approved-no-reports' },
+        @{ Name = 'deferred'; Answer = 'defer'; Decision = 'recommended-not-confirmed'; Selection = 'unconfirmed'; Native = 'no'; Html = 'no'; Status = 'pending-confirmation' },
+        @{ Name = 'blank'; Answer = ''; Decision = 'recommended-not-confirmed'; Selection = 'unconfirmed'; Native = 'no'; Html = 'no'; Status = 'pending-confirmation' },
+        @{ Name = 'native'; Answer = 'native'; Decision = 'explicitly-approved'; Selection = 'native'; Native = 'yes'; Html = 'no'; Status = 'pending-review' },
+        @{ Name = 'both'; Answer = 'both'; Decision = 'explicitly-approved'; Selection = 'both'; Native = 'yes'; Html = 'yes'; Status = 'pending-review' },
+        @{ Name = 'not-applicable'; Answer = 'yes'; Decision = 'not-applicable'; Selection = 'not-applicable'; Native = 'no'; Html = 'no'; Status = 'not-applicable' },
+        @{ Name = 'module-disabled'; Answer = 'yes'; Decision = 'not-applicable'; Selection = 'not-applicable'; Native = 'no'; Html = 'no'; Status = 'not-applicable' }
+    )
+    foreach ($case in $reportCases) {
+        $workspace = New-WizardTestWorkspace -Name "contoso-$($case.Name)"
+        if ($case.Decision -eq 'not-applicable') {
+            $disabledProfile = Get-Content -LiteralPath (Join-Path $workspace 'wizard.profile.json') -Raw | ConvertFrom-Json
+            if ($case.Name -eq 'module-disabled') {
+                $disabledProfile.execution.optionalModules.'web-resources'.enabled = $false
+            } else {
+                $disabledProfile.discovery.optionalQuestionModules.reporting = $false
+            }
+            $disabledProfile | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $workspace 'wizard.profile.json') -Encoding UTF8
+        }
+        $output = Invoke-WizardFixture -Workspace $workspace -Mode 'demo-builder' -Answers ($contosoAnswers + @($case.Answer))
+        Assert-ArtifactContract -Workspace $workspace -ScenarioSlug $contosoSlug -Mode 'demo-builder'
+        Assert-ReportingSelection -Workspace $workspace -ScenarioSlug $contosoSlug -Decision $case.Decision -Selection $case.Selection -Native $case.Native -Html $case.Html -ScopingStatus $case.Status
+        if ($case.Decision -ne 'not-applicable') {
+            Assert-True -Condition ($output.Contains('Reporting recommendation: html') -and $output.Contains('native/html/both/none')) -Message 'Contoso must see the scenario-based recommendation and all reporting choices before confirmation.'
+            $reportAnswers = Get-Content -LiteralPath (Join-Path $workspace "specs/$contosoSlug/answers.md") -Raw
+            Assert-True -Condition $reportAnswers.Contains('- Recommended scope: html') -Message 'Contoso recommendation provenance was lost.'
+        }
+        if ($case.Name -eq 'confirmed') {
+            $bootstrapCopy = Join-Path $workspace 'scripts/bootstrap'
+            New-Item -ItemType Directory -Path (Join-Path $bootstrapCopy 'helpers') -Force | Out-Null
+            Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/65-build-web-resources.ps1') -Destination $bootstrapCopy
+            Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Destination (Join-Path $bootstrapCopy 'helpers')
+            $previewOutput = @(& pwsh -NoProfile -File (Join-Path $bootstrapCopy '65-build-web-resources.ps1') -ScenarioSlug $contosoSlug -PreviewReportQueriesOnly 2>&1)
+            Assert-True -Condition ($LASTEXITCODE -ne 0 -and ($previewOutput -join "`n").Contains('Reporting scope and mappings must be approved')) -Message 'Direct HTML preview must not treat confirmed scope as approved report content.'
+            Assert-True -Condition (-not (Test-Path (Join-Path $workspace "specs/$contosoSlug/webresources"))) -Message 'Pending Contoso mappings must not generate generic HTML reports.'
+        }
+    }
+    Write-Host 'H010 Contoso reporting: 8 cases passed (confirmed, declined, deferred, blank, native, both, discovery disabled, module disabled).'
     $materialWorkspace = New-WizardTestWorkspace -Name 'optional-materials'
     $materialsPath = Join-Path $materialWorkspace 'review.json'
     @{
@@ -441,6 +535,37 @@ try {
     Assert-True -Condition ($distinctViews.Views[0].Name -eq 'Available Lab Assets') -Message 'Advanced Builder did not preserve the business view name.'
     Assert-True -Condition ($distinctViews.Views[0].Disposition -eq 'create-custom') -Message 'A distinct business view must use create-custom.'
     Assert-Step60ConsumesViewsContract -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -ExpectedDisposition 'create-custom'
+    Assert-ReportingSelection -Workspace $distinctWorkspace -ScenarioSlug 'distinct-business-view' -Decision 'explicitly-declined' -Selection 'none' -Native 'no' -Html 'no' -ScopingStatus 'approved-no-reports'
+
+    foreach ($detailedMode in @('advanced-builder', 'framework-acceptance')) {
+        foreach ($scope in @('native', 'defer', '', 'disabled')) {
+            $detailedAnswers = @(Get-Content -LiteralPath (Join-Path $acceptanceWorkspace 'scripted-answers.json') -Raw | ConvertFrom-Json)
+            # Reporting stays in the existing slot; yes/no retain their HTML meaning.
+            $detailedAnswers[34] = $scope
+            $detailedWorkspace = New-WizardTestWorkspace -Name "reporting-$detailedMode-$scope"
+            if ($scope -eq 'native') {
+                $detailedAnswers = @($detailedAnswers[0..37]) + @(
+                    'fma_request',
+                    'fma_request | Request overview | dashboard | Operations dashboard | fma_name | review request | Framework maintainer | matches active view'
+                ) + @($detailedAnswers[38..($detailedAnswers.Count - 1)])
+            } elseif ($scope -eq 'disabled') {
+                $disabledProfile = Get-Content -LiteralPath (Join-Path $detailedWorkspace 'wizard.profile.json') -Raw | ConvertFrom-Json
+                $disabledProfile.discovery.optionalQuestionModules.reporting = $false
+                $disabledProfile | ConvertTo-Json -Depth 20 | Set-Content -LiteralPath (Join-Path $detailedWorkspace 'wizard.profile.json') -Encoding UTF8
+                $detailedAnswers = @($detailedAnswers[0..33]) + @($detailedAnswers[35..($detailedAnswers.Count - 1)])
+            }
+            $null = Invoke-WizardFixture -Workspace $detailedWorkspace -Mode $detailedMode -Answers $detailedAnswers
+            if ($scope -eq 'native') {
+                Assert-ReportingSelection -Workspace $detailedWorkspace -ScenarioSlug 'framework-mode-acceptance' -Decision 'explicitly-approved' -Selection 'native' -Native 'yes' -Html 'no' -ScopingStatus 'approved'
+            } elseif ($scope -eq 'disabled') {
+                Assert-ReportingSelection -Workspace $detailedWorkspace -ScenarioSlug 'framework-mode-acceptance' -Decision 'not-applicable' -Selection 'not-applicable' -Native 'no' -Html 'no' -ScopingStatus 'not-applicable'
+            } else {
+                Assert-ReportingSelection -Workspace $detailedWorkspace -ScenarioSlug 'framework-mode-acceptance' -Decision 'recommended-not-confirmed' -Selection 'unconfirmed' -Native 'no' -Html 'no' -ScopingStatus 'pending-confirmation'
+            }
+        }
+    }
+    Write-Host 'H010 detailed reporting: 8 cases passed (native, defer, blank, disabled in both detailed modes); legacy no fixtures preserved.'
+    Assert-ReportingSelection -Workspace $acceptanceWorkspace -ScenarioSlug 'framework-mode-acceptance' -Decision 'explicitly-declined' -Selection 'none' -Native 'no' -Html 'no' -ScopingStatus 'approved-no-reports'
 
     $relationshipConflictWorkspace = New-WizardTestWorkspace -Name 'detailed-relationship-conflict'
     $relationshipConflictContract = $approvedContract | ConvertTo-Json -Depth 20 | ConvertFrom-Json -AsHashtable

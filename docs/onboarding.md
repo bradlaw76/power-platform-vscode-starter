@@ -237,7 +237,7 @@ What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
-- Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
+- Reporting scope distinguishes native dashboards, HTML web resources, both, or none; scope approval does not approve a fixed report set or deployment.
 - Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
 Validation checkpoint:
@@ -359,6 +359,26 @@ Supported application profiles:
 
 The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six core business questions, two short delivery questions, and one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
 
+Reporting is part of that same confirmation, not an extra question. Native means
+standard Dataverse charts/dashboard; HTML means tailored report web resources;
+both must serve complementary tasks; none keeps forms/views only. `yes` approves
+the displayed recommendation, or enter `native`, `html`, `both`, or `none` to
+change it. Blank/`defer` leaves reporting unconfirmed; `no` cancels the design.
+The wizard suggests HTML when the stated tasks include reporting/monitoring,
+otherwise forms/views only, with the rationale shown before confirmation.
+Confirm each report's audience, decision, metrics/calculations, record scope,
+placement, limitations, and overlap during mapping review; do not assume generic
+KPIs or a fixed set of three reports.
+
+Check `Reporting Selection` in all five planning artifacts. It distinguishes
+`explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`, and
+`not-applicable`. A disabled discovery module is not a customer refusal.
+Unconfirmed flags are safely no, but reporting still needs a decision.
+Selected Demo reports remain `pending-review` until mappings are approved.
+Advanced/Acceptance keep the same answer slot and legacy yes=HTML/no=none.
+Existing customer artifacts are not migrated; separately review consent before
+authorizing any regeneration. See [reporting consent](wizard-contract-v1.md#reporting-consent-h010).
+
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 
 ### Advanced Builder (explicit)
@@ -387,7 +407,7 @@ Then complete optional extension blocks based on profile and project needs:
 
 - `table-strategy` (standard/custom strategy)
 - `solution-identity` (new/existing solution and publisher prefix)
-- `reporting` (explicit no-report decision, or critical-table report mappings with type, placement, fields, decision, owner, and validation)
+- `reporting` (confirmed native/HTML/both/none scope or profile-disabled not-applicable status; selected surfaces require critical-table mappings with type, placement, fields, decision, owner, and validation)
 - `retrofit` (current state + remaining work)
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
@@ -420,7 +440,7 @@ Validation checkpoint:
 - If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.
 - If Task activities are enabled, approve parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not target every record unless `all` is explicitly approved.
 - Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, and relationship distribution. In Framework Acceptance, also confirm idempotent rerun, source-tagging, retention, and cleanup decisions.
-- Confirm `report-mappings.md` exists. If reports are enabled, every critical or high-frequency table must have an approved mapping; if reports are disabled, the artifact must record that explicit decision.
+- Confirm `report-mappings.md` exists and scope is confirmed or explicitly not applicable. Selected reports require approved mappings for every critical/high-frequency table; unconfirmed scope and pending mappings block planning completion.
 - Demo-data intake is planning-only; no Dataverse rows are created by `05-start-wizard.ps1`.
 - Review `requirements/GithubInstructions_General.md` and record how source control will support the app or demo being created.
 - Confirm the target repository, remote, current/default branch, existing working-tree changes, recent history, existing tooling, and applicable validation commands.

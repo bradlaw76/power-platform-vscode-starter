@@ -52,6 +52,16 @@ Use `framework-acceptance` only after explicit selection. Add authorized-environ
 
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
+Reporting consent follows `docs/wizard-contract-v1.md#reporting-consent-h010`.
+Explain native dashboards (standard charts/dashboard), HTML web resources,
+both for complementary tasks, or none. Demo Builder includes a scenario-based
+recommendation and these choices in its existing consolidated confirmation.
+Record `explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`,
+or `not-applicable` with provenance in all five planning artifacts. Never infer
+a decline from defaults or profile-disabled discovery. Unconfirmed scope or
+pending mappings block planning completion; approve content separately.
+Do not migrate existing customer requirements without separate authorization.
+
 When demo data is requested, never seed standard reused tables implicitly. If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, a bounded source-record count, ordering field, and tasks per selected record; do not create tasks for every record unless the user explicitly selects all.
 
 Capture the top user tasks with persona, frequency, entry table/view, expected outcome, owner, and done definition. For every planned relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and the task or app surface it supports.

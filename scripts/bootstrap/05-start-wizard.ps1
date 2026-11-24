@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Start Wizard
 FILE:         scripts/bootstrap/05-start-wizard.ps1
-VERSION:      0.9.0
+VERSION:      0.10.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-11-23
+LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | VS Code | Power Platform Planning Workflow
 
 -----------------------------------------------------------------------------
@@ -48,6 +48,7 @@ v0.7.0  2026-08-28  Added safe generated Active-view disposition planning.
 v0.8.0  2026-11-22  Preserve accepted native tables and opt-in framework handoff.
 v0.8.1  2026-11-22  Gate accepted table coverage and relationship semantics.
 v0.9.0  2026-11-23  Show nonblocking offline H009 version status before intake.
+v0.10.0 2026-11-24  Capture reporting consent in the consolidated recommendation.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -762,6 +763,50 @@ function Read-BpfDiscovery {
     }
 }
 
+function Set-ReportingSelection {
+    param(
+        [System.Collections.IDictionary]$Answers,
+        [string]$Choice,
+        [string]$Source
+    )
+
+    $selection = switch ($Choice) {
+        'yes' { 'html' }
+        'no' { 'none' }
+        'defer' { 'unconfirmed' }
+        default { $Choice }
+    }
+    $Answers['ReportingSelection'] = $selection
+    $Answers['ReportingDecisionSource'] = $Source
+    $Answers['ReportingDecision'] = if ($selection -eq 'not-applicable') {
+        'not-applicable'
+    } elseif ($selection -eq 'unconfirmed') {
+        'recommended-not-confirmed'
+    } elseif ($selection -eq 'none' -and $Source -eq 'reporting-choice') {
+        'explicitly-declined'
+    } else {
+        'explicitly-approved'
+    }
+    $Answers['IncludeNativeDashboards'] = if ($selection -in @('native', 'both')) { 'yes' } else { 'no' }
+    $Answers['IncludeHtmlReports'] = if ($selection -in @('html', 'both')) { 'yes' } else { 'no' }
+    $Answers['CriticalReportTables'] = 'none'
+    $Answers['ReportScopingStatus'] = switch ($selection) {
+        'unconfirmed' { 'pending-confirmation' }
+        'not-applicable' { 'not-applicable' }
+        'none' { 'approved-no-reports' }
+        default { 'pending-review' }
+    }
+    $Answers['ReportMappings'] = switch ($selection) {
+        'unconfirmed' { 'pending: reporting recommendation not confirmed; no reporting implementation approved' }
+        'not-applicable' { 'not applicable: reporting discovery disabled by profile; no customer decline collected' }
+        'none' {
+            if ($Answers['ReportingDecision'] -eq 'explicitly-declined') { 'none (customer explicitly selected no reporting)' }
+            else { 'none (forms/views-only recommendation approved in consolidated confirmation)' }
+        }
+        default { 'pending: approve report audiences, decisions, fields, calculations, scope, placement, limitations, and overlap from scenario requirements' }
+    }
+}
+
 $profilePath = Join-Path $repoRoot "wizard.profile.json"
 $contractPath = Join-Path $repoRoot "docs\wizard-contract-v1.md"
 $onboardingPath = Join-Path $repoRoot "docs\onboarding.md"
@@ -776,6 +821,9 @@ if (Test-Path $profilePath) {
         $profile = Get-Content -Path $profilePath -Raw -Encoding UTF8 | ConvertFrom-Json
         if ($null -ne $profile.execution.optionalModules."web-resources") {
             $reportsModuleEnabled = [bool]$profile.execution.optionalModules."web-resources".enabled
+        }
+        if ($null -ne $profile.discovery.optionalQuestionModules.reporting) {
+            $reportsModuleEnabled = $reportsModuleEnabled -and [bool]$profile.discovery.optionalQuestionModules.reporting
         }
         if ($null -ne $profile.discovery.optionalQuestionModules."business-process-flow") {
             $bpfModuleEnabled = [bool]$profile.discovery.optionalQuestionModules."business-process-flow"
@@ -933,9 +981,35 @@ if ($Mode -eq 'demo-builder') {
     Write-Host "  Entry point: $entryPointTable; landing view: Active $entryPointPluralDisplayName"
     Write-Host "  Review app includes all planned tables, forms, views, processes, and approved reports"
     Write-Host "  Solution: $solutionName ($solutionType); publisher prefix: $publisherPrefix"
-    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Accept these recommendations so the planning artifacts can be generated?" -AllowedValues @('yes', 'no') -Default 'yes'
-    if ($recommendationConfirmation -ne 'yes') {
+    $reportingRecommendation = 'not-applicable'
+    $reportingReason = 'Reporting discovery is disabled by the profile; this is not a customer decline.'
+    if ($reportsModuleEnabled) {
+        $reportingRecommendation = if ("$primaryUserTask $experienceAndLifecycle $successAndData" -match '(?i)\b(reports?|reporting|dashboards?|KPIs?|monitor(?:ing)?|oversight|analytics|trends?)\b') { 'html' } else { 'none' }
+        $reportingReason = if ($reportingRecommendation -eq 'html') {
+            "The stated monitoring/reporting task suggests a tailored summary for $primaryUserTask. Use only the stated workflow and success criteria; confirm metrics and placement during mapping review."
+        } else {
+            'No distinct reporting decision was identified in the stated tasks; start with forms/views only, or choose reporting below.'
+        }
+    }
+    Write-Host "  Reporting recommendation: $reportingRecommendation"
+    Write-Host "  Rationale: $reportingReason"
+    Write-Host '  Reporting choices (native/html/both/none): native = standard Dataverse charts/dashboard; html = tailored report web resources; both = complementary tasks; none = forms/views only.'
+    Write-Host '  Reporting scope approval is not mapping, payload, deployment, or placement approval.'
+    $recommendationConfirmation = Read-ChoiceValue -Prompt "7. Approve technical design and reporting recommendation (yes), change reporting (native/html/both/none), or defer reporting (defer); no cancels" -AllowedValues @('yes', 'no', 'native', 'html', 'both', 'none', 'defer') -Default 'defer'
+    if ($recommendationConfirmation -eq 'no') {
         throw "Demo Builder recommendations were not approved. Rerun with -Mode advanced-builder to control the technical design."
+    }
+    if (-not $reportsModuleEnabled -and $recommendationConfirmation -in @('native', 'html', 'both', 'none')) {
+        throw 'Reporting discovery is disabled by the profile. Enable it before selecting reporting; no customer decision was recorded.'
+    }
+    $answers['ReportingRecommendation'] = $reportingRecommendation
+    $answers['ReportingRationale'] = $reportingReason
+    if (-not $reportsModuleEnabled) {
+        Set-ReportingSelection -Answers $answers -Choice 'not-applicable' -Source 'profile-disabled'
+    } elseif ($recommendationConfirmation -eq 'yes') {
+        Set-ReportingSelection -Answers $answers -Choice $reportingRecommendation -Source 'consolidated-recommendation'
+    } else {
+        Set-ReportingSelection -Answers $answers -Choice $recommendationConfirmation -Source 'reporting-choice'
     }
 
     $answers["ScenarioName"] = $scenarioName
@@ -977,7 +1051,6 @@ if ($Mode -eq 'demo-builder') {
     $answers["StandardFieldsReused"] = 'none'
     $answers["CustomFieldsToAdd"] = 'to be refined during planning'
     $answers["RelationshipsToCreate"] = if ($inputTables.Count -gt 1) { 'to be recommended and confirmed during planning' } else { 'none' }
-    $answers["IncludeHtmlReports"] = 'no'
     $answers["UserTaskDefinitions"] = "$primaryUserTask | $experienceAndLifecycle | primary workflow | $entryPointTable/Active $entryPointPluralDisplayName | $successAndData"
     $answers["UserTaskOwnership"] = "$experienceAndLifecycle | app owner | $successAndData"
     $answers["RelationshipRequirements"] = if ($inputTables.Count -gt 1) { 'recommendation pending stakeholder confirmation' } else { 'none' }
@@ -985,9 +1058,9 @@ if ($Mode -eq 'demo-builder') {
         $answers["RelationshipRequirements"] = ConvertTo-Json -InputObject @($acceptedContract.relationships) -Depth 20 -Compress
         $answers["RelationshipsToCreate"] = $answers["RelationshipRequirements"]
     }
-    $answers["CriticalReportTables"] = 'none'
-    $answers["ReportMappings"] = 'none (reports explicitly disabled during intake)'
-    $answers["ReportScopingStatus"] = 'approved-no-reports'
+    if ($answers['ReportingSelection'] -in @('native', 'html', 'both')) {
+        $answers["CriticalReportTables"] = "$entryPointTable (proposed; confirm all critical tables during mapping review)"
+    }
     $reportMappingRows = @()
     $answers["DemoDataScope"] = if ($needsDemoData -eq 'Yes') { 'all-created' } else { 'none' }
     $answers["DemoDataTables"] = if ($needsDemoData -eq 'Yes') { $customTables -join ', ' } else { 'none' }
@@ -1148,9 +1221,10 @@ if ($Retrofit) {
     $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Custom fields still to add (table.field list; enter 'none' if all done)" "none"
     $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Relationships still to create (referencing -> referenced; enter 'none' if all done)" "none"
     if ($reportsModuleEnabled) {
-        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional operational HTML report web resources? (yes/no)" "no"
+        $reportingChoice = Read-ChoiceValue -Prompt "E-reporting. Include native charts/dashboard, HTML web resources, both, or none? (native/html/both/none; yes=html, no=none; defer=unconfirmed)" -AllowedValues @('native', 'html', 'both', 'none', 'yes', 'no', 'defer') -Default 'defer'
+        Set-ReportingSelection -Answers $answers -Choice $reportingChoice -Source 'reporting-choice'
     } else {
-        $answers["IncludeHtmlReports"] = "no"
+        Set-ReportingSelection -Answers $answers -Choice 'not-applicable' -Source 'profile-disabled'
     }
     if ($bpfModuleEnabled) {
         $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
@@ -1164,9 +1238,10 @@ if ($Retrofit) {
     $answers["CustomFieldsToAdd"] = Read-RequiredValue "E-table-mapping. Explicit mapping - custom fields to add (table.field list; enter 'none' if none)" "none"
     $answers["RelationshipsToCreate"] = Read-RequiredValue "E-table-mapping. Explicit mapping - relationships to create (referencing -> referenced; enter 'none' if none)" "none"
     if ($reportsModuleEnabled) {
-        $answers["IncludeHtmlReports"] = Read-RequiredValue "E-reporting. Create optional operational HTML report web resources? (yes/no)" "no"
+        $reportingChoice = Read-ChoiceValue -Prompt "E-reporting. Include native charts/dashboard, HTML web resources, both, or none? (native/html/both/none; yes=html, no=none; defer=unconfirmed)" -AllowedValues @('native', 'html', 'both', 'none', 'yes', 'no', 'defer') -Default 'defer'
+        Set-ReportingSelection -Answers $answers -Choice $reportingChoice -Source 'reporting-choice'
     } else {
-        $answers["IncludeHtmlReports"] = "no"
+        Set-ReportingSelection -Answers $answers -Choice 'not-applicable' -Source 'profile-disabled'
     }
     if ($bpfModuleEnabled) {
         $bpf = Read-BpfDiscovery -ScenarioName $scenarioName -ScenarioSlug $scenarioSlug
@@ -1187,7 +1262,7 @@ if ($answers["RelationshipsToCreate"].Trim().ToLowerInvariant() -ne "none") {
 }
 
 $reportMappingRows = @()
-if ($answers["IncludeHtmlReports"] -match '^(?i:y|yes|true|1)$') {
+if ($answers["ReportingSelection"] -in @('native', 'html', 'both')) {
     Write-Host ""
     Write-Host "Report scoping (required before implementation when reports are enabled)." -ForegroundColor Cyan
     $answers["CriticalReportTables"] = Read-RequiredValue "E-reporting. Critical or high-frequency table logical names (comma-separated)"
@@ -1201,10 +1276,6 @@ if ($answers["IncludeHtmlReports"] -match '^(?i:y|yes|true|1)$') {
     }
 
     $answers["ReportScopingStatus"] = "approved"
-} else {
-    $answers["CriticalReportTables"] = "none"
-    $answers["ReportMappings"] = "none (reports explicitly disabled during intake)"
-    $answers["ReportScopingStatus"] = "approved-no-reports"
 }
 
 if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$') {
@@ -1324,7 +1395,11 @@ $answers["BpfCrossTableProgression"] = if ($bpf.CrossTableProgression) { "yes" }
 $answers["BpfTargetFormName"] = $bpf.TargetFormName
 $answers["BpfStageDefinitions"] = @($bpf.StageDefinitions)
 $answers["ReportTheme"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Power Apps neutral' } else { 'Dynamics blue' }
-$answers["ReportSet"] = if ($answers["ApplicationProfile"] -eq 'standalone-model-driven') { 'Operational workspace; Team workload; Management KPI' } else { 'Agent performance report; Supervisor oversight report; Executive summary KPI report' }
+$answers["ReportSet"] = if ($answers['IncludeHtmlReports'] -eq 'yes' -and $reportMappingRows.Count -gt 0) { ($reportMappingRows | ForEach-Object { $_.SurfaceName }) -join ', ' } else { 'none' }
+if ($Mode -ne 'demo-builder') {
+    $answers['ReportingRecommendation'] = 'not supplied (direct reporting choice)'
+    $answers['ReportingRationale'] = if ($reportsModuleEnabled) { 'Reporting scope collected directly; legacy yes/no mean html/none.' } else { 'Reporting discovery is disabled by the profile; this is not a customer decline.' }
+}
 
 if ($null -ne $acceptedContract -and $Mode -ne 'demo-builder') {
     $declaredTables = @(Get-PlannedTableLogicalNames -StandardTables $answers["StandardTablesReused"] -CustomTables $answers["CustomTablesToCreate"] -PublisherPrefix $answers["PublisherPrefix"])
@@ -1444,14 +1519,31 @@ $demoDataPlanObject = if ($answers["NeedsDemoData"] -match '^(?i:y|yes|true|1)$'
     $null
 }
 $demoDataPlanJson = if ($null -ne $demoDataPlanObject) { $demoDataPlanObject | ConvertTo-Json -Depth 5 } else { "" }
-$reportMappingTable = if ($reportMappingRows.Count -gt 0) { Format-ReportMappingTable -Rows $reportMappingRows } else { '_No report surfaces selected. Reports were explicitly disabled during intake._' }
+$reportingSelectionBlock = @"
+## Reporting Selection
+- Decision: $($answers['ReportingDecision'])
+- Decision source: $($answers['ReportingDecisionSource'])
+- Recommended scope: $($answers['ReportingRecommendation'])
+- Recommendation rationale: $($answers['ReportingRationale'])
+- Selected scope: $($answers['ReportingSelection'])
+- Native dashboards: $($answers['IncludeNativeDashboards'])
+- HTML reports: $($answers['IncludeHtmlReports'])
+- Mapping status: $($answers['ReportScopingStatus'])
+- Native dashboards use standard Dataverse charts/dashboard components; HTML uses tailored web resources. Both must support complementary tasks.
+- Scope approval does not approve report content or deployment. Confirm audience, decision, metrics/calculations, record scope, placement, limitations, and overlap before implementation.
+- Unconfirmed selections have execution flags set to no for safety, not as evidence of a customer decline.
+"@
+$reportMappingTable = if ($reportMappingRows.Count -gt 0) { Format-ReportMappingTable -Rows $reportMappingRows } else { $answers['ReportMappings'] }
 $reportMappingsContent = @"
 # Report Mappings
 
 ## Scope Decision
 - Status: $($answers["ReportScopingStatus"])
 - Critical or high-frequency tables: $($answers["CriticalReportTables"])
-- Reports enabled: $($answers["IncludeHtmlReports"])
+- Native dashboards: $($answers["IncludeNativeDashboards"])
+- HTML reports: $($answers["IncludeHtmlReports"])
+
+$reportingSelectionBlock
 
 ## Report Mapping Table
 $reportMappingTable
@@ -1570,7 +1662,7 @@ $answersContent = @"
 - business-process-flow: enabled=$($answers["EnableBusinessProcessFlow"]) ; primary=$($answers["PrimaryProcessEntity"]) ; name=$($answers["BusinessProcessFlowName"])
 - table-strategy: $($answers["TableChoice"])
 - solution-identity: solution=$($answers["SolutionChoice"]) -- $($answers["SolutionName"]); prefix=$($answers["PrefixChoice"]) -- $($answers["PublisherPrefix"])
-- reporting: $($answers["IncludeHtmlReports"])
+- reporting: scope=$($answers["ReportingSelection"]); decision=$($answers["ReportingDecision"]); native=$($answers["IncludeNativeDashboards"]); html=$($answers["IncludeHtmlReports"])
 - source-control: branch=$($answers["SourceControlBranch"]); commits=$($answers["SourceControlCheckpoints"]); pull-request=$($answers["SourceControlPullRequest"])
 $(if ($Retrofit) { "- retrofit: enabled" } else { "- retrofit: disabled" })
 
@@ -1716,7 +1808,7 @@ $($answers["RelationshipRequirements"])
 - Integration scope: Create HTML web resources and add them to solution (no automatic form-tab insertion).
 - Report scoping status: $($answers["ReportScopingStatus"])
 - Critical or high-frequency tables: $($answers["CriticalReportTables"])
-- Approved mapping: See report-mappings.md.
+- Mapping status: $($answers["ReportScopingStatus"]); see report-mappings.md. Scope confirmation alone is not mapping approval.
 
 ## User Tasks
 - Task definitions: $($answers["UserTaskDefinitions"])
@@ -1921,7 +2013,7 @@ $bpfStagesMarkdown
 - Verify solution export/unpack succeeds.
 - Verify git changes are reviewable.
 - Verify import into target environment succeeds.
-- If reports are enabled, verify three HTML web resources are created and visible in solution.
+- If reporting is selected and mappings are approved, verify only the approved native/HTML surfaces and their decision-support acceptance criteria.
 - If BPF is enabled, verify the BPF build report matches the created Dataverse process metadata and the process is added only to the selected solution.
 "@
 
@@ -1958,6 +2050,7 @@ $tasksContent = @"
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
 - [ ] Review and approve report-mappings.md; every critical table must have an explicit report decision
+- [ ] Resolve reporting consent '$($answers['ReportingDecision'])' and mapping status '$($answers['ReportScopingStatus'])' before reporting implementation; do not treat safe no flags as a customer decline
 - [ ] Validate mapped report table logical names, required fields, and target form/dashboard/view placements against the approved schema
 - [ ] Create report payload and HTML source tasks for each approved mapping when reports are enabled
 - [ ] Validate report data rendering, placement, ownership, and decision-support acceptance criteria for each approved mapping
@@ -1977,8 +2070,9 @@ $tasksContent = @"
 - [ ] Add components to solution with '50-add-to-solution.ps1'
 - [ ] If BPF is enabled, run '55-build-business-process-flows.ps1' and review the generated BPF build report
 - [ ] Build starter forms/views with '60-build-forms-views.ps1'
+- [ ] If native dashboards are selected, approve reporting-*.json and run '64-build-charts-dashboard.ps1' before app assembly
 - [ ] Create or update the review app with '62-build-app-module.ps1' and validate its entry table and landing view
-- [ ] If reports are enabled, run '70-build-web-resources.ps1'
+- [ ] If HTML reports are selected and mappings/content are approved, run '70-build-web-resources.ps1'
 - [ ] At each approved checkpoint, inspect `git status` and `git diff`, run applicable validation, stage explicit files, and use a typed imperative commit message
 - [ ] Export and unpack solution
 - [ ] Create the final implementation commit after reviewing staged files and validation evidence
@@ -1999,6 +2093,10 @@ $answersContent += $requirementsMaterialsBlock
 $specContent += $requirementsMaterialsBlock
 $planContent += $requirementsMaterialsBlock
 $tasksContent += $requirementsMaterialsBlock + "`n" + $requirementsMaterialsTasks
+$answersContent += "`n$reportingSelectionBlock`n"
+$specContent += "`n$reportingSelectionBlock`n"
+$planContent += "`n$reportingSelectionBlock`n"
+$tasksContent += "`n$reportingSelectionBlock`n"
 
 if ($null -ne $acceptedContract) {
     $planningProvenance = "`n## Accepted Planning Source`n`n" + (

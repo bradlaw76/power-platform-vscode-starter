@@ -112,7 +112,17 @@ Advanced Builder questions:
 Optional extension blocks (profile-driven):
 - table-strategy (standard/custom and mapping)
 - solution-identity (new/existing solution and publisher prefix)
-- reporting (optional web resources)
+- reporting (native dashboards, HTML web resources, both, or none; independent flags and explicit consent provenance)
+
+Include reporting in Demo Builder's existing consolidated recommendation, not
+another question. `yes` approves the displayed scope; blank/`defer` remains
+`recommended-not-confirmed`; `no` cancels. Detailed modes retain legacy
+yes=HTML/no=none in the same slot. All five artifacts share `Reporting Selection`
+with `explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`,
+or `not-applicable` provenance. Disabled discovery is not a refusal.
+Unconfirmed scope/pending mappings block planning completion; report content
+needs separate audience, decision, metrics, scope, placement, limitations and
+overlap review. Do not migrate existing artifacts without separate authorization.
 - retrofit (current-state and remaining-work intake)
 - source-control (target-repository preflight, scenario branch, traceability, checkpoint commits, discovered validation/CI, PR handoff, and merge strategy)
 - user-tasks (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)

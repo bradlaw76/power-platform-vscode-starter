@@ -67,6 +67,7 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
 | Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
 | H009 version/update manager | [Version and safe updates](docs/wizard-updates.md); offline startup identity with PowerShell-relative runtime paths, Windows checkout-aware Git status, shared explicit choices, stable-only discovery, exact ownership-aware preview and guarded fixture recovery; [candidate distribution and release trust](docs/wizard-release-readiness.md); official Apply remains blocked without publisher policy |
+| H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit decision provenance, unconfirmed/not-applicable states, independent flags and separate mapping approval; no legacy artifact migration |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 
@@ -606,7 +607,7 @@ Solution isolation behavior:
 
 Optional report web resources:
 
-- `05-start-wizard.ps1` captures a yes/no decision for optional reporting module scope (when enabled in `wizard.profile.json`).
+- `05-start-wizard.ps1` includes native/HTML/both/none in Demo Builder's consolidated recommendation. `yes` confirms the displayed scope; blank/`defer` leaves reporting unconfirmed. Detailed modes retain yes=HTML/no=none in the existing reporting slot. Review the shared `Reporting Selection` and approve scenario-specific mappings/content separately before implementation.
 - `70-build-web-resources.ps1` is the canonical optional module entrypoint.
 - `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
 - The script upserts Dataverse HTML web resources and adds them to the selected solution.

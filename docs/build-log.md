@@ -4,6 +4,139 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## H010 Demo Builder reporting consent correction - 2026-11-24
+
+### Ownership, source and finding
+
+- Authorized H010 maintenance only, isolated on
+  `fix/h010-reporting-consent-20261124` from frozen H009
+  `c9ad4ca7b9ea0a4c7709b0e422bf96b87f5aa00b`. The review PR is stacked on
+  `feature/h009-wizard-update-manager` so its diff contains only H010.
+  PR16 and its source history are not changed; no merge is authorized.
+- Inspected HEAD/status, remotes, open PRs, worktrees, Git locks and available
+  process ownership. The original checkout had a modified README and untracked
+  backup directory; both were preserved. Existing editor/terminal sessions and
+  the separate authorization/execution worktree were left alone. Local inspection
+  does not establish global absence of shared-machine writers.
+- Read the retained fictional Contoso acceptance report, F-01, and original
+  seven-answer fixture. Its finding independently traced the same defect to the
+  PR base: this is pre-existing discovery behavior, not an H009 updater defect.
+- Before: Demo Builder accepted architecture yes/no, then hardcoded HTML no,
+  `approved-no-reports`, and "Reports were explicitly disabled during intake"
+  without offering a reporting choice. It was neither a customer refusal nor
+  inference from another response. The false claim propagated into mappings and
+  planning/configuration.
+
+### Source correction and compatibility
+
+- After: display a scenario-based recommendation with native/HTML/both/none in
+  the existing consolidated confirmation. Explicit `yes` confirms the displayed
+  scope; a scope token changes it; blank/defer leaves it unconfirmed; `no` still
+  cancels the design. No additional discovery question or build stage.
+- All five planning Markdown artifacts share recommendation/rationale, selected
+  scope, decision/source, independent native/HTML flags, and mapping status.
+  Decisions distinguish explicitly approved, explicitly declined, recommended
+  but not confirmed, and profile-disabled not applicable. Approving a displayed
+  forms/views-only recommendation is approval, not an invented refusal.
+- Advanced Builder/Framework Acceptance retain the reporting answer slot and
+  legacy yes=HTML/no=none meaning, with additional native/both/defer choices.
+  Their critical-table mapping validation remains. Demo scope approval leaves
+  mappings pending review; safe no flags on unresolved decisions are not consent.
+- Existing build-contract validation and direct HTML generation reject unresolved
+  consent/mappings. Pending text is not an executable report identity. Native
+  payload preparation and HTML content still require separate mapping review;
+  this correction does not redesign the legacy report rendering engine.
+- No migration or rewrite of previous customer artifacts. Existing planning
+  without the new consent block keeps legacy runtime compatibility, not
+  retroactive approval. Profile, contract, onboarding, requirements, prompt,
+  instructions, both shipped skill families and registry are aligned.
+- H009 updater/version helper, transaction engine, tests, release descriptor and
+  frozen candidate inventory are unchanged. Inventory remains pinned to its
+  H009 documentation source, not a claim to distribute this H010 candidate.
+
+### Contoso acceptance evidence
+
+Replayed the original fictional Permit/Inspection/Applicant/Review answers with
+the inert `https://contoso-permits.invalid` target in a new local fixture.
+The original consumer and retained H009 evidence were not modified.
+
+Actual displayed output:
+
+```text
+Reporting recommendation: html
+Reporting choices (native/html/both/none)
+Reporting scope approval is not mapping, payload, deployment, or placement approval.
+```
+
+Actual shared selection from the original final `yes` answer:
+
+```text
+Decision: explicitly-approved
+Decision source: consolidated-recommendation
+Recommended scope: html
+Selected scope: html
+Native dashboards: no
+HTML reports: yes
+Mapping status: pending-review
+```
+
+All five artifacts agree; no fabricated explicit-decline text or executable
+report payload is emitted. A direct HTML preview is rejected before report
+generation while mappings remain pending. The reproducible regression fixture
+and assertions are in [test-wizard-modes.ps1](../scripts/ci/test-wizard-modes.ps1).
+Local transcript and generated outputs are retained in the H010 session evidence
+folder; they are synthetic acceptance evidence, not customer requirements.
+
+### Exact local validation
+
+Native Windows, PowerShell 7.7.0. Commands below are relative to the H010 worktree.
+
+| Command/check | Result |
+| --- | --- |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-modes.ps1` | Passed: 8 Contoso reporting cases, 8 detailed-mode reporting cases, existing Demo/Advanced/Acceptance and planning-artifact fixtures |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-source-control-acceptance.ps1` | Passed: existing Advanced yes=HTML fixture, approved mappings and all five consent artifacts; no Git mutation |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-hardening.ps1` | Passed: legacy build-contract/configuration compatibility |
+| `pwsh -NoProfile -File scripts/ci/test-reporting-and-data-stages.ps1` | Passed: native reporting/synthetic-data stage regressions |
+| `pwsh -NoProfile -File scripts/ci/test-live-report-generation.ps1` | Passed: existing sparse/rich/rerun/missing-field offline HTML previews |
+| `pwsh -NoProfile -File scripts/ci/test-contract-integrity.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-docs-consistency.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-json-schema.ps1` | Passed: 91 documents parsed, 60 payloads schema-matched |
+| `pwsh -NoProfile -File scripts/ci/test-script-smoke.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-update.ps1` | 24 tests: 23 passed, 1 POSIX permission-bit skip on Windows; 178.053 seconds |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-distribution.ps1` | 5 passed; frozen inventory verified: 131 files, 1,898,505 bytes; publisher/automatic Apply false |
+| `Invoke-Pester` on `WizardUpdateEntryPoints.Tests.ps1`, `SkillParity.Tests.ps1` | 68 passed, 0 failed/skipped: 8 H009 entry-point tests and 60 skill-parity tests |
+| Focused `Invoke-ScriptAnalyzer` using repository settings, severity Error | 0 errors |
+| Cached `markdownlint-cli2@0.18.1` on changed Markdown; `git diff --check` | 0 errors |
+
+Regression-first proof: new assertions failed against unchanged H009 intake with
+`answers.md lost reporting consent '## Reporting Selection'`, then passed with
+the correction. An intermediate transcript-label assertion required an explicit
+scope-list label; fixed and rerun. One analyzer invocation incorrectly supplied
+an array to its scalar Path parameter; corrected to per-file calls, zero errors.
+No implementation failure was suppressed.
+
+The legacy HTML preview test emits an existing unrelated frozen FOIA relationship
+parse warning and intentionally rejects missing fields; its final result passes.
+That fixture warning was not repaired or presented as a live check. Full suites
+were not repeatedly run; focused mode/HTML tests were rerun after guard changes.
+Local Windows results do not certify Linux/macOS, production or live Dataverse.
+PR CI results, if available, are source-bound evidence on the separate review PR.
+
+### Handoff, boundaries and next action
+
+- SOURCE COMPLETE / TESTED locally; commit/push/PR identity is recorded in the
+  separate H010 review PR. Independent review remains required.
+- **HANDOFF NOT WRITTEN - BLOCKED** for the canonical
+  `docs/audits/chatgpt-review-handoff.md`: existing restoration requires a
+  separately selected historical source or authorized fresh index. H010 does not
+  resolve that ownership gate. This build-log entry and the PR are the complete
+  transferable report; no protection was bypassed.
+- No merge, tag/release, distribution activation, deployment, Dataverse
+  authentication/mutation, consuming application repository change, cleanup of
+  other owners' locks, or alteration of H009 PR16. Official updater Apply remains
+  fail-closed. Next action: independent H010 review and separate owner disposition
+  of the stacked dependency; do not merge automatically.
+
 ## Q18 H009 final documentation and handoff - 2026-11-24
 
 - Consolidates user-facing version/update workflow, candidate installation,

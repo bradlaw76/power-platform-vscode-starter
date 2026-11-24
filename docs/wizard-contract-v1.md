@@ -198,13 +198,56 @@ Architecture intake questions (12–18):
 - `business-process-flow`: staged lifecycle intake, process root, stage definitions, and BPF execution preferences
 - `table-strategy`: standard vs custom table strategy and explicit mapping
 - `solution-identity`: new/existing solution and publisher prefix
-- `reporting`: explicit report decision, critical/high-frequency table scope, report type and placement, required fields, supported business decision, owner, and validation checklist
+- `reporting`: independent native dashboard and HTML report decisions, critical/high-frequency table scope, report type and placement, required fields, supported business decision, owner, and validation checklist
 - `retrofit`: current-state and remaining-work intake for in-progress projects
 - `source-control`: target-repository preflight, scenario branch, work-item traceability, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy
 - `user-tasks`: persona, task, frequency, entry table/view, expected outcome, owner, and done definition
 - `demo-data`: conditional table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, method, and privacy constraints; Framework Acceptance adds rerun evidence, source tags, retention, and cleanup approval
 
 Relationship planning must identify the referencing and referenced tables, cardinality, requiredness, existing/new status, cascade behavior, and the user task or app surface supported by each relationship.
+
+### Reporting consent (H010)
+
+Explain native dashboards (standard Dataverse charts/dashboard components), HTML
+report web resources (tailored layouts), both (complementary tasks only), and
+none (forms/views only). Demo Builder shows a scenario-based recommendation in
+its existing consolidated technical confirmation, not another business question.
+Stated reporting/monitoring tasks suggest HTML for mapping review; otherwise
+recommend forms/views only. These are recommendations, not inferred consent.
+Explain audience, supported decision, metrics/calculations, record scope,
+placement, limitations, and overlap before approving report content.
+
+- `yes` approves the **displayed** scope recommendation. A literal
+  `native`/`html`/`both`/`none` changes scope while approving the technical design.
+- `defer` or a blank confirmation accepts the technical starter design but leaves
+  reporting `recommended-not-confirmed`. `no` still cancels Demo Builder without
+  writing planning files.
+- Advanced Builder and Framework Acceptance use their existing reporting slot:
+  `native`/`html`/`both`/`none`, with legacy `yes` = HTML and `no` = none.
+  Blank/`defer` is unconfirmed, never an explicit decline.
+- Disabling reporting discovery in the profile records `not-applicable` with
+  `profile-disabled` provenance, not a customer refusal. The existing disabled
+  web-resources module also suppresses this discovery block.
+
+All five planning Markdown artifacts include the same `Reporting Selection`:
+recommendation/rationale, selected scope, decision/source, independent native/HTML
+flags, and mapping status. Decisions are `explicitly-approved`,
+`explicitly-declined` (only a literal none/no reporting choice),
+`recommended-not-confirmed`, or `not-applicable`. Approving a displayed
+forms/views-only recommendation is approval, not a fabricated explicit decline.
+Safe execution flags of no for unconfirmed/not-applicable are not consent.
+
+Demo reporting approval leaves mappings `pending-review`; detailed modes retain
+their critical-table mapping gate. Unconfirmed scope remains
+`pending-confirmation`. No executable report payloads/configuration are created
+by intake. Finalize and approve mappings and content separately before preparing
+`reporting-*.json` or HTML sources; native and HTML payloads remain independent.
+The existing build-contract validation and direct HTML generation reject these
+unresolved states before generating report artifacts. Legacy planning without
+the new consent block retains its existing behavior; absence is not retroactive
+consent. Existing generated customer artifacts are not migrated or rewritten by H010.
+Review their original answers with the customer; use the existing explicit
+overwrite flow only for a separately authorized regeneration.
 
 When demo data is enabled, default scope may be all scenario-created custom tables, but the resolved table list must be shown and approved. Standard reused tables must explicitly choose create, reuse-existing, or both; they are never seeded implicitly. Hero records must identify their table, count, and demo scenario or purpose.
 
@@ -242,7 +285,7 @@ Required gate before execution:
 - Source-control plan completed when the profile enables it
 - User tasks include owners and done definitions when the profile enables them
 - Relationship decisions are complete for every planned relationship
-- Report scoping is approved. When reports are enabled, every critical or high-frequency table has a mapping with type, placement, required fields, supported decision, owner, and validation checklist. When reports are disabled, that no-report decision is explicit.
+- Report scope is confirmed or explicitly not applicable. When reports are selected, every critical or high-frequency table has an approved mapping with type, placement, required fields, supported decision, owner, and validation checklist. Unconfirmed scope or pending mappings block planning completion; safe disabled flags are not a customer decline.
 - When demo data is enabled, table scope, per-table counts, scenarios/states, hero records, relationship distribution, bounded Task activity generation, and privacy constraints are approved. Acceptance-only rerun, retention, source-tag, and cleanup engineering is required only in Framework Acceptance mode.
 - Spec Kit artifacts approved
 - No conflict between generated guidance and these docs (resolve toward internal docs or report conflict):

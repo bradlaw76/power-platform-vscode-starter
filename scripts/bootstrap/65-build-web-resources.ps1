@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Build Web Resources
 FILE:         scripts/bootstrap/65-build-web-resources.ps1
-VERSION:      0.1.0
+VERSION:      0.2.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-07-19
+LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Dataverse Web Resources | HTML Report Generation
 
 -----------------------------------------------------------------------------
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.0  2026-11-24  Block HTML generation for unresolved H010 reporting consent.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
 -----------------------------------------------------------------------------
@@ -1556,10 +1557,6 @@ if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
     }
 }
 
-if (-not $PreviewReportQueriesOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
-    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
-}
-
 $scenarioFolder = Join-Path $specsRoot $ScenarioSlug
 $answersPath = Join-Path $scenarioFolder 'answers.md'
 $specPath = Join-Path $scenarioFolder 'spec.md'
@@ -1574,6 +1571,16 @@ if (-not (Test-Path $specPath)) { throw "Missing scenario spec file: $specPath" 
 $answersContent = Get-Content -Path $answersPath -Raw -Encoding UTF8
 $specContent = Get-Content -Path $specPath -Raw -Encoding UTF8
 $planContent = if (Test-Path $planPath) { Get-Content -Path $planPath -Raw -Encoding UTF8 } else { '' }
+
+$reportingConfig = Get-WizardFeatureConfig -AnswersText $answersContent
+if ($reportingConfig.ReportingSelectionPresent -and
+    $reportingConfig.ReportScopingStatus -notin @('approved', 'approved-no-reports', 'not-applicable')) {
+    throw "Reporting scope and mappings must be approved before HTML generation: $($reportingConfig.ReportingDecision) / $($reportingConfig.ReportScopingStatus). Review report-mappings.md."
+}
+
+if (-not $PreviewReportQueriesOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {
+    Initialize-WizardArtifactManifest -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $SolutionUniqueName -PublisherPrefix $PublisherPrefix | Out-Null
+}
 
 $scenario = Get-ScenarioDefinition -ScenarioSlugValue $ScenarioSlug -AnswersContent $answersContent -SpecContent $specContent -PlanContent $planContent
 if (-not $scenario.IncludeReports) {
