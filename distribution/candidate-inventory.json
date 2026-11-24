@@ -4,12 +4,12 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "3c063ee2996600ff1ffa4852f8964f5171440d48",
+  "sourceCommit": "c3536cd7e6940512d9d010d3c5cbc1d0488bc395",
   "policySha256": "1cd2f3a7de7f5d444dbe5c0195bb6bc6f0d19d041a3946d20aad149f0df64a11",
   "publisherVerified": false,
   "automaticApply": false,
   "fileCount": 131,
-  "totalBytes": 1878544,
+  "totalBytes": 1882094,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
@@ -104,8 +104,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 51150,
-      "sha256": "e9fe0f703a64ba06bf99f0f693c227219e32a317db54bbaba7aecd711177c87c"
+      "size": 51185,
+      "sha256": "a644e3c36afa5adf371bd680c5505028d5dd82d68ff960285224598271ea7b84"
     },
     {
       "path": "SECURITY.md",
@@ -280,8 +280,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 11757,
-      "sha256": "68de8a2a69a23c523fde6e600bd27eae3365ade63fb27ace4b01af5ec72ba95f"
+      "size": 12366,
+      "sha256": "0701c2c3ca6500e50c9161ddff36db4ee2775e4521010e4b7ceb6be6767c9d0b"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md",
@@ -736,8 +736,8 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 52746,
-      "sha256": "8c9bab74c14296e526c968dbeb36595e7b88d3f34b7c13456a5c9562ea2fabd6"
+      "size": 53764,
+      "sha256": "617bb55ea5a6d3aecfbae32c03c8a8aabb5f0a47efa826f533e05ee23baf10e7"
     },
     {
       "path": "scripts/ci/AlternateKeys.Tests.ps1",
@@ -1040,8 +1040,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 41230,
-      "sha256": "ee47332d640a129f6f2c11f30b7286dc5f1ea62952600b2e1371b814153e3641"
+      "size": 43118,
+      "sha256": "5dc148e864c6e547ec7f502a8368af7f9da5ba4d099f5be820ab4f272f8ef78f"
     },
     {
       "path": "wizard.profile.json",
