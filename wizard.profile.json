@@ -32,6 +32,16 @@
     "generic-dataverse-solution"
   ],
   "discovery": {
+    "reportingConsent": {
+      "demoConfirmation": "consolidated",
+      "scopes": ["native", "html", "both", "none"],
+      "unansweredDecision": "recommended-not-confirmed",
+      "disabledDecision": "not-applicable",
+      "legacyDetailedAnswers": { "yes": "html", "no": "none" },
+      "mappingApprovalRequired": true,
+      "currentConsentRequiredBeforeResume": true,
+      "independentStageSelection": true
+    },
     "requirementsMaterials": {
       "inputSchema": "schemas/requirements-materials.schema.json",
       "optionalFileParameter": "RequirementsMaterialsFile",

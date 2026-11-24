@@ -154,6 +154,15 @@ try {
     }
 
     $scenarioFolder = Join-Path $workspaceRoot "specs/$scenarioSlug"
+    foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md')) {
+        Assert-Contains -Path (Join-Path $scenarioFolder $artifact) -ExpectedValues @(
+            '- Decision: explicitly-approved',
+            '- Selected scope: html',
+            '- Native dashboards: no',
+            '- HTML reports: yes',
+            '- Mapping status: approved'
+        )
+    }
     Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
         '## Application Profile',
         '- Wizard mode: advanced-builder',

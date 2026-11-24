@@ -104,6 +104,27 @@ This keeps Spec Kit relevant for brownfield projects, not just greenfield builds
 
 All modes generate compatible `answers.md`, `spec.md`, `plan.md`, `tasks.md`, and `report-mappings.md` files for the same build pipeline.
 
+Explain native dashboards (standard Dataverse charts/dashboard), HTML web
+resources (tailored layouts), both (complementary tasks), or none. Demo Builder
+includes a scenario-based reporting recommendation in its existing consolidated
+confirmation, not another business question. `yes` approves the displayed scope;
+blank/`defer` leaves reporting unconfirmed; `no` cancels. Detailed modes keep the
+existing reporting slot, with legacy yes=HTML/no=none.
+
+All five artifacts share `Reporting Selection`: recommendation/rationale,
+selected scope, independent native/HTML flags, decision/source, and mapping
+status. Distinguish `explicitly-approved`, `explicitly-declined`,
+`recommended-not-confirmed`, and `not-applicable`; disabled discovery is not a
+customer decline. Unconfirmed scope or pending mappings block planning
+completion. Scope approval does not approve content or deployment: explain
+audience, decision, metrics/calculations, record scope, placement, limitations,
+and overlap before mapping approval. Never migrate existing customer artifacts
+without separate authorization. See `docs/wizard-contract-v1.md#reporting-consent-h010`.
+
+Recheck current reporting consent/mapping status before new/resumed orchestration.
+Saved stages are not new consent; native/HTML stages follow independent flags,
+not leftover payloads or prose.
+
 In every mode, capture or reuse the delivery goal (`prototype`, `presentation-demo`, `connected-demo`, `pilot`, `production`) and owner timeframe. Persist accepted delivery context in the scenario planning files. Guided execution does not require WSL. Automation remains off unless the owner opts in after a net-time comparison including setup, verification and recovery. Deadlines never weaken required CI, security, environment or deployment gates. See [delivery pacing and tooling](../../../docs/delivery-pacing-and-tooling.md).
 
 Use the proportional [scenario change impact gate](../../../docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas update affected contracts and dependent surfaces; preserve native field/security proof before live binding and every mandatory release gate.
@@ -131,9 +152,9 @@ In Advanced Builder and Framework Acceptance, ask and capture all base discovery
 16. Standard fields to reuse
 17. Custom fields to add
 18. Relationships to create
-19. Create optional HTML report web resources (agent performance, supervisor oversight, executive KPI)? (yes/no)
+19. Include native dashboards, HTML web resources, both, or none? (native/html/both/none; legacy yes=HTML/no=none; defer leaves unconfirmed)
 
-If question 19 is yes, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. If question 19 is no, preserve that explicit no-report decision in `report-mappings.md`.
+When reporting is selected, capture critical/high-frequency table logical names and one report mapping per surface: table, surface name, form/dashboard/view type, target placement, required fields, business decision, owner, and validation checklist. Generate `report-mappings.md` and block planning completion if any critical table lacks a mapping. Only a literal none/no reporting choice is an explicit decline; blank/default or disabled discovery is not.
 
 After entity mapping in the detailed modes, also capture:
 - Validate the primary entry-point logical name against reused standard tables, planned custom tables, or current retrofit inventory. Give every planned view an explicit `views.json` disposition. For a uniquely planned new custom table, use `adopt-generated-active` when the requested name exactly equals `Active {plural table display name}` and `create-custom` for a distinct business view. Use `explicit-decision-required` for standard, hybrid-standard, shared, preexisting, retrofit, or ambiguous tables; never infer adoption for them. Planning intent does not replace step 60's current-run creation and exact generated metadata proof. Require explicit-decision resolution and authenticated saved-query resolution before app assembly.

@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Wizard Hardening Helper
 FILE:         scripts/bootstrap/helpers/wizard-hardening.ps1
-VERSION:      0.2.0
+VERSION:      0.3.1
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-08-28
+LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Build Contract Validation
 
 -----------------------------------------------------------------------------
@@ -37,6 +37,8 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.3.1  2026-11-24  Share reporting readiness checks with resumable orchestration.
+v0.3.0  2026-11-24  Preserve reporting consent and reject unresolved planning.
 v0.2.0  2026-08-28  Added scenario-scoped manifests and identity validation.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
@@ -404,6 +406,7 @@ function Get-WizardFeatureConfig {
     param([string]$AnswersText)
 
     $reportSection = Get-WizardMarkdownSection -Markdown $AnswersText -Heading 'Optional Report Web Resources'
+    $reportSelectionSection = Get-WizardMarkdownSection -Markdown $AnswersText -Heading 'Reporting Selection'
     $profileSection = Get-WizardMarkdownSection -Markdown $AnswersText -Heading 'Application Profile'
     $appSection = Get-WizardMarkdownSection -Markdown $AnswersText -Heading 'App Module'
 
@@ -423,13 +426,18 @@ function Get-WizardFeatureConfig {
 
     $selectedReports = @()
     if (-not [string]::IsNullOrWhiteSpace($selectedReportsLine)) {
-        $selectedReports = @($selectedReportsLine.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) })
+        $selectedReports = @($selectedReportsLine.Split(',') | ForEach-Object { $_.Trim() } | Where-Object { -not [string]::IsNullOrWhiteSpace($_) -and $_ -notin @('none', 'no', 'n/a') })
     }
 
     return [pscustomobject]@{
         ReportSectionPresent = -not [string]::IsNullOrWhiteSpace($reportSection)
         ReportEnabled = @('yes', 'y', 'true', '1') -contains $reportEnabledLine.ToLowerInvariant()
         SelectedReports = @($selectedReports)
+        ReportingSelectionPresent = -not [string]::IsNullOrWhiteSpace($reportSelectionSection)
+        ReportingDecision = [regex]::Match($reportSelectionSection, '(?im)^-\s*Decision:\s*(.+)$').Groups[1].Value.Trim()
+        ReportingScope = [regex]::Match($reportSelectionSection, '(?im)^-\s*Selected scope:\s*(.+)$').Groups[1].Value.Trim()
+        ReportScopingStatus = [regex]::Match($reportSelectionSection, '(?im)^-\s*Mapping status:\s*(.+)$').Groups[1].Value.Trim()
+        NativeReportingEnabled = [regex]::IsMatch($reportSelectionSection, '(?im)^-\s*Native dashboards:\s*yes\s*$')
         ProfileSectionPresent = -not [string]::IsNullOrWhiteSpace($profileSection)
         ApplicationProfile = $applicationProfileLine.ToLowerInvariant()
         TableStrategy = $tableStrategyLine.ToLowerInvariant()
@@ -443,6 +451,15 @@ function Get-WizardFeatureConfig {
         AppName = $appNameLine
         AppUniqueName = $appUniqueNameLine
         NavigationGroup = $navigationLine
+    }
+}
+
+function Get-WizardReportingReadinessError {
+    param([pscustomobject]$FeatureConfig)
+
+    if ($FeatureConfig.ReportingSelectionPresent -and
+        $FeatureConfig.ReportScopingStatus -notin @('approved', 'approved-no-reports', 'not-applicable')) {
+        return "Reporting consent or mappings remain unresolved: $($FeatureConfig.ReportingDecision) / $($FeatureConfig.ReportScopingStatus). Review report-mappings.md before build execution."
     }
 }
 
@@ -593,6 +610,10 @@ function Test-WizardBuildContract {
     }
 
     $featureConfig = Get-WizardFeatureConfig -AnswersText $answersText
+    $reportingError = Get-WizardReportingReadinessError -FeatureConfig $featureConfig
+    if ($reportingError) {
+        $errors.Add($reportingError) | Out-Null
+    }
     if ($featureConfig.ReportEnabled) {
         if ($featureConfig.SelectedReports.Count -eq 0) {
             $errors.Add('Optional reporting is enabled, but no Selected Reports were declared in answers.md.') | Out-Null
