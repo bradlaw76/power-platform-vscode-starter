@@ -16,6 +16,22 @@ Use **queue** for the concept in documentation; describe **cue/queue** when assi
 4. Keep the editor/worker host available if execution is local. Check the queue/task store and its timestamped status; restarting VS Code alone does not prove automatic recovery. Checkpoint and recovery must be demonstrated by tests.
 5. Review the final evidence: commit/PR, tests, live deployment receipts if applicable, what changed, remaining blockers, and rollback reference.
 
+### Native VS Code message queue — required link in every multi-item response
+
+Official instructions: https://code.visualstudio.com/docs/chat/chat-overview#_send-messages-while-a-request-is-running
+
+For each generated multi-item queue, include this URL and the following short instructions immediately before the separately copyable task prompts:
+
+1. Start the first task in VS Code Copilot Chat using the intended agent/session.
+2. While it runs, paste the next task into the same chat. Open the Send dropdown and select **Add to Queue**. Repeat for each remaining task in dependency order.
+3. Drag pending messages to reorder them if needed. Avoid **Steer with Message** or **Stop and Send** for routine follow-up tasks because they interrupt the current request.
+4. To make queueing the default, open Settings (Ctrl+, on Windows), search for `chat.requestQueuing.defaultAction`, and select `queue`. Alternatively set `"chat.requestQueuing.defaultAction": "queue"` in user settings JSON. Settings reference: https://code.visualstudio.com/docs/agents/reference/ai-settings
+5. Check that each message appears in the pending queue. Native queueing automatically submits follow-ups after the current response ends; it does not guarantee task success, reboot recovery, persistent worker execution or unattended permission approval.
+
+Each queued prompt must independently check predecessor completion and current ownership, resume from evidence, self-correct bounded failures, and skip or wait on unmet dependencies. If the queue control is unavailable, verify the installed VS Code/Copilot version and session support; use the documented sequential fallback. Never imply that a native message queue is equivalent to a durable automation worker.
+
+**Required response format:** official URL + short how-to + primary prompt + individually copyable Q01, Q02, ... prompts + dependencies and expected outcome. Queue numbers are local ordering labels, not new H-number allocations.
+
 ### Copy/paste starter prompt
 
 ```text
