@@ -56,7 +56,13 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 
 ## Versioning and updates
 
-Distribute skills from a tagged release or a reviewed commit. Record the source commit and verify provenance with `git rev-parse HEAD`; release publishers may also publish SHA-256 checksums for packaged archives. To update, compare the installed folder and runtime contract, review changes, run `scripts/ci/SkillParity.Tests.ps1`, then replace only approved files.
+Use an independently reviewed immutable source commit, or a separately approved
+authenticated release when one exists. Record `git rev-parse HEAD` as source
+identity, not proof of publisher authority. A tag, GitHub repository URL or
+publisher-provided checksum alone does not authenticate a release. To prepare a
+reviewed skill change, compare the installed folder and runtime contract, preserve
+local edits, run `scripts/ci/SkillParity.Tests.ps1`, then replace only explicitly
+approved files. Official self-updates remain disabled.
 
 H009 supplies [offline identity and safe update planning](wizard-updates.md).
 Both skills invoke the runtime's `04-check-wizard-update.ps1`, not agent-specific
@@ -74,6 +80,39 @@ receipts; candidate membership never grants home-folder or consumer writes.
 The cached repository advisor script/runbook is absent in this candidate:
 unavailable advice does not mean up-to-date. Do not copy a newer branch, overwrite
 local skill edits or install absent updater tooling automatically.
+
+### Reviewed candidate installation
+
+At the Q18 handoff, PR16 contains H009; main and design PR15 have not been changed
+to distribute it. To evaluate an independently reviewed candidate, use a new
+runtime folder outside application repositories, not an in-place pull/copy over
+an existing installation:
+
+```powershell
+git clone --no-checkout https://github.com/bradlaw76/power-platform-vscode-starter.git <new-runtime-folder>
+git -C <new-runtime-folder> switch --detach <independently-reviewed-full-commit>
+git -C <new-runtime-folder> rev-parse HEAD
+```
+
+These are preparation examples, not release verification or permission to run
+unreviewed code. Compare the full SHA with the review record and exact-head CI.
+Keep existing runtime paths and consuming projects unchanged. Inspect the full
+runtime compatibility list above and the [host matrix](wizard-updates.md#supported-host-and-verification-matrix);
+then use VersionOnly/Status/Skip before optional update discovery.
+
+Copilot can use the repo-shared skill in place. Claude installation is a separate
+explicit write to the user's skill folders: inspect the two destination folders,
+preserve a backup of their actual customized files, and review the exact proposed
+replacement before running the existing installer. It force-copies matching files
+and generated policy references, leaves unrelated old files in place, and does
+not produce an H009 transactional receipt. Do not run it automatically to repair
+an updater conflict, missing runtime or unknown ownership.
+
+No whole-home backup, project relocation, automatic Git repository creation,
+WSL requirement or missing-tool installation is part of H009 adoption. Existing
+projects keep their own accepted specs, native task IDs and source-control policy.
+Run the full runtime in its own confirmed folder; copying a skill does not copy
+that runtime or authorize its scripts in an incompatible consumer.
 
 To uninstall a user-installed Claude skill, remove its folder under `~/.claude/skills/`. The repo-shared Copilot skill is removed through a reviewed repository change. Uninstalling either skill does not remove the wizard runtime or generated scenario files.
 

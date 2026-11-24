@@ -12,6 +12,10 @@ main `57f54fbf6b2c88e391100c001ba0b3f8834e190b`. PR15 remains an intact
 design proposal; the linked implementation PR is a separate source lane as
 requested by issue14, not a replacement design or new H-number.
 
+At the Q18 handoff this remains an **unmerged source candidate**, not an official
+release or an update already installed from main. See the
+[final review and owner actions](wizard-release-readiness.md#q18-final-review-and-handoff).
+
 ## What is installed
 
 Run from the **confirmed runtime clone**, not an application project:
@@ -77,6 +81,20 @@ all human instruction edits. H009 reports application/skill/mixed topologies;
 consumer and skill-only Apply are not enabled without approved original bundle
 ownership. Existing `01-install-skills.ps1` remains a separate explicit installer,
 not the transactional updater and not a way around conflicts.
+
+For a returning user, confirm the runtime folder, read VersionOnly/Status, then
+choose whether to inspect updates or continue unchanged:
+
+```powershell
+pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Check -Offline -AsJson
+pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Skip -AsJson
+```
+
+Check needs Python; Skip does not. Review does not authorize Update, and choosing
+Update is not approval for Git integration or release. At present no verified
+official candidate can pass the live Apply gate: unknown/unverified metadata is
+not an available official version. The complete Apply example below is only for
+an independently prepared isolated fixture, never an existing installation.
 
 ## Discovery and trust
 
@@ -178,6 +196,8 @@ reports blocked/partial states honestly. Plans never authorize extra paths or
 removal. Protected application, Spec Kit, credential and instruction paths stay
 outside the update set. Windows path aliases/reparse points and Linux symlinks
 are tested separately, not inferred from each other.
+Temporary payload staging is not Git staging: Apply neither stages nor commits
+the reported `selectiveStagingPaths` in Git.
 
 Recovery is a guarded compensation operation, **not an atomic filesystem
 transaction**. It must compare current content to the updater's own recorded
@@ -185,6 +205,40 @@ bytes before restoring. Later human writes are held for manual reconciliation;
 never delete the journal/lock to manufacture success or overwrite the user.
 Keep the checkpoint and reported repair list. No automatic deletion of newly
 added files is authorized; removal requires separate explicit human handling.
+
+### Recovery results and rollback limits
+
+| Result | Exit/status meaning | Required handling |
+| --- | --- | --- |
+| Missing exact Update approval | Nonzero PowerShell error | Review a fresh exact plan; never invent an approval digest |
+| Validation or integrity failure | Engine exit2, status blocked | Preserve error, transaction, lock and original backups |
+| Recovery conflict or manual removal needed | Exit0 can contain status recovery-blocked | Not restored; preserve later edits and reconcile only explicitly approved paths |
+| Recovery complete | Exit0, status recovered | Verify reported conflicts/removals are empty and retain backups/evidence |
+| Repeated completed fixture Update | Exit0, status already-applied | Exact unchanged replay; not another release or deployment |
+
+Automation must check the JSON status, not exit0 alone. For an explicitly
+authorized existing synthetic checkpoint:
+
+```powershell
+$recovery = & $command -Action Recover -RuntimeRoot '<isolated fixture root>' `
+    -FixtureRoot '<same isolated fixture root>' `
+    -TransactionPath '<exact existing transaction>' -AsJson | ConvertFrom-Json
+if ($LASTEXITCODE -ne 0 -or $recovery.status -ne 'recovered') {
+    throw 'Recovery incomplete. Preserve the checkpoint, lock, backups and later edits.'
+}
+```
+
+Q17's actual post-replacement corruption probe returned exit2/blocked with an
+interrupted journal. Recover held the unknown bytes; only after deliberate
+fixture-operator reconciliation did Recover restore original bytes/metadata,
+unchanged clean Git branch/HEAD and two verified backups, releasing the lock.
+This tests post-write validation failure separately from the real exit86 process
+interruption tests. Neither demonstrates reboot/power-loss durability.
+
+Checkpoint compensation is not a trusted official-version downgrade. An
+authenticated anti-rollback ledger, downgrade policy and production verifier
+remain unimplemented owner gates. Never delete locks, rewrite receipts or run
+the skill installer to make recovery appear complete.
 
 For framework source updates, use an isolated reviewed feature branch/PR and
 the exact path inventory, not `git add .` or an updater mutation of main.
@@ -208,6 +262,32 @@ startup/Status/Skip. No dependency package, service or scheduler is installed.
 Consumers with copied runtime/skills need original ownership inventory before
 Apply, not blanket permission inferred from a familiar filename.
 
+## Supported host and verification matrix
+
+Declared requirements are PowerShell 7 for the shared command and Python 3.10+
+plus Git for on-demand engine actions. Requirements are not a claim that every
+minor version or platform has been certified. The pinned Q17 runtime baseline is
+`e8eb06fa576a2dc26693a233f6ff0f2ea2687f95`, with
+[exact-head CI45300515892](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/45300515892).
+Q18 only changes documentation/inventory; final submitted-head checks are linked
+from issue14/PR16.
+
+| Host or installation | Actual verification | Supported boundary |
+| --- | --- | --- |
+| Native Windows hosted runner | Windows Server 2025, PowerShell 7.6.10, Python 3.12.10; updater 23 passed/one POSIX skip, inventory 5 passed, entry Pester 8/0/0 | Windows path/CRLF/junction and fixture recovery evidence, not Linux-derived proof |
+| Hosted Linux | Ubuntu 26.04.1 LTS, PowerShell 7.6.10, Python 3.14.4; updater 23 passed/one Windows skip, inventory 5 passed, full Pester 112/0/0 | Real Linux command/metadata/symlink and shared-wrapper evidence |
+| Local native Windows | Q17 real clone, dirty/no-Git copies and post-write failure/recovery; four gap cases plus one expanded copied-entry case passed | Actual persisted synthetic state; separate from official installation acceptance |
+| Local Q18 tool inventory/smoke | PowerShell 7.7.0, Python 3.14.10, Git 2.56.1; VersionOnly and offline Check passed | Current smoke/tool versions, not retroactively assigned to earlier full test runs |
+| WSL | Earlier source-specific engine run on a native Linux filesystem; optional | No fresh Q17/Q18 WSL wrapper certification; Windows absolute worktree metadata must not be shared with Linux Git |
+| Full copied runtime without Git | Actual copied VersionOnly/Status plus offline Check/Skip passed; no invented source revision | Read-only discovery; no Git creation and no production Apply |
+| Copilot/Claude skill-only installation | Routing/parity and real shared commands tested | Missing runtime explicit; no independent two-client interactive UI certification or installed-skill Apply |
+| macOS, Windows PowerShell 5.1, declared Python minimum 3.10 | No fresh campaign for these combinations | No macOS/5.1 certification or Python 3.10 certification inferred from a declared minimum |
+
+Startup/Status/Skip do not require Python, WSL or a new Git repository. Missing
+Python blocks the selected engine action explicitly, not ordinary discovery.
+Git-less runtime copies remain read-only. Source support is not live Dataverse,
+official package/distribution, unattended scheduler or power-loss acceptance.
+
 ## Verification commands
 
 ```powershell
@@ -215,7 +295,8 @@ pwsh .\scripts\ci\test-wizard-update.ps1
 Invoke-Pester .\scripts\ci\WizardUpdateEntryPoints.Tests.ps1 -Output Detailed
 ```
 
-Python 3.10+ is optional for Check/Review/Update/Recover, not startup/Skip.
+Python 3.10+ is required for Check/Review/Update/Recover; these on-demand features
+are optional. Startup/Status/Skip need only the compatible PowerShell runtime.
 No package install is performed. Tests use isolated synthetic fixtures, no real
 application, user skill folder, credentials or Dataverse environment. Required CI
 runs the H009 engine on native Windows and Linux; Linux also runs the full existing

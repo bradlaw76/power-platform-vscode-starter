@@ -20,6 +20,23 @@ Use [current release/adoption notes](docs/release-consolidation.md) and
 [skill distribution](docs/skill-distribution.md) for reviewed manual provenance
 and compatibility. Preserve local edits, native task IDs and original evidence.
 
+At the Q18 handoff, H009 is still implementation PR16, not merged main or a
+numbered release. Design PR15 remains a separate record until the owner approves
+its disposition. Use a separate reviewed candidate checkout for evaluation;
+do not replace an existing runtime, relocate projects or rerun the force-copying
+Claude installer over local edits. See the
+[installation procedure](docs/skill-distribution.md#reviewed-candidate-installation)
+and [verified host matrix](docs/wizard-updates.md#supported-host-and-verification-matrix).
+The startup banner is additive; automation should read Status JSON rather than
+parse terminal prose. H009 adds no build stage or new discovery question.
+
+Recovery of a known local fixture checkpoint is not permission to downgrade an
+official release. Preserve the journal, lock and backups on a recovery hold;
+`recovery-blocked` can have exit0 and must not be interpreted as restored.
+Official anti-rollback/version history and release migration authority remain
+unimplemented owner gates, as recorded in the
+[final handoff](docs/wizard-release-readiness.md#q18-final-review-and-handoff).
+
 Existing solution/publisher identity must be confirmed explicitly, not inferred
 from a scenario title or free-text answer. If selecting technical retrofit
 control, use the explicitly chosen Advanced Builder with `-Retrofit` and inspect

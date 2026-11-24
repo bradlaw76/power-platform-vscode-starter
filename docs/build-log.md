@@ -4,6 +4,21 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q18 H009 final documentation and handoff - 2026-11-24
+
+- Consolidates user-facing version/update workflow, candidate installation,
+  force-copy installer cautions, explicit recovery-status handling and
+  source-specific Windows/Linux host evidence in existing PR16.
+- Preserves design PR15 pending owner disposition and Q17 runtime
+  `e8eb06fa576a2dc26693a233f6ff0f2ea2687f95`; no runtime/test/contract change.
+- [Final handoff](wizard-release-readiness.md#q18-final-review-and-handoff) records
+  implemented versus synthetic/official boundaries, owner roles and exact next
+  actions. Existing external H009_IMPLEMENTATION_REPORT.md is the sole campaign
+  progress ledger; earlier reports remain source-specific evidence.
+- Final documentation SHA and exact-head CI are recorded in issue14/PR16.
+  Official Apply and canonical **HANDOFF NOT WRITTEN - BLOCKED** are unchanged.
+  No merge, release/tag, publisher activation or live environment operation.
+
 ## Q17 H009 lifecycle and recovery acceptance - 2026-11-24
 
 - Independent real GitHub clone exposed a Windows checkout defect: excluding

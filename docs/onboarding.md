@@ -10,6 +10,10 @@ the confirmed runtime's `04-check-wizard-update.ps1 -Action Status`. Review
 changes / Update wizard / Skip for now share that command; Skip continues
 unchanged. A development checkout has unknown release identity. Network checks
 are opt-in; official Apply stays blocked without verified publisher policy.
+H009 is still the unmerged PR16 candidate at the Q18 handoff, not an installed
+main-branch release. Check the [supported host/evidence matrix](wizard-updates.md#supported-host-and-verification-matrix)
+and [reviewed candidate installation](skill-distribution.md#reviewed-candidate-installation)
+before expecting these optional commands in another clone.
 
 Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
 
@@ -127,7 +131,11 @@ What this does:
 Validation checkpoint:
 
 - Script prints `INSTALLED power-platform-vscode-wizard`.
-- You only need to run this once per machine. Re-running is safe (it overwrites with the latest version).
+- The installer force-copies matching skill/reference files. Before a rerun,
+  review and back up the exact existing destination folders; do not overwrite
+  human edits or use the installer as transactional H009 Update/Recover.
+- The shipped baseline includes wizard and reporting skills. Successful copying
+  does not install or verify the runtime, authenticate a publisher or authorize a build.
 - Repo-shared Copilot Chat skill is available at `.github/skills/power-platform-wizard-init` and can be invoked with `/power-platform-wizard-init`.
 
 ---

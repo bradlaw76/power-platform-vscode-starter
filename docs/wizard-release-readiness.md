@@ -2,13 +2,17 @@
 
 ## Status and scope
 
-This is the H009-09 through H009-12 implementation-aligned decision record and
+This is the H009 implementation-aligned trust decision record and Q18 handoff,
+preserving the H009-09 through H009-12 reconciliation. It records
 reconciliation for issue #14 and existing implementation PR #16. It supplements,
 but does not alter, design PR #15 at
 `5098769d2786fbf366b8e2e8ecb7fd8912bd84ce`.
 The original implementation is `480ba1563e54613350879a6c3efd441dfaa209ed`;
 the preserved Q15 path correction is
 `8673681b231d0e275354aa98fe1d2f53a06bf97b`.
+Q17's Windows CRLF correction is
+`c3536cd7e6940512d9d010d3c5cbc1d0488bc395`; its frozen candidate is
+`e8eb06fa576a2dc26693a233f6ff0f2ea2687f95`.
 
 **Candidate only. Official Apply, consumer-copy Apply and installed-skill Apply
 remain disabled.** Neither this record nor the inventory grants publisher,
@@ -350,3 +354,73 @@ Recommendation: **review this PR as disabled-production candidate functionality,
 not an official self-updater or release-ready distribution.** Eventual merge
 requires independent review and required CI; real Apply remains a later gated
 implementation, even after source merge.
+
+## Q18 final review and handoff
+
+### Delivered and verified
+
+- One nullable distribution descriptor, early offline VersionOnly/Status and
+  source/contract/profile identity; development release remains unknown.
+- One shared terminal/Copilot/Claude command for Check, Review, Update, Skip and
+  Recover. Explicit bounded stable-only online metadata is unverified until
+  approved publisher policy and production verification exist.
+- Exact preview, independent fixture pin or detached RSA verification,
+  explicit plan-digest consent, strict synthetic ownership and guarded
+  checkpoint/journal compensation. Actual installations cannot become writable
+  merely by using a fixture flag or candidate inventory.
+- Q15 preserves PowerShell-relative runtime paths; Q17 preserves normal Windows
+  checkout conversion without trusting executable Git configuration.
+- Q17's [source-specific acceptance](https://github.com/bradlaw76/power-platform-vscode-starter/pull/16#issuecomment-7118622588)
+  records all twelve bounded lifecycle scenarios. Actual post-write validation
+  failure, recovery conflict hold, explicit reconciliation, original bytes/
+  metadata/Git identity and two retained verified backups were checked separately
+  from process-interruption recovery and zero-write completed replay.
+
+The [version/update operations guide](wizard-updates.md) owns commands and the
+[supported-host matrix](wizard-updates.md#supported-host-and-verification-matrix).
+[Installation guidance](skill-distribution.md#reviewed-candidate-installation)
+distinguishes source evaluation, skill instructions and a complete runtime;
+the existing force-copy installer is not transactional Update/Recover.
+
+Runtime baseline `e8eb06fa576a2dc26693a233f6ff0f2ea2687f95` has successful
+[Windows/Linux CI45300515892](https://github.com/bradlaw76/power-platform-vscode-starter/actions/runs/45300515892):
+updater 23 passed/one platform skip and inventory 5 passed per OS, Windows entry
+Pester 8/0/0 and Linux full Pester 112/0/0. Sixteen optional installed-framework
+handoff skips and a non-failing checkout-action runtime deprecation annotation
+remain explicit. Q18 changes documentation and its pinned candidate inventory,
+not the runtime, schema, profile, skills or test implementation. Final exact-head
+CI and source identifiers are recorded in the existing issue/PR closeout.
+
+### Review disposition and one progress ledger
+
+| Record | Q18 disposition |
+| --- | --- |
+| Implementation PR16 | Sole consolidated source implementation; open for independent exact-head review; do not merge in this assignment |
+| Design PR15 | Separate draft design at `5098769d2786fbf366b8e2e8ecb7fd8912bd84ce`; preserve until owner approves disposition |
+| Main | `57f54fbf6b2c88e391100c001ba0b3f8834e190b` at reconciliation; no merge or automatic synchronization |
+| Existing external H009_IMPLEMENTATION_REPORT.md | Single durable campaign progress ledger, current summary plus preserved source-specific Q14-Q18 history |
+| Q16/Q17 external reports and logs | Immutable evidence inputs linked by that ledger, not competing current-status ledgers |
+| Issue14/PR16 comments | Sanitized final publication/evidence pointers; full project-shaped fixtures remain external |
+
+No submitted PR review or inline review comment was present at Q18
+reconciliation. Green CI is not reviewer approval. Earlier direct source review
+is not an independent security audit; the interrupted delegated audit never
+produced one. Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains unchanged.
+
+### Outstanding decisions and exact next actions
+
+| Owner | Next action | Gate that remains closed |
+| --- | --- | --- |
+| Repository reviewer/maintainer | Review the final PR16 SHA, CI and requirement reconciliation; record findings and separately approve PR15 disposition | No merge is performed by Q18; no old review is promoted to current approval |
+| Publisher/release authority | Record D01-D07 decisions: approved publisher/numeric source identity, proof profile, workflow/issuer/root policy, first SemVer/package, time/revocation freshness and channels | No invented key, version, authenticated publisher, release/tag or official available update |
+| Distribution/architecture owner | Approve D08 dependency-complete package, licensing, per-topology ownership receipts, compatibility and migration ranges | Candidate source inventory is not an install bundle or overwrite permission |
+| Authorized implementer and independent reviewer | Implement/test production provenance, installed identity, temporal/revocation verification, D09 anti-rollback state and native concurrency/filesystem risk handling | Do not activate production by removing fixture guards; synthetic signatures are not sufficient |
+| Release/audit authority | Resolve D10 independent review/audit destination and obtain separate source-integration, packaging, release and activation approvals with fresh exact-head evidence | Source merge, official distribution, live deployment and unattended execution remain separate permissions |
+
+An official downgrade policy is not the same as recovery of a known local
+fixture checkpoint. Windows ACL/ADS preservation, hostile filesystem races,
+power-loss/reboot durability and interactive multi-client acceptance remain
+unverified. Unavailable evidence stays unavailable, not passed.
+
+**Stop here when only these owner decisions remain.** No release/tag, official
+update activation, persistent service or Dataverse operation is part of Q18.

@@ -89,6 +89,15 @@ updates or an official release. Profile 1.6, contract 1.10.0 and installed
 automation package 0.2.1 remain separate versions. Try
 `pwsh .\scripts\bootstrap\05-start-wizard.ps1 -VersionOnly` or the agent-shared
 `pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`.
+
+At the Q18 handoff, H009 remains an **unmerged source candidate in
+[implementation PR #16](https://github.com/bradlaw76/power-platform-vscode-starter/pull/16)**,
+not an official release or a feature already delivered to main installations.
+[Design PR #15](https://github.com/bradlaw76/power-platform-vscode-starter/pull/15)
+remains separate pending owner disposition. See the
+[verified host matrix](docs/wizard-updates.md#supported-host-and-verification-matrix),
+[installation boundaries](docs/skill-distribution.md#reviewed-candidate-installation)
+and [final review/next actions](docs/wizard-release-readiness.md#q18-final-review-and-handoff).
 An unreleased clone shows `release unknown - development checkout`.
 
 ### What happens when you use this starter
@@ -319,11 +328,18 @@ Source: ..\.claude\skills
 Dest:   C:\Users\<you>\.claude\skills
 
   INSTALLED power-platform-vscode-wizard
+  INSTALLED dataverse-report-wizard
 
-Done. Installed: 1  Skipped: 0
+Done. Installed: 2  Skipped: 0
 ```
 
-This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
+This copies the wizard and reporting skill folders, with bundled authorization
+policy, to `~/.claude/skills/`. It installs instructions, not a missing runtime.
+The installer force-copies matching files: **do not rerun over customized skills
+without reviewing and backing up the exact destination folders first**. Existing
+unlisted files can remain, so copying is not an exact transactional synchronization.
+Use the [reviewed installation guidance](docs/skill-distribution.md); the installer
+cannot bypass H009's trust, ownership or local-edit gates.
 
 For VS Code Copilot Chat users, this repo also includes a shared skill at `.github/skills/power-platform-wizard-init` that can be invoked as `/power-platform-wizard-init` without running the installer.
 
