@@ -1927,6 +1927,8 @@ $tasksContent = @"
 - [ ] For routine authorized nonproduction existing-component repairs, keep a minimum change contract and rollback before editing; reconcile narrative documentation before closure, never defer semantic/report/hash/FAST/security gates
 - [ ] Verify active process, checkpoint and actual resource evidence before writer release; lease expiry alone is insufficient; recover before restart, bound repairs and continue independent work; H IDs track outcomes, not permanent component ownership
 - [ ] For explicitly autonomous multi-change work, recommend dependency-aware queues from 'docs/QUEUED_AUTONOMOUS_DELIVERY.md' and https://code.visualstudio.com/docs/agents/overview; verify actual executor support, not assumed live acceptance
+- [ ] For native acceptance, observe the actual browser principal (not session-declared or separate API-admin identity); identity mismatch stops; verify form eligibility in the intended app/user context, not mere direct URL access
+- [ ] Validate publication blast radius preserving unrelated drafts; detect unexpected native record modifications and retain evidence without blind rollback; classify application-created restrictions separately from security/platform/unknown without bypass; recover independent browser process/checkpoint/resource evidence and repeat principal preflight; Automation owns runtime capabilities, no native pilot is implied
 - [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
 - [ ] Consider automation only when a measured net time saving exceeds setup/verification cost and owner opts in; do not require WSL
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run

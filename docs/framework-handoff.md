@@ -204,6 +204,16 @@ Synthetic rehearsal is not package, deployment, inspection or UI acceptance.
 Live Dataverse, new-solution provisioning and production controls require
 separate verified permissions/evidence; this handoff grants none.
 
+Native/browser acceptance also requires the canonical policy's
+[six safety obligations](policies/authorization-and-execution.md#native-application-safety-and-browser-acceptance).
+The actual browser principal must be observed independently of API-admin or
+session-declared identity. Validate publication blast radius, unrelated drafts,
+record readback changes, restriction classification and intended app/user form
+eligibility. Recover independent browser process/checkpoint/resource evidence
+before resume and repeat principal preflight. This Starter adapter does not
+implement those Automation runtime capabilities or install a browser driver;
+missing native support is partial, not acceptance. No native pilot is claimed.
+
 ## Verification
 
 `scripts/ci/test_framework_handoff.py` includes dependency-independent boundary

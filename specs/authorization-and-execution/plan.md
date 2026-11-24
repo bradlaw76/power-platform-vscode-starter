@@ -38,3 +38,13 @@ PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION campaign:
 6. Update the existing AI-neutral handoff/build log and separate STARTER/AUTO
    registration proposal, inspect explicit staged diff, then commit with the
    required co-author trailer. Do not push or change the PR body in this run.
+
+### Q09–Q12 continuation
+
+Reuse accepted scope and prior policy/distribution mechanisms. Add six generic
+native safety obligations to the canonical policy, propagate through directly
+applicable instruction/skill/task/queue/handoff surfaces, and extend existing
+authorization, parity and emitted-template tests. Run the same affected local
+checks with worktree-local fixtures. Update existing evidence/handoff, inspect
+the explicit staged diff and commit with co-author trailer; do not push. Runtime
+implementation and synthetic end-to-end evidence remain the parent's scope.

@@ -24,6 +24,17 @@ work, recommend dependency-aware queues and ready-to-paste instructions from
 https://code.visualstudio.com/docs/agents/overview. Do not claim absent executor
 capabilities or live verification.
 
+For native work, follow the canonical policy's browser safety contract: actual
+browser-principal preflight (not session-declared or separate API-admin identity);
+identity mismatch stops. Validate publication blast radius and preserve unrelated
+drafts. Detect unexpected native record modifications, retain evidence and never
+blindly roll back. Classify application-created restrictions separately from
+security/platform/unknown without permission to bypass. Verify form eligibility
+in the intended app/user context, not mere direct URL access. Recover the
+independent browser session using process/checkpoint/resource evidence and repeat
+principal preflight. Runtime capabilities belong to Automation; these are Starter
+guidance/contracts, not an installed browser driver or a performed native pilot.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
