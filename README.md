@@ -1,5 +1,7 @@
 # Power Platform VS Code Starter
 
+> **Multi-step changes?** Use the [queued autonomous delivery and web-resource-first guide](docs/QUEUED_AUTONOMOUS_DELIVERY.md) for ready-to-paste VS Code Copilot instructions, dependency-aware queues, bounded self-repair, and live-first UI iteration. This is operating guidance; it does not install or activate a background executor. New builds still require concise mandatory Spec Kit planning and the usual authorization gates.
+
 ![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
 
 The canonical, multi-workload `power-platform-vscode-starter` repository for
