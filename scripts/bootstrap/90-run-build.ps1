@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Orchestrated Wizard Build
 FILE:         scripts/bootstrap/90-run-build.ps1
-VERSION:      0.2.0
+VERSION:      0.3.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-11-22
+LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Power Platform Bootstrap Runtime
 
 -----------------------------------------------------------------------------
@@ -29,6 +29,7 @@ TEST CASES
 ✔ Preview is the default and invokes no mutating stage.
 ✔ Apply mode stops at the first failed stage and records resumable state.
 ✔ Resume skips previously completed stages for the same scenario and scope.
+✔ Current reporting consent is checked before resuming or dispatching stages.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -65,6 +66,7 @@ $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
+. (Join-Path $PSScriptRoot 'helpers/wizard-hardening.ps1')
 
 $paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
 foreach ($requiredPath in @($paths.ScenarioFolder, $paths.PayloadFolder)) {
@@ -80,10 +82,17 @@ foreach ($planningFile in @('spec.md', 'plan.md', 'tasks.md')) {
 }
 
 $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
+$answersText = if (Test-Path -LiteralPath $answersPath -PathType Leaf) { Get-Content -LiteralPath $answersPath -Raw } else { '' }
+$reportingConfig = Get-WizardFeatureConfig -AnswersText $answersText
+$reportingError = Get-WizardReportingReadinessError -FeatureConfig $reportingConfig
+if ($reportingError) { throw $reportingError }
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
-$reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b'
+$reportsEnabled = if ($reportingConfig.ReportingSelectionPresent) { $reportingConfig.ReportEnabled } else { $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b' }
 $hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
+if ($reportingConfig.ReportingSelectionPresent -and -not $reportingConfig.NativeReportingEnabled) {
+    $hasReportingPayload = $false
+}
 $hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasSecurityRolesPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'security-roles-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 # Intake discovery mode and delivery verification are deliberately independent.

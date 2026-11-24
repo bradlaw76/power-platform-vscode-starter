@@ -53,6 +53,9 @@ Use `framework-acceptance` only after explicit selection. Add authorized-environ
 All modes must capture or confirm architecture intent before build scripts, produce compatible scenario planning artifacts, and use the same bootstrap pipeline.
 
 Reporting consent follows `docs/wizard-contract-v1.md#reporting-consent-h010`.
+Recheck current reporting consent/mapping status before new or resumed
+orchestration; completed stages are not new consent. Native/HTML stages follow
+independent flags, not leftover payloads or prose.
 Explain native dashboards (standard charts/dashboard), HTML web resources,
 both for complementary tasks, or none. Demo Builder includes a scenario-based
 recommendation and these choices in its existing consolidated confirmation.

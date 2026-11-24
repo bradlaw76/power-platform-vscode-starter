@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Wizard Hardening Helper
 FILE:         scripts/bootstrap/helpers/wizard-hardening.ps1
-VERSION:      0.3.0
+VERSION:      0.3.1
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Build Contract Validation
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.3.1  2026-11-24  Share reporting readiness checks with resumable orchestration.
 v0.3.0  2026-11-24  Preserve reporting consent and reject unresolved planning.
 v0.2.0  2026-08-28  Added scenario-scoped manifests and identity validation.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
@@ -453,6 +454,15 @@ function Get-WizardFeatureConfig {
     }
 }
 
+function Get-WizardReportingReadinessError {
+    param([pscustomobject]$FeatureConfig)
+
+    if ($FeatureConfig.ReportingSelectionPresent -and
+        $FeatureConfig.ReportScopingStatus -notin @('approved', 'approved-no-reports', 'not-applicable')) {
+        return "Reporting consent or mappings remain unresolved: $($FeatureConfig.ReportingDecision) / $($FeatureConfig.ReportScopingStatus). Review report-mappings.md before build execution."
+    }
+}
+
 function Get-WizardSolutionIdentity {
     param(
         [string]$AnswersText,
@@ -600,9 +610,9 @@ function Test-WizardBuildContract {
     }
 
     $featureConfig = Get-WizardFeatureConfig -AnswersText $answersText
-    if ($featureConfig.ReportingSelectionPresent -and
-        $featureConfig.ReportScopingStatus -notin @('approved', 'approved-no-reports', 'not-applicable')) {
-        $errors.Add("Reporting consent or mappings remain unresolved: $($featureConfig.ReportingDecision) / $($featureConfig.ReportScopingStatus). Review report-mappings.md before build execution.") | Out-Null
+    $reportingError = Get-WizardReportingReadinessError -FeatureConfig $featureConfig
+    if ($reportingError) {
+        $errors.Add($reportingError) | Out-Null
     }
     if ($featureConfig.ReportEnabled) {
         if ($featureConfig.SelectedReports.Count -eq 0) {

@@ -249,6 +249,13 @@ consent. Existing generated customer artifacts are not migrated or rewritten by 
 Review their original answers with the customer; use the existing explicit
 overwrite flow only for a separately authorized regeneration.
 
+The orchestrator checks current reporting consent/mapping status before every
+new or resumed run, before reusing completed stages. A saved validation result
+does not confirm a subsequently deferred decision. For the new consent block,
+native and HTML stages use their independent flags: a leftover native payload
+does not opt into native reporting, and native-only approval never enables HTML.
+These checks do not replace separate payload/content approval.
+
 When demo data is enabled, default scope may be all scenario-created custom tables, but the resolved table list must be shown and approved. Standard reused tables must explicitly choose create, reuse-existing, or both; they are never seeded implicitly. Hero records must identify their table, count, and demo scenario or purpose.
 
 Dataverse Task activity generation is opt-in. When enabled, planning must identify eligible parent tables, latest/all/selected scope, a source-record limit, the ordering field used to determine latest records, and tasks per selected record. The recommended default is the latest 10 parent records per table ordered by `createdon desc`; every-record task creation requires the user to explicitly select `all`.

@@ -327,6 +327,10 @@ limitations, and overlap before mapping approval. Unconfirmed scope or pending
 mappings block planning completion. Do not migrate existing customer artifacts
 without separate authorization. See [reporting consent](../docs/wizard-contract-v1.md#reporting-consent-h010).
 
+Recheck current reporting consent/mapping status before new or resumed
+orchestration. Do not reuse completed validation as new consent. Native/HTML
+stage selection must honor independent flags, not leftover payloads or prose.
+
 Mode-specific input:
 
 **Greenfield mode** (new app):

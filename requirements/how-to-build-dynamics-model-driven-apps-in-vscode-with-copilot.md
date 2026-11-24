@@ -123,6 +123,9 @@ or `not-applicable` provenance. Disabled discovery is not a refusal.
 Unconfirmed scope/pending mappings block planning completion; report content
 needs separate audience, decision, metrics, scope, placement, limitations and
 overlap review. Do not migrate existing artifacts without separate authorization.
+New/resumed orchestration rechecks current reporting consent/mapping status
+before reusing stage results; native/HTML stages follow independent consent
+flags, not leftover payloads or prose.
 - retrofit (current-state and remaining-work intake)
 - source-control (target-repository preflight, scenario branch, traceability, checkpoint commits, discovered validation/CI, PR handoff, and merge strategy)
 - user-tasks (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)

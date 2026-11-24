@@ -285,6 +285,32 @@ try {
         }
     }
     Write-Host 'H010 Contoso reporting: 8 cases passed (confirmed, declined, deferred, blank, native, both, discovery disabled, module disabled).'
+    foreach ($case in @(
+        @{ Name = 'cancelled'; Answers = $contosoAnswers + @('no'); Error = 'recommendations were not approved' },
+        @{ Name = 'unanswered'; Answers = $contosoAnswers; Error = 'Scripted answers exhausted' }
+    )) {
+        $workspace = New-WizardTestWorkspace -Name "contoso-$($case.Name)"
+        $rejected = $false
+        try { Invoke-WizardFixture -Workspace $workspace -Mode 'demo-builder' -Answers $case.Answers | Out-Null }
+        catch { $rejected = $_.Exception.Message.Contains($case.Error) }
+        Assert-True -Condition ($rejected -and -not (Test-Path (Join-Path $workspace 'specs'))) -Message "Contoso $($case.Name) confirmation must not generate consent or planning files."
+    }
+    $resumeWorkspace = New-WizardTestWorkspace -Name 'contoso-reintake'
+    Invoke-WizardFixture -Workspace $resumeWorkspace -Mode 'demo-builder' -Answers ($contosoAnswers + @('yes')) | Out-Null
+    Invoke-WizardFixture -Workspace $resumeWorkspace -Mode 'demo-builder' -Answers ($contosoAnswers + @('defer')) | Out-Null
+    Assert-ReportingSelection -Workspace $resumeWorkspace -ScenarioSlug $contosoSlug -Decision 'recommended-not-confirmed' -Selection 'unconfirmed' -Native 'no' -Html 'no' -ScopingStatus 'pending-confirmation'
+    $resumeFolder = Join-Path $resumeWorkspace "specs/$contosoSlug"
+    $beforeCancel = @(Get-ChildItem -LiteralPath $resumeFolder -File | Get-FileHash -Algorithm SHA256)
+    $cancelled = $false
+    try { Invoke-WizardFixture -Workspace $resumeWorkspace -Mode 'demo-builder' -Answers ($contosoAnswers + @('no')) | Out-Null }
+    catch { $cancelled = $_.Exception.Message.Contains('recommendations were not approved') }
+    Assert-True -Condition $cancelled -Message 'Cancelling re-intake must reject the new recommendations.'
+    foreach ($hash in $beforeCancel) {
+        Assert-True -Condition ((Get-FileHash -LiteralPath $hash.Path -Algorithm SHA256).Hash -eq $hash.Hash) -Message 'Cancelled re-intake changed an existing planning artifact.'
+    }
+    Invoke-WizardFixture -Workspace $resumeWorkspace -Mode 'demo-builder' -Answers ($contosoAnswers + @('yes')) | Out-Null
+    Assert-ReportingSelection -Workspace $resumeWorkspace -ScenarioSlug $contosoSlug -Decision 'explicitly-approved' -Selection 'html' -Native 'no' -Html 'yes' -ScopingStatus 'pending-review'
+    Write-Host 'H010 Q02 consent transitions passed: cancelled, unanswered, approved-to-deferred, cancelled re-intake preservation, and reconfirmed scope with mappings still pending.'
     $materialWorkspace = New-WizardTestWorkspace -Name 'optional-materials'
     $materialsPath = Join-Path $materialWorkspace 'review.json'
     @{

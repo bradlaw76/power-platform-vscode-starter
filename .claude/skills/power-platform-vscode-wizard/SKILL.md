@@ -121,6 +121,10 @@ audience, decision, metrics/calculations, record scope, placement, limitations,
 and overlap before mapping approval. Never migrate existing customer artifacts
 without separate authorization. See `docs/wizard-contract-v1.md#reporting-consent-h010`.
 
+Recheck current reporting consent/mapping status before new/resumed orchestration.
+Saved stages are not new consent; native/HTML stages follow independent flags,
+not leftover payloads or prose.
+
 In every mode, capture or reuse the delivery goal (`prototype`, `presentation-demo`, `connected-demo`, `pilot`, `production`) and owner timeframe. Persist accepted delivery context in the scenario planning files. Guided execution does not require WSL. Automation remains off unless the owner opts in after a net-time comparison including setup, verification and recovery. Deadlines never weaken required CI, security, environment or deployment gates. See [delivery pacing and tooling](../../../docs/delivery-pacing-and-tooling.md).
 
 Use the proportional [scenario change impact gate](../../../docs/scenario-change-impact-gate.md). Minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. Scenario deltas update affected contracts and dependent surfaces; preserve native field/security proof before live binding and every mandatory release gate.

@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    Build Web Resources
 FILE:         scripts/bootstrap/65-build-web-resources.ps1
-VERSION:      0.2.0
+VERSION:      0.2.1
 AUTHOR:       Power Platform VS Code Starter
 LAST UPDATED: 2026-11-24
 ENVIRONMENT:  PowerShell 7 | Dataverse Web Resources | HTML Report Generation
@@ -37,6 +37,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+v0.2.1  2026-11-24  Reuse the shared reporting readiness check.
 v0.2.0  2026-11-24  Block HTML generation for unresolved H010 reporting consent.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
@@ -1573,9 +1574,9 @@ $specContent = Get-Content -Path $specPath -Raw -Encoding UTF8
 $planContent = if (Test-Path $planPath) { Get-Content -Path $planPath -Raw -Encoding UTF8 } else { '' }
 
 $reportingConfig = Get-WizardFeatureConfig -AnswersText $answersContent
-if ($reportingConfig.ReportingSelectionPresent -and
-    $reportingConfig.ReportScopingStatus -notin @('approved', 'approved-no-reports', 'not-applicable')) {
-    throw "Reporting scope and mappings must be approved before HTML generation: $($reportingConfig.ReportingDecision) / $($reportingConfig.ReportScopingStatus). Review report-mappings.md."
+$reportingError = Get-WizardReportingReadinessError -FeatureConfig $reportingConfig
+if ($reportingError) {
+    throw "Reporting scope and mappings must be approved before HTML generation. $reportingError"
 }
 
 if (-not $PreviewReportQueriesOnly -and (Get-Command Initialize-WizardArtifactManifest -ErrorAction SilentlyContinue)) {

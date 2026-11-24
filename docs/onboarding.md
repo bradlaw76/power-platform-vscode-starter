@@ -379,6 +379,10 @@ Advanced/Acceptance keep the same answer slot and legacy yes=HTML/no=none.
 Existing customer artifacts are not migrated; separately review consent before
 authorizing any regeneration. See [reporting consent](wizard-contract-v1.md#reporting-consent-h010).
 
+New and resumed builds recheck current reporting consent and mapping status
+before using saved stage results. Native and HTML stages follow independent
+consent flags; leftover payloads are not permission to enable unselected reports.
+
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 
 ### Advanced Builder (explicit)
