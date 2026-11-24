@@ -247,28 +247,16 @@ try {
     Assert-True -Condition ($materialTasks.Contains('- [ ] Resolve material 2')) -Message 'Pending source review must remain an unfinished planning task.'
     foreach ($rule in @(
         'docs/policies/authorization-and-execution.md',
-        'reuse accepted requirements and valid standing scoped nonproduction authorization',
-        'unless required for real authority, enforced policy or conflicting writers',
-        'routine authorized nonproduction existing-component repairs',
-        'minimum change contract and rollback before editing',
-        'before closure, never defer semantic/report/hash/FAST/security gates',
-        'active process, checkpoint and actual resource evidence',
-        'lease expiry alone is insufficient; recover before restart',
-        'H IDs track outcomes, not permanent component ownership',
-        'explicitly autonomous multi-change work, recommend dependency-aware queues',
-        'https://code.visualstudio.com/docs/agents/overview',
-        'verify actual executor support, not assumed live acceptance'
-        'observe the actual browser principal (not session-declared or separate API-admin identity)'
-        'identity mismatch stops'
-        'form eligibility in the intended app/user context, not mere direct URL access'
-        'publication blast radius preserving unrelated drafts'
-        'unexpected native record modifications and retain evidence without blind rollback'
-        'application-created restrictions separately from security/platform/unknown without bypass'
-        'recover independent browser process/checkpoint/resource evidence and repeat principal preflight'
-        'Automation owns runtime capabilities, no native pilot is implied'
+        'single canonical',
+        'routine authorized corrections',
+        'continue independent work, then reconcile affected notes',
+        'no fresh discovery or full planning package',
+        'docs/QUEUED_AUTONOMOUS_DELIVERY.md',
+        'never infer deployment/native acceptance from source success'
     )) {
         Assert-True -Condition ($materialTasks.Contains($rule)) -Message "Generated tasks lost authorization/execution contract: $rule"
     }
+    Assert-True -Condition (-not $materialTasks.Contains('observe the actual browser principal (not session-declared')) -Message 'Generated tasks must reference, not reproduce, canonical native procedures.'
     @{ decision = 'provided'; materials = @() } | ConvertTo-Json | Set-Content -LiteralPath $materialsPath -Encoding UTF8
     $invalidWorkspace = New-WizardTestWorkspace -Name 'invalid-materials'
     $invalidRejected = $false

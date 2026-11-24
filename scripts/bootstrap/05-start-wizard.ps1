@@ -1923,12 +1923,9 @@ $tasksContent = @"
 - [ ] Review 'answers.md' with stakeholder
 - [ ] Confirm delivery goal '$($answers['DeliveryGoal'])' and timeframe '$($answers['DeliveryTimeframe'])'; resolve any unconfirmed scripted values
 - [ ] Classify the actual change under 'docs/scenario-change-impact-gate.md'; minor maintenance retains accepted planning and focused checks, while scenario deltas update affected contracts
-- [ ] Follow 'docs/policies/authorization-and-execution.md': reuse accepted requirements and valid standing scoped nonproduction authorization; registration/H numbering/narrative docs do not block independently authorized implementation unless required for real authority, enforced policy or conflicting writers
-- [ ] For routine authorized nonproduction existing-component repairs, keep a minimum change contract and rollback before editing; reconcile narrative documentation before closure, never defer semantic/report/hash/FAST/security gates
-- [ ] Verify active process, checkpoint and actual resource evidence before writer release; lease expiry alone is insufficient; recover before restart, bound repairs and continue independent work; H IDs track outcomes, not permanent component ownership
-- [ ] For explicitly autonomous multi-change work, recommend dependency-aware queues from 'docs/QUEUED_AUTONOMOUS_DELIVERY.md' and https://code.visualstudio.com/docs/agents/overview; verify actual executor support, not assumed live acceptance
-- [ ] For native acceptance, observe the actual browser principal (not session-declared or separate API-admin identity); identity mismatch stops; verify form eligibility in the intended app/user context, not mere direct URL access
-- [ ] Validate publication blast radius preserving unrelated drafts; detect unexpected native record modifications and retain evidence without blind rollback; classify application-created restrictions separately from security/platform/unknown without bypass; recover independent browser process/checkpoint/resource evidence and repeat principal preflight; Automation owns runtime capabilities, no native pilot is implied
+- [ ] Follow the single canonical 'docs/policies/authorization-and-execution.md' policy; do not duplicate its authority, backup, writer/recovery or native safety rules
+- [ ] For routine authorized corrections: implement, validate, publish only within accepted scope, verify, correct, continue independent work, then reconcile affected notes; no fresh discovery or full planning package
+- [ ] For explicitly autonomous work, use the existing dependency-aware queue in 'docs/QUEUED_AUTONOMOUS_DELIVERY.md'; verify installed capability, never infer deployment/native acceptance from source success
 - [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
 - [ ] Consider automation only when a measured net time saving exceeds setup/verification cost and owner opts in; do not require WSL
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run
@@ -1941,7 +1938,7 @@ $tasksContent = @"
 - [ ] Finalize 'plan.md'
 - [ ] Review source-control standards in 'requirements/GithubInstructions_General.md'
 - [ ] Confirm repository, remote, current/default branch, working-tree state, recent history, and applicable validation commands
-- [ ] Create or switch to scenario branch '$($answers["SourceControlBranch"])' before implementation; do not absorb unrelated working-tree changes
+- [ ] Reuse the existing authorized scenario branch '$($answers["SourceControlBranch"])'; create one only when needed and avoid competing writers or unrelated working-tree changes
 - [ ] Approve build environment and permissions
 - [ ] Review standard table reference: 'docs/standard-dataverse-tables.md'
 - [ ] Complete explicit entity mapping in spec/plan (standard reused tables, custom tables to create, standard fields reused, custom fields to add, relationships)

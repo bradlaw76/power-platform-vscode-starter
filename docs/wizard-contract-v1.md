@@ -38,6 +38,11 @@ workload question to Demo Builder.
 
 ## Canonical Flow
 
+This flow plans new/material app changes. Routine authorized corrections reuse
+accepted outcomes and follow [the canonical execution policy](policies/authorization-and-execution.md):
+implement, validate, publish only within scope, verify, correct, continue, then
+reconcile affected notes. Do not replay intake or regenerate an unchanged package.
+
 1. Wizard mode selection (`demo-builder` by default)
 2. Mode-specific discovery and technical-design confirmation
 3. Optional extension blocks (selected by profile)

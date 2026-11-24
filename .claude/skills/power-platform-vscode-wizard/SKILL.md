@@ -14,35 +14,16 @@ work. During consumer compatibility review, include this policy or a reviewed
 equivalent and reference it from the project's existing instruction entry point;
 do not overwrite local instructions. This applies to all workloads.
 
-Reuse accepted requirements and standing scoped nonproduction authorization.
-Registration, H numbering and narrative documentation must not block independently
-authorized implementation unless required for real authority, enforced policy or
-conflicting writers. H IDs track outcomes, not permanent component ownership.
-Check active process, checkpoint and actual resource evidence before writer
-release; lease expiry alone is insufficient. Recover before restart, bound repairs
-and continue independent work. Routine authorized nonproduction existing-component
-repairs may finish narrative documentation retrospectively before closure, never
-semantic/report/hash/FAST/security approvals. For explicitly autonomous multi-change
-work, recommend dependency-aware queues and ready-to-paste instructions from
-project-root `docs/QUEUED_AUTONOMOUS_DELIVERY.md` when available, including
-https://code.visualstudio.com/docs/agents/overview. If the guide is absent, use
-the bundled policy's queue contract and verify installed controls; do not claim
-absent executor capabilities or live verification.
-
-For native work, follow the canonical policy's browser safety contract: actual
-browser-principal preflight (not session-declared or separate API-admin identity);
-identity mismatch stops. Validate publication blast radius and preserve unrelated
-drafts. Detect unexpected native record modifications, retain evidence and never
-blindly roll back. Classify application-created restrictions separately from
-security/platform/unknown without permission to bypass. Verify form eligibility
-in the intended app/user context, not mere direct URL access. Recover the
-independent browser session using process/checkpoint/resource evidence and repeat
-principal preflight. Runtime capabilities belong to Automation; these are Starter
-guidance/contracts, not an installed browser driver or a performed native pilot.
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 ## Overview
 
-A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
+A wizard-guided workflow using PAC CLI and Dataverse Web API scripts. New or
+material app/schema changes require affected `spec.md`, `plan.md`, `tasks.md`
+planning. Routine authorized corrections reuse accepted behavior and reconcile
+affected notes after implementation and targeted validation.
 
 Preserve approved native table/relationship decisions. Optional continuation
 uses project-root `docs/framework-handoff.md` and the installed framework's
@@ -80,7 +61,8 @@ Before intake, inspect the target repository without modifying it. Report presen
 
 ## Mandatory Rule
 
-> Do not build tables, forms, views, flows, or solution artifacts until Spec Kit is complete.
+> Do not build new/material tables, forms, views, flows or solution artifacts
+> without affected accepted planning. Routine corrections do not need a new dossier.
 
 Spec Kit artifacts required before scripts 20–60:
 - `spec.md` — what to build and why

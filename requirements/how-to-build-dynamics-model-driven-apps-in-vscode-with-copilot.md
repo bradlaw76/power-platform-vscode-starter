@@ -9,17 +9,9 @@ for framework and generated-project work: reuse valid scope, preserve required
 safety gates, and report source, test, deployment and live verification evidence
 separately. Include the contract through the existing distribution review.
 
-Reuse accepted requirements and standing scoped nonproduction authorization.
-Registration/H numbering/narrative docs do not block independently authorized
-implementation unless required for real authority, enforced policy or conflicting
-writers; reconcile them before closure. H IDs track outcomes, not permanent
-component ownership. Check process, checkpoint and actual resource evidence before
-writer release; lease expiry alone is insufficient. Recover before restart,
-bound repairs and continue independent work. Routine existing-component repairs
-may document retrospectively, never semantic/report/hash/FAST/security approvals.
-For explicitly autonomous multi-change work, recommend
-[dependency-aware queues](../docs/QUEUED_AUTONOMOUS_DELIVERY.md) with ready-to-paste
-instructions and https://code.visualstudio.com/docs/agents/overview.
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 Companion wizard:
 
@@ -60,7 +52,8 @@ For this repository, the primary wizard entry is `/power-platform-wizard-init` i
 
 Required process gate:
 
-- Spec Kit planning is mandatory before implementation.
+- Affected Spec Kit planning precedes new/material implementation; routine
+  authorized corrections reuse accepted requirements and reconcile notes afterward.
 - Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
 
 ### 0A. Beginner first-run flow (clone to demo)
@@ -819,7 +812,7 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - Run Azure sign-in and Power Platform auth profile creation.
 - Validate target Dataverse environment URL.
 
-1. Complete planning before implementation (required)
+1. Complete affected planning for new/material changes; reuse accepted planning for routine corrections.
 
 - Answer discovery questions for scenario, users, data, and success criteria.
 - Create `spec.md`, `plan.md`, and `tasks.md`.

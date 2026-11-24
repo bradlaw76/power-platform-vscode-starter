@@ -57,18 +57,9 @@ packages; its runtime limitations are explicit.
 
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
-Reuse accepted requirements and standing scoped nonproduction authorization
-without treating administration as permission. Registration, H numbering and
-narrative documentation do not block independently authorized implementation
-unless needed for real authority, enforced policy or conflicting writers.
-H IDs track outcomes, not permanent component ownership; lease expiry alone
-does not release a writer. Recover before restart using process, checkpoint and
-actual resource evidence. Routine authorized nonproduction repairs may reconcile
-narrative documentation before closure, but never defer mandatory approvals.
-Semantic/report/hash/FAST/security gates and enforced repository controls remain.
-For explicitly autonomous multi-change work, use the dependency-aware queue guide
-above and https://code.visualstudio.com/docs/agents/overview; verify actual
-executor support rather than assuming durable unattended operation.
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 ### Enhancement registry
 
@@ -77,6 +68,7 @@ executor support rather than assuming durable unattended operation.
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); standing scoped nonproduction authority, accepted-requirements reuse, proportional checks, recoverable administration/repair documentation, evidence-based writer recovery and native browser/principal/publication/record/form safety; byte-identical policy copies through the Claude installer. [Temporary registration proposal](docs/audits/development-execution-simplification-registration-proposal.md), no H allocation or new executor |
+| Development-first instruction refactoring | Existing canonical policy, concise referencing entry points and generated tasks; routine corrections implement/validate before affected-note reconciliation. [Migration](docs/skill-distribution.md#versioning-and-updates) preserves verified framework pins and custom text; no updater, merge, tenant or protected-functionality authority |
 | Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or live deployment |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |

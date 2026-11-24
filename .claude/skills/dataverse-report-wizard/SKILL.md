@@ -13,31 +13,9 @@ project-local policy is absent. If neither exists, report BLOCKED for mutating
 work. Require this policy or a reviewed equivalent in consumer projects through
 the existing compatibility review. Reuse valid scope; preserve deployment gates.
 
-Reuse accepted requirements and standing scoped nonproduction authorization.
-Registration, H numbering and narrative documentation must not block independently
-authorized implementation unless required for real authority, enforced policy or
-conflicting writers. H IDs track outcomes, not permanent component ownership.
-Check active process, checkpoint and actual resource evidence before writer
-release; lease expiry alone is insufficient. Recover before restart, bound repairs
-and continue independent work. Routine authorized nonproduction existing-component
-repairs may finish narrative documentation retrospectively before closure, never
-semantic/report/hash/FAST/security approvals. For explicitly autonomous multi-change
-work, recommend dependency-aware queues and ready-to-paste instructions from
-project-root `docs/QUEUED_AUTONOMOUS_DELIVERY.md` when available, including
-https://code.visualstudio.com/docs/agents/overview. If the guide is absent, use
-the bundled policy's queue contract and verify installed controls; do not claim
-absent executor capabilities or live verification.
-
-For native work, follow the canonical policy's browser safety contract: actual
-browser-principal preflight (not session-declared or separate API-admin identity);
-identity mismatch stops. Validate publication blast radius and preserve unrelated
-drafts. Detect unexpected native record modifications, retain evidence and never
-blindly roll back. Classify application-created restrictions separately from
-security/platform/unknown without permission to bypass. Verify form eligibility
-in the intended app/user context, not mere direct URL access. Recover the
-independent browser session using process/checkpoint/resource evidence and repeat
-principal preflight. Runtime capabilities belong to Automation; these are Starter
-guidance/contracts, not an installed browser driver or a performed native pilot.
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 ## Purpose
 

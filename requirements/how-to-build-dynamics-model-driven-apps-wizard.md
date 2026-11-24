@@ -11,17 +11,9 @@ for all workloads and generated projects. Reuse valid scoped permission without
 repeating approval questions; preserve planning, platform and environment gates.
 Carry the policy or a reviewed equivalent through existing distribution review.
 
-Reuse accepted requirements and standing scoped nonproduction authorization.
-Registration/H numbering/narrative docs do not block independently authorized
-implementation unless required for real authority, enforced policy or conflicting
-writers; reconcile them before closure. H IDs track outcomes, not permanent
-component ownership. Check process, checkpoint and actual resource evidence before
-writer release; lease expiry alone is insufficient. Recover before restart,
-bound repairs and continue independent work. Routine existing-component repairs
-may document retrospectively, never semantic/report/hash/FAST/security approvals.
-For explicitly autonomous multi-change work, recommend
-[dependency-aware queues](../docs/QUEUED_AUTONOMOUS_DELIVERY.md) with ready-to-paste
-instructions and https://code.visualstudio.com/docs/agents/overview.
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 This document is designed as a facilitation wizard.
 
@@ -59,7 +51,9 @@ Wizard outcome:
 - A beginner-usable onboarding path that works in any repository.
 
 Mandatory rule:
-- Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+- New/material tables, forms, views, flows and solution artifacts require affected
+  accepted Spec Kit planning. Routine corrections reuse accepted requirements and
+  reconcile affected notes after implementation; actual safety gates still apply.
 
 **Proportional scenario-impact gate:** classify the actual change under [the scenario change impact gate](../docs/scenario-change-impact-gate.md). Minor maintenance uses accepted planning and focused checks; do not regenerate the full matrix. A bounded scenario delta updates only affected contracts and dependent surfaces; a new or cross-cutting scenario reviews the applicable end-to-end chain before implementation. Preserve native field/security proof before live binding and continue independent prepared work without crossing blocked dependencies.
 

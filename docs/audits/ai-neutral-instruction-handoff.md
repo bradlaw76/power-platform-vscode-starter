@@ -1,5 +1,42 @@
 # AI-neutral instruction and implementation handoff
 
+## Development-first consolidation - current continuation
+
+Originating initiative: H109-Q09; no new repository-specific H allocation.
+Continues the existing PR #17 from
+`56442b0e4f1a5a84a94fece79cfc7961e6703e2d`. The current owner authorizes
+implementation, commit and synchronization through that PR, not merge,
+release or tenant writes. Earlier sections below are historical evidence,
+not active instructions or continuing parent-only push restrictions.
+The [canonical execution policy](../policies/authorization-and-execution.md)
+governs; accepted functional contracts remain applicable.
+
+- Consolidated active Copilot, prompt, skills, requirements and generated-task
+  procedures into references to the existing canonical policy. Routine accepted
+  corrections proceed through implementation, scoped deployment where authorized,
+  verification, correction, independent continuation and incremental documentation.
+  Material features and actual safety approvals retain their functional gates.
+- Six named Starter/Automation policy entry points total **9,393 -> 2,878 words
+  (69.36% reduction)**; this is not a claim about all functional documentation.
+  Starter Copilot: 2,123 -> 409; canonical policy: 3,037 -> 1,286.
+- Supported Automation instruction migration preserves surrounding customization
+  bytes and rejects edited framework sections or unreconciled running generations.
+  Migration does not upgrade runtime, expand authority or prove tenant rollback.
+- Focused Pester: **96 passed**; generated wizard modes and contract integrity
+  passed. Changed PowerShell analyzer checks and fourteen changed Markdown files
+  passed. Existing H009/H010 branches and the original operator checkout were
+  untouched; prior exact-head campaign/installation evidence is retained.
+- Fresh external installed-package acceptance passed: current policy and custom
+  security text reached real local worker subprocesses; accepted source repair,
+  bounded correction, disjoint progress, migration recovery, blocked optional
+  document projection and retrospective reconciliation were exercised. This is
+  fictional **source preparation**, not native intended-user or tenant acceptance.
+
+Remaining integration work is coordinated PR review/protection resolution;
+Automation runtime precedes dependent Starter guidance. No application-specific
+implementation, automatic editor/updater acceptance, merge or release is claimed.
+Exact synchronized source identities and hosted checks belong to the PR evidence.
+
 ## Q09–Q12 native safety continuation — 2026-11-24
 
 Same authorized **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION** campaign,
