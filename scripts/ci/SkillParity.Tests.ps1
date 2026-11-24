@@ -57,19 +57,19 @@ Describe 'Copilot and Claude wizard skill parity' {
         @{ Path = '.github\copilot-instructions.md' }
         @{ Path = '.github\prompts\power-platform-demo-wizard.prompt.md' }
     ) {
-        $content = (Get-Content -LiteralPath (Join-Path $repoRoot $Path) -Raw) -replace '\s+', ' '
+        $entry = Get-Content -LiteralPath (Join-Path $repoRoot $Path) -Raw
+        $entry | Should -Match 'authorization-and-execution\.md'
+        $content = (Get-Content -LiteralPath (Join-Path $repoRoot 'docs\policies\authorization-and-execution.md') -Raw) -replace '\s+', ' '
         foreach ($rule in @(
-            'actual browser-principal preflight',
-            'not session-declared or separate API-admin identity',
-            'identity mismatch stops',
-            'publication blast radius and preserve unrelated drafts',
-            'unexpected native record modifications, retain evidence and never blindly roll back',
-            'application-created restrictions separately from security/platform/unknown without permission to bypass',
-            'form eligibility in the intended app/user context, not mere direct URL access',
-            'independent browser session using process/checkpoint/resource evidence',
+            "browser's actual authenticated user",
+            'identity mismatch blocks affected writes',
+            'If scoped publication cannot be proven, stop that publication',
+            'Unexpected modifications stop affected writes',
+            'Classification is diagnosis, never permission to bypass a control',
+            'Mere direct URL access is not proof of form eligibility',
+            'independent process/owner',
             'repeat principal preflight',
-            'Runtime capabilities belong to Automation',
-            'not an installed browser driver or a performed native pilot'
+            'not an installed browser driver or a performed pilot'
         )) {
             $content | Should -Match ([regex]::Escape($rule)) -Because "$Path must preserve $rule"
         }

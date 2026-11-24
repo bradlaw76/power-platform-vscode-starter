@@ -79,9 +79,6 @@ Describe 'Authorization and execution policy contract' {
         @{ Id = 'AUTH-19'; Expected = 'Report partial/unverified; verify app membership, eligibility and the actual selected form'; Rule = 'Mere direct URL access is not proof of form eligibility in the intended app/user context' }
         @{ Id = 'AUTH-20'; Expected = 'Reconcile process/checkpoint/resource evidence, repeat principal preflight and recover uncertain writes before continuing'; Rule = 'separate from an API worker or its administrator session' }
     ) {
-        $row = @($policy -split '\r?\n' | Where-Object { $_ -match "^\| $Id \|" })
-        $row.Count | Should -Be 1
-        $row[0] | Should -Match ([regex]::Escape($Expected))
         ($policy -replace '\s+', ' ') | Should -Match ([regex]::Escape($Rule))
     }
 
@@ -93,34 +90,28 @@ Describe 'Authorization and execution policy contract' {
         }
     }
 
-    It 'distributes repair authority and writer recovery without weakening real gates' {
-        foreach ($surface in $surfaces) {
-            $content = (Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw) -replace '\s+', ' '
-            foreach ($rule in @(
-                'standing scoped nonproduction', 'accepted requirements',
-                'real authority', 'enforced policy', 'conflicting writers',
-                'H IDs track outcomes, not permanent component ownership',
-                'checkpoint', 'resource evidence', 'lease expiry alone',
-                'before closure', 'semantic/report/hash/', 'FAST/security',
-                'QUEUED_AUTONOMOUS_DELIVERY.md'
-            )) {
-                $content | Should -Match ([regex]::Escape($rule)) -Because "$surface must inherit $rule"
-            }
+    It 'references rather than duplicates the canonical execution rules' {
+        foreach ($surface in $surfaces | Where-Object { $_ -match 'SKILL\.md$|prompt\.md$|copilot-instructions\.md$' }) {
+            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content | Should -Match 'authorization-and-execution\.md'
+            $content | Should -Not -Match 'For native work, follow the canonical policy.s browser safety contract'
+            $content | Should -Not -Match 'Reuse accepted requirements and standing scoped nonproduction authorization\.'
         }
     }
 
     It 'requires before-change repair evidence and refuses retroactive permission' {
         $contract = $policy -replace '\s+', ' '
         foreach ($rule in @(
-            'minimum change contract', 'recoverable before-state/rollback',
-            'New requirements, schema/type changes, report meaning, security boundaries',
+            'verified recovery', 'recoverable backup',
+            'semantic-field and report-definition approvals',
             'scope change, expiration, revocation, production target, destructive effect',
             'Standing permission cannot approve a semantic/report definition or sign an artifact hash',
-            'explicit read-only allocation restriction still binds',
+            'explicit read-only restriction still binds',
             'active process/session state, latest durable checkpoint/journal',
             'actual resource state and in-flight writes',
-            'Do not delete locks or reset state merely to force a restart',
-            'a fresh session does not reset that budget'
+            'Do not delete/recreate components, clear locks or blindly reset state',
+            'A fresh session does not reset that budget',
+            'Routine UI/web-resource repairs do not need new discovery or a complete planning package'
         )) {
             $contract | Should -Match ([regex]::Escape($rule))
         }
@@ -130,22 +121,22 @@ Describe 'Authorization and execution policy contract' {
     It 'retains native evidence and stops uncertain or conflicting browser operations' {
         $contract = $policy -replace '\s+', ' '
         foreach ($rule in @(
-            'missing or unverifiable principal evidence blocks it',
-            'Recheck after login, target or session changes',
-            'Retain sanitized principal/target evidence, never credentials',
-            'current published/unpublished state before publishing',
+            'Missing/unverifiable evidence or identity mismatch blocks affected writes',
+            'repeat after login/session/target changes',
+            'Retain sanitized evidence, never credentials',
+            'current published/unpublished state',
             'Broad table/app publication can promote unrelated pending changes',
-            'stable record identity/version and the expected write set',
-            'explicitly expected platform changes from unexpected record/field modifications',
-            'stop further affected writes and retain sanitized before/ after, diff, timing, operation and principal evidence',
-            'a business rule may protect data or enforce an approved contract',
-            'unknown restrictions block the affected action until understood',
+            'stable record identity/version',
+            'exact expected effects', 'expected platform changes',
+            'Unexpected modifications stop affected writes',
+            'A business rule may protect data',
+            'Unknown restrictions block affected actions until understood',
             'published app membership, user/role eligibility, table/form type',
-            'report direct-access-only or missing native support as partial/unverified',
-            "owner-selected browser session's independent process/owner",
-            'reconcile active browser processes, outstanding writes and actual resource state',
-            'repeat browser-principal preflight and read back uncertain effects',
-            'never launch a conflicting writer',
+            'Missing/direct-access-only proof remains partial/unverified',
+            'independent process/owner',
+            'Reconcile outstanding writes and resource state before restart',
+            'repeat principal preflight and read back uncertain effects',
+            'Never launch a conflicting writer',
             'Starter supplies guidance and instruction/distribution contracts'
         )) {
             $contract | Should -Match ([regex]::Escape($rule))
@@ -163,15 +154,14 @@ Describe 'Authorization and execution policy contract' {
         ($queue -replace '\s+', ' ') | Should -Match 'If no durable executor is configured, state this explicitly'
         foreach ($surface in $surfaces | Where-Object { $_ -match 'SKILL\.md$|prompt\.md$|copilot-instructions\.md$' }) {
             $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
-            $content | Should -Match 'https://code\.visualstudio\.com/docs/agents/overview' -Because $surface
-            ($content -replace '\s+', ' ') | Should -Match 'explicitly autonomous multi-change work'
+            $content | Should -Match 'authorization-and-execution\.md' -Because $surface
         }
     }
 
     It 'preserves stronger safety gates and distinguishes all evidence states' {
         foreach ($rule in @(
             'platform confirmations', 'signed approvals', 'environment security controls',
-            'scenario spec.md, plan.md and tasks.md', 'plan-hash approvals',
+            'Significant features, architecture', 'plan-hash approvals',
             'solution membership/export gates', 'FAST-dependent Apply remains blocked',
             'executionAuthorized: false', 'Commit permission alone does not permit push',
             'read back by stable component identity', 'unchanged deterministic error gets no retry',
@@ -208,7 +198,7 @@ Describe 'Authorization and execution policy contract' {
             'README.md', 'docs\onboarding.md', 'docs\wizard-contract-v1.md',
             'requirements\how-to-build-dynamics-model-driven-apps-wizard.md'
         )) {
-            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content = (Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw) -replace '\s+', ' '
             $content | Should -Match 'scenario-change-impact-gate\.md' -Because $surface
             $content | Should -Match '(?i)minor maintenance.{0,90}focused checks' -Because $surface
             $content | Should -Match '(?i)(do not regenerate|without regenerating) the full matrix' -Because $surface

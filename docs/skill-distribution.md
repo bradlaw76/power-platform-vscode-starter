@@ -17,30 +17,9 @@ Every shipped skill follows [authorization and execution](policies/authorization
 
 This baseline ships two skill families (wizard and reporting), four instruction files total, not the formatter family from the older integration branch. Do not import absent families merely to satisfy an obsolete count. Run `AuthorizationExecution.Tests.ps1` for policy decisions and real temporary-home install/rerun/missing-policy checks; no operator home or consumer project is used.
 
-Consumer compatibility review must retain the canonical policy's standing scoped
-nonproduction authority, accepted requirements reuse, proportional checks,
-recoverable administration, routine repair documentation before closure and
-writer recovery using process, checkpoint and actual resource evidence.
-Registration/H numbering/docs do not block independently authorized implementation
-unless required for real authority, enforced policy or conflicting writers.
-H IDs track outcomes, not permanent component ownership; lease expiry alone does
-not release a writer.
-Neither installation nor an administrative registration grants authority or
-waives semantic/report/hash/FAST/security gates. Shipped skills recommend
-dependency-aware queues for explicitly autonomous multi-change work and link
-https://code.visualstudio.com/docs/agents/overview. The
-[queue guide](QUEUED_AUTONOMOUS_DELIVERY.md) is available
-in full clones; portable skills use the bundled policy contract when it is
-absent and must verify actual executor support. No new installer payload,
-scheduler or live/native acceptance capability is claimed.
-
-Native safety inheritance also covers actual browser-principal proof (not
-session-declared or separate API-admin identity), mismatch stops, publication
-blast-radius preservation of unrelated drafts, unexpected record change evidence
-without blind rollback, restriction classification without bypass, intended
-app/user form eligibility and independent browser process/checkpoint recovery.
-Keep these obligations in both skill families and their portable byte-identical
-policy. Runtime implementation belongs to Automation; no native pilot is implied.
+Entry points reference the canonical policy rather than copying procedures.
+Its native safety and development-first rules remain in the portable policy.
+Installing guidance does not install an executor, grant authority or prove a pilot.
 
 ## Install options
 
@@ -88,6 +67,22 @@ publisher-provided checksum alone does not authenticate a release. To prepare a
 reviewed skill change, compare the installed folder and runtime contract, preserve
 local edits, run `scripts/ci/SkillParity.Tests.ps1`, then replace only explicitly
 approved files. Official self-updates remain disabled.
+For existing installed Automation-series consumer instructions, select a verified
+compatible bundle through the existing loader:
+
+```powershell
+demo-builder guidance --workspace D:\ProjectState --bundle D:\VerifiedBundle --new-run --migrate
+```
+
+This retires an exact previously pinned framework section, preserves surrounding
+custom text/security bytes, retains hashed before-state and resumes interrupted
+writes from its migration receipt. Modified framework sections, unowned files,
+changed pins and active/unreconciled task generations are blocked, not overwritten.
+Plain resumes retain their original pin. This requires the updated runtime; it
+is not an H009 updater, automatic adoption, executable upgrade or tenant rollback.
+Existing Starter clones use reviewed source-control reconciliation, preserving
+owner edits; portable policy copies continue through the existing skill installer.
+
 
 H009 supplies [offline identity and safe update planning](wizard-updates.md).
 Both skills invoke the runtime's `04-check-wizard-update.ps1`, not agent-specific
