@@ -17,6 +17,11 @@ reproduce its procedures here.
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- For a confirmed new external project, invoke the runtime's
+  `05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+  before chat intake to inherit actual local policy/assets. Existing/custom
+  instructions require shared H009 `-InstructionMigration` preview; follow
+  `docs/wizard-updates.md`, never overwrite them or infer runtime installation.
 - After runtime confirmation, use `04-check-wizard-update.ps1 -Action Status`
   from the runtime for the shared offline version/status banner. Offer Review
   changes / Update wizard / Skip for now through its shared actions; Skip

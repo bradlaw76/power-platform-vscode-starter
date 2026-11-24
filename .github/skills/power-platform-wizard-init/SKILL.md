@@ -46,6 +46,12 @@ policy resume identity.
 
 ## Runtime Compatibility Preflight
 
+For a confirmed new external project, use the runtime's
+`05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+before chat intake. It supplies actual local policy/assets, not a runtime.
+Existing/custom instructions use H009 `-InstructionMigration` preview under
+`docs/wizard-updates.md`; never copy over them.
+
 ### Installed wizard and updates (H009)
 
 After confirming the runtime path, run

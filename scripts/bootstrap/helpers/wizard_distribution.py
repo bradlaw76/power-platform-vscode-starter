@@ -50,12 +50,13 @@ def eligible(name: str, category: str) -> bool:
         return (name in {"wizard.profile.json", "wizard.release.json", "distribution/ownership-policy.json"}
                 or bool(re.fullmatch(r"schemas/(?:payloads/)?[a-zA-Z0-9.-]+\.json", name)))
     if category == "copilot-asset":
-        return (name == ".github/copilot-instructions.md"
+        return (name in {"AGENTS.md", ".github/copilot-instructions.md"}
                 or bool(re.fullmatch(r"\.github/(?:skills|prompts)/[A-Za-z0-9._/-]+\.md", name)))
     if category == "claude-asset":
         return bool(re.fullmatch(r"\.claude/skills/[A-Za-z0-9._/-]+\.md", name))
     if category == "shared-doc":
         return (name in {"README.md", "START HERE.md", "MIGRATION.md", "SECURITY.md", "CONTRIBUTING.md",
+                         "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
                          "requirements/how-to-build-dynamics-model-driven-apps-wizard.md",
                          "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md"}
                 or bool(re.fullmatch(r"docs/(?:policies/)?[a-zA-Z0-9-]+\.md", name))

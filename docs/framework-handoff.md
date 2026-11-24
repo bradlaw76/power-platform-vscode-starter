@@ -17,6 +17,11 @@ worker, Apply or deployment authorization.
   Neither may be inside either framework source tree or overlap the other.
 - Complete the selected `specs/<slug>/spec.md`, `plan.md` and `tasks.md`.
   Preserve handwritten text and native task identifiers.
+- Load the actual project-local execution policy and instruction entrypoint.
+  Reuse accepted planning for routine corrections; reconcile affected notes
+  incrementally. New project inheritance and existing instruction migration
+  follow [the shared wizard lifecycle](wizard-updates.md#local-instruction-inheritance-and-migration),
+  separately from runtime installation or synchronization authority.
 - Select the already installed `power-platform-demo-builder` **0.2.1**
   Python environment (Python 3.11+). Missing/incompatible tooling is reported,
   never silently installed.

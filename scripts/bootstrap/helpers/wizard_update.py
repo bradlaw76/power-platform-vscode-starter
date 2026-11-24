@@ -14,13 +14,16 @@ An independent SHA-256 pin supplies fixture integrity, never publisher trust.
 Preview writes a plan only when an explicit, outside-target --plan is supplied;
 apply repeats the envelope/source/trust arguments and requires that plan's hash.
 No release code, Git hook, commit, checkout, staging or push is executed.
-Recovery never removes new payload files: it reports required manual removals.
+Default recovery reports new payload files for manual removal. Explicit local
+instruction-only adoption reuses these transactions; approved recovery can
+remove only unchanged newly created instructions. It is not a runtime release.
 """
 from __future__ import annotations
 
 import argparse
 import ast
 from contextlib import contextmanager
+import difflib
 import hashlib
 import json
 import os
@@ -52,6 +55,17 @@ PROTECTED = {
     ".github", ".claude", ".copilot", "agents.md", "claude.md", "gemini.md",
     "spec.md", "binding_certification.md", "system_manifest.json.md", STATE,
 }
+INSTRUCTION_PATHS = (
+    "AGENTS.md", ".github/copilot-instructions.md",
+    "docs/policies/authorization-and-execution.md",
+    ".github/prompts/power-platform-demo-wizard.prompt.md",
+    ".github/skills/power-platform-wizard-init/SKILL.md",
+    ".github/skills/power-platform-wizard-init/references/progress-monitoring.md",
+    ".github/skills/dataverse-report-wizard/SKILL.md",
+    ".claude/skills/power-platform-vscode-wizard/SKILL.md",
+    ".claude/skills/dataverse-report-wizard/SKILL.md",
+    "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
+)
 
 
 class UpdateError(Exception):
@@ -120,7 +134,9 @@ def version(value):
     return tuple(int(part) for part in value.split("."))
 
 
-def relative_name(value):
+def relative_name(value, instructions=False):
+    if instructions and value in INSTRUCTION_PATHS:
+        return value
     if not isinstance(value, str) or not value or len(value) > 240:
         fail("Invalid ownership path")
     if "\\" in value or ":" in value or value.startswith("/") or "\x00" in value:
@@ -139,8 +155,8 @@ def relative_name(value):
     return value
 
 
-def owned_path(root, name):
-    relative_name(name)
+def owned_path(root, name, instructions=False):
+    relative_name(name, instructions)
     cursor = root
     for part in name.split("/"):
         if cursor.is_dir():
@@ -441,7 +457,7 @@ def validate_content(name, data):
         raise UpdateError("Payload syntax validation failed") from exc
 
 
-def source_inventory(source, files):
+def source_inventory(source, files, instructions=False):
     expected = {item["path"]: item for item in files}
     found = set()
     total = 0
@@ -459,7 +475,7 @@ def source_inventory(source, files):
                 if not any(item.startswith(relative + "/") for item in expected):
                     fail("Unexpected payload directory")
                 continue
-            relative_name(relative)
+            relative_name(relative, instructions)
             if relative not in expected or relative.casefold() in found:
                 fail("Unexpected or case-colliding payload file")
             data = read_bytes(path)
@@ -535,8 +551,8 @@ def file_metadata(path):
             "readOnly": bool(getattr(info, "st_file_attributes", 0) & 1)}
 
 
-def target_metadata(root, files):
-    return {item["path"]: file_metadata(owned_path(root, item["path"])) for item in files}
+def target_metadata(root, files, instructions=False):
+    return {item["path"]: file_metadata(owned_path(root, item["path"], instructions)) for item in files}
 
 
 def set_private_metadata(path, metadata):
@@ -565,7 +581,159 @@ def replacement_metadata_matches(baseline, replacement):
                                    for key in ("mode", "uid", "gid", "readOnly"))
 
 
+def instruction_mode(args):
+    return bool(getattr(args, "instruction_source", None))
+
+
+def assert_target(args, root):
+    if not instruction_mode(args):
+        return assert_fixture(args, root)
+    if check_chain(args.instruction_source).resolve() != ENGINE_ROOT:
+        fail("Instruction source must be this executing local runtime, not a release payload")
+    if root == ENGINE_ROOT or root in ENGINE_ROOT.parents or ENGINE_ROOT in root.parents:
+        fail("Instruction target must be a separate project, not the executing runtime")
+    if root == Path.home().resolve() or root.parent == root:
+        fail("User home/filesystem root is not an instruction project")
+    if args.online or any(getattr(args, key, None) for key in (
+            "envelope", "signature", "trust_key", "trusted_envelope_sha256", "source")):
+        fail("Local instruction adoption cannot be combined with release/network inputs")
+    state = git_state(root)
+    if state["branch"] == "HEAD":
+        fail("Instruction adoption requires an identifiable project branch")
+    lock_name = os.fsdecode(git(root, "rev-parse", "--git-path", "index.lock")).strip()
+    lock = Path(lock_name)
+    if not lock.is_absolute():
+        lock = root / lock
+    if check_chain(lock).exists():
+        fail("Active Git index writer detected")
+    return {"scope": "local-project-instructions", "root": str(root)}, state
+
+
+def instruction_bodies(root):
+    root = check_chain(root).resolve()
+    bodies = {}
+    for name in INSTRUCTION_PATHS:
+        path = owned_path(root, name, True)
+        if path.exists():
+            bodies[name] = read_bytes(path)
+    return bodies
+
+
+def instruction_match(data, body):
+    normalized = body.replace(b"\r\n", b"\n")
+    variants = {body, normalized, normalized.replace(b"\n", b"\r\n")}
+    matches = [(data.index(value), len(value)) for value in variants if data.count(value) == 1]
+    if sum(data.count(value) for value in variants) != 1:
+        return None
+    return matches[0]
+
+
+def make_instruction_plan(args, installed_plan=None):
+    root = check_chain(args.root).resolve()
+    marker, _ = assert_target(args, root)
+    current = instruction_bodies(ENGINE_ROOT)
+    if any(not current.get(name) for name in INSTRUCTION_PATHS):
+        fail("Local runtime lacks the complete instruction bundle, including AGENTS, Copilot and policy")
+    if b"authorization-and-execution.md" not in current["AGENTS.md"]:
+        fail("Local AGENTS does not reference the actual canonical policy")
+    previous_root = getattr(args, "previous_instructions", None)
+    previous = {}
+    if previous_root:
+        previous_root = check_chain(previous_root).resolve()
+        if previous_root == root or root in previous_root.parents or previous_root in root.parents:
+            fail("Previous instruction source must be independent of the target")
+        previous = instruction_bodies(previous_root)
+    state = snapshot(root)
+    source = None
+    if args.plan:
+        plan_path = check_chain(args.plan).resolve()
+        for boundary in (root, ENGINE_ROOT, previous_root):
+            if boundary and (plan_path == boundary or boundary in plan_path.parents):
+                fail("Instruction plan/payload must be outside project and source roots")
+        source = plan_path.with_name(plan_path.name + ".instructions")
+        check_chain(source)
+    files = []
+    diagnostics = []
+    diffs = {}
+    payload = {}
+    for name, new in current.items():
+        target = owned_path(root, name, True)
+        old = read_bytes(target) if target.exists() else None
+        if installed_plan is not None:
+            entry = next((item for item in installed_plan["files"] if item["path"] == name), None)
+            if entry:
+                if old is None or digest(old) != entry["sha256"] or old.count(new) != 1:
+                    fail("Installed instruction drift detected")
+                files.append(dict(entry))
+                payload[name] = old
+                continue
+        if old is None:
+            after, classification = new, "new"
+        elif instruction_match(old, new):
+            after, classification = old, "current-customized" if old != new else "current"
+        else:
+            baseline = previous.get(name)
+            match = instruction_match(old, baseline) if baseline else None
+            if not match:
+                fail("Edited, ambiguous or unrecognized instruction body: " + name)
+            offset, length = match
+            after = old[:offset] + new + old[offset + length:]
+            classification = "recognized-previous-customized" if old != baseline else "recognized-previous"
+        diagnostics.append({"path": name, "classification": classification,
+                            "customizationPreserved": True})
+        if after != old:
+            payload[name] = after
+            diffs[name] = "".join(difflib.unified_diff(
+                (old or b"").decode("utf-8").splitlines(keepends=True),
+                after.decode("utf-8").splitlines(keepends=True),
+                fromfile=name + " (before)", tofile=name + " (after)"))
+            files.append({"path": name, "sha256": digest(after), "size": len(after),
+                          "baselineSha256": digest(old) if old is not None else None,
+                          "class": "project-instruction", "scope": "local-source-only"})
+    if installed_plan is not None:
+        if state["files"] != installed_files(installed_plan) or any(
+                state["git"][key] != installed_plan["snapshot"]["git"][key] for key in ("head", "branch")):
+            fail("Installed project or Git identity drift detected")
+        state = installed_plan["snapshot"]
+        diagnostics = installed_plan["instructionDiagnostics"]
+        diffs = installed_plan["instructionDiffs"]
+    metadata = (installed_plan["targetMetadata"] if installed_plan is not None
+                else target_metadata(root, files, True))
+    if source:
+        ensure_directory(source)
+        for name, data in payload.items():
+            path = owned_path(source, name, True)
+            if path.exists():
+                if read_bytes(path) != data:
+                    fail("Prepared instruction payload changed; retain original plan")
+            else:
+                ensure_directory(path.parent)
+                write_exclusive(path, data)
+        source_inventory(source, files, True)
+    plan = {
+        "schemaVersion": 1, "root": str(root), "source": str(source) if source else None,
+        "sourceMode": "local-instructions", "instructionSourceRoot": str(ENGINE_ROOT),
+        "previousInstructionRoot": str(previous_root) if previous_root else None,
+        "trust": {"mode": "explicit-local-source",
+                  "sourceFiles": {name: digest(data) for name, data in current.items()},
+                  "previousFiles": {name: digest(data) for name, data in previous.items()}},
+        "fixtureMarkerSha256": digest(canonical(marker)), "snapshot": state,
+        "targetMetadata": metadata, "files": files,
+        "instructionDiagnostics": diagnostics,
+        "instructionDiffs": diffs,
+        "instructionStandard": "development-first-1",
+        "officialPolicyAvailable": False,
+        "candidateStatus": "local-instruction-adoption",
+        "runtimeUpdated": False, "releaseVerified": False,
+        "selectiveStagingPaths": [item["path"] for item in files],
+    }
+    plan["planSha256"] = digest(canonical(plan))
+    return plan
+
+
 def make_plan(args, installed_plan=None):
+    if instruction_mode(args):
+        return make_instruction_plan(args, installed_plan)
     root = check_chain(args.root).resolve()
     envelope, trust = signed_envelope(args)
     if not args.source:
@@ -710,7 +878,7 @@ def completed_replay(args, approved):
                 or journal.get("files") != [{**item, "phase": "written"} for item in approved["files"]]
                 or journal.get("fixtureMarkerSha256") != approved["fixtureMarkerSha256"]
                 or journal.get("baselineMetadata") != approved["targetMetadata"]
-                or journal.get("replacementMetadata") != target_metadata(root, approved["files"])
+                or journal.get("replacementMetadata") != target_metadata(root, approved["files"], instruction_mode(args))
                 or any(not replacement_metadata_matches(approved["targetMetadata"][item["path"]],
                                                          journal["replacementMetadata"][item["path"]])
                        for item in approved["files"])
@@ -728,7 +896,7 @@ def completed_replay(args, approved):
 
 def apply(args):
     root = check_chain(args.root).resolve()
-    assert_fixture(args, root)
+    assert_target(args, root)
     if not args.plan or not args.approved_plan_sha256:
         fail("Explicit --plan and --approved-plan-sha256 required")
     approved = read_json(args.plan)
@@ -744,11 +912,13 @@ def apply(args):
         return replay
     if make_plan(args) != approved:
         fail("Plan is stale; preview and approve again")
-    if (not (approved["trust"]["signed"] or approved["trust"].get("pinned"))
+    if not instruction_mode(args) and (not (approved["trust"]["signed"] or approved["trust"].get("pinned"))
             or approved["sourceMode"] != "fixture"
             or approved["candidateStatus"] != "newer-compatible"
             or approved["snapshot"]["git"]["dirty"]):
         fail("Apply requires independently pinned compatible fixture upgrade and a clean feature branch")
+    if instruction_mode(args) and not approved["files"]:
+        return {"status": "already-current", "writes": 0, "runtimeUpdated": False}
     if os.name == "nt" and any(metadata and (
             metadata["readOnly"] or not metadata["mode"] & stat.S_IWRITE)
             for metadata in approved["targetMetadata"].values()):
@@ -779,7 +949,7 @@ def apply(args):
         if make_plan(args) != approved:
             fail("Plan changed after lock acquisition")
         for index, item in enumerate(approved["files"]):
-            target = owned_path(root, item["path"])
+            target = owned_path(root, item["path"], instruction_mode(args))
             before = read_bytes(target) if target.exists() else None
             if (digest(before) if before is not None else None) != item["baselineSha256"]:
                 fail("Concurrent target edit detected")
@@ -813,10 +983,10 @@ def apply(args):
             if digest(staged) != item["sha256"] or len(staged) != item["size"]:
                 fail("Checkpoint staging integrity mismatch before mutation")
         for index, item in enumerate(journal["files"]):
-            _, current_git = assert_fixture(args, root)
+            _, current_git = assert_target(args, root)
             if any(current_git[key] != approved["snapshot"]["git"][key] for key in ("head", "branch")):
                 fail("Git identity changed during apply")
-            target = owned_path(root, item["path"])
+            target = owned_path(root, item["path"], instruction_mode(args))
             current = digest(read_bytes(target)) if target.exists() else None
             if current != item["baselineSha256"]:
                 fail("Concurrent edit detected; checkpoint retained")
@@ -838,7 +1008,7 @@ def apply(args):
                 fail("Concurrent edit before atomic replace")
             if file_metadata(target) != approved["targetMetadata"][item["path"]]:
                 fail("Concurrent metadata edit before atomic replace")
-            os.replace(check_chain(sibling), owned_path(root, item["path"]))
+            os.replace(check_chain(sibling), owned_path(root, item["path"], instruction_mode(args)))
             sync_directory(target.parent)
             crash(args, f"after-replace-{index}")
             if digest(read_bytes(target)) != item["sha256"]:
@@ -850,7 +1020,7 @@ def apply(args):
         journal["installedSnapshot"] = snapshot(root)
         if journal["installedSnapshot"]["files"] != installed_files(approved):
             fail("Post-apply target drift; checkpoint retained")
-        if target_metadata(root, approved["files"]) != journal["replacementMetadata"]:
+        if target_metadata(root, approved["files"], instruction_mode(args)) != journal["replacementMetadata"]:
             fail("Post-apply metadata drift; checkpoint retained")
         journal["phase"] = "complete"
         atomic_json(transaction / "journal.json", journal)
@@ -860,6 +1030,8 @@ def apply(args):
         sync_directory(state)
         return {"status": "applied", "transaction": str(transaction), "planSha256": expected,
                 "commitCreated": False, "stagingPerformed": False,
+                **({"instructionCompatibilityVerified": True, "runtimeUpdated": False}
+                   if instruction_mode(args) else {}),
                 "selectiveStagingPaths": approved["selectiveStagingPaths"]}
     except Exception:
         if journal is not None:
@@ -870,7 +1042,7 @@ def apply(args):
 
 def recover(args):
     root = check_chain(args.root).resolve()
-    marker, current_git = assert_fixture(args, root)
+    marker, current_git = assert_target(args, root)
     if not args.transaction:
         fail("Explicit --transaction required")
     transaction = check_chain(args.transaction).resolve()
@@ -882,6 +1054,8 @@ def recover(args):
         journal = read_json(transaction / "journal.json")
         plan = read_json(transaction / "plan.json")
         if (not isinstance(journal, dict) or not isinstance(plan, dict)
+                or (plan.get("sourceMode") == "local-instructions") != instruction_mode(args)
+                or (instruction_mode(args) and plan.get("instructionSourceRoot") != str(ENGINE_ROOT))
                 or journal.get("root") != str(root) or journal.get("transaction") != transaction.name
                 or not re.fullmatch(r"[a-f0-9]{32}", str(journal.get("token", "")))
                 or journal.get("fixtureMarkerSha256") != digest(canonical(marker))
@@ -893,6 +1067,9 @@ def recover(args):
                 or digest(canonical({key: value for key, value in plan.items() if key != "planSha256"}))
                 != plan.get("planSha256")):
             fail("Checkpoint identity or plan binding mismatch")
+        if (instruction_mode(args) and getattr(args, "remove_created_instructions", False)
+                and args.approved_plan_sha256 != plan["planSha256"]):
+            fail("Removing created instructions requires the exact approved transaction plan hash")
         entries = journal.get("files")
         if (not isinstance(entries, list) or not isinstance(plan.get("files"), list)
                 or len(entries) > len(plan["files"]) or len(entries) > MAX_FILES
@@ -920,7 +1097,7 @@ def recover(args):
         manual = []
         for index in reversed(range(len(entries))):
             item = entries[index]
-            target = owned_path(root, item["path"])
+            target = owned_path(root, item["path"], instruction_mode(args))
             current = digest(read_bytes(target)) if target.exists() else None
             baseline_metadata = plan["targetMetadata"][item["path"]]
             current_metadata = file_metadata(target)
@@ -932,6 +1109,15 @@ def recover(args):
                 conflicts.append(item["path"])
                 continue
             if item["baselineSha256"] is None:
+                if instruction_mode(args) and getattr(args, "remove_created_instructions", False):
+                    if (digest(read_bytes(target)) != item["sha256"]
+                            or file_metadata(target) != journal["replacementMetadata"][item["path"]]):
+                        fail("Concurrent change before scoped instruction removal")
+                    target.unlink()
+                    sync_directory(target.parent)
+                    item["phase"] = "restored"
+                    atomic_json(transaction / "journal.json", journal)
+                    continue
                 manual.append(item["path"])
                 continue
             backup = read_bytes(transaction / f"{index}.backup")
@@ -949,7 +1135,7 @@ def recover(args):
             if (digest(read_bytes(target)) != item["sha256"]
                     or file_metadata(target) != current_metadata):
                 fail("Concurrent edit during recovery")
-            os.replace(check_chain(sibling), owned_path(root, item["path"]))
+            os.replace(check_chain(sibling), owned_path(root, item["path"], instruction_mode(args)))
             sync_directory(target.parent)
             if (digest(read_bytes(target)) != item["baselineSha256"]
                     or file_metadata(target) != baseline_metadata):
@@ -1087,10 +1273,12 @@ def parser():
     network.add_argument("--offline", action="store_true", help="Default; never fetch")
     network.add_argument("--online", action="store_true", help="Check official metadata only")
     for name in ("envelope", "signature", "trust-key", "openssl-path", "source", "plan",
+                 "instruction-source", "previous-instructions",
                  "fixture-root", "transaction"):
         result.add_argument("--" + name, type=Path)
     result.add_argument("--trusted-envelope-sha256")
     result.add_argument("--approved-plan-sha256")
+    result.add_argument("--remove-created-instructions", action="store_true")
     return result
 
 
@@ -1099,7 +1287,16 @@ def main(argv=None):
     try:
         if args.online and args.command != "check":
             fail("--online is allowed only with explicit check")
-        if args.command in {"status", "check"}:
+        if args.remove_created_instructions and (args.command != "recover" or not instruction_mode(args)):
+            fail("Created-instruction removal is available only for explicit local instruction recovery")
+        if args.previous_instructions and not instruction_mode(args):
+            fail("Previous instruction source requires explicit instruction adoption scope")
+        if args.command in {"status", "check"} and instruction_mode(args):
+            if args.plan:
+                fail("Instruction status/check does not write plans or payloads")
+            output = make_instruction_plan(args)
+            output["status"] = "current" if not output["files"] else "instruction-review-required"
+        elif args.command in {"status", "check"}:
             output = inspect(args)
         elif args.command == "preview":
             output = make_plan(args)

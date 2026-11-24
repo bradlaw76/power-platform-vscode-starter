@@ -96,6 +96,80 @@ official candidate can pass the live Apply gate: unknown/unverified metadata is
 not an available official version. The complete Apply example below is only for
 an independently prepared isolated fixture, never an existing installation.
 
+## Local instruction inheritance and migration
+
+This is an explicit **instruction-only local source adoption** through the
+existing H009 transaction engine, not an official runtime/release update.
+Official Apply, publisher trust and H010 consent are unchanged. Choose a
+reviewed local runtime source; no network, executable upgrade, tenant operation,
+Git commit/staging or project authorization is implied.
+
+New terminal workspaces automatically receive the actual local AGENTS, Copilot,
+canonical policy, shipped skills/prompt and queue guidance. Chat intake invokes:
+
+```powershell
+pwsh D:\ReviewedRuntime\scripts\bootstrap\05-start-wizard.ps1 `
+  -WorkspaceRoot D:\CedarCivic -InitializeInstructionsOnly
+```
+
+Initialization needs no Python. Create-new writes cannot replace an existing
+file. Existing or partial instructions, CLAUDE.md and custom instruction folders
+are retained, not silently completed. Interrupted initial copying may leave a
+partial bundle: use migration, never delete/reset it. Guidance is not installed
+runtime compatibility or proof an agent loaded the policy. Missing referenced
+runtime dependencies still require their separate compatibility review.
+
+For an existing independent Git project on an identifiable branch, use the
+same executing runtime's explicit instruction mode. Optional
+`-PreviousInstructionRoot` must be a separately retained, reviewed *generic*
+previous instruction source, not a copy of custom project instructions used to
+force recognition. Review every diff, including stricter requirements. Unknown,
+edited or ambiguous managed bodies are held; migrate those through a separately
+reviewed customization reconciliation, not fabricated old-body evidence.
+
+```powershell
+$update = 'D:\ReviewedRuntime\scripts\bootstrap\04-check-wizard-update.ps1'
+& $update -Action Review -RuntimeRoot D:\CedarCivic -InstructionMigration `
+  -PreviousInstructionRoot D:\PreviousRuntime -PlanPath D:\Evidence\instructions.json -AsJson
+# Reuse the saved plan's exact planSha256 after reviewing the proposed changes.
+& $update -Action Update -RuntimeRoot D:\CedarCivic -InstructionMigration `
+  -PreviousInstructionRoot D:\PreviousRuntime -PlanPath D:\Evidence\instructions.json `
+  -ApprovedPlanSha256 '<reviewed planSha256>' -AsJson
+```
+
+Omit the previous-source option for missing or already current instruction
+files. Preview records body/version classifications, source/previous hashes,
+target metadata, diffs and an immutable sibling `.instructions` payload.
+Surrounding customized bytes, accepted specifications, stricter local rules
+and unrelated files are retained. Apply revalidates the entire target snapshot,
+Git identity and payload; changed inputs or active/unreconciled writers block
+the affected migration, not unrelated authorized work. Whole-workspace
+snapshotting is deliberately conservative, not component-parallel migration.
+
+Existing `.wizard-update` locks, staged bytes, backups and journal provide
+recovery; no second updater or lease-expiration shortcut is introduced.
+Use the returned transaction path:
+
+```powershell
+& $update -Action Recover -RuntimeRoot D:\CedarCivic -InstructionMigration `
+  -TransactionPath '<transaction path>' -AsJson
+# Optional compensation of newly created, still-identical instruction files:
+& $update -Action Recover -RuntimeRoot D:\CedarCivic -InstructionMigration `
+  -TransactionPath '<transaction path>' -RemoveCreatedInstructions `
+  -ApprovedPlanSha256 '<original reviewed planSha256>' -AsJson
+```
+
+Recovery preserves later human edits; conflicts return `recovery-blocked`,
+which is **not success**, even with exit zero. Compensation is guarded and
+file-by-file, not an atomic filesystem/power-loss rollback. Default recovery
+does not delete new files. After recovery, unchanged original inputs/plan can
+resume without a new investigation. `instructionCompatibilityVerified` means
+managed instruction integrity only; `runtimeUpdated` and `releaseVerified`
+remain false. No mocked or synthetic case establishes tenant/native acceptance.
+Filesystem evidence covers the existing engine's recorded metadata and
+read-only guards, not full NTFS ACL/owner portability. Protected/custom filesystem
+permissions require separate verification; do not infer it from byte integrity.
+
 ## Discovery and trust
 
 Startup and default Check are offline. On-demand online discovery requires
@@ -115,7 +189,7 @@ Offline fixture trust uses a separately supplied exact envelope SHA-256 pin
 or an independently supplied RSA public key, detached signature and explicit
 local OpenSSL executable. Optional RSA verification is operator-key verification,
 **not official publisher policy** or embedded-key trust. No OpenSSL installation
-is performed. Mutation is restricted to isolated synthetic targets. Successful
+is performed. Release/fixture mutation is restricted to isolated synthetic targets. Successful
 fixture checks demonstrate integrity/transaction behavior only; they cannot
 authorize a remote release or an update to an actual user installation.
 
@@ -134,7 +208,7 @@ No release-supplied validation/install hook is executed.
 
 ## Exact plan and recovery contract
 
-The current executable ownership allowlist is intentionally **synthetic only**:
+The default release/fixture ownership allowlist remains **synthetic only**:
 `scripts/bootstrap/helpers/update-fixture-*.py` and `update-fixture-*.json`.
 No official runtime/skill bundle is inferred or silently enabled. Fixture mutation
 requires an explicit matching root marker in an independent initial Git commit,

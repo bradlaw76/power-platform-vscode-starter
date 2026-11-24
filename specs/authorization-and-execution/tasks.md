@@ -1,5 +1,14 @@
 # Delivery tasks
 
+## Current Q15–Q16 continuation
+
+- [x] Reconcile H009/H010/PR17 dependencies on an isolated dependent lane.
+- [x] Add actual local policy/assets inheritance for terminal and chat initialization.
+- [x] Extend H009's existing instruction-only preview/Apply/recovery transaction.
+- [x] Preserve custom bytes, stricter requirements, backups and active-writer holds.
+- [x] Complete focused fictional installation/migration/interruption regressions.
+- [ ] Record exact results and synchronize dependent PR/evidence; no merge or release.
+
 - [x] Inspect branch, worktree, authorization, security and distribution rules.
 - [x] Record scope, acceptance criteria and isolated publication baseline.
 - [x] Implement canonical policy and concise entry-point references.

@@ -1,5 +1,25 @@
 # Implementation plan
 
+## Q15-Q16 current extension
+
+1. Preserve H009/H010 ancestry in a separate dependent lane and reconcile accepted
+   PR17 guidance, keeping runtime/update and reporting-consent hooks.
+2. Add the root AGENTS loader to normal clone inheritance; report local instruction
+   identity in startup and generated guidance without adding intake questions.
+3. Add an instruction-only plan adapter to H009's existing transaction engine.
+   The selected installed runtime supplies current local guidance; an explicitly
+   selected previous runtime supplies recognizable legacy bodies. Bind both
+   fingerprints and retain exact custom prefix/suffix bytes.
+4. Use the existing update command for review/apply/recover; local instruction
+   scope is explicit and cannot enable remote runtime updates. Preserve H009
+   fixture/release gates and API behavior. No executable release hooks.
+5. Exercise real shared-command transactions in neutral external workspaces:
+   clean adoption, legacy/custom bodies, unknown modifications, active lock,
+   changed plan inputs, interruption, compensation and explicit new-file rollback.
+6. Run affected contracts, H009/H010 regression compatibility and generic
+   containment; commit explicit files, verify exact remote identity and publish
+   the necessary dependent PR. No merge, release or live writes.
+
 The sequence below records the original PR #8 implementation, not a direction to merge its older baseline. The 2026-11-22 proposal projects only applicable policy/distribution changes onto main plus PRs #10/#9; it excludes missing formatter/update-advisor features. Current test evidence belongs to the integration proposal, not the historical counts.
 
 1. Use a separate worktree based on integration commit

@@ -1,5 +1,49 @@
 # AI-neutral instruction and implementation handoff
 
+## Q15-Q16 instruction inheritance and migration
+
+Continues PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION; no H allocation or
+Q01-Q14 restart. H009 PR16 `c9ad4ca`, H010 PR18 `cd816b7` and campaign PR17
+`e086d83` remain intact. The dependent lane is based on exact H010, with the
+seven accepted PR17 changes reconciled rather than rewritten. Coordination was
+recorded on PR16/PR18; session-message delivery was unavailable, not consent.
+No other worktree, branch, tenant, merge or release was changed.
+
+New projects receive actual local AGENTS, Copilot, canonical policy, both skill
+families, prompt/progress reference and queue guidance. Chat uses the same
+wizard's instruction-only initialization; ordinary startup remains Python-free.
+Existing or partially customized instructions are retained. The local H009
+instruction adapter uses the existing preview, approved hash, lock, backups,
+metadata, conditional writes and recovery journal, not another update manager.
+Exact prior bodies are replaced in place with customized surrounding bytes
+preserved; unknown/edited/ambiguous bodies and conflicting writers are held.
+Accepted specifications and unrelated files are untouched.
+
+Local Windows evidence: shared updater suite **30 passed / one POSIX skip**
+(31 cases), plus the added actual initializer-to-migration case passed.
+The seven migration cases also passed against final distributed bodies.
+Focused Pester **108 passed**, distribution **5 passed**; actual wizard-mode/
+H010 consent transitions, contract integrity, documentation consistency,
+source-control acceptance, configured analyzer and JSON validation passed.
+JSON validation parsed 91 documents and matched 60 payloads.
+Changed Markdown passed; final submitted-head CI is recorded on the dependent PR.
+
+Recoverable verification defects were corrected: the Git conversion fixture
+now invalidates its stat cache explicitly rather than relying on timing;
+Windows fixture cleanup reuses the existing writable cleanup routine;
+warning capture uses a proper advanced function; the instruction-only
+initializer does not load an unrelated table-detection dependency.
+No security or live/native acceptance campaign was repeated.
+
+Limitations: previous-source selection and diffs require actual review; byte
+integrity is not semantic agent compliance or installed-runtime compatibility.
+Whole-workspace snapshotting conservatively holds unrelated concurrent changes.
+Recovery is guarded compensation, not power-loss atomicity; new-file removal
+requires the original approved hash and unchanged bytes/metadata. Later edits
+are held, not overwritten. NTFS ACL/owner portability is not certified.
+Official runtime Apply remains fail-closed; no release/publisher or native
+tenant verification is inferred from external fictional project tests.
+
 ## Q13-Q14 reconciliation and classification - current continuation
 
 Continues the same campaign and PRs, not Q01-Q12 reinvestigation. The three

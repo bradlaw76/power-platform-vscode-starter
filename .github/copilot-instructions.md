@@ -19,7 +19,9 @@ duplicating them here. Instructions do not install an executor.
 
 ## Functional planning and beginner guidance
 
-This is a reusable Power Platform/Dynamics wizard, not a consumer application.
+Determine whether the target is this reusable Power Platform/Dynamics runtime
+or a consumer application. Consumer artifacts belong in the confirmed consumer
+repository, never the framework source tree.
 Begin new/material scenarios with discovery; retain accepted answers and actual
 current state for retrofits. Use scenario-level `spec.md`, `plan.md`, `tasks.md`;
 do not duplicate them at root. Minor maintenance uses focused checks without
@@ -45,6 +47,11 @@ offline identity, then shared Review changes / Update wizard / Skip for now.
 Never implement another pull/copy updater. Official Apply remains fail-closed;
 profile/contract versions and copied skills are not verified releases.
 See [wizard updates](../docs/wizard-updates.md).
+
+New external projects inherit actual local instructions through the runtime's
+`05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+before chat intake. Existing/custom instructions use the same H009 lifecycle's
+explicit `-InstructionMigration` Review/Update/Recover, not copy-over or a new manager.
 
 Recheck [H010 reporting consent](../docs/wizard-contract-v1.md#reporting-consent-h010)
 before new or resumed orchestration. Completed stages and leftover payloads are

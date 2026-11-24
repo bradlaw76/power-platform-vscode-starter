@@ -4,6 +4,21 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q15-Q16 local instruction inheritance/migration
+
+- Source-only dependent campaign lane preserves H009/H010 and PR17; no H number,
+  merge, release, live tenant write or application development.
+- New external terminal/chat workspaces receive actual policy/loaders/assets.
+  Existing customized instructions use the same H009 preview/backup/lock/
+  conditional recovery lifecycle, without a runtime upgrade.
+- Shared regression: 30 passed / one platform skip, plus added initializer case;
+  final-body migration cases passed. Focused Pester 108/0, distribution 5/0,
+  wizard/H010 consent, contracts/docs/source-control, JSON and analyzer passed.
+- Full evidence, defects corrected and recovery/ACL/runtime boundaries:
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md#q15-q16-instruction-inheritance-and-migration).
+- Final commit identities, refreshed candidate inventory and hosted CI belong in
+  the dependent PR receipt; these local fixture results are not native acceptance.
+
 ## H010 Demo Builder reporting consent correction - 2026-11-24
 
 ### Ownership, source and finding

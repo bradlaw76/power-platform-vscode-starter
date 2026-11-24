@@ -26,6 +26,7 @@ BeforeAll {
     $policyPath = Join-Path $repoRoot $policyRelativePath
     $policy = Get-Content -LiteralPath $policyPath -Raw
     $surfaces = @(
+        'AGENTS.md'
         '.github\copilot-instructions.md'
         '.github\prompts\power-platform-demo-wizard.prompt.md'
         '.github\skills\power-platform-wizard-init\SKILL.md'
@@ -54,6 +55,68 @@ BeforeAll {
         finally {
             Set-Variable -Name HOME -Value $previousHome -Force
         }
+    }
+
+    $wizardAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        (Join-Path $repoRoot 'scripts\bootstrap\05-start-wizard.ps1'), [ref]$null, [ref]$null)
+    foreach ($name in @('Get-InstructionFilePath', 'Initialize-WizardProjectInstructions')) {
+        $definition = $wizardAst.Find({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $name
+        }, $true)
+        . ([scriptblock]::Create($definition.Extent.Text))
+    }
+}
+
+Describe 'New project local instruction inheritance' {
+    It 'creates the actual local policy, loaders, skills and queue without altering accepted requirements' {
+        $project = Join-Path $TestDrive 'Cedar Civic'
+        $null = New-Item -ItemType Directory -Path $project
+        $requirements = Join-Path $project 'accepted-spec.md'
+        [IO.File]::WriteAllText($requirements, 'Accepted fictional lifecycle.')
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot
+        foreach ($name in @('AGENTS.md', '.github\copilot-instructions.md',
+            'docs\policies\authorization-and-execution.md', 'docs\QUEUED_AUTONOMOUS_DELIVERY.md',
+            '.github\skills\power-platform-wizard-init\references\progress-monitoring.md',
+            '.claude\skills\power-platform-vscode-wizard\SKILL.md')) {
+            (Get-FileHash -LiteralPath (Join-Path $project $name)).Hash |
+                Should -Be (Get-FileHash -LiteralPath (Join-Path $repoRoot $name)).Hash
+        }
+        [IO.File]::ReadAllText($requirements) | Should -Be 'Accepted fictional lifecycle.'
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot
+        [IO.File]::ReadAllText($requirements) | Should -Be 'Accepted fictional lifecycle.'
+    }
+
+    It 'retains customized and partially installed instructions rather than silently completing them' {
+        $project = Join-Path $TestDrive 'Existing fictional project'
+        $null = New-Item -ItemType Directory -Path $project
+        [IO.File]::WriteAllText((Join-Path $project 'AGENTS.md'), 'Never publish production.')
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot -WarningVariable warnings
+        [IO.File]::ReadAllText((Join-Path $project 'AGENTS.md')) | Should -Be 'Never publish production.'
+        Test-Path -LiteralPath (Join-Path $project '.github\copilot-instructions.md') | Should -BeFalse
+        ($warnings -join ' ') | Should -Match 'migration preview'
+    }
+
+    It 'rejects active writer checkpoints and case aliases before creating instruction files' {
+        $project = Join-Path $TestDrive 'Interrupted fictional project'
+        $null = New-Item -ItemType Directory -Path (Join-Path $project '.wizard-update')
+        [IO.File]::WriteAllText((Join-Path $project '.wizard-update\lock.json'), '{"pid":1}')
+        { Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot } |
+            Should -Throw '*checkpoint*'
+        Test-Path -LiteralPath (Join-Path $project 'AGENTS.md') | Should -BeFalse
+        [IO.File]::WriteAllText((Join-Path $project 'agents.md'), 'Existing strict instructions.')
+        { Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot } |
+            Should -Throw '*case alias*'
+    }
+
+    It 'runs the actual chat initializer without intake or a planning rewrite' {
+        $project = Join-Path $TestDrive 'Chat fictional project'
+        $output = & pwsh -NoProfile -File (Join-Path $repoRoot 'scripts\bootstrap\05-start-wizard.ps1') `
+            -WorkspaceRoot $project -InitializeInstructionsOnly 2>&1
+        $LASTEXITCODE | Should -Be 0 -Because ($output -join "`n")
+        Test-Path -LiteralPath (Join-Path $project 'AGENTS.md') | Should -BeTrue
+        Test-Path -LiteralPath (Join-Path $project 'specs') | Should -BeFalse
+        Test-Path -LiteralPath (Join-Path $project '.wizard-metrics') | Should -BeFalse
     }
 }
 

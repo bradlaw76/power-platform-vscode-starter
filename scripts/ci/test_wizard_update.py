@@ -56,6 +56,13 @@ def local_command(args, cwd=None):
     return result.stdout
 
 
+def remove_fixture_workspace(path):
+    def writable_remove(function, name, exception):
+        os.chmod(name, stat.S_IWRITE)
+        function(name)
+    shutil.rmtree(path, onerror=writable_remove)
+
+
 class WizardUpdateTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -75,10 +82,7 @@ class WizardUpdateTests(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        def writable_remove(function, path, exception):
-            os.chmod(path, stat.S_IWRITE)
-            function(path)
-        shutil.rmtree(cls.work, onerror=writable_remove)
+        remove_fixture_workspace(cls.work)
 
     def setUp(self):
         self.case = self.work / (self._testMethodName[5:8] + "-" + uuid.uuid4().hex[:8])
@@ -283,8 +287,14 @@ class WizardUpdateTests(unittest.TestCase):
             self.assertFalse(update.git_state(self.root)["dirty"])
             self.assertFalse(sentinel.exists())
             self.git("config", "core.autocrlf", "false")
+            # Conversion changes alone can retain Git's clean stat cache.
+            path = self.root.joinpath(*ALPHA.split("/"))
+            info = path.stat()
+            os.utime(path, ns=(info.st_atime_ns, info.st_mtime_ns + 2_000_000_000))
             self.assertTrue(update.git_state(self.root)["dirty"])
             self.git("config", "core.autocrlf", "true")
+            info = path.stat()
+            os.utime(path, ns=(info.st_atime_ns, info.st_mtime_ns + 2_000_000_000))
             self.assertFalse(update.git_state(self.root)["dirty"])
             self.root.joinpath(*ALPHA.split("/")).write_bytes(b"VALUE = 'human change'\r\n")
             self.assertTrue(update.git_state(self.root)["dirty"])
@@ -790,6 +800,219 @@ class WizardUpdateTests(unittest.TestCase):
         self.assertEqual(invoke("Check", expected=2)["status"], "blocked")
         self.assertEqual(invoke("Skip")["status"], "skipped")
         self.assert_original()
+
+
+class InstructionMigrationTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.work = ROOT.parent / (".instruction-ut-" + uuid.uuid4().hex[:8])
+        cls.work.mkdir()
+        cls.runtime = cls.work / "current runtime"
+        cls.engine = cls.runtime / "scripts" / "bootstrap" / "helpers" / "wizard_update.py"
+        cls.engine.parent.mkdir(parents=True)
+        shutil.copy2(ENGINE, cls.engine)
+        shutil.copy2(ROOT / "scripts/bootstrap/helpers/wizard-version.ps1", cls.engine.parent)
+        shutil.copy2(ROOT / "scripts/bootstrap/04-check-wizard-update.ps1", cls.engine.parent.parent)
+        shutil.copy2(ROOT / "scripts/bootstrap/05-start-wizard.ps1", cls.engine.parent.parent)
+        (cls.runtime / "distribution").mkdir()
+        shutil.copy2(ROOT / "distribution/ownership-policy.json", cls.runtime / "distribution")
+        for name in update.INSTRUCTION_PATHS:
+            source = ROOT.joinpath(*name.split("/"))
+            if source.exists():
+                target = cls.runtime.joinpath(*name.split("/"))
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(source.read_bytes())
+
+    @classmethod
+    def tearDownClass(cls):
+        remove_fixture_workspace(cls.work)
+
+    def setUp(self):
+        self.case = self.work / uuid.uuid4().hex
+        self.root = self.case / "Cedar Civic project"
+        self.previous = self.case / "previous runtime"
+        self.root.mkdir(parents=True)
+        self.previous.mkdir()
+        self.plan_path = self.case / "review.json"
+        self.accepted = b"# Cedar Civic Services\nAccepted fictional requirements; no new planning package.\n"
+        (self.root / "accepted-spec.md").write_bytes(self.accepted)
+
+    def initialize_git(self):
+        local_command(["git", "init", "-q", "-b", "development/instructions"], self.root)
+        for key, value in (("user.name", "Fictional fixture"), ("user.email", "fixture@example.invalid"),
+                           ("core.autocrlf", "false")):
+            local_command(["git", "config", key, value], self.root)
+        local_command(["git", "add", "."], self.root)
+        local_command(["git", "commit", "-qm", "Independent fictional project"], self.root)
+
+    def legacy(self, customized=False):
+        self.prefix = b"# Project security\r\nProduction publication is forbidden.\r\n"
+        self.suffix = b"\r\n# Project requirements\r\nKeep the accepted service lifecycle.  \r\n"
+        for name in update.INSTRUCTION_PATHS[:3]:
+            body = ("# Recognized previous " + name + "\nRoutine source work required a full dossier.\n").encode()
+            old = self.previous.joinpath(*name.split("/"))
+            old.parent.mkdir(parents=True, exist_ok=True)
+            old.write_bytes(body)
+            target = self.root.joinpath(*name.split("/"))
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_bytes(self.prefix + body.replace(b"\n", b"\r\n") + self.suffix if customized else body)
+
+    def command(self, action, *options, expected=0, crash=None):
+        args = [sys.executable, "-B", str(self.engine), action, "--root", str(self.root),
+                "--instruction-source", str(self.runtime), *map(str, options)]
+        environment = dict(os.environ)
+        if crash:
+            environment["WIZARD_UPDATE_FIXTURE_CRASH"] = crash
+            args += ["--fixture-root", str(self.root)]
+        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                env=environment, timeout=45, check=False)
+        self.assertEqual(result.returncode, expected, result.stdout.decode(errors="replace") +
+                         result.stderr.decode(errors="replace"))
+        return json.loads(result.stdout) if expected != 86 else None
+
+    def review(self, legacy=False):
+        self.options = ["--plan", str(self.plan_path)]
+        if legacy:
+            self.options += ["--previous-instructions", str(self.previous)]
+        self.plan = self.command("preview", *self.options)
+        self.options += ["--approved-plan-sha256", self.plan["planSha256"]]
+        return self.plan
+
+    def checkpoint(self):
+        return next((self.root / update.STATE / "transactions").iterdir())
+
+    def test_clean_install_and_explicit_scoped_rollback(self):
+        self.initialize_git()
+        plan = self.review()
+        self.assertIn("AGENTS.md", plan["instructionDiffs"])
+        self.assertFalse((self.root / "AGENTS.md").exists())
+        result = self.command("apply", *self.options)
+        self.assertTrue(result["instructionCompatibilityVerified"])
+        self.assertFalse(result["runtimeUpdated"])
+        self.assertFalse(plan["releaseVerified"])
+        self.assertEqual(self.command("apply", *self.options)["status"], "already-applied")
+        status = self.command("check")
+        self.assertEqual(status["status"], "current")
+        installed = (self.root / "AGENTS.md").read_bytes()
+        refused = self.command("recover", "--transaction", result["transaction"],
+                               "--remove-created-instructions", "--approved-plan-sha256", "0" * 64, expected=2)
+        self.assertEqual(refused["status"], "blocked")
+        self.assertEqual((self.root / "AGENTS.md").read_bytes(), installed)
+        held = self.command("recover", "--transaction", result["transaction"])
+        self.assertEqual(held["status"], "recovery-blocked")
+        restored = self.command("recover", "--transaction", result["transaction"],
+                                "--remove-created-instructions", "--approved-plan-sha256", plan["planSha256"])
+        self.assertEqual(restored["status"], "recovered")
+        self.assertFalse((self.root / "AGENTS.md").exists())
+        self.assertEqual((self.root / "accepted-spec.md").read_bytes(), self.accepted)
+
+    def test_actual_new_project_initializer_is_current_in_shared_migration(self):
+        if not shutil.which("pwsh"):
+            self.skipTest("PowerShell initializer unavailable on this host")
+        self.initialize_git()
+        local_command(["pwsh", "-NoProfile", "-File",
+                       str(self.runtime / "scripts/bootstrap/05-start-wizard.ps1"),
+                       "-WorkspaceRoot", str(self.root), "-InitializeInstructionsOnly"])
+        status = self.command("check")
+        self.assertEqual(status["status"], "current")
+        self.assertEqual(status["files"], [])
+        self.assertEqual((self.root / "accepted-spec.md").read_bytes(), self.accepted)
+
+    def test_existing_customizations_and_backup_restore(self):
+        self.legacy(customized=True)
+        self.initialize_git()
+        before = {name: self.root.joinpath(*name.split("/")).read_bytes()
+                  for name in update.INSTRUCTION_PATHS[:3]}
+        plan = self.review(legacy=True)
+        result = self.command("apply", *self.options)
+        for name, original in before.items():
+            after = self.root.joinpath(*name.split("/")).read_bytes()
+            self.assertTrue(after.startswith(self.prefix))
+            self.assertTrue(after.endswith(self.suffix))
+            self.assertIn(self.runtime.joinpath(*name.split("/")).read_bytes(), after)
+            index = next(i for i, item in enumerate(plan["files"]) if item["path"] == name)
+            self.assertEqual((Path(result["transaction"]) / f"{index}.backup").read_bytes(), original)
+        restored = self.command("recover", "--transaction", result["transaction"],
+                                "--remove-created-instructions", "--approved-plan-sha256", plan["planSha256"])
+        self.assertEqual(restored["status"], "recovered")
+        for name, original in before.items():
+            self.assertEqual(self.root.joinpath(*name.split("/")).read_bytes(), original)
+        self.assertEqual((self.root / "accepted-spec.md").read_bytes(), self.accepted)
+
+    def test_unknown_customized_body_is_not_overwritten(self):
+        self.legacy()
+        target = self.root / "AGENTS.md"
+        target.write_bytes(b"Unrecognized stricter project instructions.\n")
+        self.initialize_git()
+        before = target.read_bytes()
+        result = self.command("preview", "--previous-instructions", self.previous, expected=2)
+        self.assertEqual(result["status"], "blocked")
+        self.assertEqual(target.read_bytes(), before)
+        self.assertFalse((self.root / update.STATE).exists())
+
+    def test_changed_target_and_active_writer_are_held(self):
+        self.legacy()
+        self.initialize_git()
+        self.review(legacy=True)
+        state = self.root / update.STATE
+        state.mkdir()
+        lock = state / "lock.json"
+        lock.write_bytes(encoded({"root": str(self.root), "transaction": uuid.uuid4().hex,
+                                  "token": uuid.uuid4().hex, "pid": os.getpid()}))
+        self.assertEqual(self.command("apply", *self.options, expected=2)["status"], "blocked")
+        self.assertTrue(lock.exists())
+        lock.unlink()
+        target = self.root / "AGENTS.md"
+        target.write_bytes(target.read_bytes() + b"Later project-specific instruction.\n")
+        before = target.read_bytes()
+        self.assertEqual(self.command("apply", *self.options, expected=2)["status"], "blocked")
+        self.assertEqual(target.read_bytes(), before)
+
+    def test_interrupted_shared_transaction_recovers_and_reuses_plan(self):
+        self.initialize_git()
+        plan = self.review()
+        self.command("apply", *self.options, crash="after-replace-0", expected=86)
+        transaction = self.checkpoint()
+        journal = json.loads((transaction / "journal.json").read_bytes())
+        self.assertEqual(journal["files"][0]["phase"], "writing")
+        result = self.command("recover", "--transaction", transaction, "--remove-created-instructions",
+                              "--approved-plan-sha256", plan["planSha256"])
+        self.assertEqual(result["status"], "recovered")
+        self.assertEqual(self.command("apply", *self.options)["status"], "applied")
+        self.assertEqual((self.root / "accepted-spec.md").read_bytes(), self.accepted)
+
+    def test_newer_human_edits_survive_rollback(self):
+        self.initialize_git()
+        plan = self.review()
+        result = self.command("apply", *self.options)
+        target = self.root / "AGENTS.md"
+        target.write_bytes(target.read_bytes() + b"Human security correction.\n")
+        newer = target.read_bytes()
+        held = self.command("recover", "--transaction", result["transaction"], "--remove-created-instructions",
+                            "--approved-plan-sha256", plan["planSha256"])
+        self.assertEqual(held["status"], "recovery-blocked")
+        self.assertIn("AGENTS.md", held["conflicts"])
+        self.assertEqual(target.read_bytes(), newer)
+
+    def test_shared_powershell_wrapper_and_release_scope_boundary(self):
+        self.initialize_git()
+        if not shutil.which("pwsh"):
+            self.skipTest("PowerShell wrapper unavailable on this host")
+        wrapper = self.runtime / "scripts/bootstrap/04-check-wizard-update.ps1"
+        result = local_command(["pwsh", "-NoProfile", "-File", str(wrapper), "-Action", "Review",
+                                "-RuntimeRoot", str(self.root), "-InstructionMigration",
+                                "-PlanPath", str(self.plan_path), "-AsJson"])
+        plan = json.loads(result)
+        self.assertEqual(plan["sourceMode"], "local-instructions")
+        applied = local_command(["pwsh", "-NoProfile", "-File", str(wrapper), "-Action", "Update",
+                                 "-RuntimeRoot", str(self.root), "-InstructionMigration",
+                                 "-PlanPath", str(self.plan_path), "-ApprovedPlanSha256",
+                                 plan["planSha256"], "-AsJson"])
+        self.assertEqual(json.loads(applied)["status"], "applied")
+        self.assertEqual(self.command("check", "--online", expected=2)["status"], "blocked")
+        # Merely selecting a familiar filename still cannot enable fixture/release ownership.
+        with self.assertRaises(update.UpdateError):
+            update.relative_name("AGENTS.md")
 
 
 if __name__ == "__main__":

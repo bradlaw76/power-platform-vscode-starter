@@ -80,8 +80,13 @@ writes from its migration receipt. Modified framework sections, unowned files,
 changed pins and active/unreconciled task generations are blocked, not overwritten.
 Plain resumes retain their original pin. This requires the updated runtime; it
 is not an H009 updater, automatic adoption, executable upgrade or tenant rollback.
-Existing Starter clones use reviewed source-control reconciliation, preserving
-owner edits; portable policy copies continue through the existing skill installer.
+Existing Starter consumer instructions use the existing H009 shared
+`-InstructionMigration` preview/transaction/recovery lifecycle, preserving owner
+edits; see [local adoption](wizard-updates.md#local-instruction-inheritance-and-migration).
+New external wizard workspaces receive the actual local policy and assets;
+chat uses `-InitializeInstructionsOnly`. Neither operation installs a runtime
+or authenticates a release. Portable user-home skill copies continue through
+the existing skill installer, not this project-only migration.
 
 
 H009 supplies [offline identity and safe update planning](wizard-updates.md).

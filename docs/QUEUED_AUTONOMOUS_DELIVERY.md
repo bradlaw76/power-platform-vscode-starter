@@ -48,6 +48,9 @@ Each queued prompt must independently check predecessor completion and current o
 ### Copy/paste starter prompt
 
 ```text
+Load the actual project-local AGENTS and canonical execution policy before acting.
+Preserve stricter project requirements; missing instructions require the shared
+wizard inheritance/migration path, not a remote link or copy-over.
 Inspect this repository's current instructions, authorized scope, working tree, open PRs,
 existing task queue/worker and dependency locks. Reuse the existing execution owner.
 Read https://code.visualstudio.com/docs/agents/overview and verify the selected

@@ -1,5 +1,32 @@
 # Authorization and execution standard
 
+## Q15-Q16 current approved extension
+
+Continue the same campaign in an isolated lane based on exact H010 PR18
+`cd816b70cec90fce9e3245b29910533cf020a880` (contains H009 PR16), carrying accepted
+PR17 guidance. Preserve all original branches, H assignments and prior evidence.
+The owner authorizes implementation, focused tests and dependent PR publication,
+not merge, release or tenant writes. Earlier bounded source-only/push restrictions
+below describe history, not this current authorization.
+
+- Full new authoring clones contain AGENTS, Copilot, prompts/skills and the actual
+  local canonical policy. Startup and generated tasks expose instruction identity.
+- Routine accepted repairs do not rerun discovery or regenerate planning packages;
+  material features, security and architecture retain affected planning.
+- Extend the existing H009 engine/wrapper with explicitly selected local
+  instruction adoption, not another update manager or official runtime release.
+  Preview binds exact target/source/previous-source and before/after bytes.
+- Replace only absent files or one exact recognized prior framework body.
+  Preserve all surrounding custom text and stricter security. Edited/ambiguous
+  framework bodies block; never infer ownership from a familiar filename.
+- Reuse H009 locking, backups, conditional writes and durable journal/recovery.
+  Changed files/metadata and active owners block; expiration is not release.
+  Explicit scoped rollback may remove only newly created instruction bytes that
+  still match the recorded transaction, never unknown edits.
+- Verify installed managed instructions and local policy references separately
+  from runtime, publisher and native-user acceptance. Official runtime Apply
+  remains fail-closed. Test neutral external clean/custom/conflict/crash cases.
+
 This records the original PR #8 scope. Its historical publication permission does not authorize this integration proposal or any new push, merge or deployment.
 
 ## Requirement and authorization

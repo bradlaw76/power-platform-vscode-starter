@@ -126,6 +126,7 @@ param(
     [string]$Mode = 'demo-builder',
     [string]$AnswersFile,
     [string]$WorkspaceRoot,
+    [switch]$InitializeInstructionsOnly,
     [string]$DeliveryGoal = '',
     [string]$DeliveryTimeframe = '',
     [string]$AcceptedContractPath,
@@ -148,7 +149,9 @@ try {
     Write-Warning "Wizard version status unavailable: $($_.Exception.Message). Discovery can continue; no update authorized."
 }
 if ($VersionOnly) { return }
-. (Join-Path $PSScriptRoot 'helpers/table-detection.ps1')
+if (-not $InitializeInstructionsOnly) {
+    . (Join-Path $PSScriptRoot 'helpers/table-detection.ps1')
+}
 $acceptedContract = $null
 if ($EnableFrameworkSpecKitSync -and [string]::IsNullOrWhiteSpace($FrameworkRuntimeWorkspace)) {
     throw 'Explicit framework sync requires a separate runtime workspace.'
@@ -198,6 +201,123 @@ $repoRoot = if ([string]::IsNullOrWhiteSpace($WorkspaceRoot)) {
 } else {
     [System.IO.Path]::GetFullPath($WorkspaceRoot)
 }
+
+function Get-InstructionFilePath {
+    param([string]$Root, [string]$Relative)
+    $rootPath = [IO.Path]::GetFullPath($Root)
+    if (@($Relative -split '/' | Where-Object { $_ -in @('', '.', '..') }).Count -gt 0) {
+        throw 'Unsafe instruction path.'
+    }
+    $path = [IO.Path]::GetFullPath((Join-Path $rootPath $Relative))
+    if (-not $path.StartsWith($rootPath + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
+        throw 'Instruction path leaves the project.'
+    }
+    $cursor = $path
+    while ($cursor) {
+        if (Test-Path -LiteralPath $cursor) {
+            $item = Get-Item -LiteralPath $cursor -Force
+            if (($item.Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+                throw 'Instruction symlink/reparse point rejected.'
+            }
+        }
+        $cursor = Split-Path $cursor -Parent
+    }
+    $parent = $rootPath
+    foreach ($segment in ($Relative -split '/')) {
+        if ([IO.Directory]::Exists($parent)) {
+            $children = @(Get-ChildItem -LiteralPath $parent -Force | Select-Object -First 4097)
+            if ($children.Count -gt 4096) { throw 'Instruction parent inspection budget exceeded.' }
+            foreach ($child in $children) {
+                if ($child.Name.Equals($segment, [StringComparison]::OrdinalIgnoreCase) -and
+                    -not $child.Name.Equals($segment, [StringComparison]::Ordinal)) {
+                    throw 'Instruction path case alias requires explicit reconciliation.'
+                }
+            }
+        }
+        $parent = Join-Path $parent $segment
+    }
+    return $path
+}
+
+function Initialize-WizardProjectInstructions {
+    [CmdletBinding()]
+    param([string]$ProjectRoot, [string]$SourceRoot)
+    $ProjectRoot = [IO.Path]::GetFullPath($ProjectRoot)
+    $SourceRoot = [IO.Path]::GetFullPath($SourceRoot)
+    if ($ProjectRoot -eq [IO.Path]::GetPathRoot($ProjectRoot) -or $ProjectRoot -eq [IO.Path]::GetFullPath($HOME)) {
+        throw 'User home/filesystem root is not an instruction project.'
+    }
+    if ($ProjectRoot -ne $SourceRoot -and
+        ($ProjectRoot.StartsWith($SourceRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase) -or
+         $SourceRoot.StartsWith($ProjectRoot + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase))) {
+        throw 'Consumer initialization must not overlap the framework source tree.'
+    }
+    $catalog = Get-Content -LiteralPath (Join-Path $SourceRoot 'distribution\ownership-policy.json') -Raw |
+        ConvertFrom-Json
+    $paths = @('AGENTS.md')
+    $paths += @($catalog.groups | Where-Object { $_.category -in @('copilot-asset', 'claude-asset') } |
+        ForEach-Object { $_.paths } | Where-Object { $_ -ne 'AGENTS.md' })
+    $paths += @('docs/policies/authorization-and-execution.md', 'docs/QUEUED_AUTONOMOUS_DELIVERY.md')
+    foreach ($relative in $paths) {
+        if ($relative -notmatch '^(AGENTS\.md|\.github/(copilot-instructions\.md|(skills|prompts)/[A-Za-z0-9._/-]+\.md)|\.claude/skills/[A-Za-z0-9._/-]+\.md|docs/(policies/authorization-and-execution|QUEUED_AUTONOMOUS_DELIVERY)\.md)$') {
+            throw 'Catalog contains a non-instruction initialization path.'
+        }
+    }
+    $existing = @($paths | Where-Object {
+        Test-Path -LiteralPath (Get-InstructionFilePath -Root $ProjectRoot -Relative $_)
+    })
+    if ($existing.Count -gt 0 -or (Test-Path -LiteralPath (Join-Path $ProjectRoot 'CLAUDE.md')) -or
+        (Test-Path -LiteralPath (Join-Path $ProjectRoot '.github\instructions'))) {
+        if (@('AGENTS.md', '.github/copilot-instructions.md', 'docs/policies/authorization-and-execution.md') |
+            Where-Object { -not (Test-Path -LiteralPath (Get-InstructionFilePath -Root $ProjectRoot -Relative $_) -PathType Leaf) }) {
+            Write-Warning 'Existing/custom instruction installation retained. Use the shared instruction migration preview; inheritance is incomplete.'
+        }
+        return
+    }
+    $gitDirectory = Join-Path $ProjectRoot '.git'
+    if (Test-Path -LiteralPath $gitDirectory -PathType Leaf) {
+        if (((Get-Item -LiteralPath $gitDirectory -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) -ne 0) {
+            throw 'Git metadata symlink rejected.'
+        }
+        if ((Get-Item -LiteralPath $gitDirectory -Force).Length -gt 4096) { throw 'Git metadata inspection budget exceeded.' }
+        $gitPointer = [IO.File]::ReadAllText($gitDirectory).Trim()
+        if ($gitPointer -notmatch '^gitdir: ([^\r\n]+)$') { throw 'Unrecognized Git worktree metadata.' }
+        $gitDirectory = [IO.Path]::GetFullPath($(if ([IO.Path]::IsPathRooted($Matches[1])) {
+            $Matches[1]
+        } else { Join-Path $ProjectRoot $Matches[1] }))
+    }
+    $indexLock = Join-Path $gitDirectory 'index.lock'
+    $pending = @()
+    foreach ($relative in $paths) {
+        $source = Get-InstructionFilePath -Root $SourceRoot -Relative $relative
+        $target = Get-InstructionFilePath -Root $ProjectRoot -Relative $relative
+        $bytes = [IO.File]::ReadAllBytes($source)
+        if ($bytes.Length -eq 0) { throw 'Empty source instruction file rejected.' }
+        $pending += @{ Target = $target; Relative = $relative; Bytes = $bytes }
+    }
+    foreach ($item in $pending) {
+        if ((Test-Path -LiteralPath (Join-Path $ProjectRoot '.wizard-update\lock.json')) -or
+            (Test-Path -LiteralPath (Join-Path $ProjectRoot '.wizard-update\recovery.lock')) -or
+            (Test-Path -LiteralPath $indexLock)) {
+            throw 'An updater owns this project; initialization cannot bypass its checkpoint.'
+        }
+        $target = $item.Target
+        $bytes = $item.Bytes
+        $null = [IO.Directory]::CreateDirectory((Split-Path $target -Parent))
+        $target = Get-InstructionFilePath -Root $ProjectRoot -Relative $item.Relative
+        $stream = [IO.File]::Open($target, [IO.FileMode]::CreateNew, [IO.FileAccess]::Write, [IO.FileShare]::None)
+        try { $stream.Write($bytes, 0, $bytes.Length); $stream.Flush($true) }
+        finally { $stream.Dispose() }
+    }
+    Write-Host 'Local development-first instructions initialized. No runtime release or deployment permission inferred.'
+}
+
+Initialize-WizardProjectInstructions -ProjectRoot $repoRoot -SourceRoot $runtimeRoot
+$localPolicy = Join-Path $repoRoot 'docs\policies\authorization-and-execution.md'
+if (Test-Path -LiteralPath $localPolicy -PathType Leaf) {
+    Write-Host "Local execution policy: $localPolicy | SHA256 $((Get-FileHash -LiteralPath $localPolicy -Algorithm SHA256).Hash)"
+}
+if ($InitializeInstructionsOnly) { return }
 $scriptedAnswers = $null
 $scriptedAnswerIndex = 0
 if (-not [string]::IsNullOrWhiteSpace($AnswersFile)) {
@@ -2026,6 +2146,7 @@ $tasksContent = @"
 - [ ] Confirm delivery goal '$($answers['DeliveryGoal'])' and timeframe '$($answers['DeliveryTimeframe'])'; resolve any unconfirmed scripted values
 - [ ] Classify the actual change under 'docs/scenario-change-impact-gate.md'; minor maintenance retains accepted planning and focused checks, while scenario deltas update affected contracts
 - [ ] Follow the single canonical 'docs/policies/authorization-and-execution.md' policy; do not duplicate its authority, backup, writer/recovery or native safety rules
+- [ ] Load local AGENTS.md and the actual local policy; preserve stricter project security and reuse accepted requirements for routine corrections without regenerating complete planning packages
 - [ ] For routine authorized corrections: implement, validate, publish only within accepted scope, verify, correct, continue independent work, then reconcile affected notes; no fresh discovery or full planning package
 - [ ] For explicitly autonomous work, use the existing dependency-aware queue in 'docs/QUEUED_AUTONOMOUS_DELIVERY.md'; verify installed capability, never infer deployment/native acceptance from source success
 - [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
