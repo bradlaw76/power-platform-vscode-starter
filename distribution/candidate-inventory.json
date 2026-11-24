@@ -4,12 +4,12 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "c3536cd7e6940512d9d010d3c5cbc1d0488bc395",
+  "sourceCommit": "de39865950421d118c5b1be41e13664718bc7d56",
   "policySha256": "1cd2f3a7de7f5d444dbe5c0195bb6bc6f0d19d041a3946d20aad149f0df64a11",
   "publisherVerified": false,
   "automaticApply": false,
   "fileCount": 131,
-  "totalBytes": 1882094,
+  "totalBytes": 1898505,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
@@ -88,8 +88,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 3373,
-      "sha256": "092c8f9682e9b73b8ae7863960847368900234f8995a4241fc0117594f1e00cf"
+      "size": 4496,
+      "sha256": "52240d7423cbf4061ab7ad4eb8bbde0bb3bdf34f1dd9dd9d6e37238fa82df6af"
     },
     {
       "path": "PSScriptAnalyzerSettings.psd1",
@@ -104,8 +104,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 51185,
-      "sha256": "a644e3c36afa5adf371bd680c5505028d5dd82d68ff960285224598271ea7b84"
+      "size": 52225,
+      "sha256": "09f04688024901064975469ef0224e035245ee14851791d3b1092c19fd9d9da6"
     },
     {
       "path": "SECURITY.md",
@@ -184,8 +184,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 36315,
-      "sha256": "765fcfa27b4aed46c85d45b57ccbea3e10633104d580a01a0865324d6fe68e7e"
+      "size": 36959,
+      "sha256": "5fef1ff0009f5a88f4a084b6164269132cd30751ac0ddbfae580bf46e1596ea0"
     },
     {
       "path": "docs/policies/authorization-and-execution.md",
@@ -224,8 +224,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 6411,
-      "sha256": "7ab0b28100d74eddf4864aae6053d06e5fab4dfa7893186cb11953c0b3550475"
+      "size": 8488,
+      "sha256": "a0d8116abe686b99867c4d00195c96c957a809fac5015b16e739aa52da7711f8"
     },
     {
       "path": "docs/solution-isolation-runbook.md",
@@ -272,16 +272,16 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 24615,
-      "sha256": "e65054dc476afa7289296ea583c0f1dd12b27c566d91f8a7394aa43d0dc75fdb"
+      "size": 30313,
+      "sha256": "47c4be4b9938452e281cde65364911959bed754538ac3dc62a92c5b21dba3d21"
     },
     {
       "path": "docs/wizard-updates.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 12366,
-      "sha256": "0701c2c3ca6500e50c9161ddff36db4ee2775e4521010e4b7ceb6be6767c9d0b"
+      "size": 18195,
+      "sha256": "56d25cb03f3a84a460e4d2022ab722face2fb4f727bb4075e79ec1a42837b7a0"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md",
