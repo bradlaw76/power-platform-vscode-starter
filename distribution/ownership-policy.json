@@ -138,7 +138,6 @@
       "paths": [
         ".markdownlint-cli2.jsonc",
         "PSScriptAnalyzerSettings.psd1",
-        "run-quality.ps1",
         "scripts/ci/AlternateKeys.Tests.ps1",
         "scripts/ci/AuthorizationExecution.Tests.ps1",
         "scripts/ci/DataverseRuntime.Tests.ps1",
