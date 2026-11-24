@@ -7,7 +7,12 @@
 - [x] Extend H009's existing instruction-only preview/Apply/recovery transaction.
 - [x] Preserve custom bytes, stricter requirements, backups and active-writer holds.
 - [x] Complete focused fictional installation/migration/interruption regressions.
-- [ ] Record exact results and synchronize dependent PR/evidence; no merge or release.
+- [x] Record exact results and synchronize dependent PR/evidence; no merge or release.
+
+Submitted through [dependent PR #19](https://github.com/bradlaw76/power-platform-vscode-starter/pull/19).
+Implementation source: `b76fcc95a953458dd46a7ae34b49355010687c6e`.
+The candidate inventory is pinned to that source; final hosted-check receipts
+remain on the PR, not a claim that instruction adoption authenticates a release.
 
 - [x] Inspect branch, worktree, authorization, security and distribution rules.
 - [x] Record scope, acceptance criteria and isolated publication baseline.

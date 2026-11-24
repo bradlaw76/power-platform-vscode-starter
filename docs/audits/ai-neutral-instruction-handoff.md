@@ -9,6 +9,14 @@ seven accepted PR17 changes reconciled rather than rewritten. Coordination was
 recorded on PR16/PR18; session-message delivery was unavailable, not consent.
 No other worktree, branch, tenant, merge or release was changed.
 
+Submitted as [dependent PR #19](https://github.com/bradlaw76/power-platform-vscode-starter/pull/19).
+Implementation `b76fcc95a953458dd46a7ae34b49355010687c6e`;
+inventory receipt `3e8010423a9839c48acdad1e1f6b2378f888cfb9` independently
+matched its remote ref. The existing generator verified 133 owned candidate
+files against the implementation source. Publisher trust and automatic Apply
+remain false. Final hosted-check receipts are maintained on PR19; PR17's
+continuation link is [recorded separately](https://github.com/bradlaw76/power-platform-vscode-starter/pull/17#issuecomment-7147987682).
+
 New projects receive actual local AGENTS, Copilot, canonical policy, both skill
 families, prompt/progress reference and queue guidance. Chat uses the same
 wizard's instruction-only initialization; ordinary startup remains Python-free.
