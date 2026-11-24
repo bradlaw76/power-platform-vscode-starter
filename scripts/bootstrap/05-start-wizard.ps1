@@ -2025,6 +2025,10 @@ $tasksContent = @"
 - [ ] Review 'answers.md' with stakeholder
 - [ ] Confirm delivery goal '$($answers['DeliveryGoal'])' and timeframe '$($answers['DeliveryTimeframe'])'; resolve any unconfirmed scripted values
 - [ ] Classify the actual change under 'docs/scenario-change-impact-gate.md'; minor maintenance retains accepted planning and focused checks, while scenario deltas update affected contracts
+- [ ] Follow 'docs/policies/authorization-and-execution.md': reuse accepted requirements and valid standing scoped nonproduction authorization; registration/H numbering/narrative docs do not block independently authorized implementation unless required for real authority, enforced policy or conflicting writers
+- [ ] For routine authorized nonproduction existing-component repairs, keep a minimum change contract and rollback before editing; reconcile narrative documentation before closure, never defer semantic/report/hash/FAST/security gates
+- [ ] Verify active process, checkpoint and actual resource evidence before writer release; lease expiry alone is insufficient; recover before restart, bound repairs and continue independent work; H IDs track outcomes, not permanent component ownership
+- [ ] For explicitly autonomous multi-change work, recommend dependency-aware queues from 'docs/QUEUED_AUTONOMOUS_DELIVERY.md' and https://code.visualstudio.com/docs/agents/overview; verify actual executor support, not assumed live acceptance
 - [ ] Follow delivery-specific verification strategy: $($answers['ValidationStrategy'])
 - [ ] Consider automation only when a measured net time saving exceeds setup/verification cost and owner opts in; do not require WSL
 - [ ] Confirm wizard mode '$($answers["WizardMode"])' is appropriate for this run

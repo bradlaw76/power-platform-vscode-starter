@@ -66,6 +66,12 @@ Describe 'Authorization and execution policy contract' {
         @{ Id = 'AUTH-06'; Expected = 'Continue the independent test; report the blocked dependency separately'; Rule = 'continue independent authorized work only when it does not depend' }
         @{ Id = 'AUTH-07'; Expected = 'Report SOURCE COMPLETE and TESTED, not DEPLOYED or LIVE VERIFIED'; Rule = 'TESTED does not imply DEPLOYED' }
         @{ Id = 'AUTH-08'; Expected = 'Reconcile uncertain writes; no unchanged deterministic retries; bound transient attempts'; Rule = 'at most three total attempts per operation' }
+        @{ Id = 'AUTH-09'; Expected = 'Reuse standing scope; verify target and effects, retain separate required approvals'; Rule = 'Nonproduction status and credentials alone never constitute authorization' }
+        @{ Id = 'AUTH-10'; Expected = 'Implement the bounded repair; reconcile administration and documentation before closure'; Rule = 'unless they establish real authority, satisfy an enforced policy or resolve conflicting writers' }
+        @{ Id = 'AUTH-11'; Expected = 'Stop the affected operation for its required pre-change gate; retrospective documentation is not approval'; Rule = 'Retrospective documentation is not retrospective permission' }
+        @{ Id = 'AUTH-12'; Expected = 'Recover before restart; lease expiry alone does not release the writer'; Rule = 'Lease expiry alone is insufficient evidence of release' }
+        @{ Id = 'AUTH-13'; Expected = 'Check current ownership evidence; preserve the H ID, do not treat it as permanent ownership'; Rule = 'H IDs track outcomes, not permanent component ownership' }
+        @{ Id = 'AUTH-14'; Expected = 'Queue dependency-ready authorized work; preserve the hold and verify actual executor support'; Rule = 'native message queueing is not proof of durable recovery or unattended permission' }
     ) {
         $row = @($policy -split '\r?\n' | Where-Object { $_ -match "^\| $Id \|" })
         $row.Count | Should -Be 1
@@ -78,6 +84,55 @@ Describe 'Authorization and execution policy contract' {
             $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
             $content | Should -Match 'authorization-and-execution\.md' -Because $surface
             $content | Should -Not -Match 'Require explicit approval before commit and separate approval before push'
+        }
+    }
+
+    It 'distributes repair authority and writer recovery without weakening real gates' {
+        foreach ($surface in $surfaces) {
+            $content = (Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw) -replace '\s+', ' '
+            foreach ($rule in @(
+                'standing scoped nonproduction', 'accepted requirements',
+                'real authority', 'enforced policy', 'conflicting writers',
+                'H IDs track outcomes, not permanent component ownership',
+                'checkpoint', 'resource evidence', 'lease expiry alone',
+                'before closure', 'semantic/report/hash/', 'FAST/security',
+                'QUEUED_AUTONOMOUS_DELIVERY.md'
+            )) {
+                $content | Should -Match ([regex]::Escape($rule)) -Because "$surface must inherit $rule"
+            }
+        }
+    }
+
+    It 'requires before-change repair evidence and refuses retroactive permission' {
+        $contract = $policy -replace '\s+', ' '
+        foreach ($rule in @(
+            'minimum change contract', 'recoverable before-state/rollback',
+            'New requirements, schema/type changes, report meaning, security boundaries',
+            'scope change, expiration, revocation, production target, destructive effect',
+            'Standing permission cannot approve a semantic/report definition or sign an artifact hash',
+            'explicit read-only allocation restriction still binds',
+            'active process/session state, latest durable checkpoint/journal',
+            'actual resource state and in-flight writes',
+            'Do not delete locks or reset state merely to force a restart',
+            'a fresh session does not reset that budget'
+        )) {
+            $contract | Should -Match ([regex]::Escape($rule))
+        }
+    }
+
+    It 'offers executable-session queue instructions without claiming a durable executor' {
+        $queue = Get-Content -LiteralPath (Join-Path $repoRoot 'docs\QUEUED_AUTONOMOUS_DELIVERY.md') -Raw
+        $queue | Should -Match 'https://code\.visualstudio\.com/docs/agents/overview'
+        $queue | Should -Match 'Add to Queue'
+        $queue | Should -Match 'chat\.requestQueuing\.defaultAction'
+        ($queue -replace '\s+', ' ') | Should -Match 'For \*\*explicitly autonomous multi-change work\*\*, recommend a dependency-aware queue'
+        ($queue -replace '\s+', ' ') | Should -Match 'does not guarantee task success, reboot recovery'
+        ($queue -replace '\s+', ' ') | Should -Match 'Lease expiry alone is insufficient'
+        ($queue -replace '\s+', ' ') | Should -Match 'If no durable executor is configured, state this explicitly'
+        foreach ($surface in $surfaces | Where-Object { $_ -match 'SKILL\.md$|prompt\.md$|copilot-instructions\.md$' }) {
+            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content | Should -Match 'https://code\.visualstudio\.com/docs/agents/overview' -Because $surface
+            ($content -replace '\s+', ' ') | Should -Match 'explicitly autonomous multi-change work'
         }
     }
 

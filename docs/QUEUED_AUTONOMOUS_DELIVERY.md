@@ -6,6 +6,17 @@ Status: **operating guidance / proposed integration contract**. This page does n
 
 When a user asks for a multi-step build or change, the assistant should **offer a complete copy/pasteable execution bundle by default**, rather than requiring a new prompt after every task. Provide (1) a primary instruction that discovers the current executor and its queue, (2) an ordered, dependency-aware backlog, (3) self-correction/recovery instructions, and (4) a clear summary of work that needs the owner. Single focused edits do not need artificial queues.
 
+For **explicitly autonomous multi-change work**, recommend a dependency-aware
+queue, not repeated one-task approval loops. Reuse accepted requirements and
+standing scoped nonproduction authorization under the canonical
+[authorization and execution policy](policies/authorization-and-execution.md).
+Queueing is coordination, not authorization. Recoverable registration, H
+numbering and narrative documentation must not delay independently authorized
+implementation unless required for real authority, enforced policy or conflicting
+writers; reconcile them before closure. H IDs track outcomes, not permanent
+component ownership; preserve historical IDs and request allocator review rather
+than inventing or reusing one.
+
 Use **queue** for the concept in documentation; describe **cue/queue** when assisting a user who calls the feature “cues.” A Copilot chat prompt is not itself a durable queue or a guarantee of unattended execution. Verify the actual worker/extension and its persistence first. If no suitable executor exists, provide sequential prompts and explain that continuing requires the user to run them, or implement/test the required executor as a separate approved change.
 
 ### User instructions for VS Code
@@ -18,9 +29,11 @@ Use **queue** for the concept in documentation; describe **cue/queue** when assi
 
 ### Native VS Code message queue — required link in every multi-item response
 
-Official instructions: https://code.visualstudio.com/docs/chat/chat-overview#_send-messages-while-a-request-is-running
+Official agent overview: https://code.visualstudio.com/docs/agents/overview
 
-For each generated multi-item queue, include this URL and the following short instructions immediately before the separately copyable task prompts:
+Message queue instructions: https://code.visualstudio.com/docs/chat/chat-overview#_send-messages-while-a-request-is-running
+
+For each generated multi-item queue, include the agent overview URL, message queue link and the following short instructions immediately before the separately copyable task prompts. Verify feature availability in the selected installed harness/session rather than assuming every agent supports the same controls:
 
 1. Start the first task in VS Code Copilot Chat using the intended agent/session.
 2. While it runs, paste the next task into the same chat. Open the Send dropdown and select **Add to Queue**. Repeat for each remaining task in dependency order.
@@ -37,6 +50,8 @@ Each queued prompt must independently check predecessor completion and current o
 ```text
 Inspect this repository's current instructions, authorized scope, working tree, open PRs,
 existing task queue/worker and dependency locks. Reuse the existing execution owner.
+Read https://code.visualstudio.com/docs/agents/overview and verify the selected
+agent/session's actual queue and recovery support before making capability claims.
 Build a dependency-ordered backlog for my request. Provide the entire ordered queue
 up front; do not stop after each routine task for another prompt.
 
@@ -49,6 +64,13 @@ Never bypass ownership, permission, protected-source, secret handling, security,
 destructive-action, or deployment gates. Do not manufacture an approval or report
 simulation as live verification. Re-read actual state after a conflict/restart.
 Keep existing H-number assignment and PR ownership rules.
+Reuse accepted requirements and valid standing scoped nonproduction permission.
+Do not block independently authorized repairs for registration, numbering or
+narrative documentation alone; reconcile those before closure. Preserve all
+semantic/report/hash/FAST/security gates and enforced repository controls.
+H IDs track outcomes, not permanent component ownership. Check active process,
+checkpoint and actual resource evidence before writer release. Lease expiry alone
+is insufficient; recover before restart, never spawn a conflicting writer.
 
 For Dataverse HTML/JavaScript web-resource UI work, use the web-resource-first
 workflow in this repository: verify backup and target, retain a minimum change
@@ -62,11 +84,55 @@ If no durable executor is configured, state this explicitly and perform the
 available work in this session rather than claiming unattended operation.
 ```
 
+### Individually copyable queue example
+
+Adapt these local ordering labels to the accepted scope; they allocate no H IDs.
+Paste the primary prompt first, then queue these messages using the controls
+above. Dependencies are evidence checks, not an instruction to start new writers.
+
+**Q01 — Inspect/recover. Depends on: existing authorization. Outcome: known owner,
+accepted requirements, affected contracts and ready/blocked items.**
+
+```text
+Q01: Inspect accepted requirements, current scope and existing process/session,
+checkpoint, branch/PR and actual resource evidence. Attach/recover before restart;
+lease expiry alone cannot release a writer. Preserve all original worktrees.
+Report dependency-ready work and exact resource holds. Do not allocate an H ID,
+enable an executor or expand authority.
+```
+
+**Q02 — Implement/verify. Depends on: Q01 evidence for the affected resource.
+Outcome: bounded authorized changes and focused test/readback evidence.**
+
+```text
+Q02: Recheck Q01 evidence, authority and current ownership. Implement only
+dependency-ready changes under accepted requirements and the canonical policy.
+Keep minimum repair/rollback evidence; preserve semantic/report/hash/FAST/security
+gates. Apply bounded material repairs and targeted regressions. Reconcile uncertain
+writes before retry. Continue independent work; hold conflicting resources.
+Do not treat registration or narrative documentation alone as an implementation
+blocker absent real authority, enforced policy or a conflicting writer.
+```
+
+**Q03 — Reconcile/handoff. Depends on: Q02 results. Outcome: exact source/evidence,
+administrative reconciliation and truthful completion report.**
+
+```text
+Q03: Verify Q02 results from current source and target evidence, not chat status.
+Reconcile accepted source/hashes, tests, rollback, registration and narrative
+documentation before closure. Prepare separate STARTER/AUTO outcome mappings only
+when requested; do not allocate H IDs. Report source, tests, deployment and live
+verification separately. Commit/push/PR/merge/release each retain their actual
+authorization. If no durable executor ran, say so; never claim live acceptance
+from local tests or prepared prompts.
+```
+
 ## Executor contract and self-correction
 
 - **Queue state:** stable task IDs (allocated by authorized project mechanism), dependency graph, priorities, owner/lock, scope/permissions, attempt count, checkpoint, target repository/environment, and evidence links.
 - **Scheduling:** use one writer for a shared component/environment; safe read-only or independent tasks may run in parallel. Do not overwrite other branches or accepted user edits. Wait and recheck locks.
 - **Recovery:** persist state outside ephemeral chat context; on restart inspect latest authoritative branch, task store, lease and tenant snapshot before resuming. Identify stale locks by the runner's proven fencing protocol, not age alone.
+- **Writer release:** require active process/session, durable checkpoint and actual resource/in-flight-write evidence before release or takeover. Lease expiry alone is insufficient. Attach/recover before restart; if evidence is missing, hold the conflicting resource and dependents while advancing independent authorized items. Never delete locks to force progress.
 - **Repair:** classify transient infrastructure failures vs. code/test defects vs. access/security/design blockers. Apply bounded idempotent repairs, relevant tests and exponential backoff. If attempts exhaust, record the blocker and advance other independent work.
 - **Acceptance:** verify each task against explicit requirements; distinguish prepared/source-only, validated in tests, deployed, and user-visible live verified. Never label a queued prompt as executed.
 - **Safety:** no credential leakage, automatic merging of protected PRs, or tenant writes without scope-specific permission; retain backup/rollback and evidence of who authorized a change.

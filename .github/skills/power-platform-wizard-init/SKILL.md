@@ -13,6 +13,20 @@ for all workloads. During the existing consumer compatibility review, require
 this policy or a reviewed equivalent and a reference in the project's existing
 instruction entry point before mutating work. Do not overwrite local instructions.
 
+Reuse accepted requirements and standing scoped nonproduction authorization.
+Registration, H numbering and narrative documentation must not block independently
+authorized implementation unless required for real authority, enforced policy or
+conflicting writers. H IDs track outcomes, not permanent component ownership.
+Check active process, checkpoint and actual resource evidence before writer
+release; lease expiry alone is insufficient. Recover before restart, bound repairs
+and continue independent work. Routine authorized nonproduction existing-component
+repairs may finish narrative documentation retrospectively before closure, never
+semantic/report/hash/FAST/security approvals. For explicitly autonomous multi-change
+work, recommend dependency-aware queues and ready-to-paste instructions from
+[queued delivery](../../../docs/QUEUED_AUTONOMOUS_DELIVERY.md), including
+https://code.visualstudio.com/docs/agents/overview. Do not claim absent executor
+capabilities or live verification.
+
 ## Overview
 
 This skill starts the repository wizard safely through either chat or terminal, enforces planning gates, and reports progress using existing telemetry artifacts.

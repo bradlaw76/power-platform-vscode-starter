@@ -6,6 +6,16 @@ Read [docs/onboarding.md](docs/onboarding.md), [docs/wizard-contract-v1.md](docs
 
 For new or changed application behavior, align affected `spec.md`, `plan.md`, and `tasks.md` before implementation under the [proportional scenario-impact gate](docs/scenario-change-impact-gate.md). Minor maintenance that restores accepted behavior retains accepted planning and runs focused checks; do not restart the full planning cycle. Preserve payloads as the source of truth, idempotent behavior, 401 token refresh, 429 backoff, publishing, complete solution inventory, and the export gate.
 
+Reuse accepted requirements and valid standing scoped nonproduction authority
+under the canonical authorization policy. Recoverable registration, H numbering
+and narrative documentation do not block independently authorized implementation
+unless needed for real authority, enforced policy or conflicting writers. Complete
+routine repair documentation before closure; never defer semantic/report/hash/
+FAST/security gates. H IDs track outcomes, not permanent component ownership.
+Recover before restart using process, checkpoint and actual resource evidence;
+lease expiry alone does not release a writer. For explicitly autonomous
+multi-change work, recommend [dependency-aware queues](docs/QUEUED_AUTONOMOUS_DELIVERY.md).
+
 ## Development workflow
 
 1. Start from a clean clone or reviewed working tree.

@@ -15,3 +15,19 @@ Implementation and publication evidence are in the
 [original PR #8 handoff](https://github.com/bradlaw76/power-platform-vscode-starter/blob/9f4910632d186f54262c49845ab6404a4726e950/docs/fast-reporting-review-guide.md#authorization-and-execution-follow-up---2026-11-10).
 
 These checked tasks and counts are historical evidence on PR #8's integration baseline, not results or publication authority for the current main-lineage proposal.
+
+## 2026-11-24 Starter continuation tasks
+
+Temporary identifier: PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION.
+Owner Q01-R1 authorizes bounded implementation despite pending allocator review.
+
+- [x] Confirm isolated PR #17 head and inspect applicable instructions/source.
+- [x] Extend canonical authority, proportional repair and writer-recovery policy.
+- [x] Align queue guide, Copilot/prompt/skills, consumer guidance and task template.
+- [x] Add focused behavioral contract/distribution and emitted-template cases.
+- [x] Run focused validation and record exact results/limitations.
+- [x] Update existing handoff/build log and separate STARTER/AUTO mapping proposal.
+- [x] Review explicit staged diff and commit; leave push/PR-body update to parent.
+
+No H allocation, central standards mutation, original-worktree change, merge,
+release or live/native acceptance is authorized or claimed.

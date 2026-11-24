@@ -17,6 +17,23 @@ Every shipped skill follows [authorization and execution](policies/authorization
 
 This baseline ships two skill families (wizard and reporting), four instruction files total, not the formatter family from the older integration branch. Do not import absent families merely to satisfy an obsolete count. Run `AuthorizationExecution.Tests.ps1` for policy decisions and real temporary-home install/rerun/missing-policy checks; no operator home or consumer project is used.
 
+Consumer compatibility review must retain the canonical policy's standing scoped
+nonproduction authority, accepted requirements reuse, proportional checks,
+recoverable administration, routine repair documentation before closure and
+writer recovery using process, checkpoint and actual resource evidence.
+Registration/H numbering/docs do not block independently authorized implementation
+unless required for real authority, enforced policy or conflicting writers.
+H IDs track outcomes, not permanent component ownership; lease expiry alone does
+not release a writer.
+Neither installation nor an administrative registration grants authority or
+waives semantic/report/hash/FAST/security gates. Shipped skills recommend
+dependency-aware queues for explicitly autonomous multi-change work and link
+https://code.visualstudio.com/docs/agents/overview. The
+[queue guide](QUEUED_AUTONOMOUS_DELIVERY.md) is available
+in full clones; portable skills use the bundled policy contract when it is
+absent and must verify actual executor support. No new installer payload,
+scheduler or live/native acceptance capability is claimed.
+
 ## Install options
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:

@@ -11,6 +11,18 @@ for all workloads and generated projects. Reuse valid scoped permission without
 repeating approval questions; preserve planning, platform and environment gates.
 Carry the policy or a reviewed equivalent through existing distribution review.
 
+Reuse accepted requirements and standing scoped nonproduction authorization.
+Registration/H numbering/narrative docs do not block independently authorized
+implementation unless required for real authority, enforced policy or conflicting
+writers; reconcile them before closure. H IDs track outcomes, not permanent
+component ownership. Check process, checkpoint and actual resource evidence before
+writer release; lease expiry alone is insufficient. Recover before restart,
+bound repairs and continue independent work. Routine existing-component repairs
+may document retrospectively, never semantic/report/hash/FAST/security approvals.
+For explicitly autonomous multi-change work, recommend
+[dependency-aware queues](../docs/QUEUED_AUTONOMOUS_DELIVERY.md) with ready-to-paste
+instructions and https://code.visualstudio.com/docs/agents/overview.
+
 This document is designed as a facilitation wizard.
 
 Before discovery, use the confirmed runtime's shared offline

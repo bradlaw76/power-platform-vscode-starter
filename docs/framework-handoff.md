@@ -149,6 +149,17 @@ retryable rather than being cached as document conflicts.
 Interrupted work is reconciled by existing canonical tasks/journals, not copied
 into a second executable backlog.
 
+Apply the canonical [authorization and execution policy](policies/authorization-and-execution.md)
+when deciding whether work can continue: H IDs track outcomes, not permanent
+component ownership; registration and narrative documentation alone do not block
+independently authorized work absent real authority, enforced policy or writer
+conflicts. Preserve historical H008/H009/H010. Before writer release, inspect
+active process/session, latest durable checkpoint and actual resource/in-flight
+write evidence. Lease expiry alone is insufficient; recover before restart,
+bound repairs and advance independent dependency-ready work. These are operator
+obligations, not a claim that this adapter implements a new fencing or automatic
+lease-reclamation mechanism. Runtime changes are separately reviewed.
+
 If the adapter terminates after canonical adoption but before acknowledging the
 command, resume the same accepted inputs/project/runtime. The existing document
 selection and owner claim remain authoritative; replay does not reclaim them or

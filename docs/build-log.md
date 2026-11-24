@@ -342,6 +342,30 @@ remain separate owner decisions. No merge, release or Dataverse operation.
   pending or synthetic test is described as live release/deployment acceptance.
 - Canonical **HANDOFF NOT WRITTEN - BLOCKED** unchanged. No release/tag, tenant
   operation, security activation, persistent service or unrelated PR merge.
+## Development execution simplification — 2026-11-24 (Starter local)
+
+- Temporary identifier `PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION`; Q01-R1
+  authorizes implementation despite pending allocator review. No H allocated;
+  H008/H009/H010 and all original worktrees preserved.
+- Isolated `campaign/development-execution-simplification`, existing PR #17
+  baseline `6a5e7de9331299e24480d2f5751e4a3ed045b97e`. Parent owns publication.
+- Canonical authorization policy extended for standing scoped nonproduction
+  authority, accepted-requirements reuse, proportional checks, recoverable
+  administration/repair documentation and evidence-based writer recovery.
+  Semantic/report/hash/FAST/security and enforced repository gates retained.
+- Copilot/prompt/four skills/task template and applicable registry, engineering,
+  onboarding, distribution, impact, queue, recovery and handoff surfaces aligned.
+  Registration proposal contains separate STARTER/AUTO mappings for ChatGPT
+  review; central standards and Automation runtime untouched.
+- Final focused Pester: 83 passed / 0 failed / 0 skipped, including actual fixture
+  installer byte equality. Wizard modes/generated tasks, source-control intake,
+  contract integrity, changed-PowerShell parse/analyzer and changed Markdown lint
+  passed. Initial propagation failures corrected before successful rerun.
+- SOURCE COMPLETE / TESTED locally; no deployment, app/sitemap mutation,
+  inventory/sync/export run, live verification or native queue acceptance.
+  Cached update advisor absent; no fetch/freshness claim. See
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md) for
+  commands, exact limits and publication responsibilities.
 
 ## Q12 release finalization - 2026-11-23
 
