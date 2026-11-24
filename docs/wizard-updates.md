@@ -29,6 +29,15 @@ comes from the script installation, not that caller. A copied runtime without
 its own Git repository reports no source revision rather than borrowing one.
 These path rules do not install missing runtime files or authorize updates.
 
+Read-only update checks preserve Git's installed `core.autocrlf`, `core.eol`
+and `core.safecrlf` scalar settings when inspecting checkout changes. A normal
+Windows CRLF checkout is not a local customization. Repository-local overrides
+still take precedence, and real content edits remain locally modified. The
+checker reads only these validated conversion values through Git's configuration
+builtin; ordinary Git inspection continues to exclude system/global executable
+configuration and disables filesystem monitors. Invalid conversion settings are
+reported as inspection failures rather than clean status.
+
 Ordinary terminal startup prints the same banner before intake. It does not
 add a discovery question, require Python/WSL, authenticate or access the network.
 `-VersionOnly` returns without intake or telemetry. Expected development output:

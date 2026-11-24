@@ -4,6 +4,23 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q17 H009 lifecycle and recovery acceptance - 2026-11-24
+
+- Independent real GitHub clone exposed a Windows checkout defect: excluding
+  installed Git configuration removed `core.autocrlf=true`, falsely reporting
+  unchanged CRLF files as local modifications.
+- Preserve only validated line-ending scalar settings for read-only Git status;
+  retain execution isolation and filesystem-monitor disabling. The focused
+  regression covers a fresh normalized checkout, repository-local precedence,
+  genuine human edits, invalid configuration and a monitor that must not run.
+- Actual shared-command synthetic probes demonstrate post-write hash-validation
+  failure, persisted interruption, conflict-preserving recovery hold and original
+  bytes/metadata restoration after explicit fixture-only reconciliation.
+- Final source, exact-head CI and the twelve-scenario evidence matrix are linked
+  in existing issue14/PR16. No official trust, Apply policy or distribution
+  authority is activated; no merge/release/tag, tenant write or protection bypass.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains unchanged.
+
 ## H009-09 through H009-12 candidate release readiness - 2026-11-24
 
 - Preserves Q14 implementation `480ba156` and Q15 path correction `8673681`;

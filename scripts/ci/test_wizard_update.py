@@ -262,6 +262,37 @@ class WizardUpdateTests(unittest.TestCase):
         self.root.joinpath(*ALPHA.split("/")).write_text("VALUE = 'local'\n")
         self.assertEqual(self.run_cli("check")["status"], "locally-modified")
 
+    def test_checkout_line_endings_respect_safe_installation_config_without_running_monitor(self):
+        home = self.case / "isolated Git home"
+        home.mkdir()
+        config = home / ".gitconfig"
+        sentinel = self.case / "monitor-was-executed"
+        monitor = self.case / "monitor.py"
+        monitor.write_text("from pathlib import Path\n"
+                           f"Path({str(sentinel)!r}).write_text('unexpected execution')\n")
+        for key, value in {
+            "core.autocrlf": "on", "core.eol": "crlf", "core.safecrlf": "warn",
+            "core.fsmonitor": f'"{Path(sys.executable).as_posix()}" "{monitor.as_posix()}"',
+        }.items():
+            local_command(["git", "config", "--file", str(config), key, value])
+        self.git("config", "--unset", "core.autocrlf")
+        for name, data in self.original.items():
+            self.root.joinpath(*name.split("/")).write_bytes(data.replace(b"\n", b"\r\n"))
+        self.git("-c", "core.autocrlf=true", "add", "--", *self.original)
+        with patch.dict(os.environ, {"HOME": str(home), "XDG_CONFIG_HOME": str(home / "xdg")}):
+            self.assertFalse(update.git_state(self.root)["dirty"])
+            self.assertFalse(sentinel.exists())
+            self.git("config", "core.autocrlf", "false")
+            self.assertTrue(update.git_state(self.root)["dirty"])
+            self.git("config", "core.autocrlf", "true")
+            self.assertFalse(update.git_state(self.root)["dirty"])
+            self.root.joinpath(*ALPHA.split("/")).write_bytes(b"VALUE = 'human change'\r\n")
+            self.assertTrue(update.git_state(self.root)["dirty"])
+            self.assertFalse(sentinel.exists())
+            self.git("config", "core.eol", "unrecognized")
+            with self.assertRaisesRegex(update.UpdateError, "Invalid Git line-ending configuration"):
+                update.git_state(self.root)
+
     def test_U05_explicit_online_metadata_is_bounded_unsigned_and_stable_only(self):
         data = encoded([
             {"tag_name": "v1.2.0", "draft": False, "prerelease": False},

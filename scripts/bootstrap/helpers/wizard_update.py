@@ -159,11 +159,12 @@ def owned_path(root, name):
     return result
 
 
-def execute(argv, cwd=None, limit=4 * MAX_JSON):
+def execute(argv, cwd=None, limit=4 * MAX_JSON, read_git_configuration=False):
     environment = {key: value for key, value in os.environ.items()
                    if not key.upper().startswith("GIT_")}
-    environment.update(GIT_OPTIONAL_LOCKS="0", GIT_TERMINAL_PROMPT="0",
-                       GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
+    environment.update(GIT_OPTIONAL_LOCKS="0", GIT_TERMINAL_PROMPT="0")
+    if not read_git_configuration:
+        environment.update(GIT_CONFIG_NOSYSTEM="1", GIT_CONFIG_GLOBAL=os.devnull)
     try:
         with subprocess.Popen(argv, cwd=cwd, stdin=subprocess.DEVNULL, stdout=subprocess.PIPE,
                               stderr=subprocess.PIPE, env=environment) as process:
@@ -203,13 +204,14 @@ def execute(argv, cwd=None, limit=4 * MAX_JSON):
         raise UpdateError("Bounded local subprocess unavailable") from exc
 
 
-def git(root, *args):
+def git(root, *args, read_git_configuration=False):
     executable = shutil.which("git")
     if not executable:
         fail("Git unavailable")
     return execute([executable, "--no-pager", "--no-optional-locks",
                     "-c", "core.fsmonitor=false", "-c", "core.untrackedCache=false",
-                    "-c", "core.quotePath=false", "-C", str(root), *args], cwd=root)
+                    "-c", "core.quotePath=false", "-C", str(root), *args], cwd=root,
+                   read_git_configuration=read_git_configuration)
 
 
 def git_state(root):
@@ -218,7 +220,22 @@ def git_state(root):
         fail("Root must be exact Git worktree root")
     head = git(root, "rev-parse", "--verify", "HEAD").decode().strip()
     branch = git(root, "rev-parse", "--abbrev-ref", "HEAD").decode().strip()
-    status_bytes = git(root, "status", "--porcelain=v1", "-z", "--untracked-files=all",
+    line_endings = []
+    # Read only scalar conversion settings; status still excludes executable user configuration.
+    for key, default, allowed in (
+            ("core.autocrlf", "false", {"true", "false", "input"}),
+            ("core.eol", "native", {"native", "lf", "crlf"}),
+            ("core.safecrlf", "false", {"true", "false", "warn"})):
+        raw = git(root, "config", "--type=bool-or-str", "--get", "--default", default, key,
+                  read_git_configuration=True)
+        try:
+            value = raw.decode("ascii").strip().lower()
+        except UnicodeError as exc:
+            raise UpdateError("Invalid Git line-ending configuration: " + key) from exc
+        if value not in allowed:
+            fail("Invalid Git line-ending configuration: " + key)
+        line_endings.extend(("-c", key + "=" + value))
+    status_bytes = git(root, *line_endings, "status", "--porcelain=v1", "-z", "--untracked-files=all",
                        "--", ".", ":(exclude).wizard-update")
     return {"head": head, "branch": branch, "statusSha256": digest(status_bytes),
             "statusPorcelain": status_bytes.decode("utf-8", errors="replace").replace("\0", "\n"),
