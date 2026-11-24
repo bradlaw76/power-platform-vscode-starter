@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    H009 Local Wizard Version
 FILE:         scripts/bootstrap/helpers/wizard-version.ps1
-VERSION:      0.1.0
+VERSION:      0.1.1
 AUTHOR:       Power Platform VS Code Starter
 ENVIRONMENT:  PowerShell 7 | Windows | Linux
 OVERVIEW:     Read-only, offline startup identity; descriptors are not provenance.
@@ -16,6 +16,7 @@ function Get-WizardVersion {
     [CmdletBinding()]
     param([Parameter(Mandatory)][string]$RuntimeRoot)
 
+    $RuntimeRoot = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromPSPath($RuntimeRoot)
     $result = [ordered]@{
         product = 'power-platform-vscode-starter'
         installedRelease = $null

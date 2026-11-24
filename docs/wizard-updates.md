@@ -17,6 +17,13 @@ pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status
 pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status -AsJson
 ```
 
+Explicit relative `-RuntimeRoot` paths resolve from the current PowerShell
+location, even when its process directory differs. An absolute script path can
+also be invoked from a different caller directory: default runtime identity
+comes from the script installation, not that caller. A copied runtime without
+its own Git repository reports no source revision rather than borrowing one.
+These path rules do not install missing runtime files or authorize updates.
+
 Ordinary terminal startup prints the same banner before intake. It does not
 add a discovery question, require Python/WSL, authenticate or access the network.
 `-VersionOnly` returns without intake or telemetry. Expected development output:

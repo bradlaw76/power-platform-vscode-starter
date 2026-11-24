@@ -4,6 +4,21 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q15 H009 post-implementation integration - 2026-11-23
+
+- Fetched main remains H008 merge `57f54fbf6b2c88e391100c001ba0b3f8834e190b`,
+  already the implementation branch's ancestor; no rebase or H008 replay.
+- Preserved implementation PR16, design PR15 and concurrent worktrees; no
+  additional source-writer branch or actionable review finding was observed.
+- Reproduced relative-runtime source revision loss when PowerShell location and
+  process directory differ. Resolve the runtime through PowerShell's path API;
+  startup/agent interfaces, profile/contract versions and Python trust gates
+  are unchanged. Added focused path and copied no-Git runtime regressions.
+- Final submitted SHA, focused results and exact-head CI are recorded in the
+  existing H009 issue/PR and external implementation report.
+- No merge, release/tag, tenant write or protection bypass. Canonical
+  **HANDOFF NOT WRITTEN - BLOCKED** remains unchanged.
+
 ## Q14 H009 source implementation - 2026-11-23
 
 - Base main `57f54fbf6b2c88e391100c001ba0b3f8834e190b`; existing design PR15

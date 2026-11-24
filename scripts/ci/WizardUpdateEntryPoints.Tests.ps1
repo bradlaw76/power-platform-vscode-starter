@@ -2,7 +2,7 @@
 =============================================================================
 COMPONENT:    H009 Entry Point Acceptance
 FILE:         scripts/ci/WizardUpdateEntryPoints.Tests.ps1
-VERSION:      0.1.0
+VERSION:      0.1.1
 AUTHOR:       Power Platform VS Code Starter
 ENVIRONMENT:  PowerShell 7 | Pester 5.7.1 | Windows and Linux
 OVERVIEW:     Executes the real terminal and agent-shared offline commands.
@@ -37,6 +37,45 @@ Describe 'H009 actual terminal and agent shared commands' {
             $content = Get-Content (Join-Path $runtime $file) -Raw
             $content | Should -Match '04-check-wizard-update.ps1 -Action Status'
             $content | Should -Match 'Review/Update/Skip'
+        }
+    }
+
+    It 'resolves relative runtime paths from the PowerShell location, not the process directory' {
+        $expected = & git -C $runtime rev-parse --verify HEAD
+        $LASTEXITCODE | Should -Be 0
+        $processDirectory = [Environment]::CurrentDirectory
+        Push-Location $runtime
+        try {
+            [Environment]::CurrentDirectory = $TestDrive
+            $status = Get-WizardVersion -RuntimeRoot '.'
+            $status.sourceRevision | Should -Be $expected
+            $status.contractVersion | Should -Be '1.10.0'
+        } finally {
+            [Environment]::CurrentDirectory = $processDirectory
+            Pop-Location
+        }
+    }
+
+    It 'runs a copied no-Git runtime from a different caller directory with spaces' {
+        $target = Join-Path $TestDrive 'runtime with spaces'
+        $bootstrap = Join-Path $target 'scripts/bootstrap'
+        $null = New-Item -ItemType Directory -Path (Join-Path $bootstrap 'helpers') -Force
+        Copy-Item $shared (Join-Path $bootstrap '04-check-wizard-update.ps1')
+        Copy-Item (Join-Path $runtime 'scripts/bootstrap/helpers/wizard-version.ps1') (Join-Path $bootstrap 'helpers/wizard-version.ps1')
+        Copy-Item (Join-Path $runtime 'wizard.profile.json') $target
+        Copy-Item (Join-Path $runtime 'wizard.release.json') $target
+        Push-Location $TestDrive
+        try {
+            $output = & pwsh -NoProfile -NonInteractive -File (Join-Path $bootstrap '04-check-wizard-update.ps1') -Action Status -AsJson
+            $LASTEXITCODE | Should -Be 0
+            $status = $output | ConvertFrom-Json
+            $status.sourceRevision | Should -BeNullOrEmpty
+            $status.installedRelease | Should -BeNullOrEmpty
+            $status.contractVersion | Should -Be '1.10.0'
+            $status.updateState | Should -Be 'offline-unknown'
+            Test-Path (Join-Path $target '.wizard-update') | Should -BeFalse
+        } finally {
+            Pop-Location
         }
     }
 
