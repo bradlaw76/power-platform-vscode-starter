@@ -10,6 +10,10 @@ Load and follow [authorization and execution](../../docs/policies/authorization-
 for every workload and generated project; preserve required safety gates and
 reuse existing valid scoped permission.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
@@ -26,7 +30,7 @@ Use this behavior:
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
-- Treat Spec Kit as mandatory before implementation.
+- Require affected Spec Kit planning for new/material features; routine authorized corrections reuse accepted behavior and reconcile affected notes after validation.
 - Preserve approved native table/relationship identities; never replace Account
   reuse with a custom table. Optional installed-framework continuation follows
   [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime

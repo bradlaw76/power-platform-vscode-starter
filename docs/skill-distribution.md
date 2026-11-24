@@ -17,6 +17,10 @@ Every shipped skill follows [authorization and execution](policies/authorization
 
 This baseline ships two skill families (wizard and reporting), four instruction files total, not the formatter family from the older integration branch. Do not import absent families merely to satisfy an obsolete count. Run `AuthorizationExecution.Tests.ps1` for policy decisions and real temporary-home install/rerun/missing-policy checks; no operator home or consumer project is used.
 
+Entry points reference the canonical policy rather than copying procedures.
+Its native safety and development-first rules remain in the portable policy.
+Installing guidance does not install an executor, grant authority or prove a pilot.
+
 ## Install options
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:
@@ -55,6 +59,22 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 “Skill installed” means the agent can read the workflow instructions. “Wizard runtime installed” means every referenced script, helper, schema, profile, and document is present and its tests pass. Report these states separately.
 
 ## Versioning and updates
+
+For existing installed Automation-series consumer instructions, select a verified
+compatible bundle through the existing loader:
+
+```powershell
+demo-builder guidance --workspace D:\ProjectState --bundle D:\VerifiedBundle --new-run --migrate
+```
+
+This retires an exact previously pinned framework section, preserves surrounding
+custom text/security bytes, retains hashed before-state and resumes interrupted
+writes from its migration receipt. Modified framework sections, unowned files,
+changed pins and active/unreconciled task generations are blocked, not overwritten.
+Plain resumes retain their original pin. This requires the updated runtime; it
+is not an H009 updater, automatic adoption, executable upgrade or tenant rollback.
+Existing Starter clones use reviewed source-control reconciliation, preserving
+owner edits; portable policy copies continue through the existing skill installer.
 
 Distribute skills from a tagged release or a reviewed commit. Record the source commit and verify provenance with `git rev-parse HEAD`; release publishers may also publish SHA-256 checksums for packaged archives. To update, compare the installed folder and runtime contract, review changes, run `scripts/ci/SkillParity.Tests.ps1`, then replace only approved files.
 

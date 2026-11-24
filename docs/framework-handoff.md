@@ -149,6 +149,17 @@ retryable rather than being cached as document conflicts.
 Interrupted work is reconciled by existing canonical tasks/journals, not copied
 into a second executable backlog.
 
+Apply the canonical [authorization and execution policy](policies/authorization-and-execution.md)
+when deciding whether work can continue: H IDs track outcomes, not permanent
+component ownership; registration and narrative documentation alone do not block
+independently authorized work absent real authority, enforced policy or writer
+conflicts. Preserve historical H008/H009/H010. Before writer release, inspect
+active process/session, latest durable checkpoint and actual resource/in-flight
+write evidence. Lease expiry alone is insufficient; recover before restart,
+bound repairs and advance independent dependency-ready work. These are operator
+obligations, not a claim that this adapter implements a new fencing or automatic
+lease-reclamation mechanism. Runtime changes are separately reviewed.
+
 If the adapter terminates after canonical adoption but before acknowledging the
 command, resume the same accepted inputs/project/runtime. The existing document
 selection and owner claim remain authoritative; replay does not reclaim them or
@@ -192,6 +203,16 @@ acceptance.
 Synthetic rehearsal is not package, deployment, inspection or UI acceptance.
 Live Dataverse, new-solution provisioning and production controls require
 separate verified permissions/evidence; this handoff grants none.
+
+Native/browser acceptance also requires the canonical policy's
+[six safety obligations](policies/authorization-and-execution.md#native-application-safety-and-browser-acceptance).
+The actual browser principal must be observed independently of API-admin or
+session-declared identity. Validate publication blast radius, unrelated drafts,
+record readback changes, restriction classification and intended app/user form
+eligibility. Recover independent browser process/checkpoint/resource evidence
+before resume and repeat principal preflight. This Starter adapter does not
+implement those Automation runtime capabilities or install a browser driver;
+missing native support is partial, not acceptance. No native pilot is claimed.
 
 ## Verification
 

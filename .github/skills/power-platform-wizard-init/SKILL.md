@@ -13,6 +13,10 @@ for all workloads. During the existing consumer compatibility review, require
 this policy or a reviewed equivalent and a reference in the project's existing
 instruction entry point before mutating work. Do not overwrite local instructions.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Overview
 
 This skill starts the repository wizard safely through either chat or terminal, enforces planning gates, and reports progress using existing telemetry artifacts.

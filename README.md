@@ -1,5 +1,7 @@
 # Power Platform VS Code Starter
 
+> **Multi-step changes?** Use the [queued autonomous delivery and web-resource-first guide](docs/QUEUED_AUTONOMOUS_DELIVERY.md) for ready-to-paste VS Code Copilot instructions, dependency-aware queues, bounded self-repair, and live-first UI iteration. This is operating guidance; it does not install or activate a background executor. New builds still require concise mandatory Spec Kit planning and the usual authorization gates.
+
 ![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
 
 The canonical, multi-workload `power-platform-vscode-starter` repository for
@@ -55,13 +57,18 @@ packages; its runtime limitations are explicit.
 
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ### Enhancement registry
 
 | Enhancement | Contract and runtime scope |
 | --- | --- |
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
-| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
+| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); standing scoped nonproduction authority, accepted-requirements reuse, proportional checks, recoverable administration/repair documentation, evidence-based writer recovery and native browser/principal/publication/record/form safety; byte-identical policy copies through the Claude installer. [Temporary registration proposal](docs/audits/development-execution-simplification-registration-proposal.md), no H allocation or new executor |
+| Development-first instruction refactoring | Existing canonical policy, concise referencing entry points and generated tasks; routine corrections implement/validate before affected-note reconciliation. [Migration](docs/skill-distribution.md#versioning-and-updates) preserves verified framework pins and custom text; no updater, merge, tenant or protected-functionality authority |
 | Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or live deployment |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
@@ -69,6 +76,24 @@ Follow the mandatory [authorization and execution policy](docs/policies/authoriz
 | H009 version/update proposal | [Version and update status](docs/release-consolidation.md#version-and-update-status); existing PR #15 is design-only, not an installed updater or authoritative release manifest |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+For authorization/execution changes specifically, update the canonical policy,
+Copilot instructions, prompt, both wizard/report skill families, consumer
+distribution guidance, existing task templates, scenario-impact/queue guides,
+engineering requirements and existing review handoff together. Run
+`AuthorizationExecution.Tests.ps1` (including installer byte equality),
+`SkillParity.Tests.ps1` and affected template/contract checks. Keep registration
+proposals separate for STARTER and AUTO allocator review; preserve historical
+H008/H009/H010 and central standards. Do not infer native acceptance from these
+instruction/distribution regressions.
+
+Q09–Q12 native safety guidance extends that same policy with actual browser
+principal proof, publication blast-radius/draft preservation, unexpected record
+change evidence, restriction classification without bypass, app/user form
+eligibility and independent browser-session recovery. Keep these six obligations
+aligned in distributed instructions, skills, task templates and parity tests.
+Runtime implementations belong to Automation, not Starter; no native pilot or
+installed browser driver is claimed.
 
 The [release consolidation guide](docs/release-consolidation.md) distinguishes
 installed functionality from unmerged candidate capabilities, explains native

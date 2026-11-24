@@ -14,7 +14,8 @@ the authoritative detailed sequence after the authoring workspace is open.
 
 Important process rule:
 
-- Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Complete affected Spec Kit planning for new/material artifacts. Routine
+  authorized corrections reuse accepted behavior and reconcile notes after validation.
 - Optional installed-framework continuation uses
   [the H008 handoff](framework-handoff.md) after accepted planning, with separate
   consumer/runtime folders. It is not another build stage or deployment command.
@@ -25,6 +26,9 @@ Important process rule:
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.
+- Follow that policy's development-first and recovery rules, not another copied
+  procedure. [Dependency-aware queues](QUEUED_AUTONOMOUS_DELIVERY.md) remain optional
+  execution support, not a new build stage.
 - Discovery mode, delivery goal and build verification profile are independent.
   `90-run-build.ps1` defaults to `Legacy`; explicitly selected `Demo` skips
   optional second-pass/export deliverables, not first-pass/security/membership

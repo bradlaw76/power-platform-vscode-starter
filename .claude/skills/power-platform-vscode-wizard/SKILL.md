@@ -14,9 +14,16 @@ work. During consumer compatibility review, include this policy or a reviewed
 equivalent and reference it from the project's existing instruction entry point;
 do not overwrite local instructions. This applies to all workloads.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Overview
 
-A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
+A wizard-guided workflow using PAC CLI and Dataverse Web API scripts. New or
+material app/schema changes require affected `spec.md`, `plan.md`, `tasks.md`
+planning. Routine authorized corrections reuse accepted behavior and reconcile
+affected notes after implementation and targeted validation.
 
 Preserve approved native table/relationship decisions. Optional continuation
 uses project-root `docs/framework-handoff.md` and the installed framework's
@@ -54,7 +61,8 @@ Before intake, inspect the target repository without modifying it. Report presen
 
 ## Mandatory Rule
 
-> Do not build tables, forms, views, flows, or solution artifacts until Spec Kit is complete.
+> Do not build new/material tables, forms, views, flows or solution artifacts
+> without affected accepted planning. Routine corrections do not need a new dossier.
 
 Spec Kit artifacts required before scripts 20–60:
 - `spec.md` — what to build and why
