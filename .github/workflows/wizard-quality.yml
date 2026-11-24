@@ -21,10 +21,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          fetch-depth: 0
           persist-credentials: false
       - name: H009 native Windows path and recovery acceptance
         shell: pwsh
         run: ./scripts/ci/test-wizard-update.ps1
+      - name: H009 candidate distribution ownership
+        shell: pwsh
+        run: ./scripts/ci/test-wizard-distribution.ps1
       - name: H009 actual terminal and agent entry points
         shell: pwsh
         run: |
@@ -39,6 +43,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
+          fetch-depth: 0
           persist-credentials: false
 
       - name: Markdown lint

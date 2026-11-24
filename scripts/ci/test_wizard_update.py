@@ -698,6 +698,68 @@ class WizardUpdateTests(unittest.TestCase):
                 process.kill()
                 process.wait(timeout=10)
 
+    def test_signed_lifecycle_through_terminal_and_agent_shared_entry_point(self):
+        pwsh = shutil.which("pwsh")
+        if not pwsh or not self.openssl:
+            self.skipTest("Actual shared-command lifecycle requires PowerShell and OpenSSL")
+        wrapper = ROOT / "scripts" / "bootstrap" / "04-check-wizard-update.ps1"
+        local_command([self.openssl, "dgst", "-sha256", "-sign", str(self.private_key),
+                       "-out", str(self.signature_path), str(self.envelope_path)])
+
+        def invoke(action, expected=0, crash=None, **options):
+            command = [pwsh, "-NoProfile", "-NonInteractive", "-File", str(wrapper),
+                       "-Action", action, "-RuntimeRoot", str(self.root),
+                       "-PythonExecutable", sys.executable, "-FixtureRoot", str(self.root), "-AsJson"]
+            if action in {"Check", "Review", "Update"}:
+                options.update(EnvelopePath=self.envelope_path, SignaturePath=self.signature_path,
+                               TrustKeyPath=self.public_key, OpenSslPath=self.openssl)
+            for name, value in options.items():
+                command += ["-" + name, str(value)]
+            process = subprocess.run(
+                command, capture_output=True, timeout=45,
+                env={**os.environ, "WIZARD_UPDATE_FIXTURE_CRASH": crash or ""})
+            self.assertEqual(process.returncode, expected, process.stdout + process.stderr)
+            if expected == 86:
+                print("H009-LIFECYCLE " + json.dumps({"action": action, "crashExit": 86}))
+                return None
+            result = json.loads(process.stdout.decode("utf-8-sig"))
+            print("H009-LIFECYCLE " + json.dumps({"action": action, "output": result}, sort_keys=True))
+            return result
+
+        self.assertIsNone(invoke("Status")["installedRelease"])
+        checked = invoke("Check")
+        self.assertEqual(checked["distribution"]["releaseVersion"], "1.0.0")
+        self.assertEqual(checked["status"], "newer-compatible")
+        self.assertTrue(checked["trust"]["signed"])
+        self.assertFalse(checked["trust"]["publisherVerified"])
+        plan = invoke("Review", SourcePath=self.source, PlanPath=self.plan_path)
+        self.assertEqual([item["path"] for item in plan["files"]], [ALPHA, BETA])
+        approved = dict(SourcePath=self.source, PlanPath=self.plan_path,
+                        ApprovedPlanSha256=plan["planSha256"])
+        applied = invoke("Update", **approved)
+        self.assertEqual(applied["status"], "applied")
+        for name, data in self.offered.items():
+            self.assertEqual(self.root.joinpath(*name.split("/")).read_bytes(), data)
+        self.assertEqual(invoke("Check")["status"], "current")
+        before = {str(path.relative_to(self.root)): (sha(path.read_bytes()), path.stat().st_mtime_ns)
+                  for path in self.root.rglob("*") if path.is_file()}
+        self.assertEqual(invoke("Update", **approved)["status"], "already-applied")
+        after = {str(path.relative_to(self.root)): (sha(path.read_bytes()), path.stat().st_mtime_ns)
+                 for path in self.root.rglob("*") if path.is_file()}
+        self.assertEqual(before, after)
+        self.assertEqual(invoke("Recover", TransactionPath=applied["transaction"])["status"], "recovered")
+        self.assert_original()
+        self.plan_path.unlink()
+        plan = invoke("Review", SourcePath=self.source, PlanPath=self.plan_path)
+        approved["ApprovedPlanSha256"] = plan["planSha256"]
+        invoke("Update", expected=86, crash="after-replace-0", **approved)
+        self.assertEqual(invoke("Recover", TransactionPath=self.checkpoint())["status"], "recovered")
+        self.assert_original()
+        self.envelope_path.write_bytes(self.envelope_path.read_bytes() + b"\n")
+        self.assertEqual(invoke("Check", expected=2)["status"], "blocked")
+        self.assertEqual(invoke("Skip")["status"], "skipped")
+        self.assert_original()
+
 
 if __name__ == "__main__":
     unittest.main()

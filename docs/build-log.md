@@ -4,6 +4,20 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## H009-09 through H009-12 candidate release readiness - 2026-11-24
+
+- Preserves Q14 implementation `480ba156` and Q15 path correction `8673681`;
+  work isolated above Q15, with serialized publication to existing PR16.
+- Adds explicit candidate-only redistribution policy, exact Git-blob SHA-256
+  inventory/schema/negative tests and a signed real shared-command lifecycle.
+- [Release readiness](wizard-release-readiness.md) records proposed GitHub
+  provenance/rotation/revocation gates, topology ownership, honest original
+  requirement reconciliation and production filesystem limitations.
+- Final commit, manifest digest, native Windows/Linux acceptance and CI evidence
+  are linked in issue14/PR16. No synthetic authority is labeled official.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains. No official activation,
+  merge, tag/release, security-setting or consuming-application change.
+
 ## Q15 H009 post-implementation integration - 2026-11-23
 
 - Fetched main remains H008 merge `57f54fbf6b2c88e391100c001ba0b3f8834e190b`,

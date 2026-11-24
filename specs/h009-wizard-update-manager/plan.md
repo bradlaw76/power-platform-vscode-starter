@@ -32,3 +32,14 @@ Use non-force owned-branch pushes and linked implementation PR. Latest Q14
 continuation explicitly prohibits merge; stop at tested source/PR publication.
 Duplicate session `cc552cd7-ee1e-4521-bb49-4debcc14d42f` routed continuation
 back to this sole owner without editing, committing, pushing or creating a lane.
+
+## Release-readiness follow-up
+
+Preserve Q15 `8673681b231d0e275354aa98fe1d2f53a06bf97b` and work in an isolated
+follow-up worktree; serialize existing-branch publication after its owner
+releases the branch. Add candidate inventory tooling, not an installer or
+publisher verifier. Hash explicit allowlisted Git blobs at a full commit.
+Final external inventory binds the final SHA without a self-containing commit
+cycle. Use the existing tests/CI plus a signed shared-wrapper lifecycle and
+focused inventory negatives. Reconcile production gaps honestly in
+`docs/wizard-release-readiness.md`; official mutation stays blocked.

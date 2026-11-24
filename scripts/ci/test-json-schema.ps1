@@ -61,6 +61,13 @@ if (-not (Test-Json -Json $releaseDescriptor -SchemaFile (Join-Path $repoRoot 's
     throw 'Wizard distribution descriptor does not match its contract.'
 }
 
+$candidatePath = Join-Path $repoRoot 'distribution/candidate-inventory.json'
+if (Test-Path -LiteralPath $candidatePath -PathType Leaf) {
+    if (-not (Test-Json -Json (Get-Content $candidatePath -Raw) -SchemaFile (Join-Path $repoRoot 'schemas/wizard-distribution.schema.json'))) {
+        throw 'Candidate distribution inventory does not match its contract.'
+    }
+}
+
 foreach ($schemaPath in $schemaByFamily.Values) {
     if (-not (Test-Path -LiteralPath $schemaPath -PathType Leaf)) {
         $failures.Add("Missing payload schema: $schemaPath") | Out-Null

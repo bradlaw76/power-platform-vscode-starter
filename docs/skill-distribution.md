@@ -67,6 +67,10 @@ Copied Copilot and installed Claude skills are classified separately; consumer/
 skill Apply remains read-only until exact bundle ownership is approved.
 The existing installer is not H009 transactional Apply and must not be used to
 bypass local-edit conflicts or trust gates.
+The [candidate ownership inventory](../distribution/ownership-policy.json) lists
+source assets only. Its [topology and trust policy](wizard-release-readiness.md)
+requires explicit review of local instructions and verified installed-bundle
+receipts; candidate membership never grants home-folder or consumer writes.
 The cached repository advisor script/runbook is absent in this candidate:
 unavailable advice does not mean up-to-date. Do not copy a newer branch, overwrite
 local skill edits or install absent updater tooling automatically.

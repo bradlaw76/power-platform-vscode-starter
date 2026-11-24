@@ -12,6 +12,10 @@ automation package 0.2.1 are independent versions. H009 implements offline start
 identity and explicit update planning/recovery, but no official release or
 publisher policy exists. Live Apply remains blocked, and no automatic source
 update is performed. See [H009 operations](docs/wizard-updates.md).
+The [candidate distribution and trust record](docs/wizard-release-readiness.md)
+separates redistributable source templates from customer-owned installed files.
+Inventory membership is not permission to replace local instructions or an
+installed skill; consumer-copy Apply stays disabled.
 Use [current release/adoption notes](docs/release-consolidation.md) and
 [skill distribution](docs/skill-distribution.md) for reviewed manual provenance
 and compatibility. Preserve local edits, native task IDs and original evidence.

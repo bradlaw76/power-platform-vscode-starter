@@ -1,5 +1,10 @@
 # H009 - Wizard version and safe updates
 
+For candidate file ownership, proposed GitHub attestation policy, topology
+boundaries and the requirement-by-requirement reconciliation, see
+[release readiness](wizard-release-readiness.md). Candidate inventories never
+expand the fixture updater's allowlist or enable official Apply.
+
 Implements [issue #14](https://github.com/bradlaw76/power-platform-vscode-starter/issues/14)
 from [existing design PR #15](https://github.com/bradlaw76/power-platform-vscode-starter/pull/15)
 at `5098769d2786fbf366b8e2e8ecb7fd8912bd84ce`, reconciled against merged
