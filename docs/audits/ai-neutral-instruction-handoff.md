@@ -1,5 +1,27 @@
 # AI-neutral instruction and implementation handoff
 
+## Q02-Q06 - owner-preserving status compatibility
+
+The Q37 candidates were preserved and independently restored from incremental
+centralized backups before this isolated downstream correction. No Q37 lane,
+standard allocation, consumer project, tenant, merge or release was changed.
+
+Installed-candidate integration exposed a stale assumption: the coordinator
+retains expired owners as `running`, while the status adapter only flagged
+reconciliation after a status transition. The false flag was reproduced
+against both unchanged Q37 and the new candidate. The existing read-only
+projection now also recognizes canonical `lease_expired` observations. Its
+regression asserts the retained owner, ineligibility and unchanged task bytes;
+malformed graph/history checks remain intact.
+
+All 25 real installed-candidate handoff tests passed after correction, including
+synthetic construction, Windows PowerShell forwarding, UTF-8, recovery and
+lease/dependency projection. The existing policy/skill suites passed 100 tests.
+No new instruction bundle, distribution engine, scheduler or Dataverse permission
+is introduced. Candidate source/review and live acceptance remain distinct.
+The coordinated Automation/Starter PRs and consolidated external campaign report
+retain exact commits, recovery references and test receipts.
+
 ## Q15-Q16 instruction inheritance and migration
 
 Continues PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION; no H allocation or

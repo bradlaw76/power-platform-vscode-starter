@@ -242,7 +242,8 @@ def canonical_task_status(runtime: Path) -> dict:
                         "blocked_reason": task.get("blocked_reason"),
                         "waiting_for": waiting,
                         "lease_reconciliation_required": (
-                            original[task["id"]].get("status") == "running" and status != "running"),
+                            original[task["id"]].get("status") == "running"
+                            and (status != "running" or task.get("last_result_code") == "lease_expired")),
                         "next_action": action})
     return {"status": "observed", "observed_at": clock(), "updated_at": stored.get("updated_at"),
             "task_state_digest": digest(stored), "projection_only": True,

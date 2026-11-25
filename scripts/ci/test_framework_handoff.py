@@ -596,7 +596,9 @@ class InstalledHandoff(unittest.TestCase):
         report, code = self.action("status")
         self.assertEqual(code, 0)
         task = report["task_summary"]["tasks"][0]
-        self.assertEqual((task["stored_status"], task["status"]), ("running", "ready"))
+        self.assertEqual((task["stored_status"], task["status"]), ("running", "running"))
+        self.assertEqual(task["owner"], "existing-owner")
+        self.assertEqual(report["task_summary"]["eligible_task_ids"], [])
         self.assertTrue(task["lease_reconciliation_required"])
         self.assertEqual(before, (self.runtime / "tasks.json").read_bytes())
         state["tasks"][0]["depends_on"] = ["unknown-native-id"]

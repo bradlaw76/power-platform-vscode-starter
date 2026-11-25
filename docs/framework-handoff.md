@@ -264,7 +264,11 @@ and retry/run limits still determine whether a worker may launch.
 
 `projection_only: true` means expired-lease normalization is view-only.
 `stored_status` and `lease_reconciliation_required` distinguish it from
-persisted state. Status never claims tasks, renews/expires stored leases,
+persisted state. With the current coordinator, an expired owner stays `running`
+and ineligible, while `lease_reconciliation_required` is true. The flag also
+supports older coordinators that project expiry as a status transition. Neither
+case releases the stored owner or process/resource fences.
+Status never claims tasks, renews/expires stored leases,
 dispatches, re-enables synchronization or writes journals/receipts.
 
 Handoff `recorded_status`/`recorded_exit_code` describe a prior command receipt,
