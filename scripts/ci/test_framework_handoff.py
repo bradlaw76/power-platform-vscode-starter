@@ -4,6 +4,7 @@ File: scripts/ci/test_framework_handoff.py
 Environment: Python 3.11+; optional installed framework 0.2.1 and generic fixture.
 """
 import argparse
+from contextlib import nullcontext
 from copy import deepcopy
 import errno
 import importlib.util
@@ -14,8 +15,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from types import ModuleType
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("starter_handoff", ROOT / "scripts" / "bootstrap" / "helpers" / "framework-handoff.py")
@@ -42,6 +44,34 @@ class HandoffBoundaries(unittest.TestCase):
         for name in ("spec.md", "plan.md", "tasks.md"):
             (folder / name).write_bytes(b"# Human text\r\n\r\nPreserve spacing.  \r\n")
         (self.project / "BUILD.md").write_bytes(b"# Human build record\r\n")
+
+    def framework_boundary(self):
+        """Isolate delegation tests; InstalledHandoff retains the real runtime."""
+        def write_json(path, state):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(state), encoding="utf-8")
+
+        package = ModuleType("demo_builder")
+        modules = {"demo_builder": package}
+        capabilities = {
+            "workspace": {"assert_external_output": Mock(return_value=None),
+                          "locked_workspace": Mock(side_effect=lambda path: nullcontext()),
+                          "write_json": write_json},
+            "errors": {"BuildError": type("BuildError", (Exception,), {})},
+            "browser": {"validate_config": Mock(side_effect=lambda value: value)},
+            "delivery": {"Delivery": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "forms": {"guid": Mock(side_effect=lambda value: value)},
+            "discovery": {"continue_wizard": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "agent_testing": {"run_tests": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "replay": {"scenario": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "git_inventory": {"inspect_integration": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+        }
+        for name, members in capabilities.items():
+            module = ModuleType(f"demo_builder.{name}")
+            vars(module).update(members)
+            setattr(package, name, module)
+            modules[module.__name__] = module
+        return patch.dict(sys.modules, modules)
 
     def test_absent_spec_kit_is_noop_without_install_or_workspace(self):
         value, code = handoff.execute(self.args)
@@ -89,7 +119,8 @@ class HandoffBoundaries(unittest.TestCase):
         config.write_text('{"schema_version":"1.0"}')
         self.args.action, self.args.browser_config = "browser", str(config)
         succeeded = subprocess.CompletedProcess(["browser"], 0, '{"status":"passed","fixture":true}', "")
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch("demo_builder.browser.validate_config", return_value={}), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             first, code = handoff.execute(self.args)
@@ -108,7 +139,8 @@ class HandoffBoundaries(unittest.TestCase):
         self.args.action, self.args.contract = "discover", str(contract)
         self.args.entry_path, self.args.fidelity = "repair", "single-operator-demonstration"
         succeeded = subprocess.CompletedProcess(["wizard"], 0, '{"status":"discovered","ui_verified":false}', "")
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             handoff.execute(self.args)
             value, code = handoff.execute(self.args)
@@ -123,7 +155,8 @@ class HandoffBoundaries(unittest.TestCase):
         feedback = self.root / "feedback.json"
         feedback.write_text('{"schema_version":"1.0"}')
         self.args.action, self.args.feedback = "feedback", str(feedback)
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             handoff.execute(self.args)
         self.assertEqual(["wizard", "feedback"], launch.call_args.args[0][:2])
@@ -152,7 +185,8 @@ class HandoffBoundaries(unittest.TestCase):
         self.args.agent_suite, self.args.agent_config = str(suite), str(config)
         self.args.repair_agent_fixture = True
         succeeded = subprocess.CompletedProcess(["agent-test"], 0, '{"status":"passed","fixture":true}', "")
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             handoff.execute(self.args)
             value, code = handoff.execute(self.args)
@@ -171,7 +205,8 @@ class HandoffBoundaries(unittest.TestCase):
         self.runtime.mkdir()
         (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
         self.args.action = "deploy"
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"):
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"):
             with self.assertRaisesRegex(ValueError, "exact authorization"):
                 handoff.execute(self.args)
         tenant = "00000000-0000-0000-0000-000000000001"
@@ -181,7 +216,8 @@ class HandoffBoundaries(unittest.TestCase):
         authority.write_text(json.dumps({"development_profile": {"delivery": {"browser_config": str(config)}}}))
         self.args.authorization, self.args.tenant = str(authority), tenant
         succeeded = subprocess.CompletedProcess(["apply"], 0, '{"status":"completed","ui_verified":false}', "")
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch("demo_builder.browser.validate_config", side_effect=lambda value: value), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             handoff.execute(self.args)
@@ -202,7 +238,8 @@ class HandoffBoundaries(unittest.TestCase):
         manifest.write_text('{"schema_version":"1.0"}')
         self.args.action, self.args.git_review_manifest = "git-review", str(manifest)
         succeeded = subprocess.CompletedProcess(["git-review"], 0, '{"status":"observed"}', "")
-        with patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
                 patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
             handoff.execute(self.args)
             handoff.execute(self.args)

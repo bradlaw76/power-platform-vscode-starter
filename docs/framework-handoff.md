@@ -354,7 +354,10 @@ missing native support is partial, not acceptance. No native pilot is claimed.
 ## Verification
 
 `scripts/ci/test_framework_handoff.py` includes dependency-independent boundary
-checks and installed-runtime integration checks. Select the installed framework
+checks and installed-runtime integration checks. Delegation-only boundary cases
+use explicit test doubles for optional runtime imports; they retain on-disk
+handoff history and do not claim installed-runtime guards or live acceptance.
+Select the installed framework
 interpreter and set `STARTER_FRAMEWORK_FIXTURE` to an independent generic
 connected-journey fixture to run integration. Without both, integration is
 explicitly skipped, not claimed as verified by hosted CI.
