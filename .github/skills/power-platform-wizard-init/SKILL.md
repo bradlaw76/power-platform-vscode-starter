@@ -23,6 +23,31 @@ This skill starts the repository wizard safely through either chat or terminal, 
 
 This skill does not modify core wizard scripts.
 
+Optional Q29 read-only browser diagnostics uses the existing handoff's `browser`
+action and explicit `BrowserConfigPath`; follow project `docs/framework-handoff.md`.
+Do not install tooling silently or label synthetic Chromium success as tenant proof.
+Optional Q30 `deploy` uses the same handoff with exact `AuthorizationPath` and
+`TenantId`, an existing nonproduction delivery profile, published/read-only
+rendered checks and guarded source reconciliation; no expanded authority.
+When installed Q31 is available, prefer the same handoff's `discover` before
+repeating questions. Reuse selected source/scoped metadata for build/enhance/repair;
+ask only material unresolved questions. Configure single-operator, multi-persona
+or production-oriented fidelity without relaxing actual policy/security.
+Read-only discovery and accepted `feedback` may precede Spec Kit. Deliver an
+authorized first slice, offer inspection, then reconcile only affected tasks in
+the same runtime. Legacy bootstrap planning and semantic gates remain unchanged.
+For installed Q32, use that handoff's `agent-test` for ordered conversational
+behavior and version regression, not instruction lint. Keep prompts/scenarios
+external; Direct Line tests can invoke tools and need exact live-effects authority.
+Missing tool/grounding/escalation evidence is unverified. Only one accepted local
+fictional instruction correction can run automatically; never edit/publish an
+actual agent or infer native acceptance from synthetic results.
+For installed Q33, reuse the same handoff for scoped Playwright native quality
+and context checks, accepted fictional replay and offline Git/writer inspection.
+Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
+authorized synthetic-only. Preserve unique/merge changes, recovery refs and
+expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
 table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;

@@ -33,6 +33,25 @@ Use this behavior:
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
+- With installed Q31, prefer the existing handoff's `discover` before repeating
+  intake. Discover selected source/scoped metadata for build/enhance/repair;
+  ask only material unresolved questions, not reliably discoverable facts.
+  Configure single-operator, multi-persona or production-oriented fidelity;
+  never impose production persona testing on a single-operator demonstration
+  unless actual policy/security or accepted criteria require it. Read-only
+  discovery and accepted `feedback` can precede Spec Kit. Deliver an authorized
+  first slice, offer inspection and reconcile affected tasks without restarting.
+  Preserve legacy bootstrap planning, semantic gates and actual scoped authority.
+- For installed Q32 agent behavior, reuse `agent-test` through the same handoff.
+  Keep versioned prompts/scenarios external; test conversation behavior, not just
+  instruction syntax. Require exact live-test effects scope; unknown telemetry
+  remains unverified. Automatic correction is accepted local-fictional-only,
+  never actual agent editing/publication or synthetic-to-native acceptance.
+- With installed Q33, reuse the same handoff's Playwright quality/context checks,
+  accepted fictional scenario replay and read-only Git inspection. Do not replay
+  persisted transactions or duplicate seeds; synthetic reset needs exact
+  separate authority. Preserve unique/merge changes, recovery refs and expired
+  or uncertain writer ownership; no automatic merge/close or new mandatory stage.
 - Reuse the delivery goal and deadline when already provided. Select risk-based validation without weakening required CI, security or deployment acceptance. Default to guided execution; present automation only if it is likely to save net time after setup and verification, and after the user opts in. WSL is optional; never block a novice from guided planning because it is absent. See `docs/delivery-pacing-and-tooling.md`.
 - Default to `demo-builder`: ask six business questions, two delivery-context questions (prototype/presentation-demo/connected-demo/pilot/production and user timeframe), and one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
@@ -46,6 +65,11 @@ Use this behavior:
   reuse with a custom table. Optional installed-framework continuation follows
   [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime
   paths, accepted canonical contract and separate synchronization opt-in.
+  Optional Q29 `browser` action uses explicit `BrowserConfigPath` for fresh
+  read-only Playwright diagnostics; no silent installation or live-proof inference.
+  Optional Q30 `deploy` requires exact `AuthorizationPath`/`TenantId` and the
+  installed runtime's authorized nonproduction delivery profile; verify published
+  bytes and rendered form/bindings before guarded source/note reconciliation.
   Missing Spec Kit is a no-op; do not install tooling or start a scheduler.
   Read-only Status exposes canonical task/lease/dependency progress and next
   actions; projection eligibility is not worker authority or live evidence.

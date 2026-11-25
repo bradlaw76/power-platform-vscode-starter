@@ -25,6 +25,32 @@ material app/schema changes require affected `spec.md`, `plan.md`, `tasks.md`
 planning. Routine authorized corrections reuse accepted behavior and reconcile
 affected notes after implementation and targeted validation.
 
+Optional Q29 read-only Playwright diagnostics uses the existing handoff's
+`browser` action and explicit `BrowserConfigPath`; follow project-root
+`docs/framework-handoff.md`. No silent installation or synthetic-to-live claim.
+Optional Q30 `deploy` reuses an explicitly authorized nonproduction delivery
+profile through that same handoff; require `AuthorizationPath`/`TenantId`.
+Use functional slices, exact publication/readback and rendered binding checks;
+never infer production, broad publication or native-save authority.
+When installed Q31 is available, prefer the same handoff's `discover` before
+repeating questions. Reuse selected source/scoped metadata for build/enhance/repair;
+ask only material unresolved questions. Configure single-operator, multi-persona
+or production-oriented fidelity without relaxing actual policy/security.
+Read-only discovery and accepted `feedback` may precede Spec Kit. Deliver an
+authorized first slice, offer inspection, then reconcile only affected tasks in
+the same runtime. Legacy bootstrap planning and semantic gates remain unchanged.
+For installed Q32, use that handoff's `agent-test` for ordered conversational
+behavior and version regression, not instruction lint. Keep prompts/scenarios
+external; Direct Line tests can invoke tools and need exact live-effects authority.
+Missing tool/grounding/escalation evidence is unverified. Only one accepted local
+fictional instruction correction can run automatically; never edit/publish an
+actual agent or infer native acceptance from synthetic results.
+For installed Q33, reuse the same handoff for scoped Playwright native quality
+and context checks, accepted fictional replay and offline Git/writer inspection.
+Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
+authorized synthetic-only. Preserve unique/merge changes, recovery refs and
+expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+
 Preserve approved native table/relationship decisions. Optional continuation
 uses project-root `docs/framework-handoff.md` and the installed framework's
 existing task store, locks and journals, with separate synchronization opt-in.

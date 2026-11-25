@@ -27,6 +27,22 @@ Optional starter-to-framework continuation follows
 project/runtime roots, accepted source contracts and explicit synchronization
 selection are required. Native Windows guided use needs neither consumer Git
 nor WSL; synthetic completion is not live deployment/UI acceptance.
+With installed Q31 support, prefer the same handoff's read-only `discover`
+before repeat questions. Build, enhance and repair share canonical tasks;
+fidelity guides proportional testing without relaxing security. Deliver an
+authorized first slice, inspect it and reconcile accepted `feedback` without
+restarting unaffected work. Discovery/feedback do not require completed Spec Kit;
+bootstrap execution still retains required affected planning and semantic gates.
+Installed Q32 `agent-test` uses the same optional handoff for behavioral
+conversational regression and version comparison, not instruction syntax alone.
+External prompts/scenarios, exact live-test effects authority and unverified
+missing telemetry are mandatory distinctions; local-fictional correction never
+edits or publishes an actual agent.
+Installed Q33 extends the same handoff: scoped native UI quality/context via
+existing Playwright, accepted-record presentation without repeated transactions,
+exact synthetic-only reset authority and offline selected-PR/canonical-writer
+inspection. Preserve unique work, merge resolutions and recovery refs. No
+implicit live mutation, merge/close, expired-writer release or mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.

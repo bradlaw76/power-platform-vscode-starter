@@ -15,6 +15,51 @@
     "script": "09-framework-handoff.ps1",
     "frameworkVersion": "0.2.1",
     "nativeWindowsGuided": true,
+    "nativeQualityAndReuse": {
+      "actions": ["scenario", "git-review"],
+      "qualityConfiguration": "BrowserConfigPath",
+      "scenarioOperationDefault": "replay",
+      "captureRequiresAcceptance": true,
+      "reset": "exact-authorized-selected-synthetic-record-values-only",
+      "gitReviewManifestParameter": "GitReviewManifestPath",
+      "gitNetworkAccess": false,
+      "automaticMergeOrClosure": false
+    },
+    "agentBehavior": {
+      "action": "agent-test",
+      "runtimeCommand": "agent-test",
+      "suiteParameter": "AgentSuitePath",
+      "configParameter": "AgentConfigPath",
+      "actualAgentModification": false,
+      "actualAgentPublication": false,
+      "liveConversationAuthorizationRequired": true,
+      "automaticRepair": "accepted-local-fictional-instructions-only"
+    },
+    "adaptiveDiscovery": {
+      "actions": ["discover", "deliver", "feedback"],
+      "entryPaths": ["build", "enhance", "repair"],
+      "fidelities": ["single-operator-demonstration", "multi-persona-demonstration", "production-oriented"],
+      "canonicalTaskStore": "tasks.json",
+      "readOnlyDiscoveryBeforePlanning": true,
+      "bootstrapPlanningGateUnchanged": true
+    },
+    "browserDiagnostics": {
+      "action": "browser",
+      "configurationParameter": "BrowserConfigPath",
+      "runtimeCommand": "browser diagnose",
+      "optionalDependency": "browser",
+      "readOnlyDefault": true,
+      "automaticInstallation": false
+    },
+    "targetedDelivery": {
+      "action": "deploy",
+      "authorizationParameter": "AuthorizationPath",
+      "tenantParameter": "TenantId",
+      "runtimeCommand": "apply --development",
+      "requiresDeliveryProfile": true,
+      "broadPublication": false,
+      "productionDeployment": false
+    },
     "workerHosts": ["Linux", "macOS", "WSL"],
     "readOnlyTaskStatus": {
       "action": "status",

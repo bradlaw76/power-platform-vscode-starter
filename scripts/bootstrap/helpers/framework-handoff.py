@@ -24,6 +24,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 SOURCE = Path(__file__).resolve().parents[3]
 MAX_BYTES = 1024 * 1024
 MAX_LAUNCH_ATTEMPTS = 3
+FRESH_ACTIONS = {"browser", "deploy", "discover", "deliver", "feedback", "agent-test", "scenario", "git-review"}
 
 
 def hash_file(path: Path) -> str:
@@ -85,13 +86,59 @@ def classify(exc: BaseException) -> str:
     return "deterministic"
 
 
+def browser_budget(config):
+    quality = config.get("quality", {})
+    checks = len(config["scenarios"]) + len(quality.get("viewports", [])) * (len(quality.get("surfaces", [])) + 3)
+    return config.get("authentication_seconds", 180) + (checks + 5) * (config.get("timeout_seconds", 30) + 40)
+
+
 def launch(arguments: list[str]) -> tuple[subprocess.CompletedProcess, int]:
     environment = {**os.environ, "PYTHONIOENCODING": "utf-8", "PYTHONUTF8": "1"}
+    timeout = 180
+    if arguments[0] == "agent-test":
+        from demo_builder.agent_testing import validate_config, validate_suite
+        config = validate_config(load_json(Path(arguments[arguments.index("--config") + 1])))
+        suite = validate_suite(load_json(Path(arguments[arguments.index("--suite") + 1])))
+        timeout = 120 + 2 * sum(len(item["turns"]) for item in suite["scenarios"]) * (
+            config.get("turn_timeout_seconds", 60) + 40)
+    if arguments[:2] == ["browser", "diagnose"]:
+        from demo_builder.browser import validate_config
+        from demo_builder.errors import BuildError
+        try:
+            config = validate_config(load_json(Path(arguments[arguments.index("--config") + 1])))
+        except BuildError as exc:
+            raise ValueError(str(exc)) from exc
+        timeout = browser_budget(config) + 60
+    if arguments[0] == "scenario" and "--browser-config" in arguments:
+        timeout += browser_budget(load_json(Path(arguments[arguments.index("--browser-config") + 1])))
+    if arguments[0] == "apply" and "--development" in arguments:
+        authority = load_json(Path(arguments[arguments.index("--authorization") + 1]))
+        config = load_json(Path(authority["development_profile"]["delivery"]["browser_config"]))
+        plan = load_json(Path(arguments[arguments.index("--workspace") + 1]) / "build-plan.json")
+        timeout = 300 + len(plan["operations"]) * 180 + (config.get("max_repairs", 1) + 1) * browser_budget(config)
+    if arguments[:2] == ["wizard", "deliver"]:
+        timeout = 300
+        if "--worker-config" in arguments:
+            config = load_json(Path(arguments[arguments.index("--worker-config") + 1]))
+            timeout += config.get("run_timeout_seconds", 1800) + config.get("verify_timeout_seconds", 120)
+        if "--recipe" in arguments:
+            recipe = load_json(Path(arguments[arguments.index("--recipe") + 1]))
+            timeout += 180 * (10 + 5 * sum(len(value) for value in recipe.values() if isinstance(value, list)))
+        configs = []
+        if "--browser-config" in arguments:
+            configs.append(load_json(Path(arguments[arguments.index("--browser-config") + 1])))
+        if "--authorization" in arguments:
+            authority = load_json(Path(arguments[arguments.index("--authorization") + 1]))
+            delivery = authority.get("development_profile", {}).get("delivery")
+            if delivery:
+                configs.append(load_json(Path(delivery["browser_config"])))
+        for config in configs:
+            timeout += (config.get("max_repairs", 1) + 1) * browser_budget(config)
     for attempt in range(1, MAX_LAUNCH_ATTEMPTS + 1):
         try:
             return subprocess.run([sys.executable, "-m", "demo_builder", *arguments],
                                   capture_output=True, text=True, encoding="utf-8",
-                                  timeout=180, check=False, env=environment), attempt
+                                  timeout=timeout, check=False, env=environment), attempt
         except OSError as exc:
             if classify(exc) != "transient" or attempt == MAX_LAUNCH_ATTEMPTS:
                 raise
@@ -213,10 +260,10 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     selected["build"] = args.build
     documents = [selected_path(project, name) for name in selected.values()]
     existing = [path.is_file() for path in documents[:3]]
-    if not any(existing):
+    if not any(existing) and args.action not in {"discover", "feedback", "agent-test", "scenario", "git-review"}:
         return {"status": "not-applicable", "reason": "Spec Kit absent", "source_changed": False,
                 "scheduler_started": False, "next_action": "Complete accepted planning before handoff."}, 0
-    if not all(existing):
+    if not all(existing) and args.action not in {"discover", "feedback", "agent-test", "scenario", "git-review"}:
         raise ValueError("Partial Spec Kit planning: complete all selected documents before handoff.")
     for path in documents:
         if path.exists() and (not path.is_file() or path.stat().st_size > MAX_BYTES):
@@ -245,10 +292,14 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
                      or previous["intent"].get("project") != str(project)):
         raise ValueError("Existing handoff belongs to another project; preserve its canonical workspace.")
     sources = [Path(value).expanduser().absolute() for value in
-               (args.contract, args.recipe, args.snapshot, args.adoption, args.delivery, args.worker_config) if value]
+               (args.contract, args.recipe, args.snapshot, args.adoption, args.delivery, args.worker_config,
+                getattr(args, "browser_config", None), getattr(args, "authorization", None),
+                getattr(args, "feedback", None), getattr(args, "agent_suite", None),
+                getattr(args, "agent_config", None), getattr(args, "agent_baseline", None),
+                getattr(args, "git_review_manifest", None)) if value]
     for path in sources:
         load_json(path)
-    if args.action == "worker" and sys.platform == "win32":
+    if (args.action == "worker" or (args.action == "deliver" and args.worker_config)) and sys.platform == "win32":
         raise ValueError("Native Windows worker supervision is unsupported; use an explicitly selected POSIX host.")
     if args.action == "status":
         if previous is None:
@@ -282,10 +333,10 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
         config = load_json(runtime / "spec-kit.json")
         if config["project"] != str(project) or config["files"] != selected:
             raise ValueError("Resume the original document selection; do not reclaim another adoption.")
-    if (previous and previous["status"] == "completed" and previous["intent"] == intent
+    if (args.action not in FRESH_ACTIONS and previous and previous["status"] == "completed" and previous["intent"] == intent
             and previous["observed_hashes"] == observed_snapshot(observed, runtime)):
         return {**previous, "replayed": True, "source_changed": False}, 0
-    if (previous and previous["status"] == "blocked" and previous["intent"] == intent
+    if (args.action not in FRESH_ACTIONS and previous and previous["status"] == "blocked" and previous["intent"] == intent
             and (previous.get("category") == "deterministic"
                  or (previous.get("category") == "conflict-or-incomplete"
                      and previous.get("current_command") == ["spec-kit", "sync"]
@@ -293,7 +344,63 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
             and previous.get("observed_hashes") == observed_snapshot(observed, runtime)):
         return {**previous, "replayed": True, "source_changed": False}, int(previous["exit_code"])
     commands: list[list[str]] = []
-    if args.action == "start":
+    if args.action in {"scenario", "git-review"}:
+        if args.enable_sync:
+            raise ValueError("Quality, replay and Git inspection never enable document synchronization.")
+        if args.action == "scenario":
+            try:
+                from demo_builder.replay import scenario
+            except ImportError:
+                raise ValueError("Selected installed framework lacks Q33 scenario reuse.") from None
+            command = ["scenario", getattr(args, "scenario_operation", "replay"), "--workspace", str(runtime)]
+            for name in ("authorization", "browser_config"):
+                if getattr(args, name, None):
+                    command += ["--" + name.replace("_", "-"), getattr(args, name)]
+            if getattr(args, "accept_scenario", False):
+                command.append("--accepted")
+        else:
+            try:
+                from demo_builder.git_inventory import inspect_integration
+            except ImportError:
+                raise ValueError("Selected installed framework lacks Q33 Git inspection.") from None
+            if not getattr(args, "git_review_manifest", None):
+                raise ValueError("Read-only Git review requires selected PR snapshots and canonical writer workspace scope.")
+            command = ["git-review", "--root", str(project), "--manifest", args.git_review_manifest]
+        commands.append(command)
+    elif args.action == "agent-test":
+        try:
+            from demo_builder.agent_testing import run_tests
+        except ImportError:
+            raise ValueError("Selected installed framework lacks Q32 behavioral testing; no silent installation.") from None
+        if args.enable_sync or not getattr(args, "agent_suite", None) or not getattr(args, "agent_config", None):
+            raise ValueError("Agent testing requires selected suite/config and never enables document synchronization.")
+        command = ["agent-test", "--workspace", str(runtime / "agent-tests"),
+                   "--suite", args.agent_suite, "--config", args.agent_config]
+        for field in ("authorization", "agent_baseline"):
+            if getattr(args, field, None):
+                command += ["--baseline" if field == "agent_baseline" else "--authorization", getattr(args, field)]
+        if getattr(args, "repair_agent_fixture", False):
+            command.append("--repair")
+        commands.append(command)
+    elif args.action in {"discover", "deliver", "feedback"}:
+        try:
+            from demo_builder.discovery import continue_wizard
+        except ImportError:
+            raise ValueError("Selected installed framework lacks Q31 discovery; review/install its candidate first.") from None
+        if args.enable_sync:
+            raise ValueError("Select document synchronization separately; discovery never enables or regenerates planning.")
+        command = ["wizard", args.action, "--workspace", str(runtime)]
+        fields = {"discover": ("contract", "snapshot", "entry_path", "fidelity"),
+                  "deliver": ("recipe", "snapshot", "worker_config", "browser_config", "authorization", "tenant", "requirement"),
+                  "feedback": ("feedback",)}[args.action]
+        for name in fields:
+            value = getattr(args, name, None)
+            if value:
+                command += ["--input" if name == "feedback" else "--" + name.replace("_", "-"), value]
+        if args.action == "deliver" and getattr(args, "rehearse_slice", False):
+            command.append("--rehearse")
+        commands.append(command)
+    elif args.action == "start":
         if not args.contract:
             raise ValueError("Start requires an explicitly selected accepted framework contract.")
         contract = load_json(Path(args.contract))
@@ -341,7 +448,41 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
         if not args.worker_config:
             raise ValueError("Worker requires an explicitly selected existing worker configuration.")
         commands.append(["worker", "--workspace", str(runtime), "--config", args.worker_config])
-    if args.action != "start" and not (runtime / ".demo-workspace.json").is_file():
+    elif args.action == "browser":
+        if not getattr(args, "browser_config", None):
+            raise ValueError("Browser diagnostics requires an explicitly selected browser configuration.")
+        try:
+            from demo_builder.browser import validate_config
+        except ImportError:
+            raise ValueError("Selected installed framework lacks Q29 browser support; review/install its candidate first.") from None
+        try:
+            validate_config(load_json(Path(args.browser_config)))
+        except BuildError as exc:
+            raise ValueError(str(exc)) from exc
+        output = runtime / "browser-diagnostics" / hashlib.sha256(Path(args.browser_config).read_bytes()).hexdigest()[:24]
+        commands.append(["browser", "diagnose", "--workspace", str(output), "--config", args.browser_config])
+    elif args.action == "deploy":
+        if not getattr(args, "authorization", None) or not getattr(args, "tenant", None):
+            raise ValueError("Deployment requires existing exact authorization and tenant; credentials alone grant no scope.")
+        try:
+            from demo_builder.delivery import Delivery
+            from demo_builder.browser import validate_config
+            from demo_builder.forms import guid
+        except ImportError:
+            raise ValueError("Selected installed framework lacks Q30 targeted delivery; review/install its candidate first.") from None
+        authority = load_json(Path(args.authorization))
+        profile = authority.get("development_profile", {})
+        if not isinstance(profile, dict) or not isinstance(profile.get("delivery"), dict):
+            raise ValueError("Deployment requires the explicitly authorized Q30 nonproduction delivery profile.")
+        try:
+            config = validate_config(load_json(Path(profile["delivery"]["browser_config"])))
+            if guid(args.tenant) != guid(config["target"]["tenant_id"]):
+                raise ValueError("Deployment tenant differs from the authorized rendered target.")
+        except (BuildError, KeyError) as exc:
+            raise ValueError(str(exc)) from exc
+        commands.append(["apply", "--workspace", str(runtime), "--development", "--authorization",
+                         args.authorization, "--credential", "azure-cli", "--tenant", args.tenant])
+    if args.action not in {"start", "discover", "agent-test", "git-review"} and not (runtime / ".demo-workspace.json").is_file():
         raise ValueError("Start or adopt the canonical runtime before continuing.")
     history = previous.get("history", []) if previous else []
     if len(history) + len(commands) > 200:
@@ -389,9 +530,15 @@ def main() -> int:
     for name in ("project", "runtime", "scenario"):
         parser.add_argument("--" + name, required=True)
     parser.add_argument("--action", default="start",
-                        choices=("start", "preview", "sync", "enable", "disable", "rehearse", "status", "worker"))
-    for name in ("contract", "recipe", "snapshot", "adoption", "delivery", "worker-config"):
+                        choices=("start", "preview", "sync", "enable", "disable", "rehearse", "status", "worker", "browser", "deploy", "discover", "deliver", "feedback", "agent-test", "scenario", "git-review"))
+    for name in ("contract", "recipe", "snapshot", "adoption", "delivery", "worker-config", "browser-config", "authorization", "tenant", "requirement", "feedback", "agent-suite", "agent-config", "agent-baseline", "git-review-manifest"):
         parser.add_argument("--" + name)
+    parser.add_argument("--entry-path", choices=("build", "enhance", "repair"))
+    parser.add_argument("--fidelity", choices=("single-operator-demonstration", "multi-persona-demonstration", "production-oriented"))
+    parser.add_argument("--rehearse-slice", action="store_true")
+    parser.add_argument("--repair-agent-fixture", action="store_true")
+    parser.add_argument("--scenario-operation", choices=("capture", "replay", "reset"), default="replay")
+    parser.add_argument("--accept-scenario", action="store_true")
     parser.add_argument("--build", default="BUILD.md")
     parser.add_argument("--enable-sync", action="store_true")
     args = parser.parse_args()

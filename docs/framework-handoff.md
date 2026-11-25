@@ -33,6 +33,94 @@ worker, Apply or deployment authorization.
 
 ## Operator path
 
+### Native quality, replay and Git inspection (Q33)
+
+With the selected installed Q33 candidate, keep `-Action browser` and
+`-BrowserConfigPath`. Optional `quality` config specifies bounded viewports,
+selected DOM/iframe surfaces, scroll/dimension thresholds and exact native
+table/record/form context. It detects clipping, overlap, redundant visible
+headers, missing accessible names, excessive scrolling and responsive/resource
+dimensions, with screenshots. These are scoped heuristics, not accessibility
+certification. Existing metadata/form bindings remain required. `navigation`
+scenarios verify actual same-origin anchor destinations/rendered native identity
+with GET navigation, not arbitrary scripts or popup policy. Browser remains
+read-only by default and no second driver is introduced.
+
+Use `-Action scenario -ScenarioOperation capture -AcceptScenario` only after a
+completed fictional rehearsal. `-ScenarioOperation replay` is the default:
+compare accepted IDs/values without repeating persisted transactions, optionally
+adding existing fixture browser checks. Drift, accepted-record changes and
+duplicate seeding are blocked. `reset` is never implicit; `-AuthorizationPath`
+must bind accepted synthetic-only selected-record values, exact receipt/current
+snapshot digests and expiry. It backs up current state, preserves unselected
+records/counters and cannot create/delete rows or reset live data.
+
+`-Action git-review -GitReviewManifestPath <external-json>` forwards the existing
+bounded local Git inspector. Manifest `schema_version:"1.0"` selects at most
+ten `pull_requests:[{id,base,head,depends_on,supersedes,work_id}]` with full local
+commit hashes and optional `task_workspaces:[]` canonical runtime roots.
+It detects overlapping paths, missing exact ancestry, equivalent patches/work
+identities, unique superseded/merge work, dirty/ahead state and writer conflicts.
+Expired running leases/uncertain effects retain ownership. Recovery refs are
+preserved; cached observations are not remote freshness or process absence.
+No network, merge, close, push or document sync occurs. Git inspection can
+precede Spec Kit; replay requires its existing completed runtime. Both invoke
+fresh checks on reentry and add no mandatory planning or administrative stage.
+
+### Agent behavioral testing (Q32)
+
+With the selected installed Q32 candidate, use `-Action agent-test`,
+`-AgentSuitePath` and `-AgentConfigPath` for external behavioral scenarios and
+versioned instructions. This forwards Automation `agent-test`, not another
+driver or instruction-syntax checker. Optional `-AgentBaselinePath` compares
+results across versions. `-RepairAgentFixture` selects at most one explicitly
+accepted hash-bound local fictional instruction correction and retests the suite.
+It never edits or publishes an actual agent. Scenario prompts/data stay external.
+
+Tests can precede Spec Kit because they do not build an application or generate
+planning documents. Live conversations are not inherently read-only: tools may
+execute. `-AuthorizationPath` must bind the exact suite/config, target, expiry
+and approved nonproduction agent-side effects; actual security controls remain.
+Missing tool/knowledge/escalation telemetry is unverified, never a passing
+negative assertion. Use supported Direct Line or normalized enriched verifier
+observations; no implicit authentication, token persistence or maker-portal
+automation. Existing Q29 Playwright is a separate rendered diagnostic surface.
+
+The same runtime retains `agent-tests` journals and versioned results. Handoff
+reentry always invokes the runtime; completed run evidence is explicitly cached
+there. Use a distinct external runtime for an intentionally fresh run, not to
+evade an uncertain-effect hold. Tests never complete canonical native acceptance.
+
+### Adaptive discovery (Q31)
+
+When the selected installed runtime provides Q31, prefer `-Action discover`
+before repeating intake. Use `-EntryPath build|enhance|repair` when intent is
+not already known, and optional `-Fidelity single-operator-demonstration`,
+`multi-persona-demonstration` or `production-oriented`. Default single-operator
+fidelity does not add production persona tests or relax actual security.
+Read-only discovery and accepted-requirement `feedback` can run before Spec Kit
+exists, including partial local projects; neither writes application source or
+Dataverse. They never generate planning documents or enable synchronization.
+
+Use the existing accepted `-ContractPath` to initialize discovery, or resume the
+canonical runtime. Selected read roots/scoped `-SnapshotPath` inventory supply
+facts; absence/unknown and source/live evidence stay distinct. New unfinished
+intake uses installed `init`/`wizard next`; discovery does not accept proposals.
+
+After required affected planning, `-Action deliver` forwards one existing slice,
+with optional `-RequirementId`. Select `-WorkerConfigPath` on POSIX, or
+`-RecipePath -RehearseSlice` for explicit fictional execution. Live recipes
+instead require existing Q30 `-AuthorizationPath`/`-TenantId` and retain its
+resource-only nonproduction limits. Optional `-BrowserConfigPath` provides
+read-only rendered inspection. No command, recipe or fidelity grants authority.
+
+Inspect the early slice, then `-Action feedback -FeedbackPath ...` supplies
+accepted requirement/evidence arrays in schema `1.0`. It cannot change authority
+or architecture, rewrite evidence, release writers or reset journals. Existing
+task reconciliation retains unrelated completions and stable GUIDs. Resume the
+same runtime; synchronize affected documentation separately afterward.
+The legacy terminal questionnaire and bootstrap ordering are unchanged.
+
 Run from the starter checkout, replacing these example consumer paths:
 
 ```powershell
@@ -100,6 +188,50 @@ Use the same project/runtime/scenario/interpreter parameters with `-Action`:
 | `rehearse` | Synthetic execution; optional explicitly fixture-marked recipe/snapshot |
 | `status` | Read-only recorded status and current-input applicability |
 | `worker` | Explicit existing configuration on a supported POSIX host only |
+| `browser` | Optional installed Playwright diagnostics with `-BrowserConfigPath`; Windows/POSIX, fresh read-only observations |
+| `deploy` | Explicit installed Q30 delivery profile with `-AuthorizationPath` and `-TenantId`; nonproduction exact-resource publication and rendered verification |
+
+### Playwright diagnostics (Q29)
+
+After accepted planning and runtime initialization, use the same arguments with
+`-Action browser -BrowserConfigPath C:\Pilot\browser.json`. The existing handoff
+calls installed `demo-builder browser diagnose`; it never installs dependencies
+or reuses cached browser success. Evidence stays under the external runtime's
+`browser-diagnostics/<config-hash>/`, not in Starter or a second queue.
+Select the Automation candidate containing Q29 and its optional `browser` extra;
+the version number alone does not establish that capability. Use its existing
+`browser setup` / explicit `browser setup --install` when dependencies are absent.
+The installed runtime's acceptance-context guide defines the exact target GUIDs,
+record guards, application-owned paths and bounded read-only scenario format.
+An approved loopback CDP session or explicit human Microsoft sign-in supplies
+authentication; credentials/MFA are never automated or persisted.
+
+Starter's action is diagnostics only. Separately authorized repairs use the
+same runtime's `browser diagnose --repair-workspace ... --authorization ...
+--tenant ...` and existing conditional development journal/publication gates.
+Synthetic Chromium success is not intended-user tenant acceptance. Native
+business writes still require the independent `accept` adapter and exact effects.
+No discovery question or bootstrap stage is added.
+
+### Targeted delivery (Q30)
+
+After accepted planning, adoption and compilation of the smallest functional
+slice, use the same project/runtime/scenario arguments with
+`-Action deploy -AuthorizationPath C:\Pilot\authority.json -TenantId <tenant-guid>`.
+This forwards to the installed Automation runtime's existing `apply
+--development --credential azure-cli`; it does not generate authority, select
+another target or reuse cached deployment success. An already authorized API
+identity and the selected browser's independently observed user remain distinct.
+
+The authority must explicitly select a nonproduction `development_profile`
+with Q30 `delivery` settings. Its runtime acceptance-context guide defines
+the exact browser form/resource bindings, protected IDs, verified backups,
+foreign-draft ownership, published readback and source mappings.
+Fresh diagnostics precedes guarded source/note reconciliation. Read-only success
+does not claim native saves. Newer edits and conflicting writers are preserved.
+No broad publication, production deployment, schema recreation, new planning
+dossier or bootstrap stage is introduced. Unsupported form-only publication
+remains in the existing separately authorized table-publication workflow.
 
 ### One read-only operational status
 

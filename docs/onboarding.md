@@ -29,11 +29,35 @@ Important process rule:
   authorized corrections reuse accepted behavior and reconcile notes after validation.
 - Optional installed-framework continuation uses
   [the H008 handoff](framework-handoff.md) after accepted planning, with separate
-  consumer/runtime folders. It is not another build stage or deployment command.
+  consumer/runtime folders. It is not another build stage or implicit deployment.
   Its read-only Status action reports canonical task counts, dependencies,
   owner/lease holds and next actions without dispatch or stored lease changes.
   Unchanged synchronization conflict holds retain exit 3 without document,
   journal or history writes; changed inputs resume and other incomplete steps retry.
+  Optional [Playwright diagnostics](framework-handoff.md#playwright-diagnostics-q29)
+  uses that same handoff's `browser` action after planning; no new build stage,
+  silent dependency installation or environment-write authority.
+  Optional [targeted delivery](framework-handoff.md#targeted-delivery-q30)
+  uses `deploy` only with existing exact nonproduction authority and tenant;
+  published/read-only rendered evidence precedes guarded source reconciliation.
+- When installed Q31 is available, prefer the existing handoff's
+  [adaptive discovery](framework-handoff.md#adaptive-discovery-q31) before
+  repeating intake: build/enhance/repair, selected-source/scoped-metadata facts
+  and only material unresolved questions. Single-operator fidelity adds no
+  production persona matrix. Inspect a first authorized slice, then reconcile
+  accepted feedback in the same canonical task store. Read-only discovery and
+  feedback may precede Spec Kit; required affected bootstrap planning and actual
+  semantic/security/publication gates remain unchanged.
+- Optional installed [Q32 agent testing](framework-handoff.md#agent-behavioral-testing-q32)
+  reuses that handoff for versioned conversational behavior, not instruction lint.
+  Keep prompts/scenarios external. Live conversations need exact effects authority;
+  automatic correction is accepted local-fictional-only, never actual agent
+  editing/publication. No new bootstrap stage or discovery question is added.
+- Optional installed [Q33 quality/replay/Git checks](framework-handoff.md#native-quality-replay-and-git-inspection-q33)
+  extend existing Playwright and local Git inspection. Reuse accepted fictional
+  records without repeating transactions; exact synthetic-only reset authority
+  is separate. Preserve unique patches/recovery refs and expired/uncertain writer
+  ownership. No new stage, implicit merge/close or synthetic-to-live claim.
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.

@@ -28,6 +28,32 @@ Optional accepted-planning continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
 table identities and relationship evidence. Missing Spec Kit is a no-op;
 synchronization is explicit opt-in, without a new controller or scheduler.
+The same handoff's optional Q29 `browser` action takes `BrowserConfigPath`
+and delegates fresh read-only Playwright diagnostics to the installed runtime,
+without an intake question, build stage, silent installation or deployment grant.
+Optional Q30 `deploy` requires existing `AuthorizationPath`/`TenantId` and the
+installed runtime's nonproduction delivery profile. Reuse scoped discovery,
+verified backups, conditional repair, exact publication, published readback,
+rendered form/binding diagnostics and guarded source reconciliation. Functional
+vertical slices do not waive protected-component or wider-publication gates.
+Installed Q31 `discover`/`deliver`/`feedback` reuses that same runtime and task
+store. Prefer discovered facts over repeat questions; support build/enhance/repair
+and single-operator/multi-persona/production-oriented fidelity. Read-only discovery
+and accepted feedback can precede planning; execution retains affected planning,
+semantic/security gates and scoped authority. Inspect a first slice and reconcile
+only affected tasks rather than restarting intake.
+Optional installed Q32 `agent-test` validates external fictional conversations,
+versioned instructions, clarification, negative behavior, grounding and
+escalation/tool prerequisites. Reuse supported Direct Line/verifier evidence;
+unknown telemetry remains unverified. Live test effects require exact authority;
+automatic correction is local-fictional-only, with no actual agent edit/publish.
+Optional installed Q33 reuses Playwright for scoped responsive geometry,
+accessibility, navigation and native context checks; thresholds are scenario
+decisions, not universal certification. Reuse accepted fictional records for
+read-only presentation, block duplicate seeding/accepted-record changes and
+require exact synthetic reset authority. Offline selected-PR/writer inspection
+preserves unique/merge changes and recovery refs; never auto-merge/close or
+release expired/uncertain writers. No additional mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
