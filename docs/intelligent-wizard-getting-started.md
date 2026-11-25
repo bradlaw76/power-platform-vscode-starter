@@ -8,7 +8,9 @@ is `1.10.0`, profile `1.6`. Automation package `0.2.1` and selectable guidance
 `0.2.4` are separate identities, not new product releases.
 Use independently reviewed full commits from [Starter #19](https://github.com/bradlaw76/power-platform-vscode-starter/pull/19)
 and [bradlaw76/Power-Platform-vs-code-starter-automation-pipeline#27](https://github.com/bradlaw76/Power-Platform-vs-code-starter-automation-pipeline/pull/27).
-Those PRs are not mainline integration. Standards mappings in
+Those PRs are not mainline integration. The frozen 133-file candidate inventory
+remains historical; this guide accompanies full-source evaluation, not automatic
+adoption into that pinned payload. Standards mappings in
 [bradlaw76/Work-items-standards-#5](https://github.com/bradlaw76/Work-items-standards-/pull/5)
 remain proposals; they do not allocate work IDs.
 

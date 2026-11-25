@@ -50,7 +50,7 @@ expired/uncertain writer ownership; never auto-merge/close or add a mandatory st
 Q37's optional Automation CLI hosted PR discovery requires explicit selected
 repository/PRs; Starter's manifest handoff stays offline. No fetch/merge/close,
 work allocation or release approval is inferred. Use
-[concise installation and capability boundaries](../../../docs/intelligent-wizard-getting-started.md).
+[published installation and capability boundaries](https://github.com/bradlaw76/power-platform-vscode-starter/blob/campaign/starter-instruction-migration-q15-q16/docs/intelligent-wizard-getting-started.md).
 
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
