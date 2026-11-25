@@ -67,6 +67,17 @@ No network, merge, close, push or document sync occurs. Git inspection can
 precede Spec Kit; replay requires its existing completed runtime. Both invoke
 fresh checks on reentry and add no mandatory planning or administrative stage.
 
+Q37 optionally discovers hosted PR branch dependencies through the installed
+Automation CLI's same `git-review` command with explicit
+`--repository owner/repository --pull-request <number>` (repeat at most ten).
+It reuses existing `gh` authentication and local Git inspection; no sign-in,
+Git fetch, merge, close or supersession inference occurs. Matching selected
+same-repository base/head observations supply structural dependencies, not work
+allocation approval. Unselected/cross-repository prerequisites and missing local
+objects remain unverified; partial evidence returns exit 3. The Starter
+`GitReviewManifestPath` interface remains offline. See
+[installation and capability boundaries](intelligent-wizard-getting-started.md).
+
 ### Agent behavioral testing (Q32)
 
 With the selected installed Q32 candidate, use `-Action agent-test`,

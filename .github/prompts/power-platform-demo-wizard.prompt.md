@@ -52,6 +52,9 @@ Use this behavior:
   persisted transactions or duplicate seeds; synthetic reset needs exact
   separate authority. Preserve unique/merge changes, recovery refs and expired
   or uncertain writer ownership; no automatic merge/close or new mandatory stage.
+  Optional Q37 hosted PR discovery uses explicit selected repository/PRs through
+  Automation CLI only; Starter's manifest stays offline. No fetch, work allocation
+  or release approval is implied. See `docs/intelligent-wizard-getting-started.md`.
 - Reuse the delivery goal and deadline when already provided. Select risk-based validation without weakening required CI, security or deployment acceptance. Default to guided execution; present automation only if it is likely to save net time after setup and verification, and after the user opts in. WSL is optional; never block a novice from guided planning because it is absent. See `docs/delivery-pacing-and-tooling.md`.
 - Default to `demo-builder`: ask six business questions, two delivery-context questions (prototype/presentation-demo/connected-demo/pilot/production and user timeframe), and one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.

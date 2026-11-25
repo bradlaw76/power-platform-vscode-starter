@@ -23,6 +23,14 @@
       "reset": "exact-authorized-selected-synthetic-record-values-only",
       "gitReviewManifestParameter": "GitReviewManifestPath",
       "gitNetworkAccess": false,
+      "hostedMetadataDiscovery": {
+        "entryPoint": "optional-Automation-CLI-only",
+        "command": "git-review --repository owner/repository --pull-request number",
+        "defaultEnabled": false,
+        "scope": "explicit-selected-same-repository-GitHub-PR-metadata",
+        "fetchGitObjects": false,
+        "missingLocalObjects": "partial"
+      },
       "automaticMergeOrClosure": false
     },
     "agentBehavior": {

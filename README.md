@@ -41,6 +41,11 @@ separate implementation.
 
 ## Start here
 
+**Evaluating the intelligent wizard candidate?** Use the concise
+[installation and getting-started reference](docs/intelligent-wizard-getting-started.md)
+for exact-source installation, existing-install discovery, update/rollback limits,
+optional WSL/Playwright setup and available versus blocked capabilities.
+
 > **New to this repo?** Start with [START HERE.md](START%20HERE.md). It
 > explains how to determine whether this is the right workflow, install the
 > needed tools, create a local authoring workspace, choose a Copilot or
@@ -76,6 +81,7 @@ reproduce its procedures here.
 | Q32 agent behavioral testing | Same [handoff](docs/framework-handoff.md#agent-behavioral-testing-q32), `agent-test` with external versioned instructions/scenarios; supported Direct Line or normalized verifier observations, behavioral assertions, regression comparison and one approved local-fictional correction; live conversations require exact effects scope, no actual agent editing/publication |
 | Q33 native quality, replay and Git inspection | Same [handoff](docs/framework-handoff.md#native-quality-replay-and-git-inspection-q33): scoped responsive/accessibility/context checks in existing Playwright, accepted-record read-only presentation with no repeated transactions, exact synthetic-only reset authority and offline selected-PR/writer analysis preserving unique changes/recovery refs; no automatic merge/close |
 | Q34 candidate acceptance | Existing optional handoff boundaries, inherited policies and Automation end-to-end synthetic/portable-wheel compatibility checked; browser-triggered Q30 verification closes the prior diagnostic context before repair and opens a fresh retest. No new stage, authentication authority, native Windows supervisor or released-version claim. |
+| Q37 operational readiness | [Concise getting started](docs/intelligent-wizard-getting-started.md); existing identity/update/migration/rollback mechanisms and optional POSIX workers. Explicit hosted PR discovery uses Automation CLI only; Starter's manifest inspection stays offline. Candidate source is not an official release, and actual native acceptance remains blocked. |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
 | Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |

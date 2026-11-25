@@ -47,6 +47,10 @@ and context checks, accepted fictional replay and offline Git/writer inspection.
 Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
 authorized synthetic-only. Preserve unique/merge changes, recovery refs and
 expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+Q37's optional Automation CLI hosted PR discovery requires explicit selected
+repository/PRs; Starter's manifest handoff stays offline. No fetch/merge/close,
+work allocation or release approval is inferred. Use
+[concise installation and capability boundaries](../../../docs/intelligent-wizard-getting-started.md).
 
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
