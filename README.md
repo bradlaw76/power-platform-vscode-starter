@@ -1,5 +1,7 @@
 # Power Platform VS Code Starter
 
+> **Multi-step changes?** Use the [queued autonomous delivery and web-resource-first guide](docs/QUEUED_AUTONOMOUS_DELIVERY.md) for ready-to-paste VS Code Copilot instructions, dependency-aware queues, bounded self-repair, and live-first UI iteration. This is operating guidance; it does not install or activate a background executor. New builds still require concise mandatory Spec Kit planning and the usual authorization gates.
+
 ![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
 
 The canonical, multi-workload `power-platform-vscode-starter` repository for
@@ -39,6 +41,11 @@ separate implementation.
 
 ## Start here
 
+**Evaluating the intelligent wizard candidate?** Use the concise
+[installation and getting-started reference](docs/intelligent-wizard-getting-started.md)
+for exact-source installation, existing-install discovery, update/rollback limits,
+optional WSL/Playwright setup and available versus blocked capabilities.
+
 > **New to this repo?** Start with [START HERE.md](START%20HERE.md). It
 > explains how to determine whether this is the right workflow, install the
 > needed tools, create a local authoring workspace, choose a Copilot or
@@ -55,21 +62,52 @@ packages; its runtime limitations are explicit.
 
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ### Enhancement registry
 
 | Enhancement | Contract and runtime scope |
 | --- | --- |
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
-| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
-| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or live deployment |
+| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); standing scoped nonproduction authority, accepted-requirements reuse, proportional checks, recoverable administration/repair documentation, evidence-based writer recovery and native browser/principal/publication/record/form safety; byte-identical policy copies through the Claude installer. [Temporary registration proposal](docs/audits/development-execution-simplification-registration-proposal.md), no H allocation or new executor |
+| Development-first instruction refactoring | Existing canonical policy, concise referencing entry points and generated tasks; routine corrections implement/validate before affected-note reconciliation. [Migration](docs/skill-distribution.md#versioning-and-updates) preserves verified framework pins and custom text; no updater, merge, tenant or protected-functionality authority |
+| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or implicit live deployment |
+| Q29 Playwright diagnostics | Same [framework handoff](docs/framework-handoff.md#playwright-diagnostics-q29), optional `browser` action with selected `BrowserConfigPath`; installed Automation browser capability, fresh read-only observations, separate synthetic/live evidence and existing scoped repair executor; no automatic sign-in, installation or deployment grant |
+| Q30 targeted delivery | Same [handoff](docs/framework-handoff.md#targeted-delivery-q30), optional `deploy` action with exact `AuthorizationPath`/`TenantId`; existing nonproduction delivery profile, conditional repair, published readback, rendered form/binding diagnostics and guarded source reconciliation; no cached success, broad publication or production grant |
+| Q31 adaptive discovery | Same [handoff](docs/framework-handoff.md#adaptive-discovery-q31): `discover`/`deliver`/`feedback`, build/enhance/repair entry paths, configurable fidelity, material questions and existing canonical slice execution; read-only discovery/accepted feedback can precede planning, while bootstrap, semantic, deployment and security gates remain |
+| Q32 agent behavioral testing | Same [handoff](docs/framework-handoff.md#agent-behavioral-testing-q32), `agent-test` with external versioned instructions/scenarios; supported Direct Line or normalized verifier observations, behavioral assertions, regression comparison and one approved local-fictional correction; live conversations require exact effects scope, no actual agent editing/publication |
+| Q33 native quality, replay and Git inspection | Same [handoff](docs/framework-handoff.md#native-quality-replay-and-git-inspection-q33): scoped responsive/accessibility/context checks in existing Playwright, accepted-record read-only presentation with no repeated transactions, exact synthetic-only reset authority and offline selected-PR/writer analysis preserving unique changes/recovery refs; no automatic merge/close |
+| Q34 candidate acceptance | Existing optional handoff boundaries, inherited policies and Automation end-to-end synthetic/portable-wheel compatibility checked; browser-triggered Q30 verification closes the prior diagnostic context before repair and opens a fresh retest. No new stage, authentication authority, native Windows supervisor or released-version claim. |
+| Q37 operational readiness | [Concise getting started](docs/intelligent-wizard-getting-started.md); existing identity/update/migration/rollback mechanisms and optional POSIX workers. Explicit hosted PR discovery uses Automation CLI only; Starter's manifest inspection stays offline. Candidate source is not an official release, and actual native acceptance remains blocked. |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
 | Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
 | H009 version/update manager | [Version and safe updates](docs/wizard-updates.md); offline startup identity with PowerShell-relative runtime paths, Windows checkout-aware Git status, shared explicit choices, stable-only discovery, exact ownership-aware preview and guarded fixture recovery; [candidate distribution and release trust](docs/wizard-release-readiness.md); official Apply remains blocked without publisher policy |
+| Development-first instruction inheritance/migration | [Shared local instruction lifecycle](docs/wizard-updates.md#local-instruction-inheritance-and-migration); new terminal/chat projects inherit actual policy and assets; existing H009 transactions preview, preserve customizations, back up and recover instruction-only changes without upgrading runtime or bypassing official release gates |
 | H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit provenance, unconfirmed/not-applicable states, current-consent checks before resume, independent native/HTML stage selection and separate mapping approval; no legacy artifact migration |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+For authorization/execution changes specifically, update the canonical policy,
+Copilot instructions, prompt, both wizard/report skill families, consumer
+distribution guidance, existing task templates, scenario-impact/queue guides,
+engineering requirements and existing review handoff together. Run
+`AuthorizationExecution.Tests.ps1` (including installer byte equality),
+`SkillParity.Tests.ps1` and affected template/contract checks. Keep registration
+proposals separate for STARTER and AUTO allocator review; preserve historical
+H008/H009/H010 and central standards. Do not infer native acceptance from these
+instruction/distribution regressions.
+
+Q09–Q12 native safety guidance extends that same policy with actual browser
+principal proof, publication blast-radius/draft preservation, unexpected record
+change evidence, restriction classification without bypass, app/user form
+eligibility and independent browser-session recovery. Keep these six obligations
+aligned in distributed instructions, skills, task templates and parity tests.
+Runtime implementations belong to Automation, not Starter; no native pilot or
+installed browser driver is claimed.
 
 The [release consolidation guide](docs/release-consolidation.md) distinguishes
 installed functionality from unmerged candidate capabilities, explains native

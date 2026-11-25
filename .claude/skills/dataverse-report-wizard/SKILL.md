@@ -13,6 +13,10 @@ project-local policy is absent. If neither exists, report BLOCKED for mutating
 work. Require this policy or a reviewed equivalent in consumer projects through
 the existing compatibility review. Reuse valid scope; preserve deployment gates.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Purpose
 
 Create native Dataverse charts and dashboards for an existing or planned

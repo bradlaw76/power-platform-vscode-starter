@@ -4,60 +4,60 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "de39865950421d118c5b1be41e13664718bc7d56",
-  "policySha256": "1cd2f3a7de7f5d444dbe5c0195bb6bc6f0d19d041a3946d20aad149f0df64a11",
+  "sourceCommit": "b76fcc95a953458dd46a7ae34b49355010687c6e",
+  "policySha256": "3dfad3b6a41a2a273e4528acb1470698947f15aa8327b2cb3d017a57e70981d5",
   "publisherVerified": false,
   "automaticApply": false,
-  "fileCount": 131,
-  "totalBytes": 1898505,
+  "fileCount": 133,
+  "totalBytes": 2007130,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
       "category": "claude-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 6659,
-      "sha256": "f668e3ce850f2ceeb9cf788607a18d9952e1435edb7ec651be4f8a483b546a01"
+      "size": 6850,
+      "sha256": "59119f35205c0090299aeca0f716cb83155876008847daacf9f5bd8622fc37b8"
     },
     {
       "path": ".claude/skills/power-platform-vscode-wizard/SKILL.md",
       "category": "claude-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 23418,
-      "sha256": "a49b0a05aec3c950e09f4559bb5bd64cb674acef90214e8f3543c9fd670840c7"
+      "size": 25439,
+      "sha256": "eb6d38ba86eb3256762fd87144a821b7acb6fe62e75acfe97eb9087f2b033217"
     },
     {
       "path": ".github/copilot-instructions.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 15220,
-      "sha256": "bf28cf31b5a419db95a83ebe577474e8a9823da062f7e326e8f11dc941bb5930"
+      "size": 4914,
+      "sha256": "8d946313a2a63993be5e1a814a7efaef79010822b69d6e31c074a0e1e5938d82"
     },
     {
       "path": ".github/prompts/power-platform-demo-wizard.prompt.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 14705,
-      "sha256": "d572ca6e02a8b08838da5a2d0ea5462029d646cc69f1544b2b87c2d29ffe21a7"
+      "size": 16572,
+      "sha256": "e440d0049167ab31d0220427423797d682bcff535b2e34911681ec0105e79d38"
     },
     {
       "path": ".github/skills/dataverse-report-wizard/SKILL.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 7862,
-      "sha256": "59655822502b73ffa64f414832a6e15d3cf28704cc9c79adc831f982430f8585"
+      "size": 8053,
+      "sha256": "a5cc569861783fe9e59ed514e23a220738b72af34c8795c02f666f7ee8dc60c0"
     },
     {
       "path": ".github/skills/power-platform-wizard-init/SKILL.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 18451,
-      "sha256": "fc0ab51092848d6a1bf4225a610bd97e00609e1a913f0b854e173f0493647aad"
+      "size": 20023,
+      "sha256": "4436a10951c323b3f02ec95ffabcb2de0d4aa170c744d84f59d558b9bb1d4b1f"
     },
     {
       "path": ".github/skills/power-platform-wizard-init/references/progress-monitoring.md",
@@ -76,20 +76,28 @@
       "sha256": "0f9cf5163ea649bfd7550cad009ba53832f2a3930d0c671acbe22d5e58483e81"
     },
     {
+      "path": "AGENTS.md",
+      "category": "copilot-asset",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 1425,
+      "sha256": "b4301aabaa724ebdd487593b263e5e3dad011f4a518739eda7b69777299a5be0"
+    },
+    {
       "path": "CONTRIBUTING.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 2186,
-      "sha256": "676f25918090b383b46437251baab377562f1b624d0f13c4fedd3fb8d80080a0"
+      "size": 2744,
+      "sha256": "420c1881d37c47cb384c666b93c76394be3165a3413ecd8d380c1209e7b2c2c2"
     },
     {
       "path": "MIGRATION.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 4496,
-      "sha256": "52240d7423cbf4061ab7ad4eb8bbde0bb3bdf34f1dd9dd9d6e37238fa82df6af"
+      "size": 4981,
+      "sha256": "69ee5a84adb60c17516879c563e74b71ee03ff8312a9ee5dfe436034fe0c87e5"
     },
     {
       "path": "PSScriptAnalyzerSettings.psd1",
@@ -104,8 +112,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 52225,
-      "sha256": "09f04688024901064975469ef0224e035245ee14851791d3b1092c19fd9d9da6"
+      "size": 55709,
+      "sha256": "d37f6bfb5270410beca8d9bbaf4c767b3469e48a54215ab1923ba141e39b5359"
     },
     {
       "path": "SECURITY.md",
@@ -128,8 +136,16 @@
       "category": "schema-profile",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 7600,
-      "sha256": "bb8a5478503ceaeac77afb8b32e94ca8b6a61eb51f8a596b1371fe5df871fcf5"
+      "size": 7667,
+      "sha256": "dd822ea8f4343dd73c1f406dd6161107a53045873c446d957269ebe0c41ce248"
+    },
+    {
+      "path": "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
+      "category": "shared-doc",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 16404,
+      "sha256": "6238d0953e95ec16543075fb81a268582601dfddbcc6ab3cc40f48c3b39033a9"
     },
     {
       "path": "docs/bpf-operator-runbook.md",
@@ -160,16 +176,16 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 6832,
-      "sha256": "1ae11a17d2191f684aaf0da7efd6f75ac09ce1b57b9123dc1d08a98b2771c0a0"
+      "size": 7451,
+      "sha256": "767518a4f48afd790fcf8fc435e978bec5aeda8ae88cf23174b2f7d4d88d46e0"
     },
     {
       "path": "docs/framework-handoff.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 11810,
-      "sha256": "83fefd8d691167c0b357437b69d7078b2f300adf42f81dbcc7ed587b217d7c71"
+      "size": 13737,
+      "sha256": "577bd80df79c553890948795ddf0c4173b92eedbfe1f157f607f43ec78c2954f"
     },
     {
       "path": "docs/live-report-web-resources-runbook.md",
@@ -184,16 +200,16 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 36959,
-      "sha256": "5fef1ff0009f5a88f4a084b6164269132cd30751ac0ddbfae580bf46e1596ea0"
+      "size": 38981,
+      "sha256": "03cbc34293062c5cd185c4855a2a64bfcc3739c29aa1e0d3b1ad6f93c3a9a827"
     },
     {
       "path": "docs/policies/authorization-and-execution.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 11344,
-      "sha256": "aaa19c7c9f0c515a8592c38f5444d05ca57e4c6d63094cea35e13f7de93722bd"
+      "size": 10587,
+      "sha256": "4b365082a5ed3b93fcd6d660076ff21905c6c456a700da121fa2cdea5ade9dd5"
     },
     {
       "path": "docs/powershell-component-header-standard.md",
@@ -208,8 +224,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 11621,
-      "sha256": "500f568a0732e94251c5b311dbe0ff145319913722df7394b117ebde5a349931"
+      "size": 12762,
+      "sha256": "9c248dca5a2e5febd798782febde7a04a223ea807d4af01da977dc5ae3d92800"
     },
     {
       "path": "docs/semantic-field-type-standard.md",
@@ -224,8 +240,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 8488,
-      "sha256": "a0d8116abe686b99867c4d00195c96c957a809fac5015b16e739aa52da7711f8"
+      "size": 9993,
+      "sha256": "55a59b4d0faa30a4de3fe0a3b859a252d520b6c81cb049c42e628a86ec123181"
     },
     {
       "path": "docs/solution-isolation-runbook.md",
@@ -256,8 +272,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 24954,
-      "sha256": "3a7711264030b0223dea8e9c85d51ec0eb201f38f6432e57633c31e065b790b2"
+      "size": 29546,
+      "sha256": "46e31aafd4900515ae327361ec8ab6bac1d88971b908f2322729fdde6571a896"
     },
     {
       "path": "docs/wizard-hardening-runbook.md",
@@ -280,24 +296,24 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 18195,
-      "sha256": "56d25cb03f3a84a460e4d2022ab722face2fb4f727bb4075e79ec1a42837b7a0"
+      "size": 22468,
+      "sha256": "39792d184575edcf7c046bfae2026db042aa77d543b48f8830e77a1ce0ecea27"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 31719,
-      "sha256": "ce6b433dd5e9d19c3a80e3785bf82e39b2ea7c282e3a3d80aa4988b26238f731"
+      "size": 33031,
+      "sha256": "5a3273fc4b5cb5faa99c09351c3d96e73f1ed6d1557ca0f0575147490ded9a35"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-wizard.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 28859,
-      "sha256": "e00c36fb36db8113555d2c1e55713f4f535c9e9f49bbda0b6deeeb28833eb8a2"
+      "size": 30544,
+      "sha256": "f4ac8156b9b9ef6a97f4012567bfe30cdec0c96c4335b0439a982658e88d26e1"
     },
     {
       "path": "schemas/payloads/columns.schema.json",
@@ -416,16 +432,16 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 3266,
-      "sha256": "29752f3ecb1e2a5ec4c873d3fe404e69e53f7f41198ac4c3f851d266acddf275"
+      "size": 4050,
+      "sha256": "83ca3ff8ec43b71256425c68196ab70c1d6e069f98f78d0df911cd8d5183686d"
     },
     {
       "path": "scripts/bootstrap/05-start-wizard.ps1",
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 107917,
-      "sha256": "89161a7bd9865117e1f3c8976f94e6af71bfb7038817dfe8dbcbb0df06c762b4"
+      "size": 122363,
+      "sha256": "f0bf059134cc877cd95a6da8d3079d78bd7f10f6c9a672422d79a1de61f9d058"
     },
     {
       "path": "scripts/bootstrap/06-demo-script-wizard.ps1",
@@ -552,8 +568,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 79484,
-      "sha256": "a7f80961629d87abc51d45bb476803a285fc49442460c01ae5495fb1ee2bb436"
+      "size": 79909,
+      "sha256": "a0eff8b4c253c18cab60a7bf366dfccbb3649a52cfe962f0f4aeb23ca6cc841f"
     },
     {
       "path": "scripts/bootstrap/66-seed-synthetic-data.ps1",
@@ -624,8 +640,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 17941,
-      "sha256": "528bad8e8b5a0687df0088fb6174061de82fb50e493f766857ba831666525100"
+      "size": 18638,
+      "sha256": "7e7613bd6a1ee2fecd392751cad4f634a909dd595490808350579b24a5294022"
     },
     {
       "path": "scripts/bootstrap/95-export-unmanaged-solution.ps1",
@@ -696,8 +712,8 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 60001,
-      "sha256": "f16b54c54ae961b94a6d15c9054ed339621a60fbff91c8f63b82312ed38b241d"
+      "size": 61519,
+      "sha256": "2d1bcf4290630b35962ce8694b9b3318bdbac2be7e5120843ef58bc1f1b62fe9"
     },
     {
       "path": "scripts/bootstrap/helpers/wizard-run-state.ps1",
@@ -728,16 +744,16 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 9166,
-      "sha256": "0ddd84590277dae9286123e4f3055c5aab3c7a111f7e9c3976387c9b51bf1c2a"
+      "size": 9244,
+      "sha256": "484ee6157fcae702a70dcff574844a4b1d86f9950b63eef49edc863314f388a1"
     },
     {
       "path": "scripts/bootstrap/helpers/wizard_update.py",
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 53764,
-      "sha256": "617bb55ea5a6d3aecfbae32c03c8a8aabb5f0a47efa826f533e05ee23baf10e7"
+      "size": 64584,
+      "sha256": "5490722368d7ed5c357682ac602c556e8a2d33dcee5c975d619239a01a565549"
     },
     {
       "path": "scripts/ci/AlternateKeys.Tests.ps1",
@@ -752,8 +768,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 10645,
-      "sha256": "c82eb5a19f242e527739c38d1bf273a2bdd16485d5fb62a625d72946bfd93010"
+      "size": 21306,
+      "sha256": "beca23634c62050ac161de6b4d71c8173d95be1bab2d143b8bc0b2de9a37be7a"
     },
     {
       "path": "scripts/ci/DataverseRuntime.Tests.ps1",
@@ -776,8 +792,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 9442,
-      "sha256": "4f3894265b74e372be1789c5bb96297912fd050f41e44f167093059fb4caeae6"
+      "size": 10941,
+      "sha256": "fd3de729f858ce52ff24586a15fb2a6a195fdbbb3f3e44b7005caba2214dbd1e"
     },
     {
       "path": "scripts/ci/WizardUpdateEntryPoints.Tests.ps1",
@@ -976,8 +992,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 10121,
-      "sha256": "8d81e215d7e910760c786528f31d686bc9357d49218e6c405daa258aae21bddb"
+      "size": 13395,
+      "sha256": "97f7ebcdf376d461f59b4e2ece5920ed88202518ff7e43af3106b972d7275220"
     },
     {
       "path": "scripts/ci/test-wizard-distribution.ps1",
@@ -1000,16 +1016,16 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 33123,
-      "sha256": "a20e84d6d56f2d9bbccef8903680330538b8a313866eb7bb5245a8883c1566ee"
+      "size": 47819,
+      "sha256": "6b13c8785af2582089afeaf6c59704610ba36409228185a379ec91936f17b12e"
     },
     {
       "path": "scripts/ci/test-wizard-source-control-acceptance.ps1",
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 19891,
-      "sha256": "e375bbb2426b0cfc200f292c80c09fc2802f56df36561d7f73507cd1c0364509"
+      "size": 20350,
+      "sha256": "534280d8174552856877d427210d10c050da3c4ad6cd3d40959d820761c6d293"
     },
     {
       "path": "scripts/ci/test-wizard-update.ps1",
@@ -1040,16 +1056,16 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 43118,
-      "sha256": "5dc148e864c6e547ec7f502a8368af7f9da5ba4d099f5be820ab4f272f8ef78f"
+      "size": 55687,
+      "sha256": "318d01f0ad46cec6ee91ae9f5aef42817b8278843063d98c72525f83ae88dd7d"
     },
     {
       "path": "wizard.profile.json",
       "category": "schema-profile",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 10073,
-      "sha256": "d0b52e8a6bee50cd1d1b13bbe2556a10ea86990469397877e0d0fc586a36f46b"
+      "size": 10494,
+      "sha256": "9a02eb113015167d2d4f34b3ada594faaa5ae7837de96d4b22b2368a43fc67b3"
     },
     {
       "path": "wizard.release.json",

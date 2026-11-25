@@ -10,9 +10,18 @@ Load and follow [authorization and execution](../../docs/policies/authorization-
 for every workload and generated project; preserve required safety gates and
 reuse existing valid scoped permission.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- For a confirmed new external project, invoke the runtime's
+  `05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+  before chat intake to inherit actual local policy/assets. Existing/custom
+  instructions require shared H009 `-InstructionMigration` preview; follow
+  `docs/wizard-updates.md`, never overwrite them or infer runtime installation.
 - After runtime confirmation, use `04-check-wizard-update.ps1 -Action Status`
   from the runtime for the shared offline version/status banner. Offer Review
   changes / Update wizard / Skip for now through its shared actions; Skip
@@ -24,6 +33,28 @@ Use this behavior:
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
+- With installed Q31, prefer the existing handoff's `discover` before repeating
+  intake. Discover selected source/scoped metadata for build/enhance/repair;
+  ask only material unresolved questions, not reliably discoverable facts.
+  Configure single-operator, multi-persona or production-oriented fidelity;
+  never impose production persona testing on a single-operator demonstration
+  unless actual policy/security or accepted criteria require it. Read-only
+  discovery and accepted `feedback` can precede Spec Kit. Deliver an authorized
+  first slice, offer inspection and reconcile affected tasks without restarting.
+  Preserve legacy bootstrap planning, semantic gates and actual scoped authority.
+- For installed Q32 agent behavior, reuse `agent-test` through the same handoff.
+  Keep versioned prompts/scenarios external; test conversation behavior, not just
+  instruction syntax. Require exact live-test effects scope; unknown telemetry
+  remains unverified. Automatic correction is accepted local-fictional-only,
+  never actual agent editing/publication or synthetic-to-native acceptance.
+- With installed Q33, reuse the same handoff's Playwright quality/context checks,
+  accepted fictional scenario replay and read-only Git inspection. Do not replay
+  persisted transactions or duplicate seeds; synthetic reset needs exact
+  separate authority. Preserve unique/merge changes, recovery refs and expired
+  or uncertain writer ownership; no automatic merge/close or new mandatory stage.
+  Optional Q37 hosted PR discovery uses explicit selected repository/PRs through
+  Automation CLI only; Starter's manifest stays offline. No fetch, work allocation
+  or release approval is implied. See `docs/intelligent-wizard-getting-started.md`.
 - Reuse the delivery goal and deadline when already provided. Select risk-based validation without weakening required CI, security or deployment acceptance. Default to guided execution; present automation only if it is likely to save net time after setup and verification, and after the user opts in. WSL is optional; never block a novice from guided planning because it is absent. See `docs/delivery-pacing-and-tooling.md`.
 - Default to `demo-builder`: ask six business questions, two delivery-context questions (prototype/presentation-demo/connected-demo/pilot/production and user timeframe), and one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
@@ -32,11 +63,16 @@ Use this behavior:
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
-- Treat Spec Kit as mandatory before implementation.
+- Require affected Spec Kit planning for new/material features; routine authorized corrections reuse accepted behavior and reconcile affected notes after validation.
 - Preserve approved native table/relationship identities; never replace Account
   reuse with a custom table. Optional installed-framework continuation follows
   [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime
   paths, accepted canonical contract and separate synchronization opt-in.
+  Optional Q29 `browser` action uses explicit `BrowserConfigPath` for fresh
+  read-only Playwright diagnostics; no silent installation or live-proof inference.
+  Optional Q30 `deploy` requires exact `AuthorizationPath`/`TenantId` and the
+  installed runtime's authorized nonproduction delivery profile; verify published
+  bytes and rendered form/bindings before guarded source/note reconciliation.
   Missing Spec Kit is a no-op; do not install tooling or start a scheduler.
   Read-only Status exposes canonical task/lease/dependency progress and next
   actions; projection eligibility is not worker authority or live evidence.

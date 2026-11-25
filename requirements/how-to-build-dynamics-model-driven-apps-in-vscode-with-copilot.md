@@ -9,6 +9,10 @@ for framework and generated-project work: reuse valid scope, preserve required
 safety gates, and report source, test, deployment and live verification evidence
 separately. Include the contract through the existing distribution review.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 Companion wizard:
 
 The confirmed runtime exposes shared offline version/status through
@@ -23,6 +27,22 @@ Optional starter-to-framework continuation follows
 project/runtime roots, accepted source contracts and explicit synchronization
 selection are required. Native Windows guided use needs neither consumer Git
 nor WSL; synthetic completion is not live deployment/UI acceptance.
+With installed Q31 support, prefer the same handoff's read-only `discover`
+before repeat questions. Build, enhance and repair share canonical tasks;
+fidelity guides proportional testing without relaxing security. Deliver an
+authorized first slice, inspect it and reconcile accepted `feedback` without
+restarting unaffected work. Discovery/feedback do not require completed Spec Kit;
+bootstrap execution still retains required affected planning and semantic gates.
+Installed Q32 `agent-test` uses the same optional handoff for behavioral
+conversational regression and version comparison, not instruction syntax alone.
+External prompts/scenarios, exact live-test effects authority and unverified
+missing telemetry are mandatory distinctions; local-fictional correction never
+edits or publishes an actual agent.
+Installed Q33 extends the same handoff: scoped native UI quality/context via
+existing Playwright, accepted-record presentation without repeated transactions,
+exact synthetic-only reset authority and offline selected-PR/canonical-writer
+inspection. Preserve unique work, merge resolutions and recovery refs. No
+implicit live mutation, merge/close, expired-writer release or mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
@@ -55,7 +75,8 @@ For this repository, the primary wizard entry is `/power-platform-wizard-init` i
 
 Required process gate:
 
-- Spec Kit planning is mandatory before implementation.
+- Affected Spec Kit planning precedes new/material implementation; routine
+  authorized corrections reuse accepted requirements and reconcile notes afterward.
 - Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
 
 ### 0A. Beginner first-run flow (clone to demo)
@@ -827,7 +848,7 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - Run Azure sign-in and Power Platform auth profile creation.
 - Validate target Dataverse environment URL.
 
-1. Complete planning before implementation (required)
+1. Complete affected planning for new/material changes; reuse accepted planning for routine corrections.
 
 - Answer discovery questions for scenario, users, data, and success criteria.
 - Create `spec.md`, `plan.md`, and `tasks.md`.

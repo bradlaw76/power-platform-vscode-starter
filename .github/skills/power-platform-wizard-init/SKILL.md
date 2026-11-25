@@ -13,11 +13,44 @@ for all workloads. During the existing consumer compatibility review, require
 this policy or a reviewed equivalent and a reference in the project's existing
 instruction entry point before mutating work. Do not overwrite local instructions.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Overview
 
 This skill starts the repository wizard safely through either chat or terminal, enforces planning gates, and reports progress using existing telemetry artifacts.
 
 This skill does not modify core wizard scripts.
+
+Optional Q29 read-only browser diagnostics uses the existing handoff's `browser`
+action and explicit `BrowserConfigPath`; follow project `docs/framework-handoff.md`.
+Do not install tooling silently or label synthetic Chromium success as tenant proof.
+Optional Q30 `deploy` uses the same handoff with exact `AuthorizationPath` and
+`TenantId`, an existing nonproduction delivery profile, published/read-only
+rendered checks and guarded source reconciliation; no expanded authority.
+When installed Q31 is available, prefer the same handoff's `discover` before
+repeating questions. Reuse selected source/scoped metadata for build/enhance/repair;
+ask only material unresolved questions. Configure single-operator, multi-persona
+or production-oriented fidelity without relaxing actual policy/security.
+Read-only discovery and accepted `feedback` may precede Spec Kit. Deliver an
+authorized first slice, offer inspection, then reconcile only affected tasks in
+the same runtime. Legacy bootstrap planning and semantic gates remain unchanged.
+For installed Q32, use that handoff's `agent-test` for ordered conversational
+behavior and version regression, not instruction lint. Keep prompts/scenarios
+external; Direct Line tests can invoke tools and need exact live-effects authority.
+Missing tool/grounding/escalation evidence is unverified. Only one accepted local
+fictional instruction correction can run automatically; never edit/publish an
+actual agent or infer native acceptance from synthetic results.
+For installed Q33, reuse the same handoff for scoped Playwright native quality
+and context checks, accepted fictional replay and offline Git/writer inspection.
+Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
+authorized synthetic-only. Preserve unique/merge changes, recovery refs and
+expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+Q37's optional Automation CLI hosted PR discovery requires explicit selected
+repository/PRs; Starter's manifest handoff stays offline. No fetch/merge/close,
+work allocation or release approval is inferred. Use
+[published installation and capability boundaries](https://github.com/bradlaw76/power-platform-vscode-starter/blob/campaign/starter-instruction-migration-q15-q16/docs/intelligent-wizard-getting-started.md).
 
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
@@ -41,6 +74,12 @@ options only within accepted scope. Preserve mandatory gates and same-mode/
 policy resume identity.
 
 ## Runtime Compatibility Preflight
+
+For a confirmed new external project, use the runtime's
+`05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+before chat intake. It supplies actual local policy/assets, not a runtime.
+Existing/custom instructions use H009 `-InstructionMigration` preview under
+`docs/wizard-updates.md`; never copy over them.
 
 ### Installed wizard and updates (H009)
 

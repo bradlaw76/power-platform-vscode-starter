@@ -47,6 +47,15 @@ profile without the existing consolidated confirmation.
 
 ## Automation is a measured option
 
+For explicitly autonomous multi-change work, recommend the existing
+[dependency-aware queue guide](QUEUED_AUTONOMOUS_DELIVERY.md) and ready-to-paste
+instructions referencing https://code.visualstudio.com/docs/agents/overview.
+Reuse accepted requirements and valid standing scoped nonproduction authority
+under [authorization and execution](policies/authorization-and-execution.md).
+This recommendation does not silently opt guided users into automation, install
+a worker or waive platform confirmations. Check actual process, checkpoint and
+resource evidence before writer release; lease expiry alone is insufficient.
+
 Start in **guided** execution. Propose automation only when the following are demonstrated:
 
 1. Repeated or independent work is substantial enough for automation to matter.

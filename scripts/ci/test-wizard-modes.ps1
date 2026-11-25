@@ -365,6 +365,18 @@ try {
     Assert-True -Condition ($declinedProfileIndex -ge 0 -and $declinedOutput.IndexOf('recommendations were not approved') -gt $declinedProfileIndex -and -not (Test-Path (Join-Path $declinedWorkspace 'specs'))) -Message 'Declining after the visible workload recommendation must prevent planning writes.'
     $materialTasks = Get-Content -LiteralPath (Join-Path $materialFolder 'tasks.md') -Raw -Encoding UTF8
     Assert-True -Condition ($materialTasks.Contains('- [ ] Resolve material 2')) -Message 'Pending source review must remain an unfinished planning task.'
+    foreach ($rule in @(
+        'docs/policies/authorization-and-execution.md',
+        'single canonical',
+        'routine authorized corrections',
+        'continue independent work, then reconcile affected notes',
+        'no fresh discovery or full planning package',
+        'docs/QUEUED_AUTONOMOUS_DELIVERY.md',
+        'never infer deployment/native acceptance from source success'
+    )) {
+        Assert-True -Condition ($materialTasks.Contains($rule)) -Message "Generated tasks lost authorization/execution contract: $rule"
+    }
+    Assert-True -Condition (-not $materialTasks.Contains('observe the actual browser principal (not session-declared')) -Message 'Generated tasks must reference, not reproduce, canonical native procedures.'
     @{ decision = 'provided'; materials = @() } | ConvertTo-Json | Set-Content -LiteralPath $materialsPath -Encoding UTF8
     $invalidWorkspace = New-WizardTestWorkspace -Name 'invalid-materials'
     $invalidRejected = $false

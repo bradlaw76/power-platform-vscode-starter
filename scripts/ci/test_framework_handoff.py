@@ -4,6 +4,7 @@ File: scripts/ci/test_framework_handoff.py
 Environment: Python 3.11+; optional installed framework 0.2.1 and generic fixture.
 """
 import argparse
+from contextlib import nullcontext
 from copy import deepcopy
 import errno
 import importlib.util
@@ -14,8 +15,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from types import ModuleType
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("starter_handoff", ROOT / "scripts" / "bootstrap" / "helpers" / "framework-handoff.py")
@@ -42,6 +44,34 @@ class HandoffBoundaries(unittest.TestCase):
         for name in ("spec.md", "plan.md", "tasks.md"):
             (folder / name).write_bytes(b"# Human text\r\n\r\nPreserve spacing.  \r\n")
         (self.project / "BUILD.md").write_bytes(b"# Human build record\r\n")
+
+    def framework_boundary(self):
+        """Isolate delegation tests; InstalledHandoff retains the real runtime."""
+        def write_json(path, state):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(state), encoding="utf-8")
+
+        package = ModuleType("demo_builder")
+        modules = {"demo_builder": package}
+        capabilities = {
+            "workspace": {"assert_external_output": Mock(return_value=None),
+                          "locked_workspace": Mock(side_effect=lambda path: nullcontext()),
+                          "write_json": write_json},
+            "errors": {"BuildError": type("BuildError", (Exception,), {})},
+            "browser": {"validate_config": Mock(side_effect=lambda value: value)},
+            "delivery": {"Delivery": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "forms": {"guid": Mock(side_effect=lambda value: value)},
+            "discovery": {"continue_wizard": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "agent_testing": {"run_tests": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "replay": {"scenario": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "git_inventory": {"inspect_integration": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+        }
+        for name, members in capabilities.items():
+            module = ModuleType(f"demo_builder.{name}")
+            vars(module).update(members)
+            setattr(package, name, module)
+            modules[module.__name__] = module
+        return patch.dict(sys.modules, modules)
 
     def test_absent_spec_kit_is_noop_without_install_or_workspace(self):
         value, code = handoff.execute(self.args)
@@ -81,6 +111,57 @@ class HandoffBoundaries(unittest.TestCase):
                 handoff.execute(self.args)
         self.assertFalse(self.runtime.exists())
 
+    def test_browser_action_uses_existing_runtime_and_never_reuses_cached_diagnostics(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        config = self.root / "browser.json"
+        config.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.browser_config = "browser", str(config)
+        succeeded = subprocess.CompletedProcess(["browser"], 0, '{"status":"passed","fixture":true}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch("demo_builder.browser.validate_config", return_value={}), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            first, code = handoff.execute(self.args)
+            self.assertEqual(code, 0)
+            second, code = handoff.execute(self.args)
+        self.assertEqual(code, 0)
+        self.assertEqual(launch.call_count, 2)
+        self.assertEqual(launch.call_args.args[0][:2], ["browser", "diagnose"])
+        self.assertNotIn("--install", launch.call_args.args[0])
+        self.assertNotIn("replayed", second)
+
+    def test_discovery_works_before_spec_kit_and_feedback_forwards_without_cached_success(self):
+        self.project.mkdir()
+        contract = self.root / "selected.json"
+        contract.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.contract = "discover", str(contract)
+        self.args.entry_path, self.args.fidelity = "repair", "single-operator-demonstration"
+        succeeded = subprocess.CompletedProcess(["wizard"], 0, '{"status":"discovered","ui_verified":false}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            value, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual(["wizard", "discover"], command[:2])
+        self.assertEqual("repair", command[command.index("--entry-path") + 1])
+        self.assertNotIn("replayed", value)
+        self.assertFalse((self.project / "specs").exists())
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        feedback = self.root / "feedback.json"
+        feedback.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.feedback = "feedback", str(feedback)
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+        self.assertEqual(["wizard", "feedback"], launch.call_args.args[0][:2])
+        self.assertEqual(str(feedback), launch.call_args.args[0][launch.call_args.args[0].index("--input") + 1])
+
     def test_transient_launch_retries_are_bounded_and_permission_is_not_retried(self):
         transient = OSError(errno.EBUSY, "controlled busy launch")
         with patch.object(handoff.subprocess, "run", side_effect=transient) as runner:
@@ -93,7 +174,95 @@ class HandoffBoundaries(unittest.TestCase):
             with self.assertRaises(PermissionError):
                 handoff.launch(["run"])
         self.assertEqual(runner.call_count, 1)
+
+    def test_agent_behavior_uses_existing_runtime_without_planning_generation_or_publish_flags(self):
+        self.project.mkdir()
+        suite = self.root / "agent-suite.json"
+        config = self.root / "agent-config.json"
+        suite.write_text('{"schema_version":"1.0"}')
+        config.write_text('{"schema_version":"1.0"}')
+        self.args.action = "agent-test"
+        self.args.agent_suite, self.args.agent_config = str(suite), str(config)
+        self.args.repair_agent_fixture = True
+        succeeded = subprocess.CompletedProcess(["agent-test"], 0, '{"status":"passed","fixture":true}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            value, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual("agent-test", command[0])
+        self.assertEqual(str(self.runtime / "agent-tests"), command[command.index("--workspace") + 1])
+        self.assertIn("--repair", command)
+        self.assertNotIn("--publish", command)
+        self.assertFalse((self.project / "specs").exists())
+        self.assertNotIn("replayed", value)
+
+    def test_deploy_requires_explicit_delivery_authority_and_always_rechecks_the_live_target(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        self.args.action = "deploy"
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"):
+            with self.assertRaisesRegex(ValueError, "exact authorization"):
+                handoff.execute(self.args)
+        tenant = "00000000-0000-0000-0000-000000000001"
+        config = self.root / "browser.json"
+        config.write_text(json.dumps({"target": {"tenant_id": tenant}}))
+        authority = self.root / "authority.json"
+        authority.write_text(json.dumps({"development_profile": {"delivery": {"browser_config": str(config)}}}))
+        self.args.authorization, self.args.tenant = str(authority), tenant
+        succeeded = subprocess.CompletedProcess(["apply"], 0, '{"status":"completed","ui_verified":false}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch("demo_builder.browser.validate_config", side_effect=lambda value: value), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            second, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual("apply", command[0])
+        self.assertIn("--development", command)
+        self.assertEqual(str(authority), command[command.index("--authorization") + 1])
+        self.assertEqual(tenant, command[command.index("--tenant") + 1])
+        self.assertNotIn("replayed", second)
         self.assertEqual(handoff.classify(subprocess.TimeoutExpired("run", 1)), "uncertain")
+
+    def test_quality_replay_and_git_review_forward_fresh_without_planning_or_implicit_reset(self):
+        self.project.mkdir()
+        manifest = self.root / "git-review.json"
+        manifest.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.git_review_manifest = "git-review", str(manifest)
+        succeeded = subprocess.CompletedProcess(["git-review"], 0, '{"status":"observed"}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            handoff.execute(self.args)
+            self.assertEqual(2, launch.call_count)
+            command = launch.call_args.args[0]
+            self.assertEqual("git-review", command[0])
+            self.assertEqual(str(self.project), command[command.index("--root") + 1])
+            self.assertNotIn("--accepted", command)
+            (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+            self.args.action = "scenario"
+            handoff.execute(self.args)
+            self.assertEqual(["scenario", "replay"], launch.call_args.args[0][:2])
+            self.args.scenario_operation, self.args.accept_scenario = "capture", True
+            handoff.execute(self.args)
+            self.assertEqual(["scenario", "capture"], launch.call_args.args[0][:2])
+            self.assertIn("--accepted", launch.call_args.args[0])
+            self.args.scenario_operation, self.args.accept_scenario = "reset", False
+            self.args.authorization = str(manifest)
+            handoff.execute(self.args)
+            command = launch.call_args.args[0]
+            self.assertEqual(["scenario", "reset"], command[:2])
+            self.assertEqual(str(manifest), command[command.index("--authorization") + 1])
+        self.assertFalse((self.project / "specs").exists())
 
 
 @unittest.skipUnless(AVAILABLE, "Select installed framework and STARTER_FRAMEWORK_FIXTURE for real integration")

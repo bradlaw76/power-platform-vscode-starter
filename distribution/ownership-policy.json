@@ -85,6 +85,7 @@
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "paths": [
+        "AGENTS.md",
         ".github/copilot-instructions.md",
         ".github/prompts/power-platform-demo-wizard.prompt.md",
         ".github/skills/dataverse-report-wizard/SKILL.md",
@@ -104,6 +105,7 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "paths": [
+        "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
         "CONTRIBUTING.md",
         "MIGRATION.md",
         "README.md",

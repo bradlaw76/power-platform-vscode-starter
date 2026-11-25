@@ -47,7 +47,15 @@ Disabled synchronization remains disabled until explicit enable. Existing
 build resume cannot change target or effective verification policy; preserve
 the old run and prepare a reviewed new run rather than deleting its state.
 
-## Breaking Changes
+## Historical v1 baseline changes
+
+The discovery counts and before/after checklist below preserve the original v1
+migration record; they are not current discovery or execution instructions.
+Use the current [wizard contract](docs/wizard-contract-v1.md) and profile for
+selected-mode questions, and the
+[canonical execution policy](docs/policies/authorization-and-execution.md) for
+current authority and maintenance. Do not replay historical discovery or setup
+for an already authorized routine correction.
 
 - Discovery is now defined as 11 required questions plus optional extension blocks.
 - Payload folder is standardized to `payloads/` at repository root.

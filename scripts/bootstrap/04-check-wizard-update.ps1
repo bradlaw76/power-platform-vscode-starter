@@ -27,10 +27,19 @@ param(
     [string]$OpenSslPath,
     [string]$PlanPath,
     [string]$ApprovedPlanSha256,
-    [string]$TransactionPath
+    [string]$TransactionPath,
+    [switch]$InstructionMigration,
+    [string]$PreviousInstructionRoot,
+    [switch]$RemoveCreatedInstructions
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if (($PreviousInstructionRoot -or $RemoveCreatedInstructions) -and -not $InstructionMigration) {
+    throw 'PreviousInstructionRoot and RemoveCreatedInstructions require explicit InstructionMigration.'
+}
+if ($RemoveCreatedInstructions -and $Action -ne 'Recover') {
+    throw 'RemoveCreatedInstructions requires explicit Recover and the original approved plan hash.'
+}
 if ($Online -and $Offline) { throw 'Choose online or offline, not both.' }
 if ($Online -and $Action -ne 'Check') { throw 'Online is allowed only for an explicitly selected Check action.' }
 if ($Action -eq 'Skip') {
@@ -39,7 +48,7 @@ if ($Action -eq 'Skip') {
     return
 }
 . (Join-Path $PSScriptRoot 'helpers/wizard-version.ps1')
-if ($Action -eq 'Status' -and -not $EnvelopePath) {
+if ($Action -eq 'Status' -and -not $EnvelopePath -and -not $InstructionMigration) {
     if ($AsJson) { Get-WizardVersion -RuntimeRoot $RuntimeRoot | ConvertTo-Json -Depth 8 }
     else { Show-WizardVersion -RuntimeRoot $RuntimeRoot }
     return
@@ -64,7 +73,12 @@ $options = [ordered]@{
     '--plan' = $PlanPath
     '--approved-plan-sha256' = $ApprovedPlanSha256
     '--transaction' = $TransactionPath
+    '--previous-instructions' = $PreviousInstructionRoot
 }
+if ($InstructionMigration) {
+    $arguments += @('--instruction-source', (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent))
+}
+if ($RemoveCreatedInstructions) { $arguments += '--remove-created-instructions' }
 foreach ($option in $options.GetEnumerator()) {
     if ($option.Value) { $arguments += @($option.Key, $option.Value) }
 }

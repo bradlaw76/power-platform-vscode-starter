@@ -4,6 +4,21 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q15-Q16 local instruction inheritance/migration
+
+- Source-only dependent campaign lane preserves H009/H010 and PR17; no H number,
+  merge, release, live tenant write or application development.
+- New external terminal/chat workspaces receive actual policy/loaders/assets.
+  Existing customized instructions use the same H009 preview/backup/lock/
+  conditional recovery lifecycle, without a runtime upgrade.
+- Shared regression: 30 passed / one platform skip, plus added initializer case;
+  final-body migration cases passed. Focused Pester 108/0, distribution 5/0,
+  wizard/H010 consent, contracts/docs/source-control, JSON and analyzer passed.
+- Full evidence, defects corrected and recovery/ACL/runtime boundaries:
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md#q15-q16-instruction-inheritance-and-migration).
+- Final commit identities, refreshed candidate inventory and hosted CI belong in
+  the dependent PR receipt; these local fixture results are not native acceptance.
+
 ## H010 Demo Builder reporting consent correction - 2026-11-24
 
 ### Ownership, source and finding
@@ -342,6 +357,45 @@ remain separate owner decisions. No merge, release or Dataverse operation.
   pending or synthetic test is described as live release/deployment acceptance.
 - Canonical **HANDOFF NOT WRITTEN - BLOCKED** unchanged. No release/tag, tenant
   operation, security activation, persistent service or unrelated PR merge.
+## Q09–Q12 native safety continuation — 2026-11-24 (Starter local)
+
+- Same accepted campaign from `a0e7d6743cb5120104531e517253c142ac73fc3d`;
+  no Q01–Q08 restart. Canonical policy/distributed guidance now covers actual
+  browser principal/mismatch stops, publication blast radius/unrelated drafts,
+  unexpected record change evidence/no blind rollback, restriction classification
+  without bypass, app/user form eligibility and independent browser recovery.
+- Focused Pester 96 passed / 0 failed/skipped/not-run; real generated-task,
+  source-control and contract checks passed; four changed PowerShell files passed
+  parser/analyzer; changed Markdown lint passed. Installer remains byte-identical.
+- SOURCE COMPLETE / TESTED locally only. Runtime/synthetic end-to-end work belongs
+  to Automation/parent; no native pilot, live calls or runtime installed in Starter.
+  No H allocation, central standards or H009/H010 branch mutation; no push yet.
+  Exact commands and limits are in the existing AI-neutral handoff.
+
+## Development execution simplification — 2026-11-24 (Starter local)
+
+- Temporary identifier `PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION`; Q01-R1
+  authorizes implementation despite pending allocator review. No H allocated;
+  H008/H009/H010 and all original worktrees preserved.
+- Isolated `campaign/development-execution-simplification`, existing PR #17
+  baseline `6a5e7de9331299e24480d2f5751e4a3ed045b97e`. Parent owns publication.
+- Canonical authorization policy extended for standing scoped nonproduction
+  authority, accepted-requirements reuse, proportional checks, recoverable
+  administration/repair documentation and evidence-based writer recovery.
+  Semantic/report/hash/FAST/security and enforced repository gates retained.
+- Copilot/prompt/four skills/task template and applicable registry, engineering,
+  onboarding, distribution, impact, queue, recovery and handoff surfaces aligned.
+  Registration proposal contains separate STARTER/AUTO mappings for ChatGPT
+  review; central standards and Automation runtime untouched.
+- Final focused Pester: 83 passed / 0 failed / 0 skipped, including actual fixture
+  installer byte equality. Wizard modes/generated tasks, source-control intake,
+  contract integrity, changed-PowerShell parse/analyzer and changed Markdown lint
+  passed. Initial propagation failures corrected before successful rerun.
+- SOURCE COMPLETE / TESTED locally; no deployment, app/sitemap mutation,
+  inventory/sync/export run, live verification or native queue acceptance.
+  Cached update advisor absent; no fetch/freshness claim. See
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md) for
+  commands, exact limits and publication responsibilities.
 
 ## Q12 release finalization - 2026-11-23
 

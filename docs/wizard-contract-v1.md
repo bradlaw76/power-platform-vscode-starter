@@ -47,6 +47,11 @@ workload question to Demo Builder.
 
 ## Canonical Flow
 
+This flow plans new/material app changes. Routine authorized corrections reuse
+accepted outcomes and follow [the canonical execution policy](policies/authorization-and-execution.md):
+implement, validate, publish only within scope, verify, correct, continue, then
+reconcile affected notes. Do not replay intake or regenerate an unchanged package.
+
 1. Wizard mode selection (`demo-builder` by default)
 2. Mode-specific discovery and technical-design confirmation
 3. Optional extension blocks (selected by profile)
@@ -275,6 +280,18 @@ Apply `requirements/GithubInstructions_General.md` throughout each end user's ap
 7. Distinguish modified locally, committed locally, pushed, pull request opened, merged, released, and deployed.
 
 ## Planning Contract
+
+The canonical [authorization and execution policy](policies/authorization-and-execution.md)
+also governs accepted requirements reuse, standing scoped nonproduction authority,
+recoverable administration and routine repair documentation before closure.
+Registration/H numbering/docs do not block independently authorized implementation
+unless needed for real authority, enforced policy or conflicting writers.
+H IDs track outcomes, not permanent component ownership. Inspect active process,
+checkpoint and actual resource evidence before writer release; lease expiry alone
+is insufficient. Recover before restart, bound repairs and continue independent
+work. Use [dependency-aware queues](QUEUED_AUTONOMOUS_DELIVERY.md) for explicitly
+autonomous multi-change work; no scheduler or live acceptance is implied.
+Semantic/report/hash/FAST/security gates and enforced repository controls remain.
 
 Required artifacts:
 - `spec.md`

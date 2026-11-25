@@ -11,6 +11,10 @@ for all workloads and generated projects. Reuse valid scoped permission without
 repeating approval questions; preserve planning, platform and environment gates.
 Carry the policy or a reviewed equivalent through existing distribution review.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 This document is designed as a facilitation wizard.
 
 Before discovery, use the confirmed runtime's shared offline
@@ -24,6 +28,32 @@ Optional accepted-planning continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
 table identities and relationship evidence. Missing Spec Kit is a no-op;
 synchronization is explicit opt-in, without a new controller or scheduler.
+The same handoff's optional Q29 `browser` action takes `BrowserConfigPath`
+and delegates fresh read-only Playwright diagnostics to the installed runtime,
+without an intake question, build stage, silent installation or deployment grant.
+Optional Q30 `deploy` requires existing `AuthorizationPath`/`TenantId` and the
+installed runtime's nonproduction delivery profile. Reuse scoped discovery,
+verified backups, conditional repair, exact publication, published readback,
+rendered form/binding diagnostics and guarded source reconciliation. Functional
+vertical slices do not waive protected-component or wider-publication gates.
+Installed Q31 `discover`/`deliver`/`feedback` reuses that same runtime and task
+store. Prefer discovered facts over repeat questions; support build/enhance/repair
+and single-operator/multi-persona/production-oriented fidelity. Read-only discovery
+and accepted feedback can precede planning; execution retains affected planning,
+semantic/security gates and scoped authority. Inspect a first slice and reconcile
+only affected tasks rather than restarting intake.
+Optional installed Q32 `agent-test` validates external fictional conversations,
+versioned instructions, clarification, negative behavior, grounding and
+escalation/tool prerequisites. Reuse supported Direct Line/verifier evidence;
+unknown telemetry remains unverified. Live test effects require exact authority;
+automatic correction is local-fictional-only, with no actual agent edit/publish.
+Optional installed Q33 reuses Playwright for scoped responsive geometry,
+accessibility, navigation and native context checks; thresholds are scenario
+decisions, not universal certification. Reuse accepted fictional records for
+read-only presentation, block duplicate seeding/accepted-record changes and
+require exact synthetic reset authority. Offline selected-PR/writer inspection
+preserves unique/merge changes and recovery refs; never auto-merge/close or
+release expired/uncertain writers. No additional mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
@@ -54,7 +84,9 @@ Wizard outcome:
 - A beginner-usable onboarding path that works in any repository.
 
 Mandatory rule:
-- Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+- New/material tables, forms, views, flows and solution artifacts require affected
+  accepted Spec Kit planning. Routine corrections reuse accepted requirements and
+  reconcile affected notes after implementation; actual safety gates still apply.
 
 **Proportional scenario-impact gate:** classify the actual change under [the scenario change impact gate](../docs/scenario-change-impact-gate.md). Minor maintenance uses accepted planning and focused checks; do not regenerate the full matrix. A bounded scenario delta updates only affected contracts and dependent surfaces; a new or cross-cutting scenario reviews the applicable end-to-end chain before implementation. Preserve native field/security proof before live binding and continue independent prepared work without crossing blocked dependencies.
 

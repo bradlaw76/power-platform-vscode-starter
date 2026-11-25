@@ -1,5 +1,269 @@
 # AI-neutral instruction and implementation handoff
 
+## Q15-Q16 instruction inheritance and migration
+
+Continues PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION; no H allocation or
+Q01-Q14 restart. H009 PR16 `c9ad4ca`, H010 PR18 `cd816b7` and campaign PR17
+`e086d83` remain intact. The dependent lane is based on exact H010, with the
+seven accepted PR17 changes reconciled rather than rewritten. Coordination was
+recorded on PR16/PR18; session-message delivery was unavailable, not consent.
+No other worktree, branch, tenant, merge or release was changed.
+
+Submitted as [dependent PR #19](https://github.com/bradlaw76/power-platform-vscode-starter/pull/19).
+Implementation `b76fcc95a953458dd46a7ae34b49355010687c6e`;
+inventory receipt `3e8010423a9839c48acdad1e1f6b2378f888cfb9` independently
+matched its remote ref. The existing generator verified 133 owned candidate
+files against the implementation source. Publisher trust and automatic Apply
+remain false. Final hosted-check receipts are maintained on PR19; PR17's
+continuation link is [recorded separately](https://github.com/bradlaw76/power-platform-vscode-starter/pull/17#issuecomment-7147987682).
+
+New projects receive actual local AGENTS, Copilot, canonical policy, both skill
+families, prompt/progress reference and queue guidance. Chat uses the same
+wizard's instruction-only initialization; ordinary startup remains Python-free.
+Existing or partially customized instructions are retained. The local H009
+instruction adapter uses the existing preview, approved hash, lock, backups,
+metadata, conditional writes and recovery journal, not another update manager.
+Exact prior bodies are replaced in place with customized surrounding bytes
+preserved; unknown/edited/ambiguous bodies and conflicting writers are held.
+Accepted specifications and unrelated files are untouched.
+
+Local Windows evidence: shared updater suite **30 passed / one POSIX skip**
+(31 cases), plus the added actual initializer-to-migration case passed.
+The seven migration cases also passed against final distributed bodies.
+Focused Pester **108 passed**, distribution **5 passed**; actual wizard-mode/
+H010 consent transitions, contract integrity, documentation consistency,
+source-control acceptance, configured analyzer and JSON validation passed.
+JSON validation parsed 91 documents and matched 60 payloads.
+Changed Markdown passed; final submitted-head CI is recorded on the dependent PR.
+
+Recoverable verification defects were corrected: the Git conversion fixture
+now invalidates its stat cache explicitly rather than relying on timing;
+Windows fixture cleanup reuses the existing writable cleanup routine;
+warning capture uses a proper advanced function; the instruction-only
+initializer does not load an unrelated table-detection dependency.
+No security or live/native acceptance campaign was repeated.
+
+Limitations: previous-source selection and diffs require actual review; byte
+integrity is not semantic agent compliance or installed-runtime compatibility.
+Whole-workspace snapshotting conservatively holds unrelated concurrent changes.
+Recovery is guarded compensation, not power-loss atomicity; new-file removal
+requires the original approved hash and unchanged bytes/metadata. Later edits
+are held, not overwritten. NTFS ACL/owner portability is not certified.
+Official runtime Apply remains fail-closed; no release/publisher or native
+tenant verification is inferred from external fictional project tests.
+
+## Q13-Q14 reconciliation and classification - current continuation
+
+Continues the same campaign and PRs, not Q01-Q12 reinvestigation. The three
+campaign branches were clean at Starter `0034864`, Automation `31506d4` and
+Standards `c521fb8`; their open PR heads matched. No intervening campaign-source
+mutation or overlapping writer was observed in the available process/session
+view. Repository labels on application sessions are not evidence of actual
+framework writes; visibility is bounded, not proof that every writer is absent.
+The dirty original checkout, its nested standards clone and H010 worktrees were
+preserved. Do not infer authorship or revert them from routing metadata.
+
+Fixed purpose-based classification was applied to both exact retained baselines:
+Starter `56442b0`, Automation `55e95e5`, Standards `d84f507`. The inventory includes
+all tracked Markdown and the executable lesson catalog. A is active instructions
+and operator references; B is functional/design/scenario contracts; C is
+operational evidence, indexes and record templates (some manually curated, not
+claimed automatically generated); D is historical reference/proposals. The
+non-default-loaded lesson register is B; executable catalog instructions are A.
+Whole mixed A documents are counted conservatively, including necessary
+functional/security/recovery content and markup. Roles do not change to inflate
+the reduction. Consumer source content is not exported by the inventory.
+
+| Repository | A documents before / after | A words before / after |
+| --- | ---: | ---: |
+| Starter | 31 / 31 | 58,592 / 53,935 |
+| Automation | 16 / 16 | 24,369 / 21,697 |
+| Standards | 3 / 3 | 1,265 / 804 |
+| Total | 50 / 50 | 84,226 / 76,436 |
+
+The complete mixed active/reference set decreased **9.25%**, not 60%. The six
+governing policy/loader entry points below achieved **69.36%**. Physical loader
+files remain necessary. Cutting functional bootstrap, native security, worker
+protocol or recovery references to force a broader percentage is not authorized.
+Per-file A/B/C/D classifications and both word/hash snapshots are retained in
+external campaign evidence; this handoff is an evidence index, not another policy.
+
+Remaining source gaps were closed in existing files: contributor maintenance
+uses only affected prerequisites/contracts; migration counts are explicitly
+historical; Automation operator references point to its canonical AGENTS policy;
+legacy H001-AUTO provenance is quoted as history, not current allocation or
+component ownership. The H identity standard names execution continuity as the
+execution policy. Historical H assignments, URLs and registry bytes are retained.
+No application/tenant writes, merge, release or new H allocation are authorized.
+
+Focused validation: **30 canonical-policy/installation tests passed**, including
+the newly covered migration entry point; seven changed Markdown files passed.
+The changed test passes existing CI analyzer settings; two warnings from a
+broader ad hoc analyzer profile also occur in the identical file-based baseline.
+The requested cached repository-update script is absent on this candidate;
+advice is unavailable, not assumed current. PR-head reads are separate evidence.
+Unchanged runtime/security/synthetic acceptance evidence below is reused.
+
+## Development-first consolidation - current continuation
+
+Originating initiative: H109-Q09; no new repository-specific H allocation.
+Continues the existing PR #17 from
+`56442b0e4f1a5a84a94fece79cfc7961e6703e2d`. The current owner authorizes
+implementation, commit and synchronization through that PR, not merge,
+release or tenant writes. Earlier sections below are historical evidence,
+not active instructions or continuing parent-only push restrictions.
+The [canonical execution policy](../policies/authorization-and-execution.md)
+governs; accepted functional contracts remain applicable.
+
+- Consolidated active Copilot, prompt, skills, requirements and generated-task
+  procedures into references to the existing canonical policy. Routine accepted
+  corrections proceed through implementation, scoped deployment where authorized,
+  verification, correction, independent continuation and incremental documentation.
+  Material features and actual safety approvals retain their functional gates.
+- Six named Starter/Automation policy entry points total **9,393 -> 2,878 words
+  (69.36% reduction)**; this is not a claim about all functional documentation.
+  Starter Copilot: 2,123 -> 409; canonical policy: 3,037 -> 1,286.
+- Supported Automation instruction migration preserves surrounding customization
+  bytes and rejects edited framework sections or unreconciled running generations.
+  Migration does not upgrade runtime, expand authority or prove tenant rollback.
+- Focused Pester: **96 passed**; generated wizard modes and contract integrity
+  passed. Changed PowerShell analyzer checks and fourteen changed Markdown files
+  passed. Existing H009/H010 branches and the original operator checkout were
+  untouched; prior exact-head campaign/installation evidence is retained.
+- Fresh external installed-package acceptance passed: current policy and custom
+  security text reached real local worker subprocesses; accepted source repair,
+  bounded correction, disjoint progress, migration recovery, blocked optional
+  document projection and retrospective reconciliation were exercised. This is
+  fictional **source preparation**, not native intended-user or tenant acceptance.
+
+Remaining integration work is coordinated PR review/protection resolution;
+Automation runtime precedes dependent Starter guidance. No application-specific
+implementation, automatic editor/updater acceptance, merge or release is claimed.
+Exact synchronized source identities and hosted checks belong to the PR evidence.
+
+## Q09–Q12 native safety continuation — 2026-11-24
+
+Same authorized **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION** campaign,
+continued from Starter `a0e7d6743cb5120104531e517253c142ac73fc3d` in the clean
+isolated `D:\GitRepos\starter-execution-simplification` worktree, existing PR #17.
+No Q01–Q08 restart, H allocation, central standards mutation or H009/H010 branch
+change. Local implementation/tests/commit only; no push until the parent asks.
+
+The existing canonical authorization policy now requires six generic native
+safety obligations: actual observed browser principal rather than a declared
+session/API-admin identity (mismatch stops), publication blast-radius validation
+preserving unrelated drafts, unexpected native record modification detection and
+retained evidence without blind rollback, application/security/platform/unknown
+restriction classification without bypass, form eligibility in intended app/user
+context rather than direct URL access, and independent browser process/checkpoint/
+resource recovery with renewed principal preflight.
+
+Directly applicable Copilot/prompt/four skills, portable policy distribution,
+generated task template, README registry/checklist, queue/framework handoff and
+existing planning artifacts are aligned. No competing policy, browser driver,
+runtime feature, live pilot or native acceptance run is installed/claimed here.
+Automation runtime and external synthetic end-to-end implementation/evidence
+remain the parent's separate scope; synthetic results do not prove a native pilot.
+
+### Focused evidence
+
+- Pester 5.7.1:
+  `Invoke-Pester -Path '.\scripts\ci\AuthorizationExecution.Tests.ps1','.\scripts\ci\SkillParity.Tests.ps1' -Output Normal -PassThru`:
+  **96 passed / 0 failed / 0 skipped / 0 not-run**. Includes AUTH-15–AUTH-20,
+  native safety evidence/stop rules, all six distributed entry-point parity cases,
+  and real worktree-local fixture policy installer byte equality/rerun/rejection.
+- `pwsh -NoProfile -File .\scripts\ci\test-wizard-modes.ps1`,
+  `pwsh -NoProfile -File .\scripts\ci\test-wizard-source-control-acceptance.ps1`,
+  `pwsh -NoProfile -File .\scripts\ci\test-contract-integrity.ps1`: all passed.
+- Changed PowerShell parser/PSScriptAnalyzer 1.24.0 with repository settings:
+  four files passed, no findings. Changed Markdown:
+  `npx --yes markdownlint-cli2@0.18.1` with explicit changed paths, zero errors.
+- Initial focused run exposed a newly nested Pester `It` declaration; corrected
+  its scope before the final 96/0 run. No safety gate was weakened to pass tests.
+- Fixtures used process-local `TEMP`/`TMP` under the isolated worktree; no operator
+  home or tenant was used. Full publication CI remains required.
+
+**SOURCE COMPLETE / TESTED locally**, not DEPLOYED or LIVE VERIFIED. These checks
+cover instructions, distribution and generated tasks, not actual browser identity,
+native publication/record readback, live form eligibility or browser-process
+recovery. No live calls, authentication or native pilot were performed.
+
+## Continuation: development execution simplification — 2026-11-24
+
+Temporary identifier: **PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION**.
+Owner Q01-R1 supersedes the campaign's read-only allocation block and authorizes
+implementation before H allocation. ChatGPT remains the designated allocator.
+This section is additive; all earlier snapshots and H008/H009/H010 evidence
+remain historical, unchanged and distinct from this work.
+
+- Isolated Starter worktree: `D:\GitRepos\starter-execution-simplification`.
+- Branch / existing review: `campaign/development-execution-simplification`,
+  [PR #17](https://github.com/bradlaw76/power-platform-vscode-starter/pull/17).
+- Starting head: `6a5e7de9331299e24480d2f5751e4a3ed045b97e`.
+- Local scope: Q02/Q05/Q07 Starter implementation, credential-free validation
+  and commit. Parent coordinates both repositories' push/PR-body updates; this
+  execution does not push, alter the PR body, merge, release or deploy.
+- No original OneDrive checkout, original worktree, Automation runtime helper
+  or central standards repository was inspected or modified for this change.
+- [Separate STARTER and AUTO mapping proposal](development-execution-simplification-registration-proposal.md):
+  prepared for allocator review, not registered/allocated outcomes.
+
+### Implemented surfaces
+
+Extended the existing canonical `docs/policies/authorization-and-execution.md`,
+not a competing policy: standing scoped nonproduction authority, accepted
+requirements reuse, proportional planning/checks, mandatory controls versus
+recoverable administration, and retrospective narrative documentation for
+routine authorized existing-component repairs before closure. Semantic/report/
+hash/FAST/security approvals and enforced repository controls remain mandatory.
+
+Registration, H numbering and documentation do not block independently
+authorized implementation absent real authority, enforced policy or conflicting
+writers. H IDs track outcomes, not permanent component ownership. Writer release
+requires current process/session, checkpoint and actual resource/in-flight-write
+evidence; lease expiry alone is insufficient. Recover before restart, bound
+repairs, reconcile uncertain writes and continue independent dependency-ready
+work. This is guidance, not a new fencing or authorization runtime.
+
+Aligned Copilot instructions, prompt, all four shipped skill files, generated
+task template, README enhancement registry/checklist, onboarding, wizard contract,
+engineering/distribution/impact/delivery/recovery guides and existing scenario
+planning artifacts. The existing queue guide recommends dependency-aware queues
+for explicitly autonomous multi-change work, includes independently copyable
+prompts and https://code.visualstudio.com/docs/agents/overview, and distinguishes
+installed queue controls from durable unattended execution.
+
+### Local validation and limitations
+
+All fixture scratch paths were placed under the isolated worktree using
+process-local `TEMP`/`TMP`; no operator home or tenant was used.
+
+| Command/check | Result / scope |
+| --- | --- |
+| Pester 5.7.1: `Invoke-Pester -Path .\scripts\ci\AuthorizationExecution.Tests.ps1, .\scripts\ci\SkillParity.Tests.ps1 -PassThru` | 83 passed, 0 failed/skipped. Includes AUTH-01 through AUTH-14, distribution/gate/queue contracts and real fixture installer byte equality, refresh and missing-policy rejection. |
+| `pwsh -NoProfile -File .\scripts\ci\test-wizard-modes.ps1` | Passed; real scripted intake emits repair/authority/recovery/queue instructions without introducing another intake question. |
+| `pwsh -NoProfile -File .\scripts\ci\test-wizard-source-control-acceptance.ps1` | Passed; generated source-control guidance preserves non-mutation during intake. |
+| `pwsh -NoProfile -File .\scripts\ci\test-contract-integrity.ps1` | Passed; existing module/link/profile/sequence contracts. |
+| PowerShell parser and PSScriptAnalyzer 1.24.0 with repository settings, changed `.ps1` files | Passed, 3 files, no findings. |
+| `npx --yes markdownlint-cli2@0.18.1` with changed Markdown paths and new registration proposal | Passed, 0 errors. |
+
+Two initial focused runs found documentation propagation gaps (accepted
+requirements wording and the distribution guide's queue link); corrected before
+the final 83/0 run. Existing installer implementation is unchanged and its copied
+canonical policy remains byte-identical.
+
+**SOURCE COMPLETE / TESTED (local)**, not DEPLOYED or LIVE VERIFIED. These are
+behavioral instruction/distribution contracts and local fixture regressions,
+not proof of agent compliance, native VS Code queue execution, runtime lease
+recovery, hosted CI or live Dataverse acceptance. No native/live acceptance run,
+production action or tenant authentication was performed. Full repository CI
+remains required at publication; only affected local checks were run here.
+
+Cached repository-update advice was unavailable: this baseline has no
+`scripts\bootstrap\check-repository-updates.ps1`. No network fetch/update or
+remote-freshness claim was made. Existing historical release/updater
+limitations remain unchanged.
+
 ## Review snapshot: 2026-11-10 UTC
 
 This document is for a person or any AI helping generate instructions, implement

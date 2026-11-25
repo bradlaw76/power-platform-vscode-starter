@@ -14,9 +14,46 @@ work. During consumer compatibility review, include this policy or a reviewed
 equivalent and reference it from the project's existing instruction entry point;
 do not overwrite local instructions. This applies to all workloads.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Overview
 
-A wizard-guided workflow for building Power Platform model-driven apps from VS Code using PAC CLI and Dataverse Web API scripts. **Spec Kit planning is a mandatory gate — never run build scripts without completed `spec.md`, `plan.md`, and `tasks.md`.**
+A wizard-guided workflow using PAC CLI and Dataverse Web API scripts. New or
+material app/schema changes require affected `spec.md`, `plan.md`, `tasks.md`
+planning. Routine authorized corrections reuse accepted behavior and reconcile
+affected notes after implementation and targeted validation.
+
+Optional Q29 read-only Playwright diagnostics uses the existing handoff's
+`browser` action and explicit `BrowserConfigPath`; follow project-root
+`docs/framework-handoff.md`. No silent installation or synthetic-to-live claim.
+Optional Q30 `deploy` reuses an explicitly authorized nonproduction delivery
+profile through that same handoff; require `AuthorizationPath`/`TenantId`.
+Use functional slices, exact publication/readback and rendered binding checks;
+never infer production, broad publication or native-save authority.
+When installed Q31 is available, prefer the same handoff's `discover` before
+repeating questions. Reuse selected source/scoped metadata for build/enhance/repair;
+ask only material unresolved questions. Configure single-operator, multi-persona
+or production-oriented fidelity without relaxing actual policy/security.
+Read-only discovery and accepted `feedback` may precede Spec Kit. Deliver an
+authorized first slice, offer inspection, then reconcile only affected tasks in
+the same runtime. Legacy bootstrap planning and semantic gates remain unchanged.
+For installed Q32, use that handoff's `agent-test` for ordered conversational
+behavior and version regression, not instruction lint. Keep prompts/scenarios
+external; Direct Line tests can invoke tools and need exact live-effects authority.
+Missing tool/grounding/escalation evidence is unverified. Only one accepted local
+fictional instruction correction can run automatically; never edit/publish an
+actual agent or infer native acceptance from synthetic results.
+For installed Q33, reuse the same handoff for scoped Playwright native quality
+and context checks, accepted fictional replay and offline Git/writer inspection.
+Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
+authorized synthetic-only. Preserve unique/merge changes, recovery refs and
+expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+Q37's optional Automation CLI hosted PR discovery requires explicit selected
+repository/PRs; Starter's manifest handoff stays offline. No fetch/merge/close,
+work allocation or release approval is inferred. Use the
+[published installation and capability boundaries](https://github.com/bradlaw76/power-platform-vscode-starter/blob/campaign/starter-instruction-migration-q15-q16/docs/intelligent-wizard-getting-started.md).
 
 Preserve approved native table/relationship decisions. Optional continuation
 uses project-root `docs/framework-handoff.md` and the installed framework's
@@ -39,6 +76,12 @@ select `Demo`/`Acceptance` and independent rerun/export options only within
 accepted scope. Preserve mandatory gates and same-mode/policy resume identity.
 
 ## Runtime Compatibility Preflight
+
+For a confirmed new external project, use the runtime's
+`05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+before chat intake. It supplies actual local policy/assets, not a runtime.
+Existing/custom instructions use H009 `-InstructionMigration` preview under
+`docs/wizard-updates.md`; never copy over them.
 
 ### Installed wizard and updates (H009)
 
@@ -69,7 +112,8 @@ Before intake, inspect the target repository without modifying it. Report presen
 
 ## Mandatory Rule
 
-> Do not build tables, forms, views, flows, or solution artifacts until Spec Kit is complete.
+> Do not build new/material tables, forms, views, flows or solution artifacts
+> without affected accepted planning. Routine corrections do not need a new dossier.
 
 Spec Kit artifacts required before scripts 20–60:
 - `spec.md` — what to build and why

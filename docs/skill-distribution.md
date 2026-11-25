@@ -17,6 +17,10 @@ Every shipped skill follows [authorization and execution](policies/authorization
 
 This baseline ships two skill families (wizard and reporting), four instruction files total, not the formatter family from the older integration branch. Do not import absent families merely to satisfy an obsolete count. Run `AuthorizationExecution.Tests.ps1` for policy decisions and real temporary-home install/rerun/missing-policy checks; no operator home or consumer project is used.
 
+Entry points reference the canonical policy rather than copying procedures.
+Its native safety and development-first rules remain in the portable policy.
+Installing guidance does not install an executor, grant authority or prove a pilot.
+
 ## Install options
 
 For this repository, use the checked-in Copilot skill in place. Claude Code users can install the complete skill folder with:
@@ -63,6 +67,27 @@ publisher-provided checksum alone does not authenticate a release. To prepare a
 reviewed skill change, compare the installed folder and runtime contract, preserve
 local edits, run `scripts/ci/SkillParity.Tests.ps1`, then replace only explicitly
 approved files. Official self-updates remain disabled.
+For existing installed Automation-series consumer instructions, select a verified
+compatible bundle through the existing loader:
+
+```powershell
+demo-builder guidance --workspace D:\ProjectState --bundle D:\VerifiedBundle --new-run --migrate
+```
+
+This retires an exact previously pinned framework section, preserves surrounding
+custom text/security bytes, retains hashed before-state and resumes interrupted
+writes from its migration receipt. Modified framework sections, unowned files,
+changed pins and active/unreconciled task generations are blocked, not overwritten.
+Plain resumes retain their original pin. This requires the updated runtime; it
+is not an H009 updater, automatic adoption, executable upgrade or tenant rollback.
+Existing Starter consumer instructions use the existing H009 shared
+`-InstructionMigration` preview/transaction/recovery lifecycle, preserving owner
+edits; see [local adoption](wizard-updates.md#local-instruction-inheritance-and-migration).
+New external wizard workspaces receive the actual local policy and assets;
+chat uses `-InitializeInstructionsOnly`. Neither operation installs a runtime
+or authenticates a release. Portable user-home skill copies continue through
+the existing skill installer, not this project-only migration.
+
 
 H009 supplies [offline identity and safe update planning](wizard-updates.md).
 Both skills invoke the runtime's `04-check-wizard-update.ps1`, not agent-specific
