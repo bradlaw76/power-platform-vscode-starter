@@ -1,5 +1,46 @@
 # AI-neutral instruction and implementation handoff
 
+## Q10 - isolated distribution compatibility
+
+H009 PR16 is an ancestor of the selected Q02-Q06 candidate. Existing isolated
+consumer tests exercised version/availability, impact preview, exact authorized
+apply, customized instruction preservation, compatibility rejection, rollback,
+crash recovery and repeated-update safety. Final native Windows execution:
+32 cases, 31 passed and one explicit POSIX-permission skip.
+The first full run had one bounded-local-subprocess unavailability; the affected
+crash-recovery case passed alone, then the complete suite passed. Its underlying
+OS/timeout cause is unproven; no timeout, trust or ownership guard was relaxed.
+
+The absent cached advisor belongs to a different source lineage. Supported
+H009 status reports an unknown development release and `offline-unknown`,
+not remote freshness. [Supported path and distribution limits](../wizard-updates.md#external-skills-candidate-compatibility)
+document the finding. No second updater, instruction engine or runtime payload
+was created. Official runtime distribution still requires existing publisher,
+attestation, version and supported-ownership gates; fixture success is not an
+official-release receipt. No customer demonstration was updated.
+
+## Q02-Q06 - owner-preserving status compatibility
+
+The Q37 candidates were preserved and independently restored from incremental
+centralized backups before this isolated downstream correction. No Q37 lane,
+standard allocation, consumer project, tenant, merge or release was changed.
+
+Installed-candidate integration exposed a stale assumption: the coordinator
+retains expired owners as `running`, while the status adapter only flagged
+reconciliation after a status transition. The false flag was reproduced
+against both unchanged Q37 and the new candidate. The existing read-only
+projection now also recognizes canonical `lease_expired` observations. Its
+regression asserts the retained owner, ineligibility and unchanged task bytes;
+malformed graph/history checks remain intact.
+
+All 25 real installed-candidate handoff tests passed after correction, including
+synthetic construction, Windows PowerShell forwarding, UTF-8, recovery and
+lease/dependency projection. The existing policy/skill suites passed 100 tests.
+No new instruction bundle, distribution engine, scheduler or Dataverse permission
+is introduced. Candidate source/review and live acceptance remain distinct.
+The coordinated Automation/Starter PRs and consolidated external campaign report
+retain exact commits, recovery references and test receipts.
+
 ## Q15-Q16 instruction inheritance and migration
 
 Continues PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION; no H allocation or

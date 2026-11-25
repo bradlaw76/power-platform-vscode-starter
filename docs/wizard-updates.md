@@ -18,6 +18,25 @@ release or an update already installed from main. See the
 
 ## What is installed
 
+### External-skills candidate compatibility
+
+The Q02-Q06 downstream candidate includes H009 PR16 by ancestry; its runtime
+status correction is source code, not an instruction-bundle update. Source SHA,
+contract/profile versions and the Automation package version do not establish an
+official distributable release. Runtime distribution still requires the existing
+publisher trust, attestation, version, inventory and supported-ownership gates.
+Do not widen the isolated `update-fixture-*` allowlist to distribute real helpers.
+Local instruction-only migration remains separate and uses H009's existing
+exact approved plan, customization guards, recovery journal and rollback.
+
+The older cached `check-repository-updates.ps1` advisor is absent from this
+candidate lineage. Its other-lineage introducing commit
+`31219d1aff6a7e5d05696e7c4e544445a2135119` is not an ancestor of the selected
+candidate. This is unavailable advice, not freshness. Use the supported
+`04-check-wizard-update.ps1` path below; do not install another updater or copy
+the other lineage's advisor. An offline development checkout can truthfully
+report `offline-unknown` and `release unknown - development checkout`.
+
 Run from the **confirmed runtime clone**, not an application project:
 
 ```powershell
