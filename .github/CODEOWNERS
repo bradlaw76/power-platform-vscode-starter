@@ -1,0 +1,5 @@
+# Component: Framework Maintainer Review
+# Purpose: Request repository-owner review without claiming branch protection.
+# Owner: Power Platform VS Code Starter
+# Version: 1.0.0
+* @bradlaw76
