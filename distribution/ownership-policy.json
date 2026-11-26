@@ -144,6 +144,7 @@
         "docs/wizard-release-readiness.md",
         "docs/wizard-updates.md",
         "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md",
+        "requirements/GithubInstructions_General.md",
         "requirements/how-to-build-dynamics-model-driven-apps-wizard.md"
       ]
     },
@@ -172,6 +173,7 @@
         "scripts/ci/fixtures/requirements-coverage.fixture.json",
         "scripts/ci/fixtures/requirements-confirmation.fixture.json",
         "scripts/ci/test-semantic-fields.ps1",
+        "scripts/ci/test-native-source-integration.ps1",
         "scripts/ci/test-docs-consistency.ps1",
         "scripts/ci/test-form-population.ps1",
         "scripts/ci/test-idempotency-and-export-stages.ps1",

@@ -157,7 +157,8 @@ function Invoke-WizardDataverseRequest {
         [switch]$RejectRedirects,
         [scriptblock]$TokenProvider,
         [scriptblock]$RequestInvoker,
-        [scriptblock]$SleepAction
+        [scriptblock]$SleepAction,
+        [string]$Prefer = ''
     )
 
     $isMutation = $Method -ne 'Get'
@@ -182,6 +183,7 @@ function Invoke-WizardDataverseRequest {
             'OData-Version' = '4.0'
             'OData-MaxVersion' = '4.0'
         }
+        if (-not [string]::IsNullOrWhiteSpace($Prefer)) { $headers.Prefer = $Prefer }
         $request = [pscustomobject]@{
             Method = $Method
             Uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$(ConvertTo-WizardRelativeDataversePath -Path $Path)"
@@ -263,11 +265,13 @@ function Publish-WizardCustomizations {
         [Parameter(Mandatory)] [string]$AccessToken,
         [Parameter(Mandatory)] [string]$ParameterXml,
         [switch]$PreviewOnly,
-        [scriptblock]$RequestInvoker
+        [scriptblock]$RequestInvoker,
+        [scriptblock]$TokenProvider,
+        [scriptblock]$SleepAction
     )
 
     if ([string]::IsNullOrWhiteSpace($ParameterXml)) { throw 'Scoped publication requires non-empty ParameterXml.' }
-    return Invoke-WizardDataverseRequest -Method Post -Path 'PublishXml' -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body @{ ParameterXml = $ParameterXml } -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker
+    return Invoke-WizardDataverseRequest -Method Post -Path 'PublishXml' -EnvironmentUrl $EnvironmentUrl -AccessToken $AccessToken -Body @{ ParameterXml = $ParameterXml } -PreviewOnly:$PreviewOnly -RequestInvoker $RequestInvoker -TokenProvider $TokenProvider -SleepAction $SleepAction
 }
 
 function New-WizardEntityPublishXml {

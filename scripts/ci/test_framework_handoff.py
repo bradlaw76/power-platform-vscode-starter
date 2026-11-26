@@ -65,6 +65,8 @@ class HandoffBoundaries(unittest.TestCase):
             "agent_testing": {"run_tests": Mock(side_effect=AssertionError("Use the CLI boundary"))},
             "replay": {"scenario": Mock(side_effect=AssertionError("Use the CLI boundary"))},
             "git_inventory": {"inspect_integration": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "functional": {"COVERAGE_VERSION": "1.0",
+                           "load_requirements_coverage": lambda path, *, task_ids=None: {}},
         }
         for name, members in capabilities.items():
             module = ModuleType(f"demo_builder.{name}")
@@ -78,6 +80,25 @@ class HandoffBoundaries(unittest.TestCase):
         self.assertEqual(code, 0)
         self.assertEqual(value["status"], "not-applicable")
         self.assertFalse(self.project.exists())
+        self.assertFalse(self.runtime.exists())
+
+    def test_supported_versions_still_require_coverage_api_before_status(self):
+        self.docs()
+        self.args.action = "status"
+        for version in ("0.2.1", "0.2.2rc1"):
+            with self.subTest(version=version), self.framework_boundary(), \
+                    patch.object(handoff.importlib.metadata, "version", return_value=version), \
+                    patch.object(handoff, "canonical_task_status", return_value={"status": "unavailable"}):
+                result, code = handoff.execute(self.args)
+                self.assertEqual(code, 0)
+                self.assertEqual(result["status"], "not-started")
+                self.assertFalse(result["scheduler_started"])
+                with patch("demo_builder.functional.load_requirements_coverage", lambda unrelated: {}):
+                    with self.assertRaisesRegex(ValueError, "coverage API 1.0"):
+                        handoff.execute(self.args)
+                with patch("demo_builder.functional.COVERAGE_VERSION", "future"):
+                    with self.assertRaisesRegex(ValueError, "coverage API 1.0"):
+                        handoff.execute(self.args)
         self.assertFalse(self.runtime.exists())
 
     def test_partial_planning_and_protected_roots_fail_before_mutation(self):
@@ -146,6 +167,7 @@ class HandoffBoundaries(unittest.TestCase):
         self.args.action, self.args.worker_config = "worker", str(config)
         functional = ModuleType("demo_builder.functional")
         functional.COVERAGE_VERSION = "1.0"
+        functional.load_requirements_coverage = lambda path, *, task_ids=None: {}
         windows = ModuleType("demo_builder.windows_process")
         windows.WINDOWS_SUPERVISION_VERSION = "1.0"
         windows.OwnedJob, windows.identity_alive = Mock(), Mock()

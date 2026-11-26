@@ -16,6 +16,8 @@ stage, installation or approval workflow. Follow
 [semantic fields](../../docs/semantic-field-type-standard.md) and real
 `field-type-decisions.json`/report approvals; simulation provenance never approves
 native definitions. See [handoff](../../docs/framework-handoff.md#accepted-outcome-reliability).
+Integrated stages 30/65/90 enforce those native source gates; require current
+approved HTML definitions, and never equate source preflight with native acceptance.
 Windows supervised workers require selected installed owned-Job v1.0 capability
 and actual launch/recovery ownership evidence, not a copied skill or expired lease.
 

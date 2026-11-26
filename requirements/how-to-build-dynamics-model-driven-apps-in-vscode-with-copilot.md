@@ -10,6 +10,11 @@ source/installed capabilities block affected work. Apply
 `field-type-decisions.json`/report approvals, never simulation provenance.
 No extra discovery question, stage or approval ledger is required.
 
+In integrated source, stages 30/65/90 enforce semantic Payload/Metadata and
+requirements-backed HTML definitions through existing validators. Missing,
+unapproved or stale inputs block affected work; preflight requires actual source
+hooks and declared runtime closure. Offline tests are not native acceptance.
+
 Created: 2026-05-28
 Scope: Generic guide (not project-specific)
 Audience: Builders using Dynamics 365, Dataverse, VS Code, and Copilot

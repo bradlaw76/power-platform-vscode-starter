@@ -279,6 +279,7 @@ try {
             New-Item -ItemType Directory -Path (Join-Path $bootstrapCopy 'helpers') -Force | Out-Null
             Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/65-build-web-resources.ps1') -Destination $bootstrapCopy
             Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/helpers/wizard-hardening.ps1') -Destination (Join-Path $bootstrapCopy 'helpers')
+            Copy-Item -LiteralPath (Join-Path $repoRoot 'scripts/bootstrap/helpers/dataverse-runtime.ps1') -Destination (Join-Path $bootstrapCopy 'helpers')
             $previewOutput = @(& pwsh -NoProfile -File (Join-Path $bootstrapCopy '65-build-web-resources.ps1') -ScenarioSlug $contosoSlug -PreviewReportQueriesOnly 2>&1)
             Assert-True -Condition ($LASTEXITCODE -ne 0 -and ($previewOutput -join "`n").Contains('Reporting scope and mappings must be approved')) -Message 'Direct HTML preview must not treat confirmed scope as approved report content.'
             Assert-True -Condition (-not (Test-Path (Join-Path $workspace "specs/$contosoSlug/webresources"))) -Message 'Pending Contoso mappings must not generate generic HTML reports.'

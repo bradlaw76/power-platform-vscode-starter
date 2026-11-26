@@ -1,5 +1,9 @@
 # Project guidelines
 
+Integrated stages 30/65/90 enforce semantic and approved HTML source gates.
+The consolidated preflight checks actual hooks and runtime dependency closure;
+source readiness never grants native approval or proves intended-user acceptance.
+
 ## One execution policy
 
 Load [authorization and execution](../docs/policies/authorization-and-execution.md),

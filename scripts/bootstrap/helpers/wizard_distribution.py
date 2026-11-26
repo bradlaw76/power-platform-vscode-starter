@@ -57,6 +57,7 @@ def eligible(name: str, category: str) -> bool:
     if category == "shared-doc":
         return (name in {"README.md", "START HERE.md", "MIGRATION.md", "SECURITY.md", "CONTRIBUTING.md",
                          "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
+                         "requirements/GithubInstructions_General.md",
                          "requirements/how-to-build-dynamics-model-driven-apps-wizard.md",
                          "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md"}
                 or bool(re.fullmatch(r"docs/(?:policies/)?[a-zA-Z0-9-]+\.md", name))

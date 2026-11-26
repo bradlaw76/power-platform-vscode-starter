@@ -370,6 +370,19 @@ class WizardUpdateTests(unittest.TestCase):
         self.assertIn("Duplicate", self.run_cli("preview", expected=2)["error"])
         self.assert_original()
 
+    def test_owned_shared_document_is_not_a_trusted_fixture_update_path(self):
+        name = "requirements/GithubInstructions_General.md"
+        with self.assertRaises(update.UpdateError):
+            update.relative_name(name)
+        with self.assertRaises(update.UpdateError):
+            update.relative_name(name, instructions=True)
+        self.envelope["files"][0]["path"] = name
+        self.save_envelope()
+        result = self.run_cli("preview", expected=2)
+        self.assertEqual(result["status"], "blocked")
+        self.assertFalse(self.plan_path.exists())
+        self.assert_original()
+
     def test_U08_envelope_requires_complete_stable_bounded_explicit_contract(self):
         original = deepcopy(self.envelope)
         variants = [
@@ -920,11 +933,18 @@ class InstructionMigrationTests(unittest.TestCase):
 
     def test_existing_customizations_and_backup_restore(self):
         self.legacy(customized=True)
+        requirements = self.root / "requirements" / "GithubInstructions_General.md"
+        requirements.parent.mkdir()
+        requirements.write_bytes(b"# Customer-owned requirements\r\nNever publish production.\r\n")
+        protected = requirements.read_bytes()
         self.initialize_git()
         before = {name: self.root.joinpath(*name.split("/")).read_bytes()
                   for name in update.INSTRUCTION_PATHS[:3]}
         plan = self.review(legacy=True)
         result = self.command("apply", *self.options)
+        self.assertEqual(requirements.read_bytes(), protected)
+        self.assertNotIn("requirements/GithubInstructions_General.md",
+                         {item["path"] for item in plan["files"]})
         for name, original in before.items():
             after = self.root.joinpath(*name.split("/")).read_bytes()
             self.assertTrue(after.startswith(self.prefix))
@@ -935,6 +955,7 @@ class InstructionMigrationTests(unittest.TestCase):
         restored = self.command("recover", "--transaction", result["transaction"],
                                 "--remove-created-instructions", "--approved-plan-sha256", plan["planSha256"])
         self.assertEqual(restored["status"], "recovered")
+        self.assertEqual(requirements.read_bytes(), protected)
         for name, original in before.items():
             self.assertEqual(self.root.joinpath(*name.split("/")).read_bytes(), original)
         self.assertEqual((self.root / "accepted-spec.md").read_bytes(), self.accepted)

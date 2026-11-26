@@ -2062,6 +2062,11 @@ $(if ($Retrofit) { @"
 - Critical or high-frequency tables: $($answers["CriticalReportTables"])
 - Mapping artifact: report-mappings.md
 - Gate: validate every mapped table, field, and target placement before creating report payloads or HTML sources.
+- HTML gate: when selected, explicitly approve html-reports.json against current spec/plan excerpts and report-mappings.md before stage 65 or stage-90 planning; native reporting remains independent.
+
+## Semantic Field Implementation Gate
+- Follow docs/semantic-field-type-standard.md; explicitly approve field-type-decisions.json and mirror each decision in spec/plan before column payloads.
+- Validate Planning before payload generation and Payload before build; stage 30 checks existing types, and stage 90 runs Metadata after relationships and before export. No legacy approval or migration is inferred.
 
 ## Demo Data Implementation Plan
 - Scope: $($answers["DemoDataScope"])
@@ -2178,6 +2183,7 @@ $tasksContent = @"
 - [ ] Map standard names to logical names (for example: Case -> incident, Contact -> contact) before payload design
 - [ ] Confirm table payloads include only true custom tables
 - [ ] Confirm out-of-box fields are reused unless custom fields are explicitly required
+- [ ] Explicitly approve 'field-type-decisions.json' under 'docs/semantic-field-type-standard.md', mirror decisions in spec/plan, and pass '14-validate-semantic-fields.ps1' Planning before column payloads and Payload before build
 - [ ] Define custom table schemas and payloads
 - [ ] Define Dataverse tables and columns for: $($answers["DataEntities"])
 - [ ] Define required app artifacts for: $($answers["ArtifactsNeeded"])
@@ -2185,6 +2191,7 @@ $tasksContent = @"
 - [ ] Resolve reporting consent '$($answers['ReportingDecision'])' and mapping status '$($answers['ReportScopingStatus'])' before reporting implementation; do not treat safe no flags as a customer decline
 - [ ] Validate mapped report table logical names, required fields, and target form/dashboard/view placements against the approved schema
 - [ ] Create report payload and HTML source tasks for each approved mapping when reports are enabled
+- [ ] When HTML is selected, explicitly approve 'html-reports.json' against current spec/plan requirement excerpts and matching report-mappings.md rows before stage 65 or stage-90 planning; never infer approval from reporting consent
 - [ ] Validate report data rendering, placement, ownership, and decision-support acceptance criteria for each approved mapping
 - [ ] Confirm whether this scenario has a true staged lifecycle requiring a Business Process Flow
 - [ ] If BPF is enabled, finalize `process-$scenarioSlug.json` with stage order, required fields, entry criteria, exit criteria, and cross-table relationships

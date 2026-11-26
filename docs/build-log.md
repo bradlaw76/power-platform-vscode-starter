@@ -4,6 +4,18 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q13-R7 native source integration
+
+Selective prior-source reuse at `378ebd0a90c609207b767a9bac81ab72f4c98f35`
+integrates stage-30 semantic checks, stage-65 approved documentary HTML definitions,
+and stage-90 Payload/report planning plus post-relationship/pre-export Metadata.
+Current profiles, alternate keys, consent/provenance, membership and export gates
+remain; no older full runner, FAST enablement or official descriptor is adopted.
+Offline real-stage/injected-transport regressions verify the affected source paths.
+Native publication, placement and intended-user acceptance are not claimed.
+Exact commands/results and changed-file hashes belong to the requested external
+`starter-results.json`; source/policy commit and final inventory are parent-owned.
+
 ## Accepted-outcome and capability reliability corrections
 
 - Source-only isolated correction; no new work number, native build/deployment,

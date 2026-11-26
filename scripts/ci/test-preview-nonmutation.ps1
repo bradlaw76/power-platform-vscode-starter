@@ -67,9 +67,13 @@ function Get-ManifestProvenanceSnapshot {
 $tokenBefore = $env:DV_TOKEN
 $before = Get-GitPreviewSnapshot -RepositoryRoot $repoRoot
 $manifestBefore = @(Get-ManifestProvenanceSnapshot -RepositoryRoot $repoRoot)
-& pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview
-if ($LASTEXITCODE -ne 0) {
-    throw "Orchestrated preview failed with exit code $LASTEXITCODE."
+$output = & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'contoso-case-tracker' -Mode Preview 2>&1
+$legacyPlan = Join-Path $repoRoot 'specs\contoso-case-tracker\field-type-decisions.json'
+if (-not (Test-Path $legacyPlan)) {
+    if ($LASTEXITCODE -eq 0 -or ($output -join "`n") -notmatch 'Semantic planning gate: missing') { throw 'Unapproved legacy preview bypassed the semantic planning gate.' }
+    Write-Host 'Legacy Contoso preview correctly BLOCKED pending explicit semantic planning; no approval was inferred.'
+} elseif ($LASTEXITCODE -ne 0) {
+    throw "Orchestrated preview failed: $($output -join "`n")"
 }
 
 $environmentBefore = $env:DV_ENVIRONMENT_URL
@@ -80,9 +84,13 @@ try {
     $env:DV_TOKEN = 'preview-no-token'
     $env:DV_SOLUTION_NAME = 'LabEquipmentCheckoutAcceptance20260826'
     $env:DV_PUBLISHER_PREFIX = 'ppvs'
-    & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation
+    $output = & pwsh -NoProfile -File $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation 2>&1
+    if (-not (Test-Path (Join-Path $repoRoot 'specs\gcc-framework-acceptance\field-type-decisions.json'))) {
+        if ($LASTEXITCODE -eq 0 -or ($output -join "`n") -notmatch 'Semantic planning gate: missing') { throw 'Unapproved legacy acceptance preview bypassed the semantic planning gate.' }
+        Write-Host 'Legacy acceptance preview correctly BLOCKED; view adoption is not claimed. Approved synthetic runner paths have separate native-source-integration coverage.'
+    } else {
     if ($LASTEXITCODE -ne 0) {
-        throw "Enabled-app orchestrated preview failed with exit code $LASTEXITCODE."
+        throw "Enabled-app orchestrated preview failed: $($output -join "`n")"
     }
     $previewSummary = Get-Content -LiteralPath (Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json') -Raw | ConvertFrom-Json
     $formsViewsPreview = @($previewSummary.stages | Where-Object { $_.name -eq 'forms-views' })[0]
@@ -91,6 +99,7 @@ try {
     }
     if (@($formsViewsPreview.details) -notcontains 'ppvs_labasset|Available Lab Assets|create-custom') {
         throw 'Credential-free preview did not report the custom availability view.'
+    }
     }
 } finally {
     $env:DV_ENVIRONMENT_URL = $environmentBefore

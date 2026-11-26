@@ -23,7 +23,7 @@ $checked = [Collections.Generic.List[string]]::new()
 $pythonSources = [Collections.Generic.List[string]]::new()
 $runtime = @{ available = $false; status = 'not-requested' }
 $coverage = @{ status = 'not-requested' }
-$native = @{ validatorsAvailable = $false; buildIntegrationVerified = $false; status = 'not-requested' }
+$native = @{ validatorsAvailable = $false; buildIntegrationVerified = $false; status = 'not-requested'; missingHooks = @(); dependencyClosure = 'unverified'; liveVerified = $false }
 try {
     $profile = Get-Content -LiteralPath (Join-Path $RepoRoot 'wizard.profile.json') -Raw | ConvertFrom-Json -AsHashtable
     if ($profile.requirementsCoverage.schemaVersion -cne '1.0') { throw 'Profile coverage version unavailable.' }
@@ -75,9 +75,61 @@ try {
                 $failures.Add("Native example/schema compatibility failed: $family")
             }
         }
-        $native.status = 'validator-source-only'
-        if ($RequireNativeBuild) {
-            $failures.Add('Native build integration is unverified on this source lineage. Run approved Planning/Payload/Metadata and report gates through a reviewed compatible native executor; this preflight cannot authorize native build.')
+        $missingHooks = [Collections.Generic.List[string]]::new()
+        $hooks = @{
+            '30-build-columns.ps1' = @('Read-WizardSemanticPlan', 'Assert-WizardSemanticPayloads', 'Get-WizardSemanticLiveAttribute', 'Assert-WizardSemanticLiveField', 'Publish-WizardCustomizations')
+            '65-build-web-resources.ps1' = @('Get-WizardReportingSelection', 'Read-WizardHtmlReportPlan')
+            '90-run-build.ps1' = @('Assert-WizardNativeReportingChoice', 'Read-WizardHtmlReportPlan')
+        }
+        foreach ($script in $hooks.Keys) {
+            $ast = [Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot "scripts\bootstrap\$script"), [ref]$null, [ref]$null)
+            $commands = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.CommandAst] }, $true))
+            foreach ($hook in $hooks[$script]) {
+                if (-not @($commands | Where-Object { $_.GetCommandName() -eq $hook }).Count) { $missingHooks.Add("${script}:$hook") }
+            }
+            if ($script -eq '90-run-build.ps1') {
+                if (-not @($commands | Where-Object { $_.Extent.Text -match "14-validate-semantic-fields\.ps1'\)\s+-ScenarioSlug\s+\`$ScenarioSlug\s+-Mode Payload" }).Count) {
+                    $missingHooks.Add("${script}:semantic Payload invocation")
+                }
+                $stages = @($ast.FindAll({ param($node) $node -is [Management.Automation.Language.HashtableAst] }, $true))
+                foreach ($name in @('semantic-metadata', 'semantic-metadata-final')) {
+                    if (-not @($stages | Where-Object { $_.Extent.Text -match "Name = '$name'; Script = '14-validate-semantic-fields\.ps1'.*Mode = 'Metadata'" }).Count) {
+                        $missingHooks.Add("${script}:$name")
+                    }
+                }
+            }
+        }
+        $policy = Get-Content -LiteralPath (Join-Path $RepoRoot 'distribution\ownership-policy.json') -Raw | ConvertFrom-Json
+        $owned = @($policy.groups | ForEach-Object paths)
+        $missingDependencies = @($profile.capabilityPreflight.requiredSourceFiles | Where-Object { $owned -notcontains $_ })
+        $runtimeAssets = @($policy.groups | Where-Object category -in @('core-runtime', 'helper', 'schema-profile') | ForEach-Object paths)
+        foreach ($asset in $runtimeAssets) {
+            $assetPath = Join-Path $RepoRoot $asset
+            if (-not (Test-Path -LiteralPath $assetPath -PathType Leaf)) { $missingDependencies += $asset; continue }
+            if ($asset.EndsWith('.ps1')) {
+                $parseErrors = $null
+                [void][Management.Automation.Language.Parser]::ParseFile($assetPath, [ref]$null, [ref]$parseErrors)
+                if ($parseErrors.Count) { $missingDependencies += "$asset (invalid PowerShell)" }
+            } elseif ($asset.EndsWith('.json')) {
+                [void](Get-Content -LiteralPath $assetPath -Raw | ConvertFrom-Json -ErrorAction Stop)
+            } elseif ($asset.EndsWith('.py') -and -not $pythonSources.Contains($assetPath)) {
+                $pythonSources.Add($assetPath)
+            }
+        }
+        $runnerAst = [Management.Automation.Language.Parser]::ParseFile((Join-Path $RepoRoot 'scripts\bootstrap\90-run-build.ps1'), [ref]$null, [ref]$null)
+        foreach ($stage in $runnerAst.FindAll({ param($node) $node -is [Management.Automation.Language.HashtableAst] }, $true)) {
+            $reference = [regex]::Match($stage.Extent.Text, "Script = '([^']+)'")
+            if ($reference.Success -and $owned -notcontains "scripts/bootstrap/$($reference.Groups[1].Value)") {
+                $missingDependencies += "scripts/bootstrap/$($reference.Groups[1].Value)"
+            }
+        }
+        $native.dependencyClosure = $(if ($missingDependencies.Count) { 'incomplete' } else { 'explicit-source-assets-present' })
+        $native.missingDependencies = $missingDependencies
+        $native.missingHooks = @($missingHooks.ToArray())
+        $native.buildIntegrationVerified = $native.validatorsAvailable -and $missingHooks.Count -eq 0 -and $missingDependencies.Count -eq 0
+        $native.status = $(if ($native.buildIntegrationVerified) { 'source-integrated' } else { 'source-incomplete' })
+        if ($RequireNativeBuild -and -not $native.buildIntegrationVerified) {
+            $failures.Add('Native source integration or explicit runtime dependency closure is incomplete. Inspect native.missingHooks/missingDependencies; source readiness never authorizes Apply or proves native acceptance.')
         }
         if ($ScenarioFolder) {
             $coverage = Test-WizardRequirementsCoverage -ScenarioFolder $ScenarioFolder -RequireCoverage:$RequireCoverage
@@ -92,7 +144,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Selected interpreter capability probe failed.' }
         $runtime = $output | ConvertFrom-Json -AsHashtable
         foreach ($error in $runtime.sourceErrors) { $failures.Add("Invalid Python source capability: $error") }
-        if ($RequireFrameworkRuntime -and -not $runtime.available) { $failures.Add('Selected interpreter lacks compatible installed framework 0.2.1. Source/skill adoption is not installation.') }
+        if ($RequireFrameworkRuntime -and -not $runtime.available) { $failures.Add('Selected interpreter lacks compatible installed framework 0.2.1 or tested 0.2.2rc1 with required APIs. Source/skill adoption is not installation.') }
         if ($RequireFrameworkRuntime -and ($RequireCoverage -or $RequireFunctionalCapability -or $coverage.status -eq 'covered') -and -not $runtime.coverage) { $failures.Add('Installed runtime lacks accepted-outcome functional verification/reconciliation capability.') }
         if ($RequireWindowsWorker -and -not $runtime.windowsSupervision) { $failures.Add('Installed Windows owned-worker supervision capability unavailable; guided execution remains independent.') }
         if ($RequireWindowsWorker -and $runtime.platform -ne 'win32') { $failures.Add('Selected interpreter is not native Windows; WSL interop is not owned-Job supervision proof.') }

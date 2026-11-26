@@ -13,6 +13,8 @@ Run the consolidated safe `12-check-wizard-capabilities.ps1` preflight for the
 selected executor; source/schema adoption is not runtime installation or native
 approval. Simulation provenance never approves semantic/report definitions.
 See [handoff](../../../docs/framework-handoff.md#accepted-outcome-reliability).
+App-wizard stages 65/90 now require approved, current HTML definitions.
+This focused Report Wizard remains native-only; source integration is not acceptance.
 
 ## Authorization and execution
 

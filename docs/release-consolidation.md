@@ -7,6 +7,17 @@ build log, PR #13 and the requested external release report.
 
 ## Installation and adoption
 
+Q13-R7 selectively integrates native source gates from prior commit
+`378ebd0a90c609207b767a9bac81ab72f4c98f35`: stage-30 type/readback validation,
+stage-65 approved requirements-backed HTML definitions, and stage-90 Payload,
+report planning and two Metadata gates. Verification profiles, optional export
+and unrelated stage bodies are retained rather than replacing the runner.
+Current source/preflight tests are offline evidence, not native acceptance.
+Starter candidate `0.1.0-rc.1` is only an unregistered proposal:
+`releaseVersion` and `publisherPolicy` remain null. Exact committed inventory,
+independent review, publisher policy, native publication/placement and
+intended-user acceptance remain required before packaging/release claims.
+
 1. Select the repository/workspace and inspect its current revision and dirty
    state. Preserve existing instructions, applications and owner branches.
 2. Follow [onboarding](onboarding.md) for actual tooling and bootstrap order.
@@ -14,7 +25,8 @@ build log, PR #13 and the requested external release report.
 3. A copied skill is not runtime installation. Use the existing
    [distribution review](skill-distribution.md); do not activate unmerged
    installers, protection hooks or security settings implicitly.
-4. H008 uses an explicitly selected installed framework 0.2.1 environment,
+4. H008 uses an explicitly selected installed framework 0.2.1 or tested
+   0.2.2rc1 environment with compatible required APIs,
    accepted contract, separate external project/runtime roots and existing
    Spec Kit documents. Follow [the handoff guide](framework-handoff.md).
 5. Opt in to synchronization separately. Preserve native aliases, manual text,
@@ -61,7 +73,9 @@ Build resume binds scenario, target, payload folder, execution mode and effectiv
 verification policy. A changed profile, Preview/Apply mode, rerun/export decision
 or pre-policy state is rejected. Preserve the old evidence and start a separately
 reviewed fresh run; never delete state merely to force a match. Same-policy
-resume skips already completed stages.
+resume skips already completed unrelated stages; columns and both semantic
+Metadata gates revalidate. Planning, approval and report-definition/mapping
+bytes also bind resume identity; changed inputs require a reviewed fresh run.
 
 H008 recovery separately uses canonical tasks/journals and input hashes. An
 adapter crash does not permit reclaiming another owner or overwriting human
@@ -224,10 +238,11 @@ No automatic source upgrade, package install or protection-hook activation.
 | Relationship migration | Compatible intent changes revisit dependencies; pinned endpoint/kind changes remain protected. No automatic identity migration, deletion/recreation or managed-component rewrite. |
 
 Requirements: PowerShell 7 for native guided commands; explicitly selected
-`power-platform-demo-builder` 0.2.1 with Python 3.11+ for H008; full profile,
+`power-platform-demo-builder` 0.2.1 or explicitly tested 0.2.2rc1 with Python
+3.11+ and required coverage/Windows APIs for H008; full profile,
 helpers, schemas and guides. The framework declares no third-party runtime
 dependencies; `setuptools>=68` is a build-time dependency, not an auto-install
-step. Wizard profile 1.6, contract 1.10.0 and package 0.2.1 are different versions.
+step. Wizard profile 1.6, contract 1.10.0 and package versions are independent.
 PAC CLI/authentication and approved target/semantic contracts are needed for
 actual Dataverse work, which was not performed in this campaign.
 
@@ -272,7 +287,8 @@ Do not present the proposal's illustrative 1.11.0 as installed or available.
 
 Historical pre-H008 main: profile 1.4, contract 1.10.0, intake component 0.7.0.
 Merged H008 baseline: profile 1.6, contract 1.10.0, intake component 0.8.2;
-H009 intake component 0.9.0. Separate automation package remains 0.2.1.
+H009 intake component 0.9.0. Separate automation package accepts 0.2.1 and the
+explicitly tested 0.2.2rc1 candidate only when required APIs pass.
 These versions do not establish wizard release identity.
 The observed release listing was empty; historical snapshot/rollback tags and
 a moving branch are not official update authority. Offline or unavailable

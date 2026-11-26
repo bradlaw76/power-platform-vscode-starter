@@ -11,6 +11,8 @@ import sys
 import argparse
 import ast
 
+COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1"}
+
 
 def probe() -> dict:
     result = {"available": False, "version": None, "origin": None, "coverage": False, "windowsSupervision": False, "platform": sys.platform}
@@ -18,7 +20,6 @@ def probe() -> dict:
         result["version"] = importlib.metadata.version("power-platform-demo-builder")
         spec = importlib.util.find_spec("demo_builder")
         result["origin"] = str(pathlib.Path(spec.origin).resolve()) if spec and spec.origin else None
-        result["available"] = result["version"] == "0.2.1" and bool(result["origin"])
         try:
             from demo_builder import windows_process
             result["windowsSupervision"] = (
@@ -34,7 +35,12 @@ def probe() -> dict:
             functional.COVERAGE_VERSION == "1.0"
             and "path" in signature.parameters and "task_ids" in signature.parameters
         )
-    except (ImportError, AttributeError, ValueError, importlib.metadata.PackageNotFoundError) as exc:
+        result["available"] = (
+            result["version"] in COMPATIBLE_FRAMEWORK_VERSIONS
+            and bool(result["origin"]) and result["coverage"]
+            and (sys.platform != "win32" or result["windowsSupervision"])
+        )
+    except (ImportError, AttributeError, TypeError, ValueError, importlib.metadata.PackageNotFoundError) as exc:
         result["reason"] = type(exc).__name__
     return result
 

@@ -8,7 +8,15 @@ implementation tasks and applicable functional criteria in
 [the existing handoff contract](framework-handoff.md#accepted-outcome-reliability).
 Use [semantic field decisions](semantic-field-type-standard.md) and real
 `field-type-decisions.json` approvals; copied validators/schemas do not prove
-native runner integration or install an executor.
+native runner integration or install an executor. In the integrated source,
+stage 90 runs Payload before any stage, stage 30 checks existing types before
+creation, and Metadata gates follow relationships and precede export.
+Preview plans Metadata without calling Dataverse; resume rechecks these gates.
+Stage 65 and stage 90 require approved, current `html-reports.json` when HTML
+is selected. `12-check-wizard-capabilities.ps1 -RequireNativeBuild` checks source
+hooks and dependency closure, not authorization or intended-user acceptance.
+Direct stage 30 requires `-ScenarioSlug` or an unambiguous
+`payloads/scenarios/<slug>` folder; do not infer a target from unrelated payloads.
 
 > **This is the authoritative bootstrap sequence for this repository.** All agents, chat prompts, and documentation defer to the step order defined here. If another document shows a different order, this file takes precedence.
 

@@ -22,6 +22,13 @@ they are not an instruction to create three reports for every app.
 
 Before stage 65 or 70:
 
+Integrated stage 65 consumes only approved report definitions and their exact
+documentary excerpts/mapping rows; missing, unapproved or stale definitions stop
+both direct generation and stage-90 planning. It no longer invents a generic
+three-report set. Preview is local-only. The real-path offline check is
+`scripts/ci/test-native-source-integration.ps1`; it proves neither publication
+scope, native placement nor intended-user report acceptance.
+
 1. Complete and approve scenario spec/plan/tasks and `report-mappings.md`.
 2. Create `specs/<scenario-slug>/html-reports.json` using
    [the unapproved example](../schemas/examples/html-reports.example.json) and

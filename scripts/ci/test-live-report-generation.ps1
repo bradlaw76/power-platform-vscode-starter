@@ -16,9 +16,13 @@ function Assert-Condition {
 }
 
 function New-TestRepo {
-  $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ('pp-wizard-reports-' + [guid]::NewGuid().ToString('N'))
+  $tempRoot = Join-Path $repoRoot ('.wizard-metrics\pp-wizard-reports-' + [guid]::NewGuid().ToString('N'))
   New-Item -ItemType Directory -Path $tempRoot -Force | Out-Null
-  Copy-Item -Path (Join-Path $repoRoot '*') -Destination $tempRoot -Recurse -Force
+  foreach ($name in @('scripts\bootstrap', 'schemas', 'payloads', 'specs\contoso-case-tracker')) {
+    $destination = Join-Path $tempRoot (Split-Path $name -Parent)
+    New-Item -ItemType Directory -Path $destination -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $repoRoot $name) -Destination $destination -Recurse -Force
+  }
   return $tempRoot
 }
 
@@ -34,6 +38,32 @@ function Enable-ScenarioReports {
     $content = [regex]::Replace($content, '(?ims)^##\s+Optional Report Web Resources\s*\r?\n(.*?)(?=^##\s+|\z)', "## Optional Report Web Resources`r`n- Enabled: yes`r`n- Selected Reports: all`r`n- Report Mode: live-with-design-fallback`r`n")
   }
   Set-Content -Path $answersPath -Value $content -Encoding UTF8
+  $scenarioFolder = Split-Path $answersPath -Parent
+  $requirement = 'Reports show case counts, documented priority distribution, and supervisor ownership distribution.'
+  Add-Content -LiteralPath (Join-Path $scenarioFolder 'spec.md') -Value "`n## HTML Reporting Requirements`n$requirement"
+  $reports = @(
+    @{ Key = 'agent'; Level = 'frontline'; Title = 'Agent Case Activity'; Fields = @('cct_priority') },
+    @{ Key = 'supervisor'; Level = 'supervisor'; Title = 'Supervisor Ownership'; Fields = @('cct_priority', 'ownerid') },
+    @{ Key = 'executive-kpi'; Level = 'leadership'; Title = 'Leadership Case Distribution'; Fields = @('cct_priority') }
+  )
+  $definitions = @($reports | ForEach-Object {
+    $metrics = @(@{ Key = 'total-cases'; Title = 'Total Cases'; Kind = 'aggregate-count'; RequiredFields = @('__primaryid__') })
+    foreach ($field in $_.Fields) {
+      $metrics += @{ Key = "by-$($field.Replace('_','-'))"; Title = "Cases by $field"; Kind = 'aggregate-group'; RequiredFields = @('__primaryid__', $field) }
+    }
+    @{
+      Key = $_.Key; Level = $_.Level; Title = $_.Title; Audience = $_.Level
+      Purpose = $requirement; Placement = 'Review app Reports group'; TableLogicalName = 'incident'
+      Requirements = @(@{ Document = 'spec.md'; Excerpt = $requirement }); Metrics = $metrics
+    }
+  })
+  @{ Version = '1.0'; Approved = $true; Reports = $definitions } | ConvertTo-Json -Depth 15 | Set-Content -LiteralPath (Join-Path $scenarioFolder 'html-reports.json')
+  $mappingRows = @('| Table logical name | Report surface | Type | Target placement | Required fields | Business decision | Owner | Validation checklist |',
+    '| --- | --- | --- | --- | --- | --- | --- | --- |')
+  foreach ($report in $reports) {
+    $mappingRows += "| incident | $($report.Title) | HTML | Review app Reports group | $($report.Fields -join ', ') | Case oversight | $($report.Level) | Counts reconcile |"
+  }
+  Set-Content -LiteralPath (Join-Path $scenarioFolder 'report-mappings.md') -Value ($mappingRows -join "`n")
 }
 
 function Invoke-PreviewRun {

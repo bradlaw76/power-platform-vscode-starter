@@ -60,6 +60,26 @@ If runtime files are missing, stop and present a reviewed bootstrap plan. Never 
 
 ## Versioning and updates
 
+Q13-R7 integrates native source gates into stages 30/65/90 using the existing
+semantic/report helpers. The explicit H009 policy includes their dependencies
+and the framework-owned `requirements/GithubInstructions_General.md` referenced
+by generated tasks; consumer build logs, scenarios/payloads, secrets and
+application files remain excluded. Preflight parses the declared runtime assets
+and checks actual native hooks, not just copied validators.
+The committed candidate inventory remains historical until source and policy
+are committed and inventoried together. No dirty-tree inventory is a package,
+and `publisherVerified`/`automaticApply` remain false.
+
+This is source-bundle closure, not UpdateManager ownership. The exact General
+instructions document ships with the reviewed immutable framework source;
+it is not a consumer instruction migration target. UpdateManager intentionally
+rejects it even with independently pinned trusted-fixture controls, as it rejects
+other non-synthetic runtime assets. Consumer `requirements/` remains protected.
+The existing instruction migration/rollback mechanism handles only its explicit
+instruction entrypoints, preserving customized text and leaving requirements
+untouched. Full source-bundle installation requires separate explicit review;
+neither candidate membership nor the skill installer supplies an updater grant.
+
 Use an independently reviewed immutable source commit, or a separately approved
 authenticated release when one exists. Record `git rev-parse HEAD` as source
 identity, not proof of publisher authority. A tag, GitHub repository URL or

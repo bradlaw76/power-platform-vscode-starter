@@ -124,6 +124,9 @@ class DistributionTests(unittest.TestCase):
     def test_real_policy_accepts_framework_schemas_but_never_consumer_payloads(self):
         _, entries = distribution.load_policy(ROOT / "distribution" / "ownership-policy.json")
         self.assertIn("schemas/payloads/table.schema.json", {entry["path"] for entry in entries})
+        self.assertIn("requirements/GithubInstructions_General.md", {entry["path"] for entry in entries})
+        self.assertTrue(distribution.eligible("requirements/GithubInstructions_General.md", "shared-doc"))
+        self.assertFalse(distribution.eligible("requirements/customer-instructions.md", "shared-doc"))
         with self.assertRaises(distribution.UpdateError):
             distribution.eligible("payloads/scenarios/customer/table.json", "schema-profile")
 

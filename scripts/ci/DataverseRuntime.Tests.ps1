@@ -22,6 +22,23 @@ Describe 'Invoke-WizardDataverseRequest' {
         }
     }
 
+    It 'retains report preferences across 401 refresh and 429 retry' {
+        $global:wizardPreferenceRequests = @()
+        $result = Invoke-WizardDataverseRequest -Method Get -Path 'WhoAmI' -EnvironmentUrl 'https://example.invalid' `
+            -AccessToken 'expired-synthetic' -Prefer 'odata.include-annotations="*"' -TokenProvider { 'fresh-synthetic' } `
+            -SleepAction { param($seconds) } -RequestInvoker {
+                param($request)
+                $global:wizardPreferenceRequests += $request
+                if ($global:wizardPreferenceRequests.Count -eq 1) { throw (New-TestHttpError -StatusCode 401) }
+                if ($global:wizardPreferenceRequests.Count -eq 2) { throw (New-TestHttpError -StatusCode 429) }
+                return @{ ok = $true }
+            }
+        $result.ok | Should -BeTrue
+        $global:wizardPreferenceRequests.Count | Should -Be 3
+        foreach ($request in $global:wizardPreferenceRequests) { $request.Headers.Prefer | Should -Be 'odata.include-annotations="*"' }
+        $global:wizardPreferenceRequests[-1].Headers.Authorization | Should -Be 'Bearer fresh-synthetic'
+    }
+
     It 'returns a successful response' {
         $result = Invoke-WizardDataverseRequest -Method Get -Path 'WhoAmI' -EnvironmentUrl 'https://example.crm.dynamics.com' -AccessToken 'token' -RequestInvoker {
             param($request)

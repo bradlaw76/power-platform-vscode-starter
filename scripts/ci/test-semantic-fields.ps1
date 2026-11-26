@@ -389,7 +389,7 @@ try {
     Assert-Test ($pacState.calls -eq 2) 'Valid direct export must validate live semantics, then export/unpack exactly once.'
 
     } else {
-        Write-Host 'Native branch orchestration integration NOT RUN: surgical validator reuse excludes FAST/source-baseline/runner adoption. Helper planning, payload and injected metadata tests remain executed.'
+        Write-Host 'This suite covers semantic helpers. Current selective native stage integration is exercised separately by test-native-source-integration.ps1; the optional historical full-branch replay remains unadopted.'
     }
     foreach ($file in @(
         '.github\copilot-instructions.md', '.github\prompts\power-platform-demo-wizard.prompt.md',

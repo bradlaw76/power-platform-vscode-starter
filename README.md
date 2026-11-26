@@ -56,9 +56,10 @@ optional WSL/Playwright setup and available versus blocked capabilities.
 
 For field design, use the [Semantic Field Type Standard](docs/semantic-field-type-standard.md):
 business meaning determines native type, with approved categorical/date/currency
-decisions and dependent surfaces. This independent planning reference does not
-install semantic validation gates, migrate columns or adopt legacy protection
-packages; its runtime limitations are explicit.
+decisions and dependent surfaces. The integrated Starter source enforces Payload
+before orchestration, live type checks in stage 30, and Metadata after relationships
+and before export. Copying this reference does not install those gates or approve
+legacy plans; functional/native acceptance remains separate.
 
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
 
@@ -89,6 +90,7 @@ reproduce its procedures here.
 | H009 version/update manager | [Version and safe updates](docs/wizard-updates.md); offline startup identity with PowerShell-relative runtime paths, Windows checkout-aware Git status, shared explicit choices, stable-only discovery, exact ownership-aware preview and guarded fixture recovery; [candidate distribution and release trust](docs/wizard-release-readiness.md); official Apply remains blocked without publisher policy |
 | Development-first instruction inheritance/migration | [Shared local instruction lifecycle](docs/wizard-updates.md#local-instruction-inheritance-and-migration); new terminal/chat projects inherit actual policy and assets; existing H009 transactions preview, preserve customizations, back up and recover instruction-only changes without upgrading runtime or bypassing official release gates |
 | H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit provenance, unconfirmed/not-applicable states, current-consent checks before resume, independent native/HTML stage selection and separate mapping approval; no legacy artifact migration |
+| Q13-R7 native source integration | Existing stages 30/65/90 reuse semantic and requirements-backed HTML gates from exact prior source `378ebd0a90c609207b767a9bac81ab72f4c98f35`; preflight checks actual source hooks and explicit runtime asset closure. Offline real-path regressions are not native acceptance. FAST-dependent Apply stays blocked; no release/publisher identity or automatic installation is granted. |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 
@@ -137,7 +139,8 @@ reconciled before a custom build. Read the [final acceptance boundaries and
 next backlog](docs/release-consolidation.md#q7-q12-finalization-and-next-backlog).
 H009 now provides offline version/status and opt-in update planning, not automatic
 updates or an official release. Profile 1.6, contract 1.10.0 and installed
-automation package 0.2.1 remain separate versions. Try
+automation package 0.2.1 (or explicitly tested 0.2.2rc1 with required APIs)
+remain separate versions. Try
 `pwsh .\scripts\bootstrap\05-start-wizard.ps1 -VersionOnly` or the agent-shared
 `pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`.
 

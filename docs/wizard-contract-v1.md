@@ -9,6 +9,10 @@ Legacy genuinely inapplicable and explicit read-only/no-report designs remain
 supported. [Semantic fields](semantic-field-type-standard.md) require real
 `field-type-decisions.json` approval; fictional confirmation never approves
 native definitions. No additional discovery question or stage is introduced.
+Integrated stages 30/65/90 enforce semantic and approved HTML source gates.
+Preflight checks actual hooks/dependency closure; Preview suppresses metadata
+requests and resume retains completed evidence while revalidating live gates.
+This source integration grants no native approval or release identity.
 
 Status: Active
 Version: 1.10.0

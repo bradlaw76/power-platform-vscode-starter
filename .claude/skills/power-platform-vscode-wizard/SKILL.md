@@ -14,6 +14,8 @@ skill is not installed runtime capability. Missing capabilities block affected
 work. Follow project `docs/semantic-field-type-standard.md` and actual
 `field-type-decisions.json`/report approvals; simulation never grants them.
 Reference: project `docs/framework-handoff.md#accepted-outcome-reliability`.
+Integrated stages 30/65/90 enforce semantic and approved HTML source gates.
+Source preflight requires hooks/dependency closure, not native acceptance.
 Source-only `ReconcileOnly` always rechecks current source/verifier inputs.
 Select existing `TaskIds` explicitly for eligible blocked source tasks; protected
 holds remain with the canonical worker, not the handoff.

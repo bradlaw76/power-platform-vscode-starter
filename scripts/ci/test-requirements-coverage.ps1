@@ -134,7 +134,8 @@ try {
     $output = & (Join-Path $root 'scripts\bootstrap\13-validate-requirements-coverage.ps1') -ScenarioFolder $fixtureFolder -CoverageInputPath $fixtureInput
     Assert-Result (($output | ConvertFrom-Json).status -eq 'covered') 'Public generator CLI must bind and validate the reusable fixture.'
     $output = & pwsh -NoProfile -File (Join-Path $root 'scripts\bootstrap\12-check-wizard-capabilities.ps1') -RepoRoot $root -RequireNativeBuild
-    Assert-Result ($LASTEXITCODE -eq 1 -and ($output | ConvertFrom-Json).native.status -eq 'validator-source-only') 'Native integration must remain explicitly unverified, never source approval.'
+    $nativePreflight = $output | ConvertFrom-Json
+    Assert-Result ($LASTEXITCODE -eq 0 -and $nativePreflight.native.status -eq 'source-integrated' -and -not $nativePreflight.native.liveVerified -and -not $nativePreflight.nativeApproval) 'Native source integration needs actual hooks and closure, never live proof or approval.'
     Write-Host "Requirements coverage and safe preflight checks passed: $checks"
 } finally {
     if (Test-Path $testRoot) { Remove-Item $testRoot -Recurse -Force }

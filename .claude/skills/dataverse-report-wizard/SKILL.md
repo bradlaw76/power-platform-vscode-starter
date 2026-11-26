@@ -5,6 +5,9 @@ description: Use when creating, previewing, simulating, or deploying native Data
 
 # Dataverse Report Wizard
 
+App-wizard stages 65/90 require approved, current HTML definitions.
+This focused Report Wizard remains native-only; source integration is not acceptance.
+
 For existing accepted reporting outcomes, bind required metrics and real
 functional criteria through scenario `requirements-coverage.json`; do not add
 rediscovery or infer an HTML requirement after native-only/no-report selection.

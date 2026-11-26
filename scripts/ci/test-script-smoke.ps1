@@ -50,7 +50,7 @@ foreach ($required in @('function Get-SentenceFragment', 'Get-SentenceFragment -
   }
 }
 
-foreach ($required in @('helpers\dataverse-runtime.ps1', 'Invoke-WizardDataverseRequest', 'if (Test-Path $envFile)')) {
+foreach ($required in @('helpers\dataverse-runtime.ps1', 'Invoke-WizardDataverseRequest', 'Test-Path $envFile')) {
   if ($tables -notmatch [regex]::Escape($required)) {
     throw "Table build must use the shared resilient Dataverse runtime: missing $required."
   }

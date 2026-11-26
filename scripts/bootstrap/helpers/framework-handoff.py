@@ -1,7 +1,7 @@
 """Component: installed framework handoff, version 0.1.2.
 
 File: scripts/bootstrap/helpers/framework-handoff.py
-Environment: Python 3.11+; canonical power-platform-demo-builder 0.2.1.
+Environment: Python 3.11+; power-platform-demo-builder 0.2.1 or tested 0.2.2rc1.
 The status receipt is a derived view, not a task store or scheduler.
 """
 from __future__ import annotations
@@ -12,6 +12,7 @@ from datetime import datetime
 import errno
 import hashlib
 import importlib.metadata
+import inspect
 import json
 import os
 from pathlib import Path
@@ -25,6 +26,7 @@ SOURCE = Path(__file__).resolve().parents[3]
 MAX_BYTES = 1024 * 1024
 MAX_LAUNCH_ATTEMPTS = 3
 FRESH_ACTIONS = {"browser", "deploy", "discover", "deliver", "feedback", "agent-test", "scenario", "git-review"}
+COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1"}
 
 
 def hash_file(path: Path) -> str:
@@ -284,8 +286,19 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
         version = importlib.metadata.version("power-platform-demo-builder")
     except importlib.metadata.PackageNotFoundError:
         raise ValueError("Installed framework missing; select its Python environment. No automatic installation.") from None
-    if version != "0.2.1":
-        raise ValueError("Review compatibility before using a framework version other than 0.2.1.")
+    if version not in COMPATIBLE_FRAMEWORK_VERSIONS:
+        raise ValueError("Review compatibility: supported framework versions are 0.2.1 and tested 0.2.2rc1 only.")
+    try:
+        from demo_builder.functional import COVERAGE_VERSION, load_requirements_coverage
+        signature = inspect.signature(load_requirements_coverage)
+        compatible_coverage = (
+            COVERAGE_VERSION == "1.0"
+            and "path" in signature.parameters and "task_ids" in signature.parameters
+        )
+    except (ImportError, AttributeError, TypeError, ValueError):
+        compatible_coverage = False
+    if not compatible_coverage:
+        raise ValueError("Installed runtime lacks compatible requirements coverage API 1.0; no legacy execution fallback.")
     coverage_path = selected_path(project, f"specs/{args.scenario}/requirements-coverage.json")
     coverage_sources = []
     if getattr(args, "reconcile_only", False) and not coverage_path.exists():

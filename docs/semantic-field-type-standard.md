@@ -14,6 +14,13 @@ production-oriented builds; standard-table extensions, custom tables and hybrid
 designs. It applies to all three wizard modes and is independent of FAST or any
 other provider. Fully Custom is not an exemption.
 
+The integrated source reuses the existing validator: stage 90 invokes Payload
+before build work and Metadata after relationships and before export; stage 30
+checks all applicable existing fields before creating missing columns. Only a
+genuine 404 permits creation. Preview performs no metadata requests; resume
+rechecks live gates and binds current planning/report bytes. No automatic
+approval, type migration or functional-surface proof is implied.
+
 ## 1. Required semantic classification
 
 Before generating **any** `columns-*.json`, classify every planned field exactly
