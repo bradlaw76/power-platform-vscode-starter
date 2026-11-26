@@ -1,6 +1,48 @@
 {
   "profileVersion": "1.6",
   "contractVersion": "1.10.0",
+  "requirementsCoverage": {
+    "schemaVersion": "1.0",
+    "artifact": "requirements-coverage.json",
+    "schema": "schemas/requirements-coverage.schema.json",
+    "generatorInput": "RequirementsCoveragePath",
+    "validationCommand": "13-validate-requirements-coverage.ps1",
+    "legacyWithoutAcceptedOutcomes": "not-applicable",
+    "newIntakeCoverageRequired": true,
+    "nativeApproval": false,
+    "checkFamilies": ["binding", "crud", "lifecycle", "chronology", "metrics", "cancellation", "concurrency"]
+  },
+  "capabilityPreflight": {
+    "script": "12-check-wizard-capabilities.ps1",
+    "credentialFree": true,
+    "automaticInstallation": false,
+    "requiredSourceFiles": [
+      "AGENTS.md",
+      "docs/policies/authorization-and-execution.md",
+      "wizard.profile.json",
+      "scripts/bootstrap/05-start-wizard.ps1",
+      "scripts/bootstrap/09-framework-handoff.ps1",
+      "scripts/bootstrap/12-check-wizard-capabilities.ps1",
+      "scripts/bootstrap/13-validate-requirements-coverage.ps1",
+      "scripts/bootstrap/14-validate-semantic-fields.ps1",
+      "scripts/bootstrap/helpers/requirements-coverage.ps1",
+      "scripts/bootstrap/helpers/semantic-fields.ps1",
+      "scripts/bootstrap/helpers/choice-presentation-tokens.ps1",
+      "scripts/bootstrap/helpers/reporting-plan.ps1",
+      "scripts/bootstrap/helpers/dataverse-runtime.ps1",
+      "scripts/bootstrap/helpers/wizard-capabilities.py",
+      "scripts/bootstrap/helpers/framework-handoff.py",
+      "scripts/bootstrap/helpers/wizard-hardening.ps1",
+      "scripts/bootstrap/helpers/table-detection.ps1",
+      "scripts/bootstrap/helpers/wizard_distribution.py",
+      "scripts/bootstrap/helpers/wizard_update.py",
+      "schemas/requirements-coverage.schema.json",
+      "schemas/payloads/field-type-decisions.schema.json",
+      "schemas/payloads/html-reports.schema.json",
+      "schemas/examples/field-type-decisions.example.json",
+      "schemas/examples/html-reports.example.json"
+    ]
+  },
   "wizardUpdates": {
     "descriptor": "wizard.release.json",
     "command": "04-check-wizard-update.ps1",
@@ -68,7 +110,28 @@
       "broadPublication": false,
       "productionDeployment": false
     },
-    "workerHosts": ["Linux", "macOS", "WSL"],
+    "workerHosts": ["Linux", "macOS", "WSL", "Windows-with-installed-owned-job-capability"],
+    "windowsWorkerCapability": {
+      "module": "demo_builder.windows_process",
+      "version": "1.0",
+      "jobOwnershipRequired": true,
+      "leaseExpiryReleasesWorker": false,
+      "wslInteropOwnershipInferred": false,
+      "batchGuardFileDescriptors": "POSIX-only"
+    },
+    "sourceReconciliation": {
+      "action": "worker",
+      "parameter": "ReconcileOnly",
+      "runtimeArgument": "--reconcile-only",
+      "taskSelectionParameter": "TaskIds",
+      "taskSelectionRuntimeArgument": "--task-id",
+      "taskSelectionRepeated": true,
+      "handoffCacheReplay": false,
+      "protectedHoldsReleased": false,
+      "taskKinds": ["prepare"],
+      "environmentWrites": false,
+      "requiresIndependentVerifier": true
+    },
     "readOnlyTaskStatus": {
       "action": "status",
       "outputField": "task_summary",

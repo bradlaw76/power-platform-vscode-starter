@@ -1,5 +1,15 @@
 # Onboarding Guide
 
+Accepted-outcome reliability reuses the existing confirmation, not another
+question or stage. Before completion, bind original confirmed excerpts/hash to
+implementation tasks and applicable functional criteria in
+`requirements-coverage.json`; run the consolidated credential-free
+`12-check-wizard-capabilities.ps1` preflight. See
+[the existing handoff contract](framework-handoff.md#accepted-outcome-reliability).
+Use [semantic field decisions](semantic-field-type-standard.md) and real
+`field-type-decisions.json` approvals; copied validators/schemas do not prove
+native runner integration or install an executor.
+
 > **This is the authoritative bootstrap sequence for this repository.** All agents, chat prompts, and documentation defer to the step order defined here. If another document shows a different order, this file takes precedence.
 
 Use this document when setting up this repo for the first time in VS Code.

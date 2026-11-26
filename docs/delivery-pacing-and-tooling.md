@@ -3,7 +3,10 @@
 The optional [installed H008 handoff](framework-handoff.md) reuses canonical
 tasks, lessons and synchronization after accepted planning. Native Windows
 guided use does not require consumer Git or WSL; worker supervision remains
-POSIX-only and does not authorize an unattended scheduler or live deployment.
+available on POSIX or an explicitly selected compatible installed Windows
+owned-Job runtime; it does not authorize an unattended scheduler or live deployment.
+Run the consolidated capability preflight. Source/skill copies do not install
+Windows supervision, and a capability probe does not prove actual Job ownership.
 
 This reusable starter serves first-time builders and experienced implementers. A demo, pilot and production release have different delivery needs, but a deadline never authorizes skipping a required platform or security check. The delivery context applies to Demo Builder, Advanced Builder and Framework Acceptance, for greenfield and existing-project adoption.
 

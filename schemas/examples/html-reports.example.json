@@ -1,0 +1,35 @@
+{
+  "Version": "1.0",
+  "Approved": false,
+  "Reports": [
+    {
+      "Key": "supervisor",
+      "Level": "supervisor",
+      "Title": "Checkout Request Oversight",
+      "Audience": "Lab supervisors",
+      "Purpose": "Understand checkout request volume and lifecycle distribution.",
+      "Placement": "Review app Reports group",
+      "TableLogicalName": "lab_checkoutrequest",
+      "Requirements": [
+        {
+          "Document": "spec.md",
+          "Excerpt": "Supervisors need checkout request counts by lifecycle stage."
+        }
+      ],
+      "Metrics": [
+        {
+          "Key": "total-requests",
+          "Title": "Total Checkout Requests",
+          "Kind": "aggregate-count",
+          "RequiredFields": ["__primaryid__"]
+        },
+        {
+          "Key": "requests-by-stage",
+          "Title": "Checkout Requests by Lifecycle Stage",
+          "Kind": "aggregate-group",
+          "RequiredFields": ["__primaryid__", "lab_lifecyclestage"]
+        }
+      ]
+    }
+  ]
+}

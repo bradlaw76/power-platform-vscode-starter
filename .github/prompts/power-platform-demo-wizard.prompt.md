@@ -6,6 +6,19 @@ agent: "agent"
 ---
 Act as the guided wizard for this repository.
 
+Preserve original accepted outcomes in scenario `requirements-coverage.json`
+using the existing consolidated confirmation: documentary excerpts/hash, real
+tasks and proportional functional criteria. Do not narrow mutations to mapping
+or read-only completion. Run one credential-free
+`12-check-wizard-capabilities.ps1` preflight for source and selected installed API;
+missing capabilities block affected work, not unrelated tasks. No extra question,
+stage, installation or approval workflow. Follow
+[semantic fields](../../docs/semantic-field-type-standard.md) and real
+`field-type-decisions.json`/report approvals; simulation provenance never approves
+native definitions. See [handoff](../../docs/framework-handoff.md#accepted-outcome-reliability).
+Windows supervised workers require selected installed owned-Job v1.0 capability
+and actual launch/recovery ownership evidence, not a copied skill or expired lease.
+
 Load and follow [authorization and execution](../../docs/policies/authorization-and-execution.md)
 for every workload and generated project; preserve required safety gates and
 reuse existing valid scoped permission.

@@ -48,7 +48,7 @@ def eligible(name: str, category: str) -> bool:
         return bool(re.fullmatch(r"scripts/bootstrap/helpers/[a-zA-Z0-9_-]+\.(ps1|py)", name))
     if category == "schema-profile":
         return (name in {"wizard.profile.json", "wizard.release.json", "distribution/ownership-policy.json"}
-                or bool(re.fullmatch(r"schemas/(?:payloads/)?[a-zA-Z0-9.-]+\.json", name)))
+                or bool(re.fullmatch(r"schemas/(?:payloads/|examples/)?[a-zA-Z0-9.-]+\.json", name)))
     if category == "copilot-asset":
         return (name in {"AGENTS.md", ".github/copilot-instructions.md"}
                 or bool(re.fullmatch(r"\.github/(?:skills|prompts)/[A-Za-z0-9._/-]+\.md", name)))

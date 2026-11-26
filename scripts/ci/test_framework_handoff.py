@@ -132,6 +132,119 @@ class HandoffBoundaries(unittest.TestCase):
         self.assertNotIn("--install", launch.call_args.args[0])
         self.assertNotIn("replayed", second)
 
+    def worker_boundary(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        self.source = self.project / "source.py"
+        self.verifier = self.project / "verifier.py"
+        self.source.write_text("source version one")
+        self.verifier.write_text("verifier version one")
+        config = self.root / "worker.json"
+        config.write_text(json.dumps({"command": [sys.executable, str(self.source)],
+                                     "verify_command": [sys.executable, str(self.verifier)]}))
+        self.args.action, self.args.worker_config = "worker", str(config)
+        functional = ModuleType("demo_builder.functional")
+        functional.COVERAGE_VERSION = "1.0"
+        windows = ModuleType("demo_builder.windows_process")
+        windows.WINDOWS_SUPERVISION_VERSION = "1.0"
+        windows.OwnedJob, windows.identity_alive = Mock(), Mock()
+        return patch.dict(sys.modules, {functional.__name__: functional, windows.__name__: windows})
+
+    def test_reconciliation_rechecks_current_source_and_verifier_after_cached_results(self):
+        with self.worker_boundary(), self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", side_effect=[
+                    (subprocess.CompletedProcess(["worker"], 0, "accepted original source", ""), 1),
+                    (subprocess.CompletedProcess(["worker"], 2, "", "source fingerprint changed"), 1),
+                    (subprocess.CompletedProcess(["worker"], 3, "", "verifier fingerprint changed"), 1),
+                ]) as launch:
+            self.args.reconcile_only = True
+            handoff.execute(self.args)
+            self.source.write_text("source version two")
+            changed_source, code = handoff.execute(self.args)
+            self.assertEqual(2, code, changed_source)
+            self.assertNotIn("replayed", changed_source)
+            self.verifier.write_text("verifier version two")
+            changed_verifier, code = handoff.execute(self.args)
+            self.assertEqual(3, code, changed_verifier)
+            self.assertNotIn("replayed", changed_verifier)
+        self.assertEqual(3, launch.call_count)
+        self.assertTrue(all("--reconcile-only" in call.args[0] for call in launch.call_args_list))
+
+    def test_worker_task_selection_is_forwarded_and_changes_cached_intent_without_releasing_holds(self):
+        with self.worker_boundary(), self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(
+                    subprocess.CompletedProcess(["worker"], 0, "delegated", ""), 1)) as launch:
+            canonical = self.runtime / "tasks.json"
+            canonical.write_text(json.dumps({"tasks": [
+                {"id": "SOURCE-BLOCKED", "status": "blocked"},
+                {"id": "OWNER-HOLD", "status": "blocked", "reason": "protected owner hold"},
+            ]}))
+            original = canonical.read_bytes()
+            self.args.task_id = ["SOURCE-BLOCKED", "OWNER-HOLD"]
+            handoff.execute(self.args)
+            command = launch.call_args.args[0]
+            self.assertEqual(command[-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+            self.assertNotIn("--force", command)
+            self.args.task_id = ["SOURCE-BLOCKED"]
+            result, code = handoff.execute(self.args)
+            self.assertEqual(0, code, result)
+            self.assertNotIn("replayed", result)
+            self.assertEqual(2, launch.call_count)
+            self.assertEqual(canonical.read_bytes(), original)
+            replayed, code = handoff.execute(self.args)
+            self.assertEqual(0, code, replayed)
+            self.assertTrue(replayed["replayed"])
+            self.assertEqual(2, launch.call_count)
+            self.args.task_id = ["UNKNOWN-EXISTING-ID"]
+            launch.return_value = (subprocess.CompletedProcess(["worker"], 2, "", "unknown task ID"), 1)
+            result, code = handoff.execute(self.args)
+            self.assertEqual(2, code, result)
+            self.assertEqual(launch.call_args.args[0][-2:], ["--task-id", "UNKNOWN-EXISTING-ID"])
+            self.assertEqual(canonical.read_bytes(), original)
+            self.args.reconcile_only, self.args.task_id = True, ["SOURCE-BLOCKED", "OWNER-HOLD"]
+            handoff.execute(self.args)
+            self.assertIn("--reconcile-only", launch.call_args.args[0])
+            self.assertEqual(launch.call_args.args[0][-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+            self.assertEqual(canonical.read_bytes(), original)
+
+    def test_python_entrypoint_accepts_repeated_existing_task_ids(self):
+        argv = ["handoff", "--project", str(self.project), "--runtime", str(self.runtime),
+                "--scenario", self.args.scenario, "--action", "worker", "--reconcile-only",
+                "--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"]
+        with patch.object(sys, "argv", argv), patch.object(handoff, "execute", return_value=({}, 0)) as execute:
+            self.assertEqual(0, handoff.main())
+        self.assertEqual(execute.call_args.args[0].task_id, ["SOURCE-BLOCKED", "OWNER-HOLD"])
+        self.assertTrue(execute.call_args.args[0].reconcile_only)
+
+    @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is needed for wrapper forwarding")
+    def test_powershell_entrypoint_forwards_explicit_existing_task_ids(self):
+        scripts = self.root / "wrapper"
+        (scripts / "helpers").mkdir(parents=True)
+        shutil.copyfile(ROOT / "scripts" / "bootstrap" / "09-framework-handoff.ps1", scripts / "09-framework-handoff.ps1")
+        (scripts / "12-check-wizard-capabilities.ps1").write_text("$global:LASTEXITCODE = 0\n")
+        (scripts / "helpers" / "framework-handoff.py").write_text("import json,sys\nprint(json.dumps(sys.argv[1:]))\n")
+        result = subprocess.run(["pwsh", "-NoProfile", "-File", str(scripts / "09-framework-handoff.ps1"),
+            "-ProjectRoot", str(self.project), "-RuntimeWorkspace", str(self.runtime),
+            "-ScenarioSlug", self.args.scenario, "-Action", "worker", "-ReconcileOnly",
+            "-TaskIds", "SOURCE-BLOCKED", "-PythonExecutable", sys.executable],
+            capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        command = json.loads(result.stdout)
+        self.assertIn("--reconcile-only", command)
+        self.assertEqual(command[-2:], ["--task-id", "SOURCE-BLOCKED"])
+        quote = lambda value: "'" + str(value).replace("'", "''") + "'"
+        expression = (f"& {quote(scripts / '09-framework-handoff.ps1')} "
+            f"-ProjectRoot {quote(self.project)} -RuntimeWorkspace {quote(self.runtime)} "
+            f"-ScenarioSlug {quote(self.args.scenario)} -Action worker -ReconcileOnly "
+            f"-TaskIds @('SOURCE-BLOCKED','OWNER-HOLD') -PythonExecutable {quote(sys.executable)}")
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", expression],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)[-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+
     def test_discovery_works_before_spec_kit_and_feedback_forwards_without_cached_success(self):
         self.project.mkdir()
         contract = self.root / "selected.json"

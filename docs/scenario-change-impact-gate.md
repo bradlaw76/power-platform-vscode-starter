@@ -21,6 +21,13 @@ dependency-ready work.
 
 ## Proportional impact review
 
+Bind only affected accepted outcomes to real tasks and functional criteria in
+existing scenario `requirements-coverage.json`; preserve original confirmation
+excerpts/hash and unchanged links. Select applicable binding/CRUD/lifecycle/
+chronology/metrics/cancellation/concurrency checks, not a mandatory checklist.
+The [coverage/preflight contract](framework-handoff.md#accepted-outcome-reliability)
+adds no framework stage or approval workflow.
+
 Classify the actual delta before expanding planning. Reuse accepted requirements, delivery answers, inventories and evidence; inspect only changed contracts and their dependent surfaces.
 
 | Change class | Required planning and verification |

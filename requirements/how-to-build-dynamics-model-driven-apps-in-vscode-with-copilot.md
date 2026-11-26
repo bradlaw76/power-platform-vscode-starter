@@ -1,5 +1,15 @@
 # How to Build Dynamics Model-Driven Apps in VS Code with Copilot
 
+Reuse existing confirmation for original accepted outcomes; link exact
+excerpts/hash, implementation tasks and proportional functional criteria in
+`requirements-coverage.json`. Mapping/read-only completion cannot replace
+mutations. Use the consolidated safe capability preflight and
+[handoff](../docs/framework-handoff.md#accepted-outcome-reliability); missing
+source/installed capabilities block affected work. Apply
+[semantic fields](../docs/semantic-field-type-standard.md) with actual
+`field-type-decisions.json`/report approvals, never simulation provenance.
+No extra discovery question, stage or approval ledger is required.
+
 Created: 2026-05-28
 Scope: Generic guide (not project-specific)
 Audience: Builders using Dynamics 365, Dataverse, VS Code, and Copilot

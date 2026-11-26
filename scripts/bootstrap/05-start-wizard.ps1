@@ -117,6 +117,11 @@ NON-NEGOTIABLES
 .PARAMETER RequirementsMaterialsFile
     Optional schema-validated JSON review notes. No source documents, images or
     URLs are fetched. Notes do not approve architecture or deployment.
+
+.PARAMETER RequirementsCoveragePath
+    Original confirmed outcomes, real task excerpts and functional criteria
+    from the existing consolidated confirmation. No additional discovery or
+    native approval is inferred. Documentary hashes are bound after generation.
 #>
 
 param(
@@ -136,6 +141,7 @@ param(
     [ValidateSet('standalone-model-driven', 'new-dynamics-365-app', 'dynamics-sales-extension', 'dynamics-customer-service-extension', 'dynamics-field-service-extension', 'generic-dataverse-solution')]
     [string]$ApplicationProfile,
     [string]$RequirementsMaterialsFile,
+    [string]$RequirementsCoveragePath,
     [switch]$VersionOnly
 )
 
@@ -318,6 +324,8 @@ if (Test-Path -LiteralPath $localPolicy -PathType Leaf) {
     Write-Host "Local execution policy: $localPolicy | SHA256 $((Get-FileHash -LiteralPath $localPolicy -Algorithm SHA256).Hash)"
 }
 if ($InitializeInstructionsOnly) { return }
+& (Join-Path $PSScriptRoot '12-check-wizard-capabilities.ps1') -RepoRoot $runtimeRoot -PlanningWorkspaceRoot $repoRoot | Out-Host
+if ($LASTEXITCODE -ne 0) { throw 'Consolidated source/planning capability preflight blocked before discovery; no runtime installation inferred.' }
 $scriptedAnswers = $null
 $scriptedAnswerIndex = 0
 if (-not [string]::IsNullOrWhiteSpace($AnswersFile)) {
@@ -2233,9 +2241,26 @@ if ($null -ne $acceptedContract) {
     $tasksContent += $planningProvenance
 }
 Set-Content -Path $answersPath -Value $answersContent -Encoding UTF8
+$coverageGuidance = "`n## Accepted Outcome Coverage`n`nPreserve original confirmed outcomes and source excerpts/hash in requirements-coverage.json. Link real implementation task excerpts to applicable binding/CRUD/lifecycle/chronology/metrics/cancellation/concurrency criteria; mapping/read-only completion cannot replace accepted mutations. Run 12-check-wizard-capabilities.ps1 for source and selected installed runtime. Simulation confirmation is not native field/report approval. See docs/framework-handoff.md; no extra discovery question or stage.`n"
+$specContent += $coverageGuidance
+$planContent += $coverageGuidance
+$tasksContent += $coverageGuidance
+if ($RequirementsCoveragePath) {
+    $confirmedCoverage = Get-Content -LiteralPath $RequirementsCoveragePath -Raw -Encoding UTF8 | ConvertFrom-Json -AsHashtable
+    foreach ($outcome in $confirmedCoverage.outcomes) {
+        if ($outcome.document -eq 'spec.md') { $specContent += "`n$($outcome.excerpt)`n" }
+        else { $planContent += "`n$($outcome.excerpt)`n" }
+    }
+    $tasksContent += "`n## Accepted Implementation Tasks`n"
+    foreach ($task in $confirmedCoverage.tasks) { $tasksContent += "`n$($task.excerpt)`n" }
+}
 Set-Content -Path $specPath -Value $specContent -Encoding UTF8
 Set-Content -Path $planPath -Value $planContent -Encoding UTF8
 Set-Content -Path $tasksPath -Value $tasksContent -Encoding UTF8
+if ($RequirementsCoveragePath) {
+    . (Join-Path $PSScriptRoot 'helpers\requirements-coverage.ps1')
+    Write-WizardRequirementsCoverage -InputPath $RequirementsCoveragePath -ScenarioFolder $scenarioFolder | Out-Null
+}
 Set-Content -Path $reportMappingsPath -Value $reportMappingsContent -Encoding UTF8
 Set-Content -Path $viewsPath -Value $viewsJson -Encoding UTF8
 if ($null -ne $demoDataPlanObject) {
@@ -2263,6 +2288,8 @@ if ($bpf.Enabled) {
 Write-Host "  $envFilePath  (planning values for 10-auth-connect.ps1)"
 Write-Host ""
 Write-Host "Next steps:" -ForegroundColor Cyan
+Write-Host "  Preserve confirmed outcomes in requirements-coverage.json; bind real implementation tasks and functional criteria before claiming completion."
+Write-Host "  Run 12-check-wizard-capabilities.ps1 once for source and selected installed runtime; missing capabilities block affected work."
 if ($Retrofit) {
     Write-Host "  1. Review spec.md — confirm it reflects current state accurately."
     Write-Host "  2. Review plan.md — confirm remaining work is complete and correct."
