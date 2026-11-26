@@ -6,18 +6,70 @@ agent: "agent"
 ---
 Act as the guided wizard for this repository.
 
+Preserve original accepted outcomes in scenario `requirements-coverage.json`
+using the existing consolidated confirmation: documentary excerpts/hash, real
+tasks and proportional functional criteria. Do not narrow mutations to mapping
+or read-only completion. Run one credential-free
+`12-check-wizard-capabilities.ps1` preflight for source and selected installed API;
+missing capabilities block affected work, not unrelated tasks. No extra question,
+stage, installation or approval workflow. Follow
+[semantic fields](../../docs/semantic-field-type-standard.md) and real
+`field-type-decisions.json`/report approvals; simulation provenance never approves
+native definitions. See [handoff](../../docs/framework-handoff.md#accepted-outcome-reliability).
+Integrated stages 30/65/90 enforce those native source gates; require current
+approved HTML definitions, and never equate source preflight with native acceptance.
+Windows supervised workers require selected installed owned-Job v1.0 capability
+and actual launch/recovery ownership evidence, not a copied skill or expired lease.
+
 Load and follow [authorization and execution](../../docs/policies/authorization-and-execution.md)
 for every workload and generated project; preserve required safety gates and
 reuse existing valid scoped permission.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 The primary repository entry is `/power-platform-wizard-init`. Also recognize the natural-language request `Start the Power Platform wizard in this repository.` and apply the same startup behavior. If the current conversation already contains repository confirmation and a successful prerequisite summary from the init skill, reuse that state, do not ask for confirmation again, and continue directly with greenfield-or-retrofit selection.
 
 Use this behavior:
+- For a confirmed new external project, invoke the runtime's
+  `05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+  before chat intake to inherit actual local policy/assets. Existing/custom
+  instructions require shared H009 `-InstructionMigration` preview; follow
+  `docs/wizard-updates.md`, never overwrite them or infer runtime installation.
+- After runtime confirmation, use `04-check-wizard-update.ps1 -Action Status`
+  from the runtime for the shared offline version/status banner. Offer Review
+  changes / Update wizard / Skip for now through its shared actions; Skip
+  continues unchanged. Missing runtime is unavailable, not an installed skill
+  release. No network without opt-in or Apply without verified publisher trust,
+  exact release/ownership/compatibility. Follow `docs/wizard-updates.md`.
 - When setup has not already been completed, use the headings `Initial setup`, `Before discovery`, `What will change`, and `First decision` in the first response.
 - Under those headings, explain that after confirmation you will inspect the target repository without modifying tracked project files, run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`, explain any missing requirements, and only then begin discovery.
 - State that the prerequisite script writes local progress telemetry under `.wizard-metrics/` unless `WIZARD_METRICS_OPTOUT=1`, but initial setup does not authenticate, create Dataverse resources, run build scripts, commit, or push. Ask only for target-repository confirmation in the first response.
 - Because this prompt is already the chat path, select greenfield or retrofit after setup and then continue intake in the current conversation. Do not ask the user to choose chat again. Do not invoke another wizard prompt.
 - Ask discovery questions one at a time unless the user asks for a batch.
+- With installed Q31, prefer the existing handoff's `discover` before repeating
+  intake. Discover selected source/scoped metadata for build/enhance/repair;
+  ask only material unresolved questions, not reliably discoverable facts.
+  Configure single-operator, multi-persona or production-oriented fidelity;
+  never impose production persona testing on a single-operator demonstration
+  unless actual policy/security or accepted criteria require it. Read-only
+  discovery and accepted `feedback` can precede Spec Kit. Deliver an authorized
+  first slice, offer inspection and reconcile affected tasks without restarting.
+  Preserve legacy bootstrap planning, semantic gates and actual scoped authority.
+- For installed Q32 agent behavior, reuse `agent-test` through the same handoff.
+  Keep versioned prompts/scenarios external; test conversation behavior, not just
+  instruction syntax. Require exact live-test effects scope; unknown telemetry
+  remains unverified. Automatic correction is accepted local-fictional-only,
+  never actual agent editing/publication or synthetic-to-native acceptance.
+- With installed Q33, reuse the same handoff's Playwright quality/context checks,
+  accepted fictional scenario replay and read-only Git inspection. Do not replay
+  persisted transactions or duplicate seeds; synthetic reset needs exact
+  separate authority. Preserve unique/merge changes, recovery refs and expired
+  or uncertain writer ownership; no automatic merge/close or new mandatory stage.
+  Optional Q37 hosted PR discovery uses explicit selected repository/PRs through
+  Automation CLI only; Starter's manifest stays offline. No fetch, work allocation
+  or release approval is implied. See `docs/intelligent-wizard-getting-started.md`.
 - Reuse the delivery goal and deadline when already provided. Select risk-based validation without weakening required CI, security or deployment acceptance. Default to guided execution; present automation only if it is likely to save net time after setup and verification, and after the user opts in. WSL is optional; never block a novice from guided planning because it is absent. See `docs/delivery-pacing-and-tooling.md`.
 - Default to `demo-builder`: ask six business questions, two delivery-context questions (prototype/presentation-demo/connected-demo/pilot/production and user timeframe), and one consolidated technical recommendation confirmation. Do not ask disposable-environment, cleanup, retention, acceptance-source-tag, or rerun-proof questions.
 - Offer `advanced-builder` when the user explicitly wants direct control of application profile, architecture, mappings, relationships, reports, demo data, solution identity, or source control.
@@ -26,11 +78,16 @@ Use this behavior:
 - Use the repository workflow in [README.md](../../README.md), [docs/onboarding.md](../../docs/onboarding.md), [requirements/how-to-build-dynamics-model-driven-apps-wizard.md](../../requirements/how-to-build-dynamics-model-driven-apps-wizard.md), and [requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md](../../requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md).
 - Apply [requirements/GithubInstructions_General.md](../../requirements/GithubInstructions_General.md) to the app or demo the end user is creating throughout its lifecycle, not only as repository cleanup at the end.
 - Treat [docs/wizard-contract-v1.md](../../docs/wizard-contract-v1.md) and `wizard.profile.json` as the discovery/execution contract source.
-- Treat Spec Kit as mandatory before implementation.
+- Require affected Spec Kit planning for new/material features; routine authorized corrections reuse accepted behavior and reconcile affected notes after validation.
 - Preserve approved native table/relationship identities; never replace Account
   reuse with a custom table. Optional installed-framework continuation follows
   [the H008 handoff](../../docs/framework-handoff.md): explicit consumer/runtime
   paths, accepted canonical contract and separate synchronization opt-in.
+  Optional Q29 `browser` action uses explicit `BrowserConfigPath` for fresh
+  read-only Playwright diagnostics; no silent installation or live-proof inference.
+  Optional Q30 `deploy` requires exact `AuthorizationPath`/`TenantId` and the
+  installed runtime's authorized nonproduction delivery profile; verify published
+  bytes and rendered form/bindings before guarded source/note reconciliation.
   Missing Spec Kit is a no-op; do not install tooling or start a scheduler.
   Read-only Status exposes canonical task/lease/dependency progress and next
   actions; projection eligibility is not worker authority or live evidence.
@@ -85,10 +142,13 @@ Required output behavior:
 - When demo data is enabled, ask whether to target all scenario-created custom tables or selected tables, show the resolved table list, require per-table record counts, and identify any hero records with their demo purpose. Never seed standard reused tables implicitly.
 - If Task activities are requested, ask for eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Never apply tasks to every record unless the user explicitly selects all.
 - Persist approved seed decisions to `demo-data-plan.json` and scenario-owned `data-*.json` payloads. Create records only through the approved `66-seed-synthetic-data.ps1` stage, using stable natural keys and the approved source tag.
-- After planning, run a **report scoping step** based on created or planned tables (see Section 4A of how-to-build-dynamics-model-driven-apps-wizard.md).
+- Include native dashboards (standard Dataverse charts/dashboard), HTML web resources (tailored layouts), both (complementary tasks), or none in Demo Builder's existing consolidated recommendation; no extra business question. `yes` approves the displayed scope; blank/`defer` is unconfirmed; `no` cancels. Detailed modes keep their reporting slot and legacy yes=HTML/no=none.
+- Record the same `Reporting Selection` in all five planning artifacts: recommendation/rationale, selected scope, independent native/HTML flags, decision/source, and mapping status. Distinguish `explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`, and `not-applicable`; disabled discovery is not a customer refusal. Do not migrate old customer artifacts without separate authorization.
+- Recheck current reporting consent/mapping status before new/resumed orchestration. Saved stages are not new consent; native/HTML stages follow independent flags, not leftover payloads or prose.
+- For selected reporting, run a **report scoping step** based on created or planned tables (see Section 4A of how-to-build-dynamics-model-driven-apps-wizard.md). Explain audience, decision, metrics/calculations, record scope, placement, limitations, and overlap. Scope approval is not content or deployment approval.
 - Ask the user to identify which tables need reports and what report type each table needs (form web resource, dashboard KPI, or queue/view summary).
 - Generate a Report Mapping Table artifact (`report-mappings.md`) and convert it into implementation and validation tasks in `tasks.md`.
-- **Blocker rule**: If a table is marked critical in workflow but has no report decision, flag this and stop progression until resolved.
+- **Blocker rule**: Unconfirmed scope, pending mapping approval, or a critical table without a report decision blocks planning completion. Do not treat safe no flags as a customer decline.
 - If the scenario has a real staged lifecycle, offer the optional business-process-flow block and capture: whether BPF is needed, process root, stage order, required stage fields, entry/exit criteria, and cross-table progression.
 - Apply the proportional [scenario change impact gate](../../docs/scenario-change-impact-gate.md): minor maintenance retains accepted planning and uses focused checks without regenerating the full matrix. New or changed scenarios review affected requirements, bindings, schema, native/portal surfaces, permissions and fixture/tests before implementation; align affected Spec Kit files and link unchanged contracts. A candidate field is not deployed: require native field/security proof from current Dataverse metadata before live binding. Preserve shared/OOB forms, existing assets and writers; continue independent ready work and never allocate H numbers.
 - Do not tell the user to run build scripts until planning **and report scoping** are complete.

@@ -5,6 +5,17 @@ description: Use when creating, previewing, simulating, or deploying native Data
 
 # Dataverse Report Wizard
 
+App-wizard stages 65/90 require approved, current HTML definitions.
+This focused Report Wizard remains native-only; source integration is not acceptance.
+
+For existing accepted reporting outcomes, bind required metrics and real
+functional criteria through scenario `requirements-coverage.json`; do not add
+rediscovery or infer an HTML requirement after native-only/no-report selection.
+Run project `scripts/bootstrap/12-check-wizard-capabilities.ps1` credential-free;
+source/schema adoption is not runtime installation or native approval.
+Simulation provenance never approves semantic/report definitions. Reference:
+project `docs/framework-handoff.md#accepted-outcome-reliability`.
+
 ## Authorization and execution
 
 Load and follow project-root `docs/policies/authorization-and-execution.md`.
@@ -12,6 +23,10 @@ Installed skills use bundled `references/authorization-and-execution.md` when
 project-local policy is absent. If neither exists, report BLOCKED for mutating
 work. Require this policy or a reviewed equivalent in consumer projects through
 the existing compatibility review. Reuse valid scope; preserve deployment gates.
+
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 ## Purpose
 

@@ -11,6 +11,10 @@ throughout framework and generated-project work. Commit and push each need
 explicit permission; reuse valid scope without redundant approval prompts.
 Existing security, platform and repository protections remain mandatory.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 The repository is the authoritative engineering record for the project.
 
 ---

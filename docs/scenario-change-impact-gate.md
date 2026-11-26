@@ -8,7 +8,25 @@ Trigger it not only when a new project begins, but when a user adds a **new scen
 
 The Wizard must not ask the owner to re-answer accepted questions, restart prior completed work or assume a blocked component stops every independent package. Inspect the current repository, Spec Kit, open PRs/branches, dirty worktrees, active writers and locks; keep current H/workload numbers. In projects where ChatGPT allocates H numbers, Copilot must not select, rename or reuse them. The owner can authorize **multiple compatible H-numbered packages in one batch**; preserve one writer per conflicting resource and per-environment write authority.
 
+Apply the canonical [authorization and execution policy](policies/authorization-and-execution.md):
+standing scoped nonproduction permission may be reused, but never substitutes for
+semantic/report/hash/FAST/security gates. H IDs track outcomes, not permanent
+component ownership. Registration, numbering and narrative documentation do not
+block independently authorized implementation unless needed for real authority,
+enforced policy or conflicting writers. Use an existing temporary identifier and
+reconcile administration before closure; do not allocate an H ID. Check active
+process, checkpoint and actual resource evidence before writer release; lease
+expiry alone is insufficient. Recover before restart and continue independent
+dependency-ready work.
+
 ## Proportional impact review
+
+Bind only affected accepted outcomes to real tasks and functional criteria in
+existing scenario `requirements-coverage.json`; preserve original confirmation
+excerpts/hash and unchanged links. Select applicable binding/CRUD/lifecycle/
+chronology/metrics/cancellation/concurrency checks, not a mandatory checklist.
+The [coverage/preflight contract](framework-handoff.md#accepted-outcome-reliability)
+adds no framework stage or approval workflow.
 
 Classify the actual delta before expanding planning. Reuse accepted requirements, delivery answers, inventories and evidence; inspect only changed contracts and their dependent surfaces.
 
@@ -19,6 +37,12 @@ Classify the actual delta before expanding planning. Reuse accepted requirements
 | New or cross-cutting scenario | A new scenario, changed actor/security boundary, data model, lifecycle or cross-surface binding: review the applicable end-to-end chain below and align affected Spec Kit artifacts before implementation. Do not invent unused forms, reports or portal contracts. |
 
 A minor edit must not restart discovery, force a full planning cycle or require a new impact register. If a seemingly small change alters business meaning, access, data integrity or a live binding, use the affected scenario-delta review instead. Full applicable CI, security, signed approvals, environment authorization, solution membership and production acceptance remain mandatory where required; proportional review is not a waiver.
+
+For routine authorized nonproduction existing-component repairs, keep a minimum
+change contract and recoverable before-state before editing. The full narrative
+and administrative reconciliation may follow implementation and focused checks
+in the existing task/PR, but must be complete before closure. This is not
+retroactive authority or a waiver of required pre-change approvals.
 
 A timeframe-only change updates delivery context in the existing planning files, not the schema or unrelated implementation tasks. A delivery-goal change revisits acceptance depth for the affected release; urgency never activates automation or reduces mandatory verification. Reuse owner answers, and ask only for a missing material decision. No H number is required merely to perform unnumbered maintenance.
 

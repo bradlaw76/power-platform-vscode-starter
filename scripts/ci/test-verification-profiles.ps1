@@ -4,7 +4,7 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
-$fixture = Join-Path ([IO.Path]::GetTempPath()) ('wizard-profiles-' + [guid]::NewGuid().ToString('N'))
+$fixture = Join-Path $repoRoot ('.wizard-metrics\wizard-profiles-' + [guid]::NewGuid().ToString('N'))
 $bootstrap = Join-Path $fixture 'scripts/bootstrap'
 $scenario = 'ci-profiles'
 $payloads = Join-Path $fixture "payloads/scenarios/$scenario"
@@ -18,19 +18,27 @@ function Assert-Profile {
 }
 try {
     New-Item -ItemType Directory -Path "$bootstrap/helpers",$payloads,$planning -Force | Out-Null
-    foreach ($name in @('90-run-build.ps1','helpers/dataverse-runtime.ps1','helpers/wizard-run-state.ps1')) {
+    foreach ($name in @('90-run-build.ps1','helpers/dataverse-runtime.ps1','helpers/wizard-run-state.ps1','helpers/wizard-hardening.ps1','helpers/reporting-plan.ps1')) {
         Copy-Item (Join-Path $repoRoot "scripts/bootstrap/$name") (Join-Path $bootstrap $name)
     }
     foreach ($name in @('spec.md','plan.md','tasks.md')) { Set-Content (Join-Path $planning $name) 'Synthetic fixture; reports enabled' }
+    New-Item -ItemType Directory -Path (Join-Path $fixture 'schemas\payloads') -Force | Out-Null
+    Copy-Item (Join-Path $repoRoot 'schemas\payloads\html-reports.schema.json') (Join-Path $fixture 'schemas\payloads')
+    Add-Content (Join-Path $planning 'spec.md') "`n- Checkout Request -> lab_checkoutrequest`nSupervisors need checkout request counts by lifecycle stage."
+    $htmlDefinition = Get-Content (Join-Path $repoRoot 'schemas\examples\html-reports.example.json') -Raw | ConvertFrom-Json
+    $htmlDefinition.Approved = $true
+    $htmlDefinition | ConvertTo-Json -Depth 20 | Set-Content (Join-Path $planning 'html-reports.json')
+    Set-Content (Join-Path $planning 'report-mappings.md') '| lab_checkoutrequest | Checkout Request Oversight | HTML | Review app Reports group | lab_lifecyclestage | Lifecycle oversight | Lab supervisors | Reconcile |'
     foreach ($name in @('reporting-ci.json','data-ci.json','security-roles-ci.json','process-ci.json')) { Set-Content (Join-Path $payloads $name) '{}' }
     $stub = @'
 [CmdletBinding()]
-param($ScenarioSlug,$PayloadsFolder,$PublisherPrefixOverride,$SolutionUniqueName,
+param($ScenarioSlug,$PayloadsFolder,$PublisherPrefixOverride,$SolutionUniqueName,$EnvironmentUrl,
     $PublisherPrefix,$RequestInvoker,$Mode,$Phase,$PayloadFolder,
     [switch]$PreviewOnly,[switch]$FailIfSolutionHasForeignTables,
     [switch]$InventoryOnly,[switch]$EnforceExportGate)
 $global:LASTEXITCODE = 0
 $name = Split-Path $PSCommandPath -Leaf
+if ($name -eq '14-validate-semantic-fields.ps1' -and $Mode -eq 'Payload') { return }
 [ordered]@{script=$name; preview=[bool]$PreviewOnly; inventory=[bool]$InventoryOnly; gate=[bool]$EnforceExportGate; phase=$Phase} |
     ConvertTo-Json -Compress | Add-Content (Join-Path $PSScriptRoot 'calls.jsonl')
 if ((Test-Path (Join-Path $PSScriptRoot 'fail-membership')) -and $InventoryOnly) { throw 'Synthetic membership failure' }
@@ -108,7 +116,75 @@ if ((Test-Path (Join-Path $PSScriptRoot 'fail-membership')) -and $InventoryOnly)
     }
     $before = @(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count
     & (Join-Path $bootstrap '90-run-build.ps1') @common -Mode Apply -VerificationProfile Demo -Resume
-    Assert-Profile (@(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count -eq $before) 'Same-policy resume repeated completed stages.'
+    Assert-Profile (@(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count -eq ($before + 3)) "Same-policy resume must recheck columns and both Metadata gates only: before=$before after=$(@(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count)."
+    $before = @(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count
+    $consentPath = Join-Path $planning 'answers.md'
+    foreach ($status in @('pending-confirmation', 'pending-review')) {
+        $decision = if ($status -eq 'pending-review') { 'explicitly-approved' } else { 'recommended-not-confirmed' }
+        $selection = if ($status -eq 'pending-review') { 'native' } else { 'unconfirmed' }
+        $native = if ($status -eq 'pending-review') { 'yes' } else { 'no' }
+        @"
+## Optional Report Web Resources
+- Enabled: no
+- Selected Reports: none
+
+## Reporting Selection
+- Decision: $decision
+- Selected scope: $selection
+- Native dashboards: $native
+- HTML reports: no
+- Mapping status: $status
+"@ | Set-Content $consentPath
+        foreach ($mode in @('Preview', 'Apply')) {
+            foreach ($resume in @($true, $false)) {
+                $rejected = $false
+                try { & (Join-Path $bootstrap '90-run-build.ps1') @common -Mode $mode -VerificationProfile Demo -Resume:$resume }
+                catch { $rejected = $_.Exception.Message -match 'Reporting consent or mappings remain unresolved' }
+                Assert-Profile $rejected "Reporting $status bypassed the current-consent gate ($mode/Resume=$resume)."
+                Assert-Profile (@(Get-Content (Join-Path $bootstrap 'calls.jsonl')).Count -eq $before) 'Unresolved reporting reached a stage.'
+            }
+        }
+    }
+    @'
+## Optional Report Web Resources
+- Enabled: no
+- Selected Reports: none
+
+## Reporting Selection
+- Decision: explicitly-approved
+- Selected scope: native
+- Native dashboards: yes
+- HTML reports: no
+- Mapping status: approved
+'@ | Set-Content $consentPath
+    & (Join-Path $bootstrap '90-run-build.ps1') @common -Mode Apply -VerificationProfile Demo
+    $summary = Get-Content $summaryPath -Raw | ConvertFrom-Json
+    Assert-Profile (@($summary.stages | Where-Object name -eq 'web-resources')[0].status -eq 'skipped') 'Native-only consent enabled the HTML stage.'
+    Assert-Profile (@($summary.stages | Where-Object name -eq 'native-reporting')[0].status -eq 'completed') 'Native-only consent disabled its approved native stage.'
+    Remove-Item (Join-Path $payloads 'reporting-ci.json')
+    foreach ($selection in @('html', 'none')) {
+        $html = if ($selection -eq 'html') { 'yes' } else { 'no' }
+        $status = if ($selection -eq 'html') { 'approved' } else { 'approved-no-reports' }
+        $decision = if ($selection -eq 'html') { 'explicitly-approved' } else { 'explicitly-declined' }
+        @"
+## Optional Report Web Resources
+- Enabled: $html
+- Selected Reports: Summary
+
+## Reporting Selection
+- Decision: $decision
+- Selected scope: $selection
+- Native dashboards: no
+- HTML reports: $html
+- Mapping status: $status
+"@ | Set-Content $consentPath
+        & (Join-Path $bootstrap '90-run-build.ps1') @common -Mode Apply -VerificationProfile Demo
+        $summary = Get-Content $summaryPath -Raw | ConvertFrom-Json
+        Assert-Profile (@($summary.stages | Where-Object name -eq 'native-reporting')[0].status -eq 'skipped') "$selection consent executed an unselected native payload."
+        Assert-Profile ((@($summary.stages | Where-Object name -eq 'web-resources')[0].status -eq 'completed') -eq ($html -eq 'yes')) "$selection consent did not preserve the independent HTML choice."
+    }
+    Remove-Item -LiteralPath $consentPath
+    Set-Content (Join-Path $payloads 'reporting-ci.json') '{}'
     Set-Content (Join-Path $bootstrap 'fail-membership') 'fail'
     $failed = $false
     try { & (Join-Path $bootstrap '90-run-build.ps1') @common -Mode Apply -VerificationProfile Demo -ExportSolution } catch { $failed = $_.Exception.Message -match 'Synthetic membership failure' }

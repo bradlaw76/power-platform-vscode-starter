@@ -1,5 +1,7 @@
 # Power Platform VS Code Starter
 
+> **Multi-step changes?** Use the [queued autonomous delivery and web-resource-first guide](docs/QUEUED_AUTONOMOUS_DELIVERY.md) for ready-to-paste VS Code Copilot instructions, dependency-aware queues, bounded self-repair, and live-first UI iteration. This is operating guidance; it does not install or activate a background executor. New builds still require concise mandatory Spec Kit planning and the usual authorization gates.
+
 ![Power Platform VS Code Starter classic workflow](docs/assets/power-platform-vscode-wizard-classic-v2.svg)
 
 The canonical, multi-workload `power-platform-vscode-starter` repository for
@@ -39,6 +41,11 @@ separate implementation.
 
 ## Start here
 
+**Evaluating the intelligent wizard candidate?** Use the concise
+[installation and getting-started reference](docs/intelligent-wizard-getting-started.md)
+for exact-source installation, existing-install discovery, update/rollback limits,
+optional WSL/Playwright setup and available versus blocked capabilities.
+
 > **New to this repo?** Start with [START HERE.md](START%20HERE.md). It
 > explains how to determine whether this is the right workflow, install the
 > needed tools, create a local authoring workspace, choose a Copilot or
@@ -49,26 +56,72 @@ separate implementation.
 
 For field design, use the [Semantic Field Type Standard](docs/semantic-field-type-standard.md):
 business meaning determines native type, with approved categorical/date/currency
-decisions and dependent surfaces. This independent planning reference does not
-install semantic validation gates, migrate columns or adopt legacy protection
-packages; its runtime limitations are explicit.
+decisions and dependent surfaces. The integrated Starter source enforces Payload
+before orchestration, live type checks in stage 30, and Metadata after relationships
+and before export. Copying this reference does not install those gates or approve
+legacy plans; functional/native acceptance remains separate.
 
 Follow the mandatory [authorization and execution policy](docs/policies/authorization-and-execution.md): reuse valid scoped permission without repeating routine approval questions, preserve platform/signature/environment gates, and distinguish source, tested, deployed and live-verified outcomes. Delivery urgency is not authorization for automation or deployment.
+
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
 
 ### Enhancement registry
 
 | Enhancement | Contract and runtime scope |
 | --- | --- |
+| Accepted-outcome reliability | [Existing handoff](docs/framework-handoff.md#accepted-outcome-reliability); `requirements-coverage.json` links original confirmed excerpts/hash, implementation tasks and proportional functional criteria. `12-check-wizard-capabilities.ps1` consolidates source/installed API checks, including conditional Windows owned-Job availability, without credentials or installation; validator source alone is not native build readiness. `ReconcileOnly` bypasses historical handoff caches and forwards explicit existing `TaskIds` without releasing protected holds. No extra discovery question, stage or approval workflow. |
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
-| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); existing instructions and skill distribution, with byte-identical policy copies through the Claude installer |
-| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization; no scheduler or live deployment |
+| Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); standing scoped nonproduction authority, accepted-requirements reuse, proportional checks, recoverable administration/repair documentation, evidence-based writer recovery and native browser/principal/publication/record/form safety; byte-identical policy copies through the Claude installer. [Temporary registration proposal](docs/audits/development-execution-simplification-registration-proposal.md), no H allocation or new executor |
+| Development-first instruction refactoring | Existing canonical policy, concise referencing entry points and generated tasks; routine corrections implement/validate before affected-note reconciliation. [Migration](docs/skill-distribution.md#versioning-and-updates) preserves verified framework pins and custom text; no updater, merge, tenant or protected-functionality authority |
+| Starter H008 handoff | [Installed framework handoff](docs/framework-handoff.md); complete accepted table/relationship decisions, UTF-8 CLI transport, explicit delivery resume, canonical tasks/journals, read-only task/lease/dependency status, unchanged conflict-hold replay and opt-in synchronization. Expired retained owners are explicitly flagged for reconciliation without becoming eligible; no scheduler or implicit live deployment |
+| Q29 Playwright diagnostics | Same [framework handoff](docs/framework-handoff.md#playwright-diagnostics-q29), optional `browser` action with selected `BrowserConfigPath`; installed Automation browser capability, fresh read-only observations, separate synthetic/live evidence and existing scoped repair executor; no automatic sign-in, installation or deployment grant |
+| Q30 targeted delivery | Same [handoff](docs/framework-handoff.md#targeted-delivery-q30), optional `deploy` action with exact `AuthorizationPath`/`TenantId`; existing nonproduction delivery profile, conditional repair, published readback, rendered form/binding diagnostics and guarded source reconciliation; no cached success, broad publication or production grant |
+| Q31 adaptive discovery | Same [handoff](docs/framework-handoff.md#adaptive-discovery-q31): `discover`/`deliver`/`feedback`, build/enhance/repair entry paths, configurable fidelity, material questions and existing canonical slice execution; read-only discovery/accepted feedback can precede planning, while bootstrap, semantic, deployment and security gates remain |
+| Q32 agent behavioral testing | Same [handoff](docs/framework-handoff.md#agent-behavioral-testing-q32), `agent-test` with external versioned instructions/scenarios; supported Direct Line or normalized verifier observations, behavioral assertions, regression comparison and one approved local-fictional correction; live conversations require exact effects scope, no actual agent editing/publication |
+| Q33 native quality, replay and Git inspection | Same [handoff](docs/framework-handoff.md#native-quality-replay-and-git-inspection-q33): scoped responsive/accessibility/context checks in existing Playwright, accepted-record read-only presentation with no repeated transactions, exact synthetic-only reset authority and offline selected-PR/writer analysis preserving unique changes/recovery refs; no automatic merge/close |
+| Q34 candidate acceptance | Existing optional handoff boundaries, inherited policies and Automation end-to-end synthetic/portable-wheel compatibility checked; browser-triggered Q30 verification closes the prior diagnostic context before repair and opens a fresh retest. No new stage, authentication authority, native Windows supervisor or released-version claim. |
+| Q37 operational readiness | [Concise getting started](docs/intelligent-wizard-getting-started.md); existing identity/update/migration/rollback mechanisms and optional POSIX workers. Explicit hosted PR discovery uses Automation CLI only; Starter's manifest inspection stays offline. Candidate source is not an official release, and actual native acceptance remains blocked. |
 | Explicit delivery verification | [Release operating modes](docs/release-consolidation.md); `90-run-build.ps1` keeps `Legacy` by default, with explicit `Demo`/`Acceptance` and independent rerun/export opt-ins; required membership/security gates remain |
 | Optional workload and source notes | [Wizard contract](docs/wizard-contract-v1.md); explicit new-Dynamics intent and schema-validated review notes, without extra mandatory discovery prompts or source fetching |
 | Explicit scenario slug guard | [Hardening runbook](docs/wizard-hardening-runbook.md); explicit context slugs require lowercase letters/numbers and single hyphens; legacy default selection is unchanged |
-| H009 version/update proposal | [Version and update status](docs/release-consolidation.md#version-and-update-status); existing PR #15 is design-only, not an installed updater or authoritative release manifest |
+| H009 version/update manager | [Version and safe updates](docs/wizard-updates.md); offline startup identity with PowerShell-relative runtime paths, Windows checkout-aware Git status, shared explicit choices, stable-only discovery, exact ownership-aware preview and guarded fixture recovery; [candidate distribution and release trust](docs/wizard-release-readiness.md); official Apply remains blocked without publisher policy |
+| Development-first instruction inheritance/migration | [Shared local instruction lifecycle](docs/wizard-updates.md#local-instruction-inheritance-and-migration); new terminal/chat projects inherit actual policy and assets; existing H009 transactions preview, preserve customizations, back up and recover instruction-only changes without upgrading runtime or bypassing official release gates |
+| H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit provenance, unconfirmed/not-applicable states, current-consent checks before resume, independent native/HTML stage selection and separate mapping approval; no legacy artifact migration |
+| Q13-R7 native source integration | Existing stages 30/65/90 reuse semantic and requirements-backed HTML gates from exact prior source `378ebd0a90c609207b767a9bac81ab72f4c98f35`; preflight checks actual source hooks and explicit runtime asset closure. Offline real-path regressions are not native acceptance. FAST-dependent Apply stays blocked; no release/publisher identity or automatic installation is granted. |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+For coverage/preflight changes, also align the one coverage schema, task/criterion
+links, installed runtime API/version/origin probe, packaging ownership policy and
+existing handoff/build log. Refresh candidate inventory only against the eventual
+exact committed source; do not publish a dirty-tree inventory as a release.
+For worker handoff corrections, preserve fresh source/verifier reconciliation,
+explicit task-ID forwarding and canonical holds in both entrypoints and tests.
+
+Native field decisions remain explicitly approved `field-type-decisions.json`
+under the semantic standard; report-definition approval remains independent of
+architecture/coverage confirmation.
+
+For authorization/execution changes specifically, update the canonical policy,
+Copilot instructions, prompt, both wizard/report skill families, consumer
+distribution guidance, existing task templates, scenario-impact/queue guides,
+engineering requirements and existing review handoff together. Run
+`AuthorizationExecution.Tests.ps1` (including installer byte equality),
+`SkillParity.Tests.ps1` and affected template/contract checks. Keep registration
+proposals separate for STARTER and AUTO allocator review; preserve historical
+H008/H009/H010 and central standards. Do not infer native acceptance from these
+instruction/distribution regressions.
+
+Q09–Q12 native safety guidance extends that same policy with actual browser
+principal proof, publication blast-radius/draft preservation, unexpected record
+change evidence, restriction classification without bypass, app/user form
+eligibility and independent browser-session recovery. Keep these six obligations
+aligned in distributed instructions, skills, task templates and parity tests.
+Runtime implementations belong to Automation, not Starter; no native pilot or
+installed browser driver is claimed.
 
 The [release consolidation guide](docs/release-consolidation.md) distinguishes
 installed functionality from unmerged candidate capabilities, explains native
@@ -84,8 +137,22 @@ not deploy Dataverse or complete every canonical task. Publisher metadata is not
 modeled by the memory adapter; independent native/framework namespaces must be
 reconciled before a custom build. Read the [final acceptance boundaries and
 next backlog](docs/release-consolidation.md#q7-q12-finalization-and-next-backlog).
-There is no automatic wizard updater: profile 1.6, contract 1.10.0 and installed
-automation package 0.2.1 are separate versions, not a wizard release number.
+H009 now provides offline version/status and opt-in update planning, not automatic
+updates or an official release. Profile 1.6, contract 1.10.0 and installed
+automation package 0.2.1 (or explicitly tested 0.2.2rc1 with required APIs)
+remain separate versions. Try
+`pwsh .\scripts\bootstrap\05-start-wizard.ps1 -VersionOnly` or the agent-shared
+`pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`.
+
+At the Q18 handoff, H009 remains an **unmerged source candidate in
+[implementation PR #16](https://github.com/bradlaw76/power-platform-vscode-starter/pull/16)**,
+not an official release or a feature already delivered to main installations.
+[Design PR #15](https://github.com/bradlaw76/power-platform-vscode-starter/pull/15)
+remains separate pending owner disposition. See the
+[verified host matrix](docs/wizard-updates.md#supported-host-and-verification-matrix),
+[installation boundaries](docs/skill-distribution.md#reviewed-candidate-installation)
+and [final review/next actions](docs/wizard-release-readiness.md#q18-final-review-and-handoff).
+An unreleased clone shows `release unknown - development checkout`.
 
 ### What happens when you use this starter
 
@@ -315,11 +382,18 @@ Source: ..\.claude\skills
 Dest:   C:\Users\<you>\.claude\skills
 
   INSTALLED power-platform-vscode-wizard
+  INSTALLED dataverse-report-wizard
 
-Done. Installed: 1  Skipped: 0
+Done. Installed: 2  Skipped: 0
 ```
 
-This copies the `power-platform-vscode-wizard` skill to `~/.claude/skills/` so it is available to Claude Code on this machine. Re-running is safe and picks up any skill updates from the repo.
+This copies the wizard and reporting skill folders, with bundled authorization
+policy, to `~/.claude/skills/`. It installs instructions, not a missing runtime.
+The installer force-copies matching files: **do not rerun over customized skills
+without reviewing and backing up the exact destination folders first**. Existing
+unlisted files can remain, so copying is not an exact transactional synchronization.
+Use the [reviewed installation guidance](docs/skill-distribution.md); the installer
+cannot bypass H009's trust, ownership or local-edit gates.
 
 For VS Code Copilot Chat users, this repo also includes a shared skill at `.github/skills/power-platform-wizard-init` that can be invoked as `/power-platform-wizard-init` without running the installer.
 
@@ -586,7 +660,7 @@ Solution isolation behavior:
 
 Optional report web resources:
 
-- `05-start-wizard.ps1` captures a yes/no decision for optional reporting module scope (when enabled in `wizard.profile.json`).
+- `05-start-wizard.ps1` includes native/HTML/both/none in Demo Builder's consolidated recommendation. `yes` confirms the displayed scope; blank/`defer` leaves reporting unconfirmed. Detailed modes retain yes=HTML/no=none in the existing reporting slot. Review the shared `Reporting Selection` and approve scenario-specific mappings/content separately before implementation.
 - `70-build-web-resources.ps1` is the canonical optional module entrypoint.
 - `65-build-web-resources.ps1` remains the implementation script called by `70-build-web-resources.ps1`.
 - The script upserts Dataverse HTML web resources and adds them to the selected solution.

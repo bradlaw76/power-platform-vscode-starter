@@ -49,6 +49,32 @@ BeforeAll {
 }
 
 Describe 'Copilot and Claude wizard skill parity' {
+    It '<Path> inherits native safety without claiming an installed runtime' -ForEach @(
+        @{ Path = '.github\skills\power-platform-wizard-init\SKILL.md' }
+        @{ Path = '.claude\skills\power-platform-vscode-wizard\SKILL.md' }
+        @{ Path = '.github\skills\dataverse-report-wizard\SKILL.md' }
+        @{ Path = '.claude\skills\dataverse-report-wizard\SKILL.md' }
+        @{ Path = '.github\copilot-instructions.md' }
+        @{ Path = '.github\prompts\power-platform-demo-wizard.prompt.md' }
+    ) {
+        $entry = Get-Content -LiteralPath (Join-Path $repoRoot $Path) -Raw
+        $entry | Should -Match 'authorization-and-execution\.md'
+        $content = (Get-Content -LiteralPath (Join-Path $repoRoot 'docs\policies\authorization-and-execution.md') -Raw) -replace '\s+', ' '
+        foreach ($rule in @(
+            "browser's actual authenticated user",
+            'identity mismatch blocks affected writes',
+            'If scoped publication cannot be proven, stop that publication',
+            'Unexpected modifications stop affected writes',
+            'Classification is diagnosis, never permission to bypass a control',
+            'Mere direct URL access is not proof of form eligibility',
+            'independent process/owner',
+            'repeat principal preflight',
+            'not an installed browser driver or a performed pilot'
+        )) {
+            $content | Should -Match ([regex]::Escape($rule)) -Because "$Path must preserve $rule"
+        }
+    }
+
     It '<Skill> uses docs/onboarding.md as the authoritative sequence' -ForEach @(
         @{ Skill = 'Copilot' }
         @{ Skill = 'Claude' }

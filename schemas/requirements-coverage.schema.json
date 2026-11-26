@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$comment": "COMPONENT: Accepted outcome coverage v1.0; ARCHITECTURE: documentary task and functional links; SECURITY: no native approval or execution authority.",
+  "title": "Accepted outcomes, implementation tasks and functional criteria",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "scenarioSlug", "provenance", "documents", "outcomes", "tasks", "criteria"],
+  "properties": {
+    "schemaVersion": {"const": "1.0"},
+    "scenarioSlug": {"type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"},
+    "provenance": {
+      "type": "object", "additionalProperties": false,
+      "required": ["kind", "confirmed", "sourcePath", "sourceSha256"],
+      "properties": {
+        "kind": {"enum": ["owner-confirmed", "simulation"]},
+        "confirmed": {"const": true},
+        "sourcePath": {"type": "string", "pattern": "^[A-Za-z0-9_-]+(?:[./\\\\][A-Za-z0-9_-]+)*\\.(?:json|md)$"},
+        "sourceSha256": {"$ref": "#/$defs/hash"}
+      }
+    },
+    "documents": {
+      "type": "array", "minItems": 3, "maxItems": 3,
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["path", "sha256"],
+        "properties": {"path": {"enum": ["spec.md", "plan.md", "tasks.md"]}, "sha256": {"$ref": "#/$defs/hash"}}
+      }
+    },
+    "outcomes": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "document", "excerpt", "operations", "taskIds", "criterionIds"],
+        "properties": {
+          "id": {"$ref": "#/$defs/text"}, "document": {"enum": ["spec.md", "plan.md"]},
+          "excerpt": {"$ref": "#/$defs/text"}, "operations": {"$ref": "#/$defs/operations"},
+          "taskIds": {"$ref": "#/$defs/ids"}, "criterionIds": {"$ref": "#/$defs/ids"}
+        }
+      }
+    },
+    "tasks": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "excerpt", "operations", "criterionIds"],
+        "properties": {
+          "id": {"$ref": "#/$defs/text"}, "excerpt": {"$ref": "#/$defs/text"},
+          "operations": {"$ref": "#/$defs/operations"}, "criterionIds": {"$ref": "#/$defs/ids"}
+        }
+      }
+    },
+    "criteria": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["id", "operations", "checkFamily", "taskIds", "surface", "assertion"],
+        "properties": {
+          "id": {"$ref": "#/$defs/text"}, "operations": {"$ref": "#/$defs/operations"},
+          "checkFamily": {"enum": ["binding", "crud", "lifecycle", "chronology", "metrics", "cancellation", "concurrency"]},
+          "taskIds": {"$ref": "#/$defs/ids"}, "surface": {"$ref": "#/$defs/text"}, "assertion": {"$ref": "#/$defs/text"}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "hash": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "text": {"type": "string", "minLength": 3, "maxLength": 8192, "pattern": "\\S"},
+    "ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/text"}},
+    "operations": {
+      "type": "array", "minItems": 1, "uniqueItems": true,
+      "items": {"enum": ["binding", "read", "create", "update", "assign", "inspect", "resolve", "delete", "lifecycle", "chronology", "metrics", "cancellation", "concurrency"]}
+    }
+  }
+}

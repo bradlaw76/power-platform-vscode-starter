@@ -100,6 +100,7 @@ if (-not (Test-Path $skillsSource)) {
 }
 
 $installed = 0
+Write-Host 'Instruction copies do not install the framework runtime or prove native build readiness.'
 $skipped   = 0
 $policySource = Join-Path $repoRoot 'docs\policies\authorization-and-execution.md'
 if (-not (Test-Path -LiteralPath $policySource -PathType Leaf)) {

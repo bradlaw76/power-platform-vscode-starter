@@ -1,0 +1,187 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Universal semantic field-type decision inventory",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "scenarioSlug", "approval", "fields", "surfaces"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "scenarioSlug": { "type": "string", "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$" },
+    "approval": { "$ref": "#/definitions/approval" },
+    "fields": {
+      "type": "array", "minItems": 1,
+      "items": {
+        "type": "object", "additionalProperties": false,
+        "required": ["decisionId", "table", "field", "businessMeaning", "semanticCategory", "boundedValues", "categoricalCandidate", "disposition", "rationale", "selectionFactors", "typeConfig", "expectedMetadata", "dependencies"],
+        "properties": {
+          "decisionId": { "type": "string", "pattern": "^FIELD-[A-Za-z0-9-]+$" },
+          "table": { "$ref": "#/definitions/logicalName" },
+          "field": { "$ref": "#/definitions/logicalName" },
+          "businessMeaning": { "$ref": "#/definitions/text" },
+          "semanticCategory": {
+            "enum": ["free-text", "identifier", "whole-number", "decimal", "floating-point", "currency", "date-time", "yes-no", "choice", "multi-select-choice", "lookup", "file", "image"]
+          },
+          "boundedValues": { "type": "boolean", "description": "Bounded business vocabulary, not numeric/date validation ranges or finite identifier examples." },
+          "categoricalCandidate": { "type": "boolean" },
+          "disposition": { "enum": ["create-column", "create-relationship", "table-primary", "reuse"] },
+          "rationale": { "$ref": "#/definitions/text" },
+          "selectionFactors": {
+            "type": "object", "additionalProperties": false,
+            "required": ["businessMeaning", "allowedValueOwnership", "validation", "cardinality", "reportingFiltering", "automation", "integration", "securityOwnership", "valueLifecycle", "extensibility"],
+            "properties": {
+              "businessMeaning": { "$ref": "#/definitions/text" },
+              "allowedValueOwnership": { "$ref": "#/definitions/text" },
+              "validation": { "$ref": "#/definitions/text" },
+              "cardinality": { "$ref": "#/definitions/text" },
+              "reportingFiltering": { "$ref": "#/definitions/text" },
+              "automation": { "$ref": "#/definitions/text" },
+              "integration": { "$ref": "#/definitions/text" },
+              "securityOwnership": { "$ref": "#/definitions/text" },
+              "valueLifecycle": { "$ref": "#/definitions/text" },
+              "extensibility": { "$ref": "#/definitions/text" }
+            }
+          },
+          "typeConfig": { "type": "object" },
+          "expectedMetadata": {
+            "type": "object",
+            "required": ["@odata.type", "SchemaName", "RequiredLevel", "DisplayName"],
+            "properties": {
+              "@odata.type": { "type": "string", "pattern": "^Microsoft\\.Dynamics\\.CRM\\.[A-Za-z]+AttributeMetadata$" },
+              "SchemaName": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]*$" },
+              "RequiredLevel": {
+                "type": "object", "required": ["Value"],
+                "properties": { "Value": { "enum": ["None", "SystemRequired", "ApplicationRequired", "Recommended"] } }
+              },
+              "DisplayName": { "$ref": "#/definitions/label" }
+            }
+          },
+          "choice": {
+            "type": "object", "additionalProperties": false,
+            "required": ["scope", "name", "default", "localization", "options", "mappings"],
+            "properties": {
+              "scope": { "enum": ["local", "global"] },
+              "name": { "$ref": "#/definitions/logicalName" },
+              "default": { "type": ["integer", "null"] },
+              "localization": { "$ref": "#/definitions/text" },
+              "options": {
+                "type": "array", "minItems": 1,
+                "items": {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["value", "labels", "meaning"],
+                  "properties": {
+                    "value": { "type": "integer", "minimum": 0, "maximum": 2147483647 },
+                    "labels": { "$ref": "#/definitions/label" },
+                    "meaning": { "$ref": "#/definitions/text" }
+                  }
+                }
+              },
+              "mappings": {
+                "type": "object", "additionalProperties": false,
+                "required": ["sample", "integration", "retrofit"],
+                "properties": {
+                  "sample": { "$ref": "#/definitions/mapping" },
+                  "integration": { "$ref": "#/definitions/mapping" },
+                  "retrofit": { "$ref": "#/definitions/mapping" }
+                }
+              }
+            }
+          },
+          "textException": {
+            "type": "object", "additionalProperties": false,
+            "required": ["approval", "reason", "alternativeConsidered", "consequences"],
+            "properties": {
+              "approval": { "$ref": "#/definitions/approval" },
+              "reason": { "$ref": "#/definitions/text" },
+              "alternativeConsidered": { "$ref": "#/definitions/text" },
+              "consequences": {
+                "type": "object",
+                "required": ["reporting", "filtering", "automation", "integration", "dataQuality"],
+                "additionalProperties": { "$ref": "#/definitions/text" }
+              }
+            }
+          },
+          "relationship": {
+            "type": "object",
+            "required": ["SchemaName", "ReferencedEntity", "ReferencingEntity", "ReferencingAttribute", "CascadeConfiguration"],
+            "properties": {
+              "SchemaName": { "$ref": "#/definitions/logicalName" },
+              "ReferencedEntity": { "$ref": "#/definitions/logicalName" },
+              "ReferencingEntity": { "$ref": "#/definitions/logicalName" },
+              "ReferencingAttribute": { "$ref": "#/definitions/logicalName" },
+              "CascadeConfiguration": { "type": "object", "minProperties": 1 }
+            }
+          },
+          "dependencies": { "type": "array", "items": { "$ref": "#/definitions/text" } }
+        }
+      }
+    },
+    "surfaces": {
+      "type": "object", "additionalProperties": false,
+      "required": ["forms", "views", "charts", "businessProcessFlows", "automation", "integrations", "reports"],
+      "properties": {
+        "forms": { "$ref": "#/definitions/surface" },
+        "views": { "$ref": "#/definitions/surface" },
+        "charts": { "$ref": "#/definitions/surface" },
+        "businessProcessFlows": { "$ref": "#/definitions/surface" },
+        "automation": { "$ref": "#/definitions/surface" },
+        "integrations": { "$ref": "#/definitions/surface" },
+        "reports": { "$ref": "#/definitions/surface" }
+      }
+    }
+  },
+  "definitions": {
+    "text": { "type": "string", "pattern": "\\S" },
+    "logicalName": { "type": "string", "pattern": "^[a-z][a-z0-9_]*$" },
+    "approval": {
+      "type": "object", "additionalProperties": false,
+      "required": ["approved", "approvedBy", "approvedAtUtc"],
+      "properties": {
+        "approved": { "const": true },
+        "approvedBy": { "$ref": "#/definitions/text" },
+        "approvedAtUtc": { "type": "string", "format": "date-time", "pattern": "Z$" }
+      }
+    },
+    "label": {
+      "type": "object", "required": ["LocalizedLabels"],
+      "properties": {
+        "LocalizedLabels": {
+          "type": "array", "minItems": 1,
+          "items": {
+            "type": "object", "required": ["Label", "LanguageCode"],
+            "properties": {
+              "Label": { "$ref": "#/definitions/text" },
+              "LanguageCode": { "type": "integer", "minimum": 1 }
+            }
+          }
+        }
+      }
+    },
+    "mapping": {
+      "type": "object", "additionalProperties": false,
+      "required": ["applicable", "reason", "entries"],
+      "properties": {
+        "applicable": { "type": "boolean" },
+        "reason": { "$ref": "#/definitions/text" },
+        "entries": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["source", "value"],
+            "properties": {
+              "source": { "$ref": "#/definitions/text" },
+              "value": { "type": "integer" }
+            }
+          }
+        }
+      }
+    },
+    "surface": {
+      "type": "object", "additionalProperties": false,
+      "required": ["status", "details"],
+      "properties": {
+        "status": { "enum": ["approved", "not-applicable"] },
+        "details": { "$ref": "#/definitions/text" }
+      }
+    }
+  }
+}

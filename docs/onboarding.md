@@ -1,8 +1,37 @@
 # Onboarding Guide
 
+Accepted-outcome reliability reuses the existing confirmation, not another
+question or stage. Before completion, bind original confirmed excerpts/hash to
+implementation tasks and applicable functional criteria in
+`requirements-coverage.json`; run the consolidated credential-free
+`12-check-wizard-capabilities.ps1` preflight. See
+[the existing handoff contract](framework-handoff.md#accepted-outcome-reliability).
+Use [semantic field decisions](semantic-field-type-standard.md) and real
+`field-type-decisions.json` approvals; copied validators/schemas do not prove
+native runner integration or install an executor. In the integrated source,
+stage 90 runs Payload before any stage, stage 30 checks existing types before
+creation, and Metadata gates follow relationships and precede export.
+Preview plans Metadata without calling Dataverse; resume rechecks these gates.
+Stage 65 and stage 90 require approved, current `html-reports.json` when HTML
+is selected. `12-check-wizard-capabilities.ps1 -RequireNativeBuild` checks source
+hooks and dependency closure, not authorization or intended-user acceptance.
+Direct stage 30 requires `-ScenarioSlug` or an unambiguous
+`payloads/scenarios/<slug>` folder; do not infer a target from unrelated payloads.
+
 > **This is the authoritative bootstrap sequence for this repository.** All agents, chat prompts, and documentation defer to the step order defined here. If another document shows a different order, this file takes precedence.
 
 Use this document when setting up this repo for the first time in VS Code.
+
+The terminal shows the [H009 installed-version banner](wizard-updates.md) before
+discovery, offline and without another question or build stage. Chat agents use
+the confirmed runtime's `04-check-wizard-update.ps1 -Action Status`. Review
+changes / Update wizard / Skip for now share that command; Skip continues
+unchanged. A development checkout has unknown release identity. Network checks
+are opt-in; official Apply stays blocked without verified publisher policy.
+H009 is still the unmerged PR16 candidate at the Q18 handoff, not an installed
+main-branch release. Check the [supported host/evidence matrix](wizard-updates.md#supported-host-and-verification-matrix)
+and [reviewed candidate installation](skill-distribution.md#reviewed-candidate-installation)
+before expecting these optional commands in another clone.
 
 Prefer a visual format? Open the full walkthrough page: [docs/wizard-walkthrough.html](wizard-walkthrough.html).
 
@@ -14,17 +43,45 @@ the authoritative detailed sequence after the authoring workspace is open.
 
 Important process rule:
 
-- Complete Spec Kit planning (`spec.md`, `plan.md`, `tasks.md`) before building artifacts.
+- Complete affected Spec Kit planning for new/material artifacts. Routine
+  authorized corrections reuse accepted behavior and reconcile notes after validation.
 - Optional installed-framework continuation uses
   [the H008 handoff](framework-handoff.md) after accepted planning, with separate
-  consumer/runtime folders. It is not another build stage or deployment command.
+  consumer/runtime folders. It is not another build stage or implicit deployment.
   Its read-only Status action reports canonical task counts, dependencies,
   owner/lease holds and next actions without dispatch or stored lease changes.
   Unchanged synchronization conflict holds retain exit 3 without document,
   journal or history writes; changed inputs resume and other incomplete steps retry.
+  Optional [Playwright diagnostics](framework-handoff.md#playwright-diagnostics-q29)
+  uses that same handoff's `browser` action after planning; no new build stage,
+  silent dependency installation or environment-write authority.
+  Optional [targeted delivery](framework-handoff.md#targeted-delivery-q30)
+  uses `deploy` only with existing exact nonproduction authority and tenant;
+  published/read-only rendered evidence precedes guarded source reconciliation.
+- When installed Q31 is available, prefer the existing handoff's
+  [adaptive discovery](framework-handoff.md#adaptive-discovery-q31) before
+  repeating intake: build/enhance/repair, selected-source/scoped-metadata facts
+  and only material unresolved questions. Single-operator fidelity adds no
+  production persona matrix. Inspect a first authorized slice, then reconcile
+  accepted feedback in the same canonical task store. Read-only discovery and
+  feedback may precede Spec Kit; required affected bootstrap planning and actual
+  semantic/security/publication gates remain unchanged.
+- Optional installed [Q32 agent testing](framework-handoff.md#agent-behavioral-testing-q32)
+  reuses that handoff for versioned conversational behavior, not instruction lint.
+  Keep prompts/scenarios external. Live conversations need exact effects authority;
+  automatic correction is accepted local-fictional-only, never actual agent
+  editing/publication. No new bootstrap stage or discovery question is added.
+- Optional installed [Q33 quality/replay/Git checks](framework-handoff.md#native-quality-replay-and-git-inspection-q33)
+  extend existing Playwright and local Git inspection. Reuse accepted fictional
+  records without repeating transactions; exact synthetic-only reset authority
+  is separate. Preserve unique patches/recovery refs and expired/uncertain writer
+  ownership. No new stage, implicit merge/close or synthetic-to-live claim.
 - Follow [authorization and execution](policies/authorization-and-execution.md)
   across every workload and generated project. Reuse valid scoped permission;
   required planning, platform, hash/signature and environment controls remain.
+- Follow that policy's development-first and recovery rules, not another copied
+  procedure. [Dependency-aware queues](QUEUED_AUTONOMOUS_DELIVERY.md) remain optional
+  execution support, not a new build stage.
 - Discovery mode, delivery goal and build verification profile are independent.
   `90-run-build.ps1` defaults to `Legacy`; explicitly selected `Demo` skips
   optional second-pass/export deliverables, not first-pass/security/membership
@@ -120,7 +177,11 @@ What this does:
 Validation checkpoint:
 
 - Script prints `INSTALLED power-platform-vscode-wizard`.
-- You only need to run this once per machine. Re-running is safe (it overwrites with the latest version).
+- The installer force-copies matching skill/reference files. Before a rerun,
+  review and back up the exact existing destination folders; do not overwrite
+  human edits or use the installer as transactional H009 Update/Recover.
+- The shipped baseline includes wizard and reporting skills. Successful copying
+  does not install or verify the runtime, authenticate a publisher or authorize a build.
 - Repo-shared Copilot Chat skill is available at `.github/skills/power-platform-wizard-init` and can be invoked with `/power-platform-wizard-init`.
 
 ---
@@ -222,7 +283,7 @@ What each option does:
 
 - Chat prompt: asks discovery questions and helps draft planning files interactively.
 - Terminal wizard: asks discovery questions in PowerShell and creates starter files under `specs/<scenario-slug>/`.
-- Wizard now includes an optional yes/no decision to generate 3 HTML report web resources (agent, supervisor, executive KPI).
+- Reporting scope distinguishes native dashboards, HTML web resources, both, or none; scope approval does not approve a fixed report set or deployment.
 - Wizard now includes an optional Business Process Flow block for scenarios with a true staged lifecycle (for example: intake -> review -> decision -> closure).
 
 Validation checkpoint:
@@ -344,6 +405,30 @@ Supported application profiles:
 
 The `demo-builder` mode is selected when `-Mode` is omitted. Run `pwsh ./scripts/bootstrap/05-start-wizard.ps1`. It asks six core business questions, two short delivery questions, and one consolidated recommendation confirmation. It infers the application profile, OOB/custom/hybrid table strategy, form strategy, primary entry-point table, named landing view, review-app artifacts, navigation, relationships/reports, solution name, and publisher prefix. Review those recommendations together before files are written.
 
+Reporting is part of that same confirmation, not an extra question. Native means
+standard Dataverse charts/dashboard; HTML means tailored report web resources;
+both must serve complementary tasks; none keeps forms/views only. `yes` approves
+the displayed recommendation, or enter `native`, `html`, `both`, or `none` to
+change it. Blank/`defer` leaves reporting unconfirmed; `no` cancels the design.
+The wizard suggests HTML when the stated tasks include reporting/monitoring,
+otherwise forms/views only, with the rationale shown before confirmation.
+Confirm each report's audience, decision, metrics/calculations, record scope,
+placement, limitations, and overlap during mapping review; do not assume generic
+KPIs or a fixed set of three reports.
+
+Check `Reporting Selection` in all five planning artifacts. It distinguishes
+`explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`, and
+`not-applicable`. A disabled discovery module is not a customer refusal.
+Unconfirmed flags are safely no, but reporting still needs a decision.
+Selected Demo reports remain `pending-review` until mappings are approved.
+Advanced/Acceptance keep the same answer slot and legacy yes=HTML/no=none.
+Existing customer artifacts are not migrated; separately review consent before
+authorizing any regeneration. See [reporting consent](wizard-contract-v1.md#reporting-consent-h010).
+
+New and resumed builds recheck current reporting consent and mapping status
+before using saved stage results. Native and HTML stages follow independent
+consent flags; leftover payloads are not permission to enable unselected reports.
+
 Demo Builder does not ask about disposable environments, destructive cleanup, retention, acceptance source tags, or rerun-proof engineering.
 
 ### Advanced Builder (explicit)
@@ -372,7 +457,7 @@ Then complete optional extension blocks based on profile and project needs:
 
 - `table-strategy` (standard/custom strategy)
 - `solution-identity` (new/existing solution and publisher prefix)
-- `reporting` (explicit no-report decision, or critical-table report mappings with type, placement, fields, decision, owner, and validation)
+- `reporting` (confirmed native/HTML/both/none scope or profile-disabled not-applicable status; selected surfaces require critical-table mappings with type, placement, fields, decision, owner, and validation)
 - `retrofit` (current state + remaining work)
 - `business-process-flow` (when enabled, include stage sequence, branch predicates with explicit Yes/No outcomes, human decision checkpoints, and Finish behavior)
 - `source-control` (repository preflight, scenario branch, related work, commit checkpoints, discovered validation/CI, pull request handoff, and merge strategy)
@@ -405,7 +490,7 @@ Validation checkpoint:
 - If demo data is enabled, show and approve the exact target tables, record count per table, and hero records with their demo purpose. Do not implicitly seed standard reused tables.
 - If Task activities are enabled, approve parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not target every record unless `all` is explicitly approved.
 - Confirm `demo-data-plan.json` captures hero records, bounded Task generation, synthetic-data/privacy, and relationship distribution. In Framework Acceptance, also confirm idempotent rerun, source-tagging, retention, and cleanup decisions.
-- Confirm `report-mappings.md` exists. If reports are enabled, every critical or high-frequency table must have an approved mapping; if reports are disabled, the artifact must record that explicit decision.
+- Confirm `report-mappings.md` exists and scope is confirmed or explicitly not applicable. Selected reports require approved mappings for every critical/high-frequency table; unconfirmed scope and pending mappings block planning completion.
 - Demo-data intake is planning-only; no Dataverse rows are created by `05-start-wizard.ps1`.
 - Review `requirements/GithubInstructions_General.md` and record how source control will support the app or demo being created.
 - Confirm the target repository, remote, current/default branch, existing working-tree changes, recent history, existing tooling, and applicable validation commands.

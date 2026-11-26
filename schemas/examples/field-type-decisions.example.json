@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "synthetic-work-items",
+  "approval": {
+    "approved": true,
+    "approvedBy": "Synthetic example only; not authorization for any deployment",
+    "approvedAtUtc": "2026-10-19T00:00:00Z"
+  },
+  "fields": [
+    {
+      "decisionId": "FIELD-processing",
+      "table": "sample_workitem",
+      "field": "sample_processing",
+      "businessMeaning": "Current operational processing state",
+      "semanticCategory": "choice",
+      "boundedValues": true,
+      "categoricalCandidate": true,
+      "disposition": "create-column",
+      "rationale": "Stable business-owned workflow vocabulary, not governed reference records.",
+      "selectionFactors": {
+        "businessMeaning": "Current operational processing state",
+        "allowedValueOwnership": "Process owner governs the vocabulary",
+        "validation": "Only approved numeric options",
+        "cardinality": "One state per item",
+        "reportingFiltering": "Group and filter by state",
+        "automation": "Transitions consume numeric option values",
+        "integration": "External state codes have explicit mappings",
+        "securityOwnership": "No per-option ownership or security",
+        "valueLifecycle": "Stable meanings; never renumber deployed options",
+        "extensibility": "New states require reviewed stable numeric values"
+      },
+      "typeConfig": {},
+      "expectedMetadata": {
+        "@odata.type": "Microsoft.Dynamics.CRM.PicklistAttributeMetadata",
+        "SchemaName": "sample_processing",
+        "DisplayName": { "LocalizedLabels": [{ "Label": "Processing", "LanguageCode": 1033 }] },
+        "RequiredLevel": { "Value": "ApplicationRequired" },
+        "DefaultFormValue": 100000000,
+        "OptionSet": {
+          "IsGlobal": false,
+          "Options": [
+            { "Value": 100000000, "Label": { "LocalizedLabels": [{ "Label": "New", "LanguageCode": 1033 }] } },
+            { "Value": 100000001, "Label": { "LocalizedLabels": [{ "Label": "Completed", "LanguageCode": 1033 }] } }
+          ]
+        }
+      },
+      "choice": {
+        "scope": "local",
+        "name": "sample_processing",
+        "default": 100000000,
+        "localization": "English 1033; additional languages require reviewed labels",
+        "options": [
+          { "value": 100000000, "labels": { "LocalizedLabels": [{ "Label": "New", "LanguageCode": 1033 }] }, "meaning": "Processing has not started" },
+          { "value": 100000001, "labels": { "LocalizedLabels": [{ "Label": "Completed", "LanguageCode": 1033 }] }, "meaning": "Processing is complete" }
+        ],
+        "mappings": {
+          "sample": {
+            "applicable": true,
+            "reason": "Synthetic source labels are translated before payload generation",
+            "entries": [{ "source": "New", "value": 100000000 }, { "source": "Completed", "value": 100000001 }]
+          },
+          "integration": {
+            "applicable": true,
+            "reason": "External codes map deterministically",
+            "entries": [{ "source": "NEW", "value": 100000000 }, { "source": "DONE", "value": 100000001 }]
+          },
+          "retrofit": {
+            "applicable": false,
+            "reason": "Synthetic greenfield example; no existing data",
+            "entries": []
+          }
+        }
+      },
+      "dependencies": ["Work item main form Processing control", "Operational view Processing filter"]
+    }
+  ],
+  "surfaces": {
+    "forms": { "status": "approved", "details": "Processing uses the approved Choice vocabulary and appropriate control" },
+    "views": { "status": "approved", "details": "Processing filters use numeric values from the approved inventory" },
+    "charts": { "status": "not-applicable", "details": "No charts in this synthetic example" },
+    "businessProcessFlows": { "status": "not-applicable", "details": "No BPF in this synthetic example" },
+    "automation": { "status": "not-applicable", "details": "No automation is deployed by this example" },
+    "integrations": { "status": "approved", "details": "Documented NEW/DONE mapping only; no integration is deployed" },
+    "reports": { "status": "not-applicable", "details": "No reports in this synthetic example" }
+  }
+}

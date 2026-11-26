@@ -154,6 +154,15 @@ try {
     }
 
     $scenarioFolder = Join-Path $workspaceRoot "specs/$scenarioSlug"
+    foreach ($artifact in @('answers.md', 'spec.md', 'plan.md', 'tasks.md', 'report-mappings.md')) {
+        Assert-Contains -Path (Join-Path $scenarioFolder $artifact) -ExpectedValues @(
+            '- Decision: explicitly-approved',
+            '- Selected scope: html',
+            '- Native dashboards: no',
+            '- HTML reports: yes',
+            '- Mapping status: approved'
+        )
+    }
     Assert-Contains -Path (Join-Path $scenarioFolder 'answers.md') -ExpectedValues @(
         '## Application Profile',
         '- Wizard mode: advanced-builder',
@@ -206,7 +215,8 @@ try {
         "Confirm entry point 'incident' opens with 'Active Cases'",
         "Execute landing-view action 'explicit-decision-required' for 'Active Cases' on 'incident' before app assembly",
         "Verify the named landing view resolves to a saved query before running '62-build-app-module.ps1'",
-        "Create or switch to scenario branch 'feature/source-control-acceptance' before implementation",
+        "Reuse the existing authorized scenario branch 'feature/source-control-acceptance'",
+        'create one only when needed and avoid competing writers',
         'stage explicit files',
         'Push only after approval, verify the remote branch contains the local commit',
         'Reuse valid scoped commit/push permission already provided; ask only for missing scope',

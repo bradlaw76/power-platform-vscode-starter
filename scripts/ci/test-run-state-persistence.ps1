@@ -51,7 +51,15 @@ $transport = {
 }
 
 for ($run = 1; $run -le 2; $run++) {
-    & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation -RequestInvoker $transport
+    try {
+        & $orchestrator -ScenarioSlug 'gcc-framework-acceptance' -Mode Preview -EnvironmentUrl 'https://preview.invalid' -SolutionUniqueName 'LabEquipmentCheckoutAcceptance20260826' -PublisherPrefix 'ppvs' -StrictSolutionIsolation -RequestInvoker $transport
+    } catch {
+        if (-not (Test-Path (Join-Path $repoRoot 'specs\gcc-framework-acceptance\field-type-decisions.json')) -and $_.Exception.Message -match 'Semantic planning gate: missing') {
+            Write-Host "Legacy preview $run correctly BLOCKED before state writes; approved synthetic persistence/revalidation is tested in test-native-source-integration.ps1."
+            continue
+        }
+        throw
+    }
     $summaryPath = Join-Path $repoRoot '.wizard-metrics/runs/gcc-framework-acceptance/run-summary.json'
     $summary = Read-WizardJsonFile -Path $summaryPath
     if ($summary.status -ne 'preview-complete') { throw "Framework Acceptance preview $run did not complete." }
@@ -74,7 +82,7 @@ $gitAfter = Get-GitStateSnapshot -RepositoryRoot $repoRoot
 if (@(Compare-Object $trackedBefore $trackedAfter).Count -ne 0) { throw 'Framework Acceptance previews changed checked-in file content.' }
 if ($gitBefore -cne $gitAfter) { throw 'Framework Acceptance previews changed Git HEAD, index, or worktree state.' }
 
-$atomicRoot = Join-Path ([IO.Path]::GetTempPath()) "wizard-run-state-$([guid]::NewGuid().ToString('N'))"
+$atomicRoot = Join-Path $repoRoot ".wizard-metrics\wizard-run-state-$([guid]::NewGuid().ToString('N'))"
 $atomicPath = Join-Path $atomicRoot 'current-run.json'
 try {
     $original = [ordered]@{ runId='original'; scopeHash='scope'; mode='Preview'; startedAtUtc='2026-08-31T00:00:00Z'; stages=@() }

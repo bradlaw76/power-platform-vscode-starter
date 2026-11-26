@@ -1,0 +1,12 @@
+{
+  "schemaVersion": "1.0",
+  "product": "power-platform-vscode-starter",
+  "releaseVersion": null,
+  "channel": "development",
+  "repository": "bradlaw76/power-platform-vscode-starter",
+  "compatibility": {
+    "contractVersion": "1.10.0",
+    "profileVersion": "1.6"
+  },
+  "publisherPolicy": null
+}

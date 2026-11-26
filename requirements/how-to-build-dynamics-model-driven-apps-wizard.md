@@ -1,5 +1,20 @@
 # Dynamics Model-Driven App Wizard (VS Code + Copilot)
 
+Reuse existing confirmation for original accepted outcomes; link exact
+excerpts/hash, implementation tasks and proportional functional criteria in
+`requirements-coverage.json`. Mapping/read-only completion cannot replace
+mutations. Use the consolidated safe capability preflight and
+[handoff](../docs/framework-handoff.md#accepted-outcome-reliability); missing
+source/installed capabilities block affected work. Apply
+[semantic fields](../docs/semantic-field-type-standard.md) with actual
+`field-type-decisions.json`/report approvals, never simulation provenance.
+No extra discovery question, stage or approval ledger is required.
+
+In integrated source, stages 30/65/90 enforce semantic Payload/Metadata and
+requirements-backed HTML definitions through existing validators. Missing,
+unapproved or stale inputs block affected work; preflight requires actual source
+hooks and declared runtime closure. Offline tests are not native acceptance.
+
 Created: 2026-05-29
 Scope: Generic wizard playbook (not project-specific)
 Audience: Teams that want a guided, question-first process from idea to release
@@ -11,12 +26,49 @@ for all workloads and generated projects. Reuse valid scoped permission without
 repeating approval questions; preserve planning, platform and environment gates.
 Carry the policy or a reviewed equivalent through existing distribution review.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 This document is designed as a facilitation wizard.
+
+Before discovery, use the confirmed runtime's shared offline
+`04-check-wizard-update.ps1 -Action Status` banner. Terminal startup does this
+without an extra question; agents offer Review changes / Update wizard / Skip
+for now through the same command. Skip continues unchanged. Follow
+[H009 version/update safeguards](../docs/wizard-updates.md); no release identity
+from profile versions, no network by default or Apply without publisher trust.
 
 Optional accepted-planning continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Preserve standard
 table identities and relationship evidence. Missing Spec Kit is a no-op;
 synchronization is explicit opt-in, without a new controller or scheduler.
+The same handoff's optional Q29 `browser` action takes `BrowserConfigPath`
+and delegates fresh read-only Playwright diagnostics to the installed runtime,
+without an intake question, build stage, silent installation or deployment grant.
+Optional Q30 `deploy` requires existing `AuthorizationPath`/`TenantId` and the
+installed runtime's nonproduction delivery profile. Reuse scoped discovery,
+verified backups, conditional repair, exact publication, published readback,
+rendered form/binding diagnostics and guarded source reconciliation. Functional
+vertical slices do not waive protected-component or wider-publication gates.
+Installed Q31 `discover`/`deliver`/`feedback` reuses that same runtime and task
+store. Prefer discovered facts over repeat questions; support build/enhance/repair
+and single-operator/multi-persona/production-oriented fidelity. Read-only discovery
+and accepted feedback can precede planning; execution retains affected planning,
+semantic/security gates and scoped authority. Inspect a first slice and reconcile
+only affected tasks rather than restarting intake.
+Optional installed Q32 `agent-test` validates external fictional conversations,
+versioned instructions, clarification, negative behavior, grounding and
+escalation/tool prerequisites. Reuse supported Direct Line/verifier evidence;
+unknown telemetry remains unverified. Live test effects require exact authority;
+automatic correction is local-fictional-only, with no actual agent edit/publish.
+Optional installed Q33 reuses Playwright for scoped responsive geometry,
+accessibility, navigation and native context checks; thresholds are scenario
+decisions, not universal certification. Reuse accepted fictional records for
+read-only presentation, block duplicate seeding/accepted-record changes and
+require exact synthetic reset authority. Offline selected-PR/writer inspection
+preserves unique/merge changes and recovery refs; never auto-merge/close or
+release expired/uncertain writers. No additional mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
@@ -47,7 +99,9 @@ Wizard outcome:
 - A beginner-usable onboarding path that works in any repository.
 
 Mandatory rule:
-- Spec Kit comes first. Do not build tables, forms, views, flows, or solution artifacts until `spec.md`, `plan.md`, and `tasks.md` are complete.
+- New/material tables, forms, views, flows and solution artifacts require affected
+  accepted Spec Kit planning. Routine corrections reuse accepted requirements and
+  reconcile affected notes after implementation; actual safety gates still apply.
 
 **Proportional scenario-impact gate:** classify the actual change under [the scenario change impact gate](../docs/scenario-change-impact-gate.md). Minor maintenance uses accepted planning and focused checks; do not regenerate the full matrix. A bounded scenario delta updates only affected contracts and dependent surfaces; a new or cross-cutting scenario reviews the applicable end-to-end chain before implementation. Preserve native field/security proof before live binding and continue independent prepared work without crossing blocked dependencies.
 
@@ -302,6 +356,27 @@ Response template:
 ## 4A. Report Scoping Wizard (Web Resources)
 
 Goal: Identify which tables require report surfaces and define report content before development begins.
+
+First explain native dashboards (standard Dataverse charts/dashboard), HTML web
+resources (tailored layouts), both (complementary tasks), or none. Demo Builder
+includes this scope recommendation in its existing consolidated confirmation,
+not another discovery question. `yes` approves the displayed recommendation;
+blank/`defer` is unconfirmed; `no` cancels. Detailed modes retain the reporting
+slot and legacy yes=HTML/no=none.
+
+All five artifacts share `Reporting Selection` with recommendation/rationale,
+selected scope, native/HTML flags, decision/source, and mapping status:
+`explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`, or
+`not-applicable`. Defaults and disabled discovery never imply customer refusal.
+Scope approval alone does not approve report content or deployment. Explain each
+report's audience, decision, metrics/calculations, record scope, placement,
+limitations, and overlap before mapping approval. Unconfirmed scope or pending
+mappings block planning completion. Do not migrate existing customer artifacts
+without separate authorization. See [reporting consent](../docs/wizard-contract-v1.md#reporting-consent-h010).
+
+Recheck current reporting consent/mapping status before new or resumed
+orchestration. Do not reuse completed validation as new consent. Native/HTML
+stage selection must honor independent flags, not leftover payloads or prose.
 
 Mode-specific input:
 

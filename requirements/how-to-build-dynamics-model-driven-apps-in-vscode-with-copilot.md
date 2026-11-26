@@ -1,5 +1,20 @@
 # How to Build Dynamics Model-Driven Apps in VS Code with Copilot
 
+Reuse existing confirmation for original accepted outcomes; link exact
+excerpts/hash, implementation tasks and proportional functional criteria in
+`requirements-coverage.json`. Mapping/read-only completion cannot replace
+mutations. Use the consolidated safe capability preflight and
+[handoff](../docs/framework-handoff.md#accepted-outcome-reliability); missing
+source/installed capabilities block affected work. Apply
+[semantic fields](../docs/semantic-field-type-standard.md) with actual
+`field-type-decisions.json`/report approvals, never simulation provenance.
+No extra discovery question, stage or approval ledger is required.
+
+In integrated source, stages 30/65/90 enforce semantic Payload/Metadata and
+requirements-backed HTML definitions through existing validators. Missing,
+unapproved or stale inputs block affected work; preflight requires actual source
+hooks and declared runtime closure. Offline tests are not native acceptance.
+
 Created: 2026-05-28
 Scope: Generic guide (not project-specific)
 Audience: Builders using Dynamics 365, Dataverse, VS Code, and Copilot
@@ -9,13 +24,40 @@ for framework and generated-project work: reuse valid scope, preserve required
 safety gates, and report source, test, deployment and live verification evidence
 separately. Include the contract through the existing distribution review.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 Companion wizard:
+
+The confirmed runtime exposes shared offline version/status through
+`04-check-wizard-update.ps1 -Action Status`. Both skills and terminal use
+Review changes / Update wizard / Skip for now without another intake question;
+Skip preserves the current wizard. Follow
+[H009 version/update safeguards](../docs/wizard-updates.md); copied skills are
+not runtime installations, and official Apply stays publisher-policy gated.
 
 Optional starter-to-framework continuation follows
 [the installed H008 handoff](../docs/framework-handoff.md). Separate external
 project/runtime roots, accepted source contracts and explicit synchronization
 selection are required. Native Windows guided use needs neither consumer Git
 nor WSL; synthetic completion is not live deployment/UI acceptance.
+With installed Q31 support, prefer the same handoff's read-only `discover`
+before repeat questions. Build, enhance and repair share canonical tasks;
+fidelity guides proportional testing without relaxing security. Deliver an
+authorized first slice, inspect it and reconcile accepted `feedback` without
+restarting unaffected work. Discovery/feedback do not require completed Spec Kit;
+bootstrap execution still retains required affected planning and semantic gates.
+Installed Q32 `agent-test` uses the same optional handoff for behavioral
+conversational regression and version comparison, not instruction syntax alone.
+External prompts/scenarios, exact live-test effects authority and unverified
+missing telemetry are mandatory distinctions; local-fictional correction never
+edits or publishes an actual agent.
+Installed Q33 extends the same handoff: scoped native UI quality/context via
+existing Playwright, accepted-record presentation without repeated transactions,
+exact synthetic-only reset authority and offline selected-PR/canonical-writer
+inspection. Preserve unique work, merge resolutions and recovery refs. No
+implicit live mutation, merge/close, expired-writer release or mandatory stage.
 Accepted table coverage must be complete and unique. Preserve accepted
 relationship endpoints and business meaning; native many-to-many has no child
 lookup, while one-to-many requires it.
@@ -48,7 +90,8 @@ For this repository, the primary wizard entry is `/power-platform-wizard-init` i
 
 Required process gate:
 
-- Spec Kit planning is mandatory before implementation.
+- Affected Spec Kit planning precedes new/material implementation; routine
+  authorized corrections reuse accepted requirements and reconcile notes afterward.
 - Complete `spec.md`, `plan.md`, and `tasks.md` before running build scripts.
 
 ### 0A. Beginner first-run flow (clone to demo)
@@ -105,7 +148,20 @@ Advanced Builder questions:
 Optional extension blocks (profile-driven):
 - table-strategy (standard/custom and mapping)
 - solution-identity (new/existing solution and publisher prefix)
-- reporting (optional web resources)
+- reporting (native dashboards, HTML web resources, both, or none; independent flags and explicit consent provenance)
+
+Include reporting in Demo Builder's existing consolidated recommendation, not
+another question. `yes` approves the displayed scope; blank/`defer` remains
+`recommended-not-confirmed`; `no` cancels. Detailed modes retain legacy
+yes=HTML/no=none in the same slot. All five artifacts share `Reporting Selection`
+with `explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`,
+or `not-applicable` provenance. Disabled discovery is not a refusal.
+Unconfirmed scope/pending mappings block planning completion; report content
+needs separate audience, decision, metrics, scope, placement, limitations and
+overlap review. Do not migrate existing artifacts without separate authorization.
+New/resumed orchestration rechecks current reporting consent/mapping status
+before reusing stage results; native/HTML stages follow independent consent
+flags, not leftover payloads or prose.
 - retrofit (current-state and remaining-work intake)
 - source-control (target-repository preflight, scenario branch, traceability, checkpoint commits, discovered validation/CI, PR handoff, and merge strategy)
 - user-tasks (persona, task, frequency, entry table/view, expected outcome, owner, and done definition)
@@ -807,7 +863,7 @@ Use this path to onboard someone with no VS Code or Dynamics build experience.
 - Run Azure sign-in and Power Platform auth profile creation.
 - Validate target Dataverse environment URL.
 
-1. Complete planning before implementation (required)
+1. Complete affected planning for new/material changes; reuse accepted planning for routine corrections.
 
 - Answer discovery questions for scenario, users, data, and success criteria.
 - Create `spec.md`, `plan.md`, and `tasks.md`.

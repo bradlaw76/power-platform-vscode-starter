@@ -2,9 +2,9 @@
 =============================================================================
 COMPONENT:    Orchestrated Wizard Build
 FILE:         scripts/bootstrap/90-run-build.ps1
-VERSION:      0.2.0
+VERSION:      0.3.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-11-22
+LAST UPDATED: 2026-11-26
 ENVIRONMENT:  PowerShell 7 | Power Platform Bootstrap Runtime
 
 -----------------------------------------------------------------------------
@@ -28,7 +28,8 @@ TEST CASES
 -----------------------------------------------------------------------------
 ✔ Preview is the default and invokes no mutating stage.
 ✔ Apply mode stops at the first failed stage and records resumable state.
-✔ Resume skips previously completed stages for the same scenario and scope.
+✔ Resume revalidates native gates without losing completed later-stage evidence.
+✔ Current reporting consent is checked before resuming or dispatching stages.
 
 -----------------------------------------------------------------------------
 NON-NEGOTIABLES
@@ -63,8 +64,24 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
 
 $repoRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+$architectureDecisionPath = Join-Path $repoRoot "specs\$ScenarioSlug\accelerator\accelerator-decision.json"
+$acceleratorBuildPlanPath = Join-Path $repoRoot "specs\$ScenarioSlug\accelerator\build-plan\build-plan-manifest.json"
+if ($Mode -eq 'Apply' -and (Test-Path -LiteralPath $acceleratorBuildPlanPath -PathType Leaf)) {
+    $acceleratorBuildPlan = Get-Content -LiteralPath $acceleratorBuildPlanPath -Raw | ConvertFrom-Json
+    if ($acceleratorBuildPlan.architecture -cne 'fully-custom') {
+        throw 'FAST-dependent or unresolved build execution is disabled. Readiness never authorizes build stages.'
+    }
+}
+if ($Mode -eq 'Apply' -and (Test-Path -LiteralPath $architectureDecisionPath -PathType Leaf)) {
+    $architectureDecision = Get-Content -LiteralPath $architectureDecisionPath -Raw | ConvertFrom-Json
+    if ($architectureDecision.selectedOption -cne 'fully-custom') {
+        throw 'FAST-dependent or unresolved build execution is disabled. Readiness never authorizes build stages.'
+    }
+}
 . (Join-Path $PSScriptRoot 'helpers/dataverse-runtime.ps1')
 . (Join-Path $PSScriptRoot 'helpers/wizard-run-state.ps1')
+. (Join-Path $PSScriptRoot 'helpers/wizard-hardening.ps1')
+. (Join-Path $PSScriptRoot 'helpers\reporting-plan.ps1')
 
 $paths = Resolve-WizardScenarioPaths -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -PayloadsFolder $PayloadsFolder
 foreach ($requiredPath in @($paths.ScenarioFolder, $paths.PayloadFolder)) {
@@ -79,11 +96,30 @@ foreach ($planningFile in @('spec.md', 'plan.md', 'tasks.md')) {
     }
 }
 
+& (Join-Path $PSScriptRoot '14-validate-semantic-fields.ps1') -ScenarioSlug $ScenarioSlug -Mode Payload -PayloadsFolder $paths.PayloadFolder
+
 $answersPath = Join-Path $paths.ScenarioFolder 'answers.md'
+$answersText = if (Test-Path -LiteralPath $answersPath -PathType Leaf) { Get-Content -LiteralPath $answersPath -Raw } else { '' }
+$reportingConfig = Get-WizardFeatureConfig -AnswersText $answersText
+$reportingError = Get-WizardReportingReadinessError -FeatureConfig $reportingConfig
+if ($reportingError) { throw $reportingError }
 $planningText = @(Get-ChildItem -LiteralPath $paths.ScenarioFolder -File | Where-Object Name -in @('answers.md', 'spec.md', 'plan.md', 'tasks.md') | ForEach-Object { Get-Content -LiteralPath $_.FullName -Raw }) -join "`n"
 $hasBpfPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'process-*.json' -File -ErrorAction SilentlyContinue).Count -gt 0
-$reportsEnabled = $planningText -match '(?im)^.*(?:reports?|web resources?).*\b(?:yes|enabled|true)\b'
 $hasReportingPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'reporting-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
+$reportingSelection = Assert-WizardNativeReportingChoice -ScenarioFolder $paths.ScenarioFolder -HasPayload $hasReportingPayload
+$reportsEnabled = $reportingSelection.HtmlEnabled
+if ($reportingSelection.Explicit -and ($reportingSelection.NativeEnabled -or $reportsEnabled)) {
+    $mappingsPath = Join-Path $paths.ScenarioFolder 'report-mappings.md'
+    if (-not (Test-Path -LiteralPath $mappingsPath) -or (Get-Content -LiteralPath $mappingsPath -Raw) -match '(?im)^- Status:\s*pending-review\s*$') {
+        throw 'Reporting mappings require review before building. Complete report-mappings.md against the approved scenario requirements.'
+    }
+}
+if ($reportingSelection.Explicit -and $reportingSelection.NativeEnabled -and -not $hasReportingPayload) {
+    throw 'Native dashboards were selected, but an approved reporting-*.json payload is missing. Complete reporting planning before building.'
+}
+if ($reportsEnabled) {
+    Read-WizardHtmlReportPlan -RepoRoot $repoRoot -ScenarioFolder $paths.ScenarioFolder | Out-Null
+}
 $hasDataPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'data-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 $hasSecurityRolesPayload = @(Get-ChildItem -LiteralPath $paths.PayloadFolder -Filter 'security-roles-*.json' -File -ErrorAction SilentlyContinue).Count -eq 1
 # Intake discovery mode and delivery verification are deliberately independent.
@@ -111,19 +147,24 @@ $scopeHashSource = "$($scope.scenarioSlug)|$($scope.payloadFolder)|$($scope.envi
 # Never resume evidence from a different mode or verification policy. Old state
 # intentionally requires a fresh run rather than guessing its execution policy.
 $scopeHashSource += "|$Mode|$VerificationProfile|$([bool]$idempotencyEnabled)|$([bool]$exportEnabled)"
+foreach ($artifact in @('spec.md', 'plan.md', 'tasks.md', 'answers.md', 'field-type-decisions.json', 'html-reports.json', 'report-mappings.md')) {
+    $artifactPath = Join-Path $paths.ScenarioFolder $artifact
+    $scopeHashSource += "|${artifact}:$(if (Test-Path -LiteralPath $artifactPath -PathType Leaf) { (Get-FileHash -LiteralPath $artifactPath -Algorithm SHA256).Hash } else { 'absent' })"
+}
 $scopeHash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes($scopeHashSource))).ToLowerInvariant()
 
 $stageDefinitions = @(
     [pscustomobject]@{ Name = 'validate'; Script = '15-dry-validate.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadsFolder = $paths.PayloadFolder; PublisherPrefixOverride = $PublisherPrefix; PreviewOnly = $true } }
     [pscustomobject]@{ Name = 'tables'; Script = '20-build-tables.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
-    [pscustomobject]@{ Name = 'columns'; Script = '30-build-columns.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
+    [pscustomobject]@{ Name = 'columns'; Script = '30-build-columns.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'relationships'; Script = '40-build-relationships.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder } }
+    [pscustomobject]@{ Name = 'semantic-metadata'; Script = '14-validate-semantic-fields.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = 'Metadata'; PayloadsFolder = $paths.PayloadFolder; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; FailIfSolutionHasForeignTables = [bool]$StrictSolutionIsolation } }
     [pscustomobject]@{ Name = 'business-process-flow'; Script = '55-build-business-process-flows.ps1'; Optional = $true; Enabled = $hasBpfPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'forms-views'; Script = '60-build-forms-views.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug } }
     [pscustomobject]@{ Name = 'native-reporting'; Script = '64-build-charts-dashboard.ps1'; Optional = $true; Enabled = $hasReportingPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'app-module'; Script = '62-build-app-module.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; RequestInvoker = $RequestInvoker } }
-    [pscustomobject]@{ Name = 'web-resources'; Script = '65-build-web-resources.ps1'; Optional = $true; Enabled = $reportsEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug } }
+    [pscustomobject]@{ Name = 'web-resources'; Script = '65-build-web-resources.ps1'; Optional = $true; Enabled = $reportsEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; EnvironmentUrl = $EnvironmentUrl; SolutionUniqueName = $SolutionUniqueName; PublisherPrefix = $PublisherPrefix; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'synthetic-data'; Script = '66-seed-synthetic-data.ps1'; Optional = $true; Enabled = $hasDataPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'security-roles'; Script = '68-build-security-roles.ps1'; Optional = $true; Enabled = $hasSecurityRolesPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; Mode = $Mode; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-first-pass'; Script = '50-add-to-solution.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
@@ -135,6 +176,7 @@ $stageDefinitions = @(
     [pscustomobject]@{ Name = 'rerun-security-roles'; Script = '68-build-security-roles.ps1'; Optional = $true; Enabled = $idempotencyEnabled -and $hasSecurityRolesPayload; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName; Mode = $Mode; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'solution-membership-final'; Script = '50-add-to-solution.ps1'; Optional = $false; Enabled = $true; Arguments = @{ PayloadsFolder = $paths.PayloadFolder; ScenarioSlug = $ScenarioSlug; InventoryOnly = $true; EnforceExportGate = $true } }
     [pscustomobject]@{ Name = 'idempotency-verification'; Script = '85-verify-idempotency.ps1'; Optional = $true; Enabled = $idempotencyEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; Phase = 'Verify' } }
+    [pscustomobject]@{ Name = 'semantic-metadata-final'; Script = '14-validate-semantic-fields.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; Mode = 'Metadata'; PayloadsFolder = $paths.PayloadFolder; EnvironmentUrl = $EnvironmentUrl; RequestInvoker = $RequestInvoker } }
     [pscustomobject]@{ Name = 'unmanaged-export'; Script = '95-export-unmanaged-solution.ps1'; Optional = $true; Enabled = $exportEnabled; Arguments = @{ ScenarioSlug = $ScenarioSlug; SolutionUniqueName = $SolutionUniqueName } }
     [pscustomobject]@{ Name = 'post-build'; Script = '80-post-build-analysis.ps1'; Optional = $false; Enabled = $true; Arguments = @{ ScenarioSlug = $ScenarioSlug; PayloadFolder = $paths.PayloadFolder; PreviewOnly = $true } }
 )
@@ -176,9 +218,10 @@ if ($Mode -eq 'Apply') {
 }
 
 $results = [System.Collections.Generic.List[object]]::new()
+$previousStages = @($runState.stages)
 foreach ($stage in $stageDefinitions) {
-    $existing = @($runState.stages | Where-Object { $_.name -eq $stage.Name -and $_.status -eq 'completed' })
-    if ($Resume -and $existing.Count -gt 0) {
+    $existing = @($previousStages | Where-Object { $_.name -eq $stage.Name -and $_.status -eq 'completed' })
+    if ($Resume -and $existing.Count -gt 0 -and $stage.Name -notin @('columns', 'semantic-metadata', 'semantic-metadata-final')) {
         $results.Add($existing[0]) | Out-Null
         Write-Host "RESUME: $($stage.Name) already completed." -ForegroundColor DarkGray
         continue
@@ -229,7 +272,9 @@ foreach ($stage in $stageDefinitions) {
         durationSeconds = [Math]::Round(([DateTime]::UtcNow - $started).TotalSeconds, 3)
     }
     $results.Add($result) | Out-Null
-    $runState.stages = @($results.ToArray())
+    # Revalidation checkpoints must not discard completed later-stage evidence.
+    $processedNames = @($results | ForEach-Object name)
+    $runState.stages = @($results.ToArray()) + @($previousStages | Where-Object { $_.name -notin $processedNames })
     Write-WizardAtomicJson -Path $statePath -InputObject $runState -Depth 20
     if ($status -eq 'failed') { break }
 }

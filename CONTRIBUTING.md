@@ -2,14 +2,26 @@
 
 ## Before changing code
 
-Read [docs/onboarding.md](docs/onboarding.md), [docs/wizard-contract-v1.md](docs/wizard-contract-v1.md), and the repository instructions. Keep scenario work under `specs/<scenario-slug>/` and `payloads/scenarios/<scenario-slug>/`; do not recreate scenario planning at the repository root.
+Load the [canonical execution policy](docs/policies/authorization-and-execution.md)
+and only the functional contracts affected by the change. For wizard/application
+changes, use [onboarding](docs/onboarding.md) and the
+[wizard contract](docs/wizard-contract-v1.md). Keep scenario work under
+`specs/<scenario-slug>/` and `payloads/scenarios/<scenario-slug>/`; do not recreate
+scenario planning at the repository root.
 
 For new or changed application behavior, align affected `spec.md`, `plan.md`, and `tasks.md` before implementation under the [proportional scenario-impact gate](docs/scenario-change-impact-gate.md). Minor maintenance that restores accepted behavior retains accepted planning and runs focused checks; do not restart the full planning cycle. Preserve payloads as the source of truth, idempotent behavior, 401 token refresh, 429 backoff, publishing, complete solution inventory, and the export gate.
+
+The canonical policy owns authority, writer/recovery, publication and
+documentation rules; this contributor guide does not add another approval cycle.
+For explicitly autonomous multi-change work, use
+[dependency-aware queues](docs/QUEUED_AUTONOMOUS_DELIVERY.md).
 
 ## Development workflow
 
 1. Start from a clean clone or reviewed working tree.
-2. Run `pwsh ./scripts/bootstrap/00-prereq-check.ps1`.
+2. Run the prerequisites needed by the affected workflow. Wizard/environment
+   work uses `00-prereq-check.ps1`; routine source maintenance uses its existing
+   focused validation, not a repeated environment setup cycle.
 3. Make focused changes without modifying unrelated user work.
 4. Add credential-free tests, including rerun behavior when metadata mutation changes.
 5. Run the repository CI commands documented in [docs/onboarding.md](docs/onboarding.md).

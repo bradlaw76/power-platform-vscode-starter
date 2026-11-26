@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Wizard distribution descriptor (not proof of a release)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "product", "releaseVersion", "channel", "repository", "compatibility", "publisherPolicy"],
+  "properties": {
+    "schemaVersion": { "const": "1.0" },
+    "product": { "const": "power-platform-vscode-starter" },
+    "releaseVersion": { "type": ["string", "null"], "pattern": "^(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)\\.(0|[1-9][0-9]*)$" },
+    "channel": { "enum": ["development", "stable"] },
+    "repository": { "const": "bradlaw76/power-platform-vscode-starter" },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["contractVersion", "profileVersion"],
+      "properties": {
+        "contractVersion": { "type": "string" },
+        "profileVersion": { "type": "string" }
+      }
+    },
+    "publisherPolicy": { "type": "null" }
+  },
+  "allOf": [
+    { "if": { "properties": { "channel": { "const": "development" } } }, "then": { "properties": { "releaseVersion": { "type": "null" } } } }
+  ]
+}

@@ -3,7 +3,10 @@
 The optional [installed H008 handoff](framework-handoff.md) reuses canonical
 tasks, lessons and synchronization after accepted planning. Native Windows
 guided use does not require consumer Git or WSL; worker supervision remains
-POSIX-only and does not authorize an unattended scheduler or live deployment.
+available on POSIX or an explicitly selected compatible installed Windows
+owned-Job runtime; it does not authorize an unattended scheduler or live deployment.
+Run the consolidated capability preflight. Source/skill copies do not install
+Windows supervision, and a capability probe does not prove actual Job ownership.
 
 This reusable starter serves first-time builders and experienced implementers. A demo, pilot and production release have different delivery needs, but a deadline never authorizes skipping a required platform or security check. The delivery context applies to Demo Builder, Advanced Builder and Framework Acceptance, for greenfield and existing-project adoption.
 
@@ -46,6 +49,15 @@ profile without the existing consolidated confirmation.
 - Tool presence is not proof of working authentication, tenancy, provider entitlement or a functioning runtime. Never install tools, alter security policy or enable a scheduler by implication.
 
 ## Automation is a measured option
+
+For explicitly autonomous multi-change work, recommend the existing
+[dependency-aware queue guide](QUEUED_AUTONOMOUS_DELIVERY.md) and ready-to-paste
+instructions referencing https://code.visualstudio.com/docs/agents/overview.
+Reuse accepted requirements and valid standing scoped nonproduction authority
+under [authorization and execution](policies/authorization-and-execution.md).
+This recommendation does not silently opt guided users into automation, install
+a worker or waive platform confirmations. Check actual process, checkpoint and
+resource evidence before writer release; lease expiry alone is insufficient.
 
 Start in **guided** execution. Propose automation only when the following are demonstrated:
 

@@ -4,6 +4,7 @@ File: scripts/ci/test_framework_handoff.py
 Environment: Python 3.11+; optional installed framework 0.2.1 and generic fixture.
 """
 import argparse
+from contextlib import nullcontext
 from copy import deepcopy
 import errno
 import importlib.util
@@ -14,8 +15,9 @@ import shutil
 import subprocess
 import sys
 import tempfile
+from types import ModuleType
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 ROOT = Path(__file__).resolve().parents[2]
 spec = importlib.util.spec_from_file_location("starter_handoff", ROOT / "scripts" / "bootstrap" / "helpers" / "framework-handoff.py")
@@ -43,11 +45,60 @@ class HandoffBoundaries(unittest.TestCase):
             (folder / name).write_bytes(b"# Human text\r\n\r\nPreserve spacing.  \r\n")
         (self.project / "BUILD.md").write_bytes(b"# Human build record\r\n")
 
+    def framework_boundary(self):
+        """Isolate delegation tests; InstalledHandoff retains the real runtime."""
+        def write_json(path, state):
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(state), encoding="utf-8")
+
+        package = ModuleType("demo_builder")
+        modules = {"demo_builder": package}
+        capabilities = {
+            "workspace": {"assert_external_output": Mock(return_value=None),
+                          "locked_workspace": Mock(side_effect=lambda path: nullcontext()),
+                          "write_json": write_json},
+            "errors": {"BuildError": type("BuildError", (Exception,), {})},
+            "browser": {"validate_config": Mock(side_effect=lambda value: value)},
+            "delivery": {"Delivery": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "forms": {"guid": Mock(side_effect=lambda value: value)},
+            "discovery": {"continue_wizard": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "agent_testing": {"run_tests": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "replay": {"scenario": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "git_inventory": {"inspect_integration": Mock(side_effect=AssertionError("Use the CLI boundary"))},
+            "functional": {"COVERAGE_VERSION": "1.0",
+                           "load_requirements_coverage": lambda path, *, task_ids=None: {}},
+        }
+        for name, members in capabilities.items():
+            module = ModuleType(f"demo_builder.{name}")
+            vars(module).update(members)
+            setattr(package, name, module)
+            modules[module.__name__] = module
+        return patch.dict(sys.modules, modules)
+
     def test_absent_spec_kit_is_noop_without_install_or_workspace(self):
         value, code = handoff.execute(self.args)
         self.assertEqual(code, 0)
         self.assertEqual(value["status"], "not-applicable")
         self.assertFalse(self.project.exists())
+        self.assertFalse(self.runtime.exists())
+
+    def test_supported_versions_still_require_coverage_api_before_status(self):
+        self.docs()
+        self.args.action = "status"
+        for version in ("0.2.1", "0.2.2rc1"):
+            with self.subTest(version=version), self.framework_boundary(), \
+                    patch.object(handoff.importlib.metadata, "version", return_value=version), \
+                    patch.object(handoff, "canonical_task_status", return_value={"status": "unavailable"}):
+                result, code = handoff.execute(self.args)
+                self.assertEqual(code, 0)
+                self.assertEqual(result["status"], "not-started")
+                self.assertFalse(result["scheduler_started"])
+                with patch("demo_builder.functional.load_requirements_coverage", lambda unrelated: {}):
+                    with self.assertRaisesRegex(ValueError, "coverage API 1.0"):
+                        handoff.execute(self.args)
+                with patch("demo_builder.functional.COVERAGE_VERSION", "future"):
+                    with self.assertRaisesRegex(ValueError, "coverage API 1.0"):
+                        handoff.execute(self.args)
         self.assertFalse(self.runtime.exists())
 
     def test_partial_planning_and_protected_roots_fail_before_mutation(self):
@@ -81,6 +132,171 @@ class HandoffBoundaries(unittest.TestCase):
                 handoff.execute(self.args)
         self.assertFalse(self.runtime.exists())
 
+    def test_browser_action_uses_existing_runtime_and_never_reuses_cached_diagnostics(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        config = self.root / "browser.json"
+        config.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.browser_config = "browser", str(config)
+        succeeded = subprocess.CompletedProcess(["browser"], 0, '{"status":"passed","fixture":true}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch("demo_builder.browser.validate_config", return_value={}), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            first, code = handoff.execute(self.args)
+            self.assertEqual(code, 0)
+            second, code = handoff.execute(self.args)
+        self.assertEqual(code, 0)
+        self.assertEqual(launch.call_count, 2)
+        self.assertEqual(launch.call_args.args[0][:2], ["browser", "diagnose"])
+        self.assertNotIn("--install", launch.call_args.args[0])
+        self.assertNotIn("replayed", second)
+
+    def worker_boundary(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        self.source = self.project / "source.py"
+        self.verifier = self.project / "verifier.py"
+        self.source.write_text("source version one")
+        self.verifier.write_text("verifier version one")
+        config = self.root / "worker.json"
+        config.write_text(json.dumps({"command": [sys.executable, str(self.source)],
+                                     "verify_command": [sys.executable, str(self.verifier)]}))
+        self.args.action, self.args.worker_config = "worker", str(config)
+        functional = ModuleType("demo_builder.functional")
+        functional.COVERAGE_VERSION = "1.0"
+        functional.load_requirements_coverage = lambda path, *, task_ids=None: {}
+        windows = ModuleType("demo_builder.windows_process")
+        windows.WINDOWS_SUPERVISION_VERSION = "1.0"
+        windows.OwnedJob, windows.identity_alive = Mock(), Mock()
+        return patch.dict(sys.modules, {functional.__name__: functional, windows.__name__: windows})
+
+    def test_reconciliation_rechecks_current_source_and_verifier_after_cached_results(self):
+        with self.worker_boundary(), self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", side_effect=[
+                    (subprocess.CompletedProcess(["worker"], 0, "accepted original source", ""), 1),
+                    (subprocess.CompletedProcess(["worker"], 2, "", "source fingerprint changed"), 1),
+                    (subprocess.CompletedProcess(["worker"], 3, "", "verifier fingerprint changed"), 1),
+                ]) as launch:
+            self.args.reconcile_only = True
+            handoff.execute(self.args)
+            self.source.write_text("source version two")
+            changed_source, code = handoff.execute(self.args)
+            self.assertEqual(2, code, changed_source)
+            self.assertNotIn("replayed", changed_source)
+            self.verifier.write_text("verifier version two")
+            changed_verifier, code = handoff.execute(self.args)
+            self.assertEqual(3, code, changed_verifier)
+            self.assertNotIn("replayed", changed_verifier)
+        self.assertEqual(3, launch.call_count)
+        self.assertTrue(all("--reconcile-only" in call.args[0] for call in launch.call_args_list))
+
+    def test_worker_task_selection_is_forwarded_and_changes_cached_intent_without_releasing_holds(self):
+        with self.worker_boundary(), self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(
+                    subprocess.CompletedProcess(["worker"], 0, "delegated", ""), 1)) as launch:
+            canonical = self.runtime / "tasks.json"
+            canonical.write_text(json.dumps({"tasks": [
+                {"id": "SOURCE-BLOCKED", "status": "blocked"},
+                {"id": "OWNER-HOLD", "status": "blocked", "reason": "protected owner hold"},
+            ]}))
+            original = canonical.read_bytes()
+            self.args.task_id = ["SOURCE-BLOCKED", "OWNER-HOLD"]
+            handoff.execute(self.args)
+            command = launch.call_args.args[0]
+            self.assertEqual(command[-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+            self.assertNotIn("--force", command)
+            self.args.task_id = ["SOURCE-BLOCKED"]
+            result, code = handoff.execute(self.args)
+            self.assertEqual(0, code, result)
+            self.assertNotIn("replayed", result)
+            self.assertEqual(2, launch.call_count)
+            self.assertEqual(canonical.read_bytes(), original)
+            replayed, code = handoff.execute(self.args)
+            self.assertEqual(0, code, replayed)
+            self.assertTrue(replayed["replayed"])
+            self.assertEqual(2, launch.call_count)
+            self.args.task_id = ["UNKNOWN-EXISTING-ID"]
+            launch.return_value = (subprocess.CompletedProcess(["worker"], 2, "", "unknown task ID"), 1)
+            result, code = handoff.execute(self.args)
+            self.assertEqual(2, code, result)
+            self.assertEqual(launch.call_args.args[0][-2:], ["--task-id", "UNKNOWN-EXISTING-ID"])
+            self.assertEqual(canonical.read_bytes(), original)
+            self.args.reconcile_only, self.args.task_id = True, ["SOURCE-BLOCKED", "OWNER-HOLD"]
+            handoff.execute(self.args)
+            self.assertIn("--reconcile-only", launch.call_args.args[0])
+            self.assertEqual(launch.call_args.args[0][-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+            self.assertEqual(canonical.read_bytes(), original)
+
+    def test_python_entrypoint_accepts_repeated_existing_task_ids(self):
+        argv = ["handoff", "--project", str(self.project), "--runtime", str(self.runtime),
+                "--scenario", self.args.scenario, "--action", "worker", "--reconcile-only",
+                "--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"]
+        with patch.object(sys, "argv", argv), patch.object(handoff, "execute", return_value=({}, 0)) as execute:
+            self.assertEqual(0, handoff.main())
+        self.assertEqual(execute.call_args.args[0].task_id, ["SOURCE-BLOCKED", "OWNER-HOLD"])
+        self.assertTrue(execute.call_args.args[0].reconcile_only)
+
+    @unittest.skipUnless(shutil.which("pwsh"), "PowerShell is needed for wrapper forwarding")
+    def test_powershell_entrypoint_forwards_explicit_existing_task_ids(self):
+        scripts = self.root / "wrapper"
+        (scripts / "helpers").mkdir(parents=True)
+        shutil.copyfile(ROOT / "scripts" / "bootstrap" / "09-framework-handoff.ps1", scripts / "09-framework-handoff.ps1")
+        (scripts / "12-check-wizard-capabilities.ps1").write_text("$global:LASTEXITCODE = 0\n")
+        (scripts / "helpers" / "framework-handoff.py").write_text("import json,sys\nprint(json.dumps(sys.argv[1:]))\n")
+        result = subprocess.run(["pwsh", "-NoProfile", "-File", str(scripts / "09-framework-handoff.ps1"),
+            "-ProjectRoot", str(self.project), "-RuntimeWorkspace", str(self.runtime),
+            "-ScenarioSlug", self.args.scenario, "-Action", "worker", "-ReconcileOnly",
+            "-TaskIds", "SOURCE-BLOCKED", "-PythonExecutable", sys.executable],
+            capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        command = json.loads(result.stdout)
+        self.assertIn("--reconcile-only", command)
+        self.assertEqual(command[-2:], ["--task-id", "SOURCE-BLOCKED"])
+        quote = lambda value: "'" + str(value).replace("'", "''") + "'"
+        expression = (f"& {quote(scripts / '09-framework-handoff.ps1')} "
+            f"-ProjectRoot {quote(self.project)} -RuntimeWorkspace {quote(self.runtime)} "
+            f"-ScenarioSlug {quote(self.args.scenario)} -Action worker -ReconcileOnly "
+            f"-TaskIds @('SOURCE-BLOCKED','OWNER-HOLD') -PythonExecutable {quote(sys.executable)}")
+        result = subprocess.run(["pwsh", "-NoProfile", "-Command", expression],
+                                capture_output=True, text=True, timeout=30)
+        self.assertEqual(0, result.returncode, result.stdout + result.stderr)
+        self.assertEqual(json.loads(result.stdout)[-4:], ["--task-id", "SOURCE-BLOCKED", "--task-id", "OWNER-HOLD"])
+
+    def test_discovery_works_before_spec_kit_and_feedback_forwards_without_cached_success(self):
+        self.project.mkdir()
+        contract = self.root / "selected.json"
+        contract.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.contract = "discover", str(contract)
+        self.args.entry_path, self.args.fidelity = "repair", "single-operator-demonstration"
+        succeeded = subprocess.CompletedProcess(["wizard"], 0, '{"status":"discovered","ui_verified":false}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            value, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual(["wizard", "discover"], command[:2])
+        self.assertEqual("repair", command[command.index("--entry-path") + 1])
+        self.assertNotIn("replayed", value)
+        self.assertFalse((self.project / "specs").exists())
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        feedback = self.root / "feedback.json"
+        feedback.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.feedback = "feedback", str(feedback)
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+        self.assertEqual(["wizard", "feedback"], launch.call_args.args[0][:2])
+        self.assertEqual(str(feedback), launch.call_args.args[0][launch.call_args.args[0].index("--input") + 1])
+
     def test_transient_launch_retries_are_bounded_and_permission_is_not_retried(self):
         transient = OSError(errno.EBUSY, "controlled busy launch")
         with patch.object(handoff.subprocess, "run", side_effect=transient) as runner:
@@ -93,7 +309,95 @@ class HandoffBoundaries(unittest.TestCase):
             with self.assertRaises(PermissionError):
                 handoff.launch(["run"])
         self.assertEqual(runner.call_count, 1)
+
+    def test_agent_behavior_uses_existing_runtime_without_planning_generation_or_publish_flags(self):
+        self.project.mkdir()
+        suite = self.root / "agent-suite.json"
+        config = self.root / "agent-config.json"
+        suite.write_text('{"schema_version":"1.0"}')
+        config.write_text('{"schema_version":"1.0"}')
+        self.args.action = "agent-test"
+        self.args.agent_suite, self.args.agent_config = str(suite), str(config)
+        self.args.repair_agent_fixture = True
+        succeeded = subprocess.CompletedProcess(["agent-test"], 0, '{"status":"passed","fixture":true}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            value, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual("agent-test", command[0])
+        self.assertEqual(str(self.runtime / "agent-tests"), command[command.index("--workspace") + 1])
+        self.assertIn("--repair", command)
+        self.assertNotIn("--publish", command)
+        self.assertFalse((self.project / "specs").exists())
+        self.assertNotIn("replayed", value)
+
+    def test_deploy_requires_explicit_delivery_authority_and_always_rechecks_the_live_target(self):
+        self.docs()
+        self.runtime.mkdir()
+        (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+        self.args.action = "deploy"
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"):
+            with self.assertRaisesRegex(ValueError, "exact authorization"):
+                handoff.execute(self.args)
+        tenant = "00000000-0000-0000-0000-000000000001"
+        config = self.root / "browser.json"
+        config.write_text(json.dumps({"target": {"tenant_id": tenant}}))
+        authority = self.root / "authority.json"
+        authority.write_text(json.dumps({"development_profile": {"delivery": {"browser_config": str(config)}}}))
+        self.args.authorization, self.args.tenant = str(authority), tenant
+        succeeded = subprocess.CompletedProcess(["apply"], 0, '{"status":"completed","ui_verified":false}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch("demo_builder.browser.validate_config", side_effect=lambda value: value), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            second, code = handoff.execute(self.args)
+        self.assertEqual(0, code)
+        self.assertEqual(2, launch.call_count)
+        command = launch.call_args.args[0]
+        self.assertEqual("apply", command[0])
+        self.assertIn("--development", command)
+        self.assertEqual(str(authority), command[command.index("--authorization") + 1])
+        self.assertEqual(tenant, command[command.index("--tenant") + 1])
+        self.assertNotIn("replayed", second)
         self.assertEqual(handoff.classify(subprocess.TimeoutExpired("run", 1)), "uncertain")
+
+    def test_quality_replay_and_git_review_forward_fresh_without_planning_or_implicit_reset(self):
+        self.project.mkdir()
+        manifest = self.root / "git-review.json"
+        manifest.write_text('{"schema_version":"1.0"}')
+        self.args.action, self.args.git_review_manifest = "git-review", str(manifest)
+        succeeded = subprocess.CompletedProcess(["git-review"], 0, '{"status":"observed"}', "")
+        with self.framework_boundary(), \
+                patch.object(handoff.importlib.metadata, "version", return_value="0.2.1"), \
+                patch.object(handoff, "launch", return_value=(succeeded, 1)) as launch:
+            handoff.execute(self.args)
+            handoff.execute(self.args)
+            self.assertEqual(2, launch.call_count)
+            command = launch.call_args.args[0]
+            self.assertEqual("git-review", command[0])
+            self.assertEqual(str(self.project), command[command.index("--root") + 1])
+            self.assertNotIn("--accepted", command)
+            (self.runtime / ".demo-workspace.json").write_text('{"owner":"demo-builder"}')
+            self.args.action = "scenario"
+            handoff.execute(self.args)
+            self.assertEqual(["scenario", "replay"], launch.call_args.args[0][:2])
+            self.args.scenario_operation, self.args.accept_scenario = "capture", True
+            handoff.execute(self.args)
+            self.assertEqual(["scenario", "capture"], launch.call_args.args[0][:2])
+            self.assertIn("--accepted", launch.call_args.args[0])
+            self.args.scenario_operation, self.args.accept_scenario = "reset", False
+            self.args.authorization = str(manifest)
+            handoff.execute(self.args)
+            command = launch.call_args.args[0]
+            self.assertEqual(["scenario", "reset"], command[:2])
+            self.assertEqual(str(manifest), command[command.index("--authorization") + 1])
+        self.assertFalse((self.project / "specs").exists())
 
 
 @unittest.skipUnless(AVAILABLE, "Select installed framework and STARTER_FRAMEWORK_FIXTURE for real integration")
@@ -427,7 +731,9 @@ class InstalledHandoff(unittest.TestCase):
         report, code = self.action("status")
         self.assertEqual(code, 0)
         task = report["task_summary"]["tasks"][0]
-        self.assertEqual((task["stored_status"], task["status"]), ("running", "ready"))
+        self.assertEqual((task["stored_status"], task["status"]), ("running", "running"))
+        self.assertEqual(task["owner"], "existing-owner")
+        self.assertEqual(report["task_summary"]["eligible_task_ids"], [])
         self.assertTrue(task["lease_reconciliation_required"])
         self.assertEqual(before, (self.runtime / "tasks.json").read_bytes())
         state["tasks"][0]["depends_on"] = ["unknown-native-id"]

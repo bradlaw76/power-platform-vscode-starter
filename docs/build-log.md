@@ -4,6 +4,440 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q13-R7 native source integration
+
+Selective prior-source reuse at `378ebd0a90c609207b767a9bac81ab72f4c98f35`
+integrates stage-30 semantic checks, stage-65 approved documentary HTML definitions,
+and stage-90 Payload/report planning plus post-relationship/pre-export Metadata.
+Current profiles, alternate keys, consent/provenance, membership and export gates
+remain; no older full runner, FAST enablement or official descriptor is adopted.
+Offline real-stage/injected-transport regressions verify the affected source paths.
+Native publication, placement and intended-user acceptance are not claimed.
+Exact commands/results and changed-file hashes belong to the requested external
+`starter-results.json`; source/policy commit and final inventory are parent-owned.
+
+## Accepted-outcome and capability reliability corrections
+
+- Source-only isolated correction; no new work number, native build/deployment,
+  merge, release, distribution or application regeneration.
+- Original outcome operations now bind confirmation bytes/excerpts, real tasks
+  and proportional functional criteria; new intake cannot silently omit coverage.
+  Existing read-only/no-report and genuinely inapplicable legacy paths remain.
+- Reused native validators/schema/docs from exact commit
+  `378ebd0a90c609207b767a9bac81ab72f4c98f35`, including required existing Choice
+  token/report-plan dependencies. Preserved the current runtime's forcibly-closed
+  retry after targeted regression exposed a compatibility loss.
+- Credential-free source/planning/installed API preflight reports missing
+  capabilities explicitly. Native runner integration is unverified; source and
+  simulation confirmation never approve native fields/reports. Windows worker
+  support is conditional on installed owned-Job API and actual launch ownership.
+- Targeted checks: 17 coverage/preflight, 64 reused semantic helper,
+  18 Dataverse runtime, 3 capability compatibility and 5 packaging cases passed;
+  current intake/report-consent compatibility, JSON/contracts/docs also passed.
+  Native full-branch orchestration integration was not adopted or tested.
+  [Existing handoff contract and CLI fixtures](framework-handoff.md#accepted-outcome-reliability)
+  contain source provenance and functional/runtime boundaries.
+- Independent review corrections: reconciliation bypasses historical completed
+  and blocked handoff caches; explicit existing task IDs are forwarded through
+  PowerShell/Python and bound to handoff intent without altering canonical holds.
+  Four focused regressions reproduced red before the fix and passed green,
+  including selected source/verifier drift and both public entrypoints. These
+  and all 13 handoff boundary cases passed, preserving ordinary replay.
+  Boundary tests do not claim Pipeline end-to-end reconciliation acceptance.
+
+## Q15-Q16 local instruction inheritance/migration
+
+- Source-only dependent campaign lane preserves H009/H010 and PR17; no H number,
+  merge, release, live tenant write or application development.
+- New external terminal/chat workspaces receive actual policy/loaders/assets.
+  Existing customized instructions use the same H009 preview/backup/lock/
+  conditional recovery lifecycle, without a runtime upgrade.
+- Shared regression: 30 passed / one platform skip, plus added initializer case;
+  final-body migration cases passed. Focused Pester 108/0, distribution 5/0,
+  wizard/H010 consent, contracts/docs/source-control, JSON and analyzer passed.
+- Full evidence, defects corrected and recovery/ACL/runtime boundaries:
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md#q15-q16-instruction-inheritance-and-migration).
+- Final commit identities, refreshed candidate inventory and hosted CI belong in
+  the dependent PR receipt; these local fixture results are not native acceptance.
+
+## H010 Demo Builder reporting consent correction - 2026-11-24
+
+### Ownership, source and finding
+
+- Authorized H010 maintenance only, isolated on
+  `fix/h010-reporting-consent-20261124` from frozen H009
+  `c9ad4ca7b9ea0a4c7709b0e422bf96b87f5aa00b`. The review PR is stacked on
+  `feature/h009-wizard-update-manager` so its diff contains only H010.
+  PR16 and its source history are not changed; no merge is authorized.
+- Inspected HEAD/status, remotes, open PRs, worktrees, Git locks and available
+  process ownership. The original checkout had a modified README and untracked
+  backup directory; both were preserved. Existing editor/terminal sessions and
+  the separate authorization/execution worktree were left alone. Local inspection
+  does not establish global absence of shared-machine writers.
+- Read the retained fictional Contoso acceptance report, F-01, and original
+  seven-answer fixture. Its finding independently traced the same defect to the
+  PR base: this is pre-existing discovery behavior, not an H009 updater defect.
+- Before: Demo Builder accepted architecture yes/no, then hardcoded HTML no,
+  `approved-no-reports`, and "Reports were explicitly disabled during intake"
+  without offering a reporting choice. It was neither a customer refusal nor
+  inference from another response. The false claim propagated into mappings and
+  planning/configuration.
+
+### Source correction and compatibility
+
+- After: display a scenario-based recommendation with native/HTML/both/none in
+  the existing consolidated confirmation. Explicit `yes` confirms the displayed
+  scope; a scope token changes it; blank/defer leaves it unconfirmed; `no` still
+  cancels the design. No additional discovery question or build stage.
+- All five planning Markdown artifacts share recommendation/rationale, selected
+  scope, decision/source, independent native/HTML flags, and mapping status.
+  Decisions distinguish explicitly approved, explicitly declined, recommended
+  but not confirmed, and profile-disabled not applicable. Approving a displayed
+  forms/views-only recommendation is approval, not an invented refusal.
+- Advanced Builder/Framework Acceptance retain the reporting answer slot and
+  legacy yes=HTML/no=none meaning, with additional native/both/defer choices.
+  Their critical-table mapping validation remains. Demo scope approval leaves
+  mappings pending review; safe no flags on unresolved decisions are not consent.
+- Existing build-contract validation and direct HTML generation reject unresolved
+  consent/mappings. Pending text is not an executable report identity. Native
+  payload preparation and HTML content still require separate mapping review;
+  this correction does not redesign the legacy report rendering engine.
+- No migration or rewrite of previous customer artifacts. Existing planning
+  without the new consent block keeps legacy runtime compatibility, not
+  retroactive approval. Profile, contract, onboarding, requirements, prompt,
+  instructions, both shipped skill families and registry are aligned.
+- H009 updater/version helper, transaction engine, tests, release descriptor and
+  frozen candidate inventory are unchanged. Inventory remains pinned to its
+  H009 documentation source, not a claim to distribute this H010 candidate.
+
+### Contoso acceptance evidence
+
+Replayed the original fictional Permit/Inspection/Applicant/Review answers with
+the inert `https://contoso-permits.invalid` target in a new local fixture.
+The original consumer and retained H009 evidence were not modified.
+
+Actual displayed output:
+
+```text
+Reporting recommendation: html
+Reporting choices (native/html/both/none)
+Reporting scope approval is not mapping, payload, deployment, or placement approval.
+```
+
+Actual shared selection from the original final `yes` answer:
+
+```text
+Decision: explicitly-approved
+Decision source: consolidated-recommendation
+Recommended scope: html
+Selected scope: html
+Native dashboards: no
+HTML reports: yes
+Mapping status: pending-review
+```
+
+All five artifacts agree; no fabricated explicit-decline text or executable
+report payload is emitted. A direct HTML preview is rejected before report
+generation while mappings remain pending. The reproducible regression fixture
+and assertions are in [test-wizard-modes.ps1](../scripts/ci/test-wizard-modes.ps1).
+Local transcript and generated outputs are retained in the H010 session evidence
+folder; they are synthetic acceptance evidence, not customer requirements.
+
+### Exact local validation
+
+Native Windows, PowerShell 7.7.0. Commands below are relative to the H010 worktree.
+
+| Command/check | Result |
+| --- | --- |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-modes.ps1` | Passed: 8 Contoso reporting cases, 8 detailed-mode reporting cases, existing Demo/Advanced/Acceptance and planning-artifact fixtures |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-source-control-acceptance.ps1` | Passed: existing Advanced yes=HTML fixture, approved mappings and all five consent artifacts; no Git mutation |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-hardening.ps1` | Passed: legacy build-contract/configuration compatibility |
+| `pwsh -NoProfile -File scripts/ci/test-reporting-and-data-stages.ps1` | Passed: native reporting/synthetic-data stage regressions |
+| `pwsh -NoProfile -File scripts/ci/test-live-report-generation.ps1` | Passed: existing sparse/rich/rerun/missing-field offline HTML previews |
+| `pwsh -NoProfile -File scripts/ci/test-contract-integrity.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-docs-consistency.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-json-schema.ps1` | Passed: 91 documents parsed, 60 payloads schema-matched |
+| `pwsh -NoProfile -File scripts/ci/test-script-smoke.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-update.ps1` | 24 tests: 23 passed, 1 POSIX permission-bit skip on Windows; 178.053 seconds |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-distribution.ps1` | 5 passed; frozen inventory verified: 131 files, 1,898,505 bytes; publisher/automatic Apply false |
+| `Invoke-Pester` on `WizardUpdateEntryPoints.Tests.ps1`, `SkillParity.Tests.ps1` | 68 passed, 0 failed/skipped: 8 H009 entry-point tests and 60 skill-parity tests |
+| Focused `Invoke-ScriptAnalyzer` using repository settings, severity Error | 0 errors |
+| Cached `markdownlint-cli2@0.18.1` on changed Markdown; `git diff --check` | 0 errors |
+
+Regression-first proof: new assertions failed against unchanged H009 intake with
+`answers.md lost reporting consent '## Reporting Selection'`, then passed with
+the correction. An intermediate transcript-label assertion required an explicit
+scope-list label; fixed and rerun. One analyzer invocation incorrectly supplied
+an array to its scalar Path parameter; corrected to per-file calls, zero errors.
+No implementation failure was suppressed.
+
+The legacy HTML preview test emits an existing unrelated frozen FOIA relationship
+parse warning and intentionally rejects missing fields; its final result passes.
+That fixture warning was not repaired or presented as a live check. Full suites
+were not repeatedly run; focused mode/HTML tests were rerun after guard changes.
+Local Windows results do not certify Linux/macOS, production or live Dataverse.
+PR CI results, if available, are source-bound evidence on the separate review PR.
+
+### Handoff, boundaries and next action
+
+- SOURCE COMPLETE / TESTED locally; commit/push/PR identity is recorded in the
+  separate H010 review PR. Independent review remains required.
+- **HANDOFF NOT WRITTEN - BLOCKED** for the canonical
+  `docs/audits/chatgpt-review-handoff.md`: existing restoration requires a
+  separately selected historical source or authorized fresh index. H010 does not
+  resolve that ownership gate. This build-log entry and the PR are the complete
+  transferable report; no protection was bypassed.
+- No merge, tag/release, distribution activation, deployment, Dataverse
+  authentication/mutation, consuming application repository change, cleanup of
+  other owners' locks, or alteration of H009 PR16. Official updater Apply remains
+  fail-closed. Next action: independent H010 review and separate owner disposition
+  of the stacked dependency; do not merge automatically.
+
+### H010-Q02 independent source review and closeout - 2026-11-24
+
+Reviewed the existing H010 diff at
+`a09ea2cb8738be4ec8a2b7298e86138c6e690f67`, its original Contoso evidence,
+and successful CI run `45408035015`. Reused the existing verification checkout,
+implementation branch and PR #18; no duplicate worktree, branch, PR or H-number.
+This is independent source review and fixture validation, not a human approving
+GitHub review or release authorization.
+
+#### Confirmed H010 findings and corrections
+
+1. **Completed validation bypassed current consent on resume.** The orchestrator
+   reused its completed `validate` stage after reporting was deferred. A new
+   isolated profile regression failed with
+   `Unconfirmed reporting bypassed the current-consent gate (Resume=True)`.
+   The shared reporting readiness check now runs before state reuse or stage
+   dispatch, for both new/resumed Preview and Apply. Pending scope or mappings
+   stop before any stage, even when saved validation says completed.
+2. **Stage selection ignored independent native/HTML consent.** Generic prose
+   could enable the HTML stage for native-only consent; any native payload could
+   enable native reporting for HTML-only or declined scope. The new regression
+   reproduced `html consent executed an unselected native payload`. For new
+   consent blocks, HTML now uses its exact feature flag and native reporting
+   additionally requires its independent flag. Leftover payloads are not opt-in.
+   Legacy artifacts without the block retain legacy selection behavior.
+
+The shared helper is reused by build-contract validation, direct HTML generation
+and orchestration; this is not a new approval system. Profile, registry,
+instructions, prompt, skills, discovery contract, onboarding and requirements
+describe the same checks. No report mappings, historical scenarios, H009 updater,
+release inventory or application-specific source were changed.
+
+Consent-state review verified explicit acceptance, explicit reporting decline,
+whole-design rejection, blank/deferred response, exhausted scripted input,
+profile-disabled scope and legacy behavior. Explicitly authorized re-intake
+replaces prior approval with deferred status rather than inheriting it;
+cancelling re-intake preserves existing scenario artifacts. Reconfirming scope
+still leaves Demo mappings `pending-review`. Detailed modes still collect and
+validate individual mapping rows separately from their reporting scope answer.
+Neither scope approval nor cached validation approves report content/deployment.
+
+#### Focused optional-discovery consent assessment (read-only)
+
+| Capability | Observed state and conclusion |
+| --- | --- |
+| Native/HTML reporting and report web resources | H010 decisions distinguish explicit consent, deferred and profile-disabled states; corrected dispatch above. Power BI is not a separate implemented discovery capability here; absence is not a decline or proof of service unavailability. |
+| Copilot Studio and Power Pages | Detailed intake can record platform intent as free text. No dedicated per-capability approval/decline or provisioning is emitted by this intake. Generic design tasks are not authorization. |
+| Integrations | No typed integration consent or integration adapter provisioning in this intake. Raw requirements and future planning work must not be interpreted as approval or unavailability. |
+| Unattended automation and framework sync | Guided execution is a disclosed system default, not a customer refusal. Automation is not started. Framework handoff needs explicit runtime/accepted-contract inputs; synchronization is separately opt-in. |
+| Optional security roles | Profile availability is not customer consent. The role stage requires a schema-valid enabled payload and defaults Preview; Apply remains explicit. Assignments, field security, SharePoint provisioning, Delete and Share remain rejected. No false explicit-decline record found in the reviewed path. |
+| Business Process Flow | Confirmed follow-up candidate: Demo Builder always disables BPF, then emits "No staged lifecycle was captured during discovery." The retained Contoso lifecycle explicitly includes stages, so the rationale is inaccurate. Detailed modes also collapse a blank/default no and a literal no into one Boolean. No new H-number or BPF rewrite in H010. |
+| Synthetic sample data | Confirmed follow-up candidate: Demo Builder defaults `NeedsDemoData=Yes` unless its success text matches a narrow no-data phrase; that inference is not shown in the consolidated design and lacks decision provenance. Detailed blank input defaults Yes. This is an inferred/default enablement, not the original fabricated explicit reporting decline; data planning gates still require counts/scope approval. |
+
+Evidence: [intake and generated templates](../scripts/bootstrap/05-start-wizard.ps1)
+(`Read-BpfDiscovery`, Demo data inference, reporting confirmation, automation
+defaults and optional BPF template);
+[profile capability availability](../wizard.profile.json);
+[bounded security-role stage](../scripts/bootstrap/68-build-security-roles.ps1).
+This assessment does not certify external workloads, live service availability
+or every bootstrap stage. The follow-up candidates need owner prioritization,
+not automatic H-number assignment.
+
+#### Canonical handoff reconciliation
+
+**HANDOFF NOT WRITTEN - BLOCKED.** The canonical destination is absent from the
+accepted baseline; this is not a filesystem permission error or a failed test.
+There are four competing historical blobs, independently checked through Git:
+`d1431d0955d140186a45e31d031f214195d20bf3` (Skills),
+`d6659180ccd38ff6766f36194f143f8a00fe6dd3` (historical canonical policy),
+`5fe10453cbd4b509336b8fd4017d7cb914865f73` (PR #5), and
+`efb8afb304eaed4a4bff4d0506bcec7df69e7eb4` (PR #6).
+No current owner record selects one as restoration authority or authorizes a
+fresh canonical index. The current authorization policy preserves that gate.
+
+Specific missing decision: select an exact historical commit/blob, preserving
+its bytes and linking the other records, **or** authorize a fresh dated index
+linking all four; specify its role, repository/branch/full starting SHA,
+canonical path, write/commit/push scope and applicable maintenance preflight.
+See the existing [immutable audit map and owner choices](audits/h008-release-consolidation-proposal.md).
+Q02's conditional instruction to resolve if permitted does not select that
+authority. No restoration write, protection adoption or repeated blocked
+attempt was made. This entry and PR #18 remain the transferable handoff.
+
+#### Exact additional tests and dependency disposition
+
+Native Windows, PowerShell 7.7.0; credential-free tests only:
+
+| Command/check | Result |
+| --- | --- |
+| `pwsh -NoProfile -File scripts/ci/test-verification-profiles.ps1` | 176 assertions passed; includes eight pending-scope/mapping new/resumed Preview/Apply combinations and independent native/HTML/none dispatch; stage bodies stubbed |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-modes.ps1` | Existing 8 Contoso + 8 detailed cases passed; additional cancellation, missing input, approved/deferred/reconfirmed re-intake and artifact-preservation checks passed |
+| `pwsh -NoProfile -File scripts/ci/test-wizard-hardening.ps1` | Passed; legacy contract behavior retained |
+| `pwsh -NoProfile -File scripts/ci/test-preview-nonmutation.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-run-state-persistence.ps1` | Passed |
+| `pwsh -NoProfile -File scripts/ci/test-live-report-generation.ps1` | Passed; existing intentional missing-field rejection remains |
+| Contract integrity, docs consistency, JSON/schema, script smoke | Passed; 91 local JSON documents, 60 schema-matched payloads |
+| Pester 5.7.1: `DataverseRuntime.Tests.ps1`, `SkillParity.Tests.ps1` | 78 passed, zero failed/skipped |
+| ScriptAnalyzer 1.24.0 with repository settings | Five changed PowerShell files, zero findings |
+
+The two expected regression-first failures were preserved as evidence, not
+suppressed or counted as passing. Unchanged H009 transaction evidence is reused;
+PR CI will validate the follow-up commit separately from baseline CI.
+
+The 16 optional installed-framework integration skips are gated by an installed
+`demo_builder` package and explicitly selected `STARTER_FRAMEWORK_FIXTURE`.
+Neither is selected locally; ordinary CI intentionally lacks that external
+fixture. They cover installed handoff/adoption, scoped projection, leases,
+recovery/replay and synthetic end-to-end handoff, not live Dataverse reporting.
+The wizard-to-installed-handoff case is adjacent to intake, so this is a real
+external integration coverage limitation, not 16 H010 successes. H010 does not
+change that adapter, accepted-contract format or sync projection. The skips do
+not block the focused consent correction/source review; an installed-framework
+distribution claim still needs separately selected compatible integration
+evidence. No package was installed, fixture invented or skip weakened.
+
+PR #18 is stacked on frozen #16 at
+`c9ad4ca7b9ea0a4c7709b0e422bf96b87f5aa00b`; #16 targets main. Recommended
+sequence, only after separate owner authorization: review/integrate #16 first;
+then retarget #18 to main, reconcile the integration strategy (squash/rebase can
+change ancestry), verify the resulting diff contains H010 only and run
+exact-result CI; review/integrate #18 next. Do not merge the stacked child ahead
+of its dependency or infer permission from passing checks. Design PR #15 is
+reference-only, not an additional runtime dependency.
+
+Source corrections and local review are complete. Final follow-up commit,
+remote verification and exact-head CI disposition belong in PR #18 and the
+existing external progress ledger. Canonical restoration and release authority
+remain separate owner decisions. No merge, release or Dataverse operation.
+
+## Q18 H009 final documentation and handoff - 2026-11-24
+
+- Consolidates user-facing version/update workflow, candidate installation,
+  force-copy installer cautions, explicit recovery-status handling and
+  source-specific Windows/Linux host evidence in existing PR16.
+- Preserves design PR15 pending owner disposition and Q17 runtime
+  `e8eb06fa576a2dc26693a233f6ff0f2ea2687f95`; no runtime/test/contract change.
+- [Final handoff](wizard-release-readiness.md#q18-final-review-and-handoff) records
+  implemented versus synthetic/official boundaries, owner roles and exact next
+  actions. Existing external H009_IMPLEMENTATION_REPORT.md is the sole campaign
+  progress ledger; earlier reports remain source-specific evidence.
+- Final documentation SHA and exact-head CI are recorded in issue14/PR16.
+  Official Apply and canonical **HANDOFF NOT WRITTEN - BLOCKED** are unchanged.
+  No merge, release/tag, publisher activation or live environment operation.
+
+## Q17 H009 lifecycle and recovery acceptance - 2026-11-24
+
+- Independent real GitHub clone exposed a Windows checkout defect: excluding
+  installed Git configuration removed `core.autocrlf=true`, falsely reporting
+  unchanged CRLF files as local modifications.
+- Preserve only validated line-ending scalar settings for read-only Git status;
+  retain execution isolation and filesystem-monitor disabling. The focused
+  regression covers a fresh normalized checkout, repository-local precedence,
+  genuine human edits, invalid configuration and a monitor that must not run.
+- Actual shared-command synthetic probes demonstrate post-write hash-validation
+  failure, persisted interruption, conflict-preserving recovery hold and original
+  bytes/metadata restoration after explicit fixture-only reconciliation.
+- Final source, exact-head CI and the twelve-scenario evidence matrix are linked
+  in existing issue14/PR16. No official trust, Apply policy or distribution
+  authority is activated; no merge/release/tag, tenant write or protection bypass.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains unchanged.
+
+## H009-09 through H009-12 candidate release readiness - 2026-11-24
+
+- Preserves Q14 implementation `480ba156` and Q15 path correction `8673681`;
+  work isolated above Q15, with serialized publication to existing PR16.
+- Adds explicit candidate-only redistribution policy, exact Git-blob SHA-256
+  inventory/schema/negative tests and a signed real shared-command lifecycle.
+- [Release readiness](wizard-release-readiness.md) records proposed GitHub
+  provenance/rotation/revocation gates, topology ownership, honest original
+  requirement reconciliation and production filesystem limitations.
+- Final commit, manifest digest, native Windows/Linux acceptance and CI evidence
+  are linked in issue14/PR16. No synthetic authority is labeled official.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** remains. No official activation,
+  merge, tag/release, security-setting or consuming-application change.
+
+## Q15 H009 post-implementation integration - 2026-11-23
+
+- Fetched main remains H008 merge `57f54fbf6b2c88e391100c001ba0b3f8834e190b`,
+  already the implementation branch's ancestor; no rebase or H008 replay.
+- Preserved implementation PR16, design PR15 and concurrent worktrees; no
+  additional source-writer branch or actionable review finding was observed.
+- Reproduced relative-runtime source revision loss when PowerShell location and
+  process directory differ. Resolve the runtime through PowerShell's path API;
+  startup/agent interfaces, profile/contract versions and Python trust gates
+  are unchanged. Added focused path and copied no-Git runtime regressions.
+- Final submitted SHA, focused results and exact-head CI are recorded in the
+  existing H009 issue/PR and external implementation report.
+- No merge, release/tag, tenant write or protection bypass. Canonical
+  **HANDOFF NOT WRITTEN - BLOCKED** remains unchanged.
+
+## Q14 H009 source implementation - 2026-11-23
+
+- Base main `57f54fbf6b2c88e391100c001ba0b3f8834e190b`; existing design PR15
+  `5098769d2786fbf366b8e2e8ecb7fd8912bd84ce`, issue14 ownership claim.
+- Isolated `feature/h009-wizard-update-manager` source lane; design owner/history,
+  H008 evidence and legacy PRs preserved. No new H-number or controller.
+- Nullable development distribution descriptor, offline version-only terminal
+  startup and shared agent commands; optional updater does not gate discovery.
+- Exact file planning/recovery is separate from application/Spec Kit data.
+  Official Apply remains blocked without independent publisher policy.
+- H009-focused Windows/Linux results, final exact commits/CI and demonstrations
+  are recorded in the linked implementation PR and issue14 final report; no
+  pending or synthetic test is described as live release/deployment acceptance.
+- Canonical **HANDOFF NOT WRITTEN - BLOCKED** unchanged. No release/tag, tenant
+  operation, security activation, persistent service or unrelated PR merge.
+## Q09–Q12 native safety continuation — 2026-11-24 (Starter local)
+
+- Same accepted campaign from `a0e7d6743cb5120104531e517253c142ac73fc3d`;
+  no Q01–Q08 restart. Canonical policy/distributed guidance now covers actual
+  browser principal/mismatch stops, publication blast radius/unrelated drafts,
+  unexpected record change evidence/no blind rollback, restriction classification
+  without bypass, app/user form eligibility and independent browser recovery.
+- Focused Pester 96 passed / 0 failed/skipped/not-run; real generated-task,
+  source-control and contract checks passed; four changed PowerShell files passed
+  parser/analyzer; changed Markdown lint passed. Installer remains byte-identical.
+- SOURCE COMPLETE / TESTED locally only. Runtime/synthetic end-to-end work belongs
+  to Automation/parent; no native pilot, live calls or runtime installed in Starter.
+  No H allocation, central standards or H009/H010 branch mutation; no push yet.
+  Exact commands and limits are in the existing AI-neutral handoff.
+
+## Development execution simplification — 2026-11-24 (Starter local)
+
+- Temporary identifier `PROPOSED-DEVELOPMENT-EXECUTION-SIMPLIFICATION`; Q01-R1
+  authorizes implementation despite pending allocator review. No H allocated;
+  H008/H009/H010 and all original worktrees preserved.
+- Isolated `campaign/development-execution-simplification`, existing PR #17
+  baseline `6a5e7de9331299e24480d2f5751e4a3ed045b97e`. Parent owns publication.
+- Canonical authorization policy extended for standing scoped nonproduction
+  authority, accepted-requirements reuse, proportional checks, recoverable
+  administration/repair documentation and evidence-based writer recovery.
+  Semantic/report/hash/FAST/security and enforced repository gates retained.
+- Copilot/prompt/four skills/task template and applicable registry, engineering,
+  onboarding, distribution, impact, queue, recovery and handoff surfaces aligned.
+  Registration proposal contains separate STARTER/AUTO mappings for ChatGPT
+  review; central standards and Automation runtime untouched.
+- Final focused Pester: 83 passed / 0 failed / 0 skipped, including actual fixture
+  installer byte equality. Wizard modes/generated tasks, source-control intake,
+  contract integrity, changed-PowerShell parse/analyzer and changed Markdown lint
+  passed. Initial propagation failures corrected before successful rerun.
+- SOURCE COMPLETE / TESTED locally; no deployment, app/sitemap mutation,
+  inventory/sync/export run, live verification or native queue acceptance.
+  Cached update advisor absent; no fetch/freshness claim. See
+  [existing AI-neutral handoff](audits/ai-neutral-instruction-handoff.md) for
+  commands, exact limits and publication responsibilities.
+
 ## Q12 release finalization - 2026-11-23
 
 - Starting candidate `56fee3c6fd5a525f0392055422e5cab6a527e8e6`, main

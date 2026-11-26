@@ -6,6 +6,21 @@ argument-hint: 'Optional: mode=demo-builder|advanced-builder|framework-acceptanc
 
 # Power Platform Wizard Init
 
+Preserve original confirmed outcomes, excerpts/hash, real tasks and applicable
+functional criteria in scenario `requirements-coverage.json`, using existing
+confirmation rather than extra discovery. Accepted mutations cannot become
+mapping/read-only completion. Run consolidated credential-free
+`12-check-wizard-capabilities.ps1`; source/skill adoption is not installed runtime
+availability. Missing capabilities block affected work. Apply
+[semantic fields](../../../docs/semantic-field-type-standard.md) and actual
+`field-type-decisions.json`/report approvals; simulation never grants them.
+See [handoff](../../../docs/framework-handoff.md#accepted-outcome-reliability).
+Integrated stages 30/65/90 enforce semantic and approved HTML source gates.
+Source preflight requires hooks/dependency closure, not native acceptance.
+Source-only `ReconcileOnly` always rechecks current source/verifier inputs.
+Select existing `TaskIds` explicitly for eligible blocked source tasks; protected
+holds remain with the canonical worker, not the handoff.
+
 ## Authorization and execution
 
 Load and follow [authorization and execution](../../../docs/policies/authorization-and-execution.md)
@@ -13,16 +28,52 @@ for all workloads. During the existing consumer compatibility review, require
 this policy or a reviewed equivalent and a reference in the project's existing
 instruction entry point before mutating work. Do not overwrite local instructions.
 
+Follow the canonical authorization-and-execution.md policy for development-first
+corrections, actual safety gates, writer recovery and native evidence; do not
+reproduce its procedures here.
+
 ## Overview
 
 This skill starts the repository wizard safely through either chat or terminal, enforces planning gates, and reports progress using existing telemetry artifacts.
 
 This skill does not modify core wizard scripts.
 
+Optional Q29 read-only browser diagnostics uses the existing handoff's `browser`
+action and explicit `BrowserConfigPath`; follow project `docs/framework-handoff.md`.
+Do not install tooling silently or label synthetic Chromium success as tenant proof.
+Optional Q30 `deploy` uses the same handoff with exact `AuthorizationPath` and
+`TenantId`, an existing nonproduction delivery profile, published/read-only
+rendered checks and guarded source reconciliation; no expanded authority.
+When installed Q31 is available, prefer the same handoff's `discover` before
+repeating questions. Reuse selected source/scoped metadata for build/enhance/repair;
+ask only material unresolved questions. Configure single-operator, multi-persona
+or production-oriented fidelity without relaxing actual policy/security.
+Read-only discovery and accepted `feedback` may precede Spec Kit. Deliver an
+authorized first slice, offer inspection, then reconcile only affected tasks in
+the same runtime. Legacy bootstrap planning and semantic gates remain unchanged.
+For installed Q32, use that handoff's `agent-test` for ordered conversational
+behavior and version regression, not instruction lint. Keep prompts/scenarios
+external; Direct Line tests can invoke tools and need exact live-effects authority.
+Missing tool/grounding/escalation evidence is unverified. Only one accepted local
+fictional instruction correction can run automatically; never edit/publish an
+actual agent or infer native acceptance from synthetic results.
+For installed Q33, reuse the same handoff for scoped Playwright native quality
+and context checks, accepted fictional replay and offline Git/writer inspection.
+Presentation must not repeat transactions or duplicate seeds. Reset is explicitly
+authorized synthetic-only. Preserve unique/merge changes, recovery refs and
+expired/uncertain writer ownership; never auto-merge/close or add a mandatory stage.
+Q37's optional Automation CLI hosted PR discovery requires explicit selected
+repository/PRs; Starter's manifest handoff stays offline. No fetch/merge/close,
+work allocation or release approval is inferred. Use
+[published installation and capability boundaries](https://github.com/bradlaw76/power-platform-vscode-starter/blob/campaign/starter-instruction-migration-q15-q16/docs/intelligent-wizard-getting-started.md).
+
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
 table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
-native Windows supports guided continuation, not autonomous worker supervision.
+native Windows always supports guided continuation; supervised workers additionally
+require the selected installed `demo_builder.windows_process` v1.0 owned-Job
+capability and actual ownership evidence. Do not infer ownership from lease
+expiry, a WSL interop child or a capability constant.
 Its read-only Status action projects canonical task counts, eligible IDs and
 dependency/owner holds with timestamps and next actions. Never dispatch from
 that projection, persist lease expiry or turn a missing store into zero success.
@@ -41,6 +92,27 @@ options only within accepted scope. Preserve mandatory gates and same-mode/
 policy resume identity.
 
 ## Runtime Compatibility Preflight
+
+For a confirmed new external project, use the runtime's
+`05-start-wizard.ps1 -WorkspaceRoot <project> -InitializeInstructionsOnly`
+before chat intake. It supplies actual local policy/assets, not a runtime.
+Existing/custom instructions use H009 `-InstructionMigration` preview under
+`docs/wizard-updates.md`; never copy over them.
+
+### Installed wizard and updates (H009)
+
+After confirming the runtime path, run
+`pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`
+from that runtime, not the consuming project. Display its installed release,
+source revision, contract/profile and update state before discovery. This shared
+command is offline and read-only; a copied skill without it is not an installed
+runtime. Report unavailable rather than inventing a version or installing it.
+Offer Review changes, Update wizard, or Skip for now; use the same command's
+Review/Update/Skip actions, never agent-authored pull/copy logic. Skip continues
+unchanged with no new intake question. Online checking requires explicit opt-in.
+Official Apply remains blocked until publisher trust, immutable release identity,
+integrity, compatibility and ownership are verified. Preserve local instructions,
+Spec Kit, credentials and native IDs. See `docs/wizard-updates.md` in the runtime.
 
 Optional `-ApplicationProfile new-dynamics-365-app` and
 `-RequirementsMaterialsFile` follow the repo's wizard-contract source-note
@@ -143,7 +215,10 @@ Use the proportional [scenario change impact gate](../../../docs/scenario-change
 5. Capture task, relationship, report, and demo-data planning at the selected mode's depth
 - Record top user tasks as persona, task, frequency, entry table/view, expected outcome, owner, and done definition.
 - For each relationship, capture cardinality, requiredness, existing/new status, cascade behavior, and supporting task/surface.
-- Generate `report-mappings.md` for every run. If reports are enabled, capture critical/high-frequency tables and one mapping per report with table logical name, surface, form/dashboard/view type, placement, required fields, supported decision, owner, and validation checklist. Block progression when a critical table has no mapping. If reports are disabled, record that explicit decision.
+- Explain native dashboards (standard Dataverse charts/dashboard), HTML web resources (tailored layouts), both (complementary tasks), or none. Demo Builder includes a scenario-based recommendation in its existing consolidated confirmation, not another question. `yes` approves the displayed scope; blank/`defer` leaves reporting unconfirmed; `no` cancels. Detailed modes keep their reporting slot and legacy yes=HTML/no=none.
+- Generate `report-mappings.md` for every run and the same `Reporting Selection` in all five planning artifacts: recommendation/rationale, selected scope, native/HTML flags, decision/source, and mapping status. Distinguish `explicitly-approved`, `explicitly-declined`, `recommended-not-confirmed`, and `not-applicable`. Disabled discovery is not a customer decline; do not migrate old artifacts without separate authorization.
+- Recheck current reporting consent/mapping status before new/resumed orchestration. Saved stages are not new consent; native/HTML stages follow independent flags, not leftover payloads or prose.
+- Selected reports need critical-table mappings with surface type, placement, fields, supported decision, owner, and validation. Explain audience, metrics/calculations, scope, limitations, and overlap. Unconfirmed scope or pending mappings block planning completion; scope approval alone is not report content or deployment approval. See `docs/wizard-contract-v1.md#reporting-consent-h010`.
 - If demo data is enabled, choose all scenario-created custom tables or selected tables, confirm the resolved tables, and capture per-table counts, scenarios/states, hero records and their demo purpose, relationship distribution, method, and privacy constraints. Rerun-proof evidence, acceptance source tagging, retention, and cleanup approval belong only to Framework Acceptance.
 - If Dataverse Task activities are requested, capture eligible parent tables, latest/all/selected scope, source-record limit (default 10 for latest), ordering field, and tasks per selected record. Do not plan tasks for every record unless the user explicitly selects all.
 - Generate `demo-data-plan.json` when enabled. This stage plans data only and must not create Dataverse rows.

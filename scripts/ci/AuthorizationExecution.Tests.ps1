@@ -26,6 +26,7 @@ BeforeAll {
     $policyPath = Join-Path $repoRoot $policyRelativePath
     $policy = Get-Content -LiteralPath $policyPath -Raw
     $surfaces = @(
+        'AGENTS.md'
         '.github\copilot-instructions.md'
         '.github\prompts\power-platform-demo-wizard.prompt.md'
         '.github\skills\power-platform-wizard-init\SKILL.md'
@@ -36,6 +37,7 @@ BeforeAll {
         'docs\wizard-contract-v1.md'
         'docs\skill-distribution.md'
         'CONTRIBUTING.md'
+        'MIGRATION.md'
         'README.md'
         'requirements\GithubInstructions_General.md'
         'requirements\how-to-build-dynamics-model-driven-apps-wizard.md'
@@ -54,6 +56,68 @@ BeforeAll {
             Set-Variable -Name HOME -Value $previousHome -Force
         }
     }
+
+    $wizardAst = [System.Management.Automation.Language.Parser]::ParseFile(
+        (Join-Path $repoRoot 'scripts\bootstrap\05-start-wizard.ps1'), [ref]$null, [ref]$null)
+    foreach ($name in @('Get-InstructionFilePath', 'Initialize-WizardProjectInstructions')) {
+        $definition = $wizardAst.Find({
+            param($node)
+            $node -is [System.Management.Automation.Language.FunctionDefinitionAst] -and $node.Name -eq $name
+        }, $true)
+        . ([scriptblock]::Create($definition.Extent.Text))
+    }
+}
+
+Describe 'New project local instruction inheritance' {
+    It 'creates the actual local policy, loaders, skills and queue without altering accepted requirements' {
+        $project = Join-Path $TestDrive 'Cedar Civic'
+        $null = New-Item -ItemType Directory -Path $project
+        $requirements = Join-Path $project 'accepted-spec.md'
+        [IO.File]::WriteAllText($requirements, 'Accepted fictional lifecycle.')
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot
+        foreach ($name in @('AGENTS.md', '.github\copilot-instructions.md',
+            'docs\policies\authorization-and-execution.md', 'docs\QUEUED_AUTONOMOUS_DELIVERY.md',
+            '.github\skills\power-platform-wizard-init\references\progress-monitoring.md',
+            '.claude\skills\power-platform-vscode-wizard\SKILL.md')) {
+            (Get-FileHash -LiteralPath (Join-Path $project $name)).Hash |
+                Should -Be (Get-FileHash -LiteralPath (Join-Path $repoRoot $name)).Hash
+        }
+        [IO.File]::ReadAllText($requirements) | Should -Be 'Accepted fictional lifecycle.'
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot
+        [IO.File]::ReadAllText($requirements) | Should -Be 'Accepted fictional lifecycle.'
+    }
+
+    It 'retains customized and partially installed instructions rather than silently completing them' {
+        $project = Join-Path $TestDrive 'Existing fictional project'
+        $null = New-Item -ItemType Directory -Path $project
+        [IO.File]::WriteAllText((Join-Path $project 'AGENTS.md'), 'Never publish production.')
+        Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot -WarningVariable warnings
+        [IO.File]::ReadAllText((Join-Path $project 'AGENTS.md')) | Should -Be 'Never publish production.'
+        Test-Path -LiteralPath (Join-Path $project '.github\copilot-instructions.md') | Should -BeFalse
+        ($warnings -join ' ') | Should -Match 'migration preview'
+    }
+
+    It 'rejects active writer checkpoints and case aliases before creating instruction files' {
+        $project = Join-Path $TestDrive 'Interrupted fictional project'
+        $null = New-Item -ItemType Directory -Path (Join-Path $project '.wizard-update')
+        [IO.File]::WriteAllText((Join-Path $project '.wizard-update\lock.json'), '{"pid":1}')
+        { Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot } |
+            Should -Throw '*checkpoint*'
+        Test-Path -LiteralPath (Join-Path $project 'AGENTS.md') | Should -BeFalse
+        [IO.File]::WriteAllText((Join-Path $project 'agents.md'), 'Existing strict instructions.')
+        { Initialize-WizardProjectInstructions -ProjectRoot $project -SourceRoot $repoRoot } |
+            Should -Throw '*case alias*'
+    }
+
+    It 'runs the actual chat initializer without intake or a planning rewrite' {
+        $project = Join-Path $TestDrive 'Chat fictional project'
+        $output = & pwsh -NoProfile -File (Join-Path $repoRoot 'scripts\bootstrap\05-start-wizard.ps1') `
+            -WorkspaceRoot $project -InitializeInstructionsOnly 2>&1
+        $LASTEXITCODE | Should -Be 0 -Because ($output -join "`n")
+        Test-Path -LiteralPath (Join-Path $project 'AGENTS.md') | Should -BeTrue
+        Test-Path -LiteralPath (Join-Path $project 'specs') | Should -BeFalse
+        Test-Path -LiteralPath (Join-Path $project '.wizard-metrics') | Should -BeFalse
+    }
 }
 
 Describe 'Authorization and execution policy contract' {
@@ -66,10 +130,19 @@ Describe 'Authorization and execution policy contract' {
         @{ Id = 'AUTH-06'; Expected = 'Continue the independent test; report the blocked dependency separately'; Rule = 'continue independent authorized work only when it does not depend' }
         @{ Id = 'AUTH-07'; Expected = 'Report SOURCE COMPLETE and TESTED, not DEPLOYED or LIVE VERIFIED'; Rule = 'TESTED does not imply DEPLOYED' }
         @{ Id = 'AUTH-08'; Expected = 'Reconcile uncertain writes; no unchanged deterministic retries; bound transient attempts'; Rule = 'at most three total attempts per operation' }
+        @{ Id = 'AUTH-09'; Expected = 'Reuse standing scope; verify target and effects, retain separate required approvals'; Rule = 'Nonproduction status and credentials alone never constitute authorization' }
+        @{ Id = 'AUTH-10'; Expected = 'Implement the bounded repair; reconcile administration and documentation before closure'; Rule = 'unless they establish real authority, satisfy an enforced policy or resolve conflicting writers' }
+        @{ Id = 'AUTH-11'; Expected = 'Stop the affected operation for its required pre-change gate; retrospective documentation is not approval'; Rule = 'Retrospective documentation is not retrospective permission' }
+        @{ Id = 'AUTH-12'; Expected = 'Recover before restart; lease expiry alone does not release the writer'; Rule = 'Lease expiry alone is insufficient evidence of release' }
+        @{ Id = 'AUTH-13'; Expected = 'Check current ownership evidence; preserve the H ID, do not treat it as permanent ownership'; Rule = 'H IDs track outcomes, not permanent component ownership' }
+        @{ Id = 'AUTH-14'; Expected = 'Queue dependency-ready authorized work; preserve the hold and verify actual executor support'; Rule = 'native message queueing is not proof of durable recovery or unattended permission' }
+        @{ Id = 'AUTH-15'; Expected = 'Block before writes; actual browser-principal preflight is required and identity mismatch stops the operation'; Rule = 'A session-declared identity, displayed persona switch or separate API administrator identity is not browser-principal proof' }
+        @{ Id = 'AUTH-16'; Expected = 'Stop broad publication; validate actual blast radius and preserve unrelated drafts'; Rule = 'If scoped publication cannot be proven, stop that publication' }
+        @{ Id = 'AUTH-17'; Expected = 'Stop affected writes, retain before/after evidence and investigate; no blind rollback'; Rule = 'Do not blindly roll back, overwrite concurrent changes or delete records' }
+        @{ Id = 'AUTH-18'; Expected = 'Classify separately from security/platform/unknown; diagnosis does not permit bypass'; Rule = 'Classification is diagnosis, never permission to bypass a control' }
+        @{ Id = 'AUTH-19'; Expected = 'Report partial/unverified; verify app membership, eligibility and the actual selected form'; Rule = 'Mere direct URL access is not proof of form eligibility in the intended app/user context' }
+        @{ Id = 'AUTH-20'; Expected = 'Reconcile process/checkpoint/resource evidence, repeat principal preflight and recover uncertain writes before continuing'; Rule = 'separate from an API worker or its administrator session' }
     ) {
-        $row = @($policy -split '\r?\n' | Where-Object { $_ -match "^\| $Id \|" })
-        $row.Count | Should -Be 1
-        $row[0] | Should -Match ([regex]::Escape($Expected))
         ($policy -replace '\s+', ' ') | Should -Match ([regex]::Escape($Rule))
     }
 
@@ -81,10 +154,78 @@ Describe 'Authorization and execution policy contract' {
         }
     }
 
+    It 'references rather than duplicates the canonical execution rules' {
+        foreach ($surface in $surfaces | Where-Object { $_ -match 'SKILL\.md$|prompt\.md$|copilot-instructions\.md$' }) {
+            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content | Should -Match 'authorization-and-execution\.md'
+            $content | Should -Not -Match 'For native work, follow the canonical policy.s browser safety contract'
+            $content | Should -Not -Match 'Reuse accepted requirements and standing scoped nonproduction authorization\.'
+        }
+    }
+
+    It 'requires before-change repair evidence and refuses retroactive permission' {
+        $contract = $policy -replace '\s+', ' '
+        foreach ($rule in @(
+            'verified recovery', 'recoverable backup',
+            'semantic-field and report-definition approvals',
+            'scope change, expiration, revocation, production target, destructive effect',
+            'Standing permission cannot approve a semantic/report definition or sign an artifact hash',
+            'explicit read-only restriction still binds',
+            'active process/session state, latest durable checkpoint/journal',
+            'actual resource state and in-flight writes',
+            'Do not delete/recreate components, clear locks or blindly reset state',
+            'A fresh session does not reset that budget',
+            'Routine UI/web-resource repairs do not need new discovery or a complete planning package'
+        )) {
+            $contract | Should -Match ([regex]::Escape($rule))
+        }
+
+    }
+
+    It 'retains native evidence and stops uncertain or conflicting browser operations' {
+        $contract = $policy -replace '\s+', ' '
+        foreach ($rule in @(
+            'Missing/unverifiable evidence or identity mismatch blocks affected writes',
+            'repeat after login/session/target changes',
+            'Retain sanitized evidence, never credentials',
+            'current published/unpublished state',
+            'Broad table/app publication can promote unrelated pending changes',
+            'stable record identity/version',
+            'exact expected effects', 'expected platform changes',
+            'Unexpected modifications stop affected writes',
+            'A business rule may protect data',
+            'Unknown restrictions block affected actions until understood',
+            'published app membership, user/role eligibility, table/form type',
+            'Missing/direct-access-only proof remains partial/unverified',
+            'independent process/owner',
+            'Reconcile outstanding writes and resource state before restart',
+            'repeat principal preflight and read back uncertain effects',
+            'Never launch a conflicting writer',
+            'Starter supplies guidance and instruction/distribution contracts'
+        )) {
+            $contract | Should -Match ([regex]::Escape($rule))
+        }
+    }
+
+    It 'offers executable-session queue instructions without claiming a durable executor' {
+        $queue = Get-Content -LiteralPath (Join-Path $repoRoot 'docs\QUEUED_AUTONOMOUS_DELIVERY.md') -Raw
+        $queue | Should -Match 'https://code\.visualstudio\.com/docs/agents/overview'
+        $queue | Should -Match 'Add to Queue'
+        $queue | Should -Match 'chat\.requestQueuing\.defaultAction'
+        ($queue -replace '\s+', ' ') | Should -Match 'For \*\*explicitly autonomous multi-change work\*\*, recommend a dependency-aware queue'
+        ($queue -replace '\s+', ' ') | Should -Match 'does not guarantee task success, reboot recovery'
+        ($queue -replace '\s+', ' ') | Should -Match 'Lease expiry alone is insufficient'
+        ($queue -replace '\s+', ' ') | Should -Match 'If no durable executor is configured, state this explicitly'
+        foreach ($surface in $surfaces | Where-Object { $_ -match 'SKILL\.md$|prompt\.md$|copilot-instructions\.md$' }) {
+            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content | Should -Match 'authorization-and-execution\.md' -Because $surface
+        }
+    }
+
     It 'preserves stronger safety gates and distinguishes all evidence states' {
         foreach ($rule in @(
             'platform confirmations', 'signed approvals', 'environment security controls',
-            'scenario spec.md, plan.md and tasks.md', 'plan-hash approvals',
+            'Significant features, architecture', 'plan-hash approvals',
             'solution membership/export gates', 'FAST-dependent Apply remains blocked',
             'executionAuthorized: false', 'Commit permission alone does not permit push',
             'read back by stable component identity', 'unchanged deterministic error gets no retry',
@@ -121,7 +262,7 @@ Describe 'Authorization and execution policy contract' {
             'README.md', 'docs\onboarding.md', 'docs\wizard-contract-v1.md',
             'requirements\how-to-build-dynamics-model-driven-apps-wizard.md'
         )) {
-            $content = Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw
+            $content = (Get-Content -LiteralPath (Join-Path $repoRoot $surface) -Raw) -replace '\s+', ' '
             $content | Should -Match 'scenario-change-impact-gate\.md' -Because $surface
             $content | Should -Match '(?i)minor maintenance.{0,90}focused checks' -Because $surface
             $content | Should -Match '(?i)(do not regenerate|without regenerating) the full matrix' -Because $surface
