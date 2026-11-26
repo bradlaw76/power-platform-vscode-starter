@@ -1,5 +1,15 @@
 # Wizard Contract v1
 
+Confirmed outcomes must not be narrowed to mapping/read-only delivery when they
+require mutations. Use scenario `requirements-coverage.json` to bind original
+confirmation excerpts/hash, real tasks and proportional functional criteria;
+see [handoff](framework-handoff.md#accepted-outcome-reliability). The consolidated
+safe capability preflight distinguishes source from the selected installed API.
+Legacy genuinely inapplicable and explicit read-only/no-report designs remain
+supported. [Semantic fields](semantic-field-type-standard.md) require real
+`field-type-decisions.json` approval; fictional confirmation never approves
+native definitions. No additional discovery question or stage is introduced.
+
 Status: Active
 Version: 1.10.0
 

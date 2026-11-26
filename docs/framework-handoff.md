@@ -5,6 +5,98 @@ This is starter integration under issue #12, reusing Automation Framework H008
 Spec Kit remains required before build. This optional continuation adds no
 mandatory discovery question, build stage, installation or deployment.
 
+## Accepted-outcome reliability
+
+Reuse the existing consolidated confirmation and original accepted requirements;
+do not add discovery questions or a separate approval ledger. Author
+`requirements-coverage.json` against `schemas/requirements-coverage.schema.json`.
+Its original confirmation source is scenario-relative (`provenance.sourcePath`,
+exact `sourceSha256`); excerpts also match current spec/plan, whose hashes and
+real task excerpts are bound. Select only applicable operations and criteria:
+binding, CRUD (create/read/update/delete and related assignment/inspection),
+lifecycle, chronology, metrics, cancellation and concurrency. Read-only/no-report
+designs require only their accepted surfaces. A narrowed read-only task cannot
+satisfy accepted mutations; mapping and source existence are not functional proof.
+Fictional confirmation uses `kind: simulation`, never native approval.
+
+Terminal intake accepts `-RequirementsCoveragePath` from that same confirmation.
+For existing accepted artifacts, generate/validate without rediscovery:
+
+```powershell
+pwsh .\scripts\bootstrap\13-validate-requirements-coverage.ps1 -ScenarioFolder .\specs\example -CoverageInputPath .\confirmed-coverage.json
+pwsh .\scripts\bootstrap\12-check-wizard-capabilities.ps1 -ScenarioFolder .\specs\example -RequireCoverage -RequireFrameworkRuntime -PythonExecutable python
+```
+
+The safe consolidated preflight checks source scripts/helpers/schema/profile and
+the selected installed package version, origin and functional API. A skill copy
+does not install runtime capabilities. Missing capabilities block affected work;
+no install, authentication, worker, native write or deployment is attempted.
+Intake runs that same preflight with `-PlanningWorkspaceRoot` to verify the actual
+selected profile and required wizard/onboarding guides; missing external runtime
+files cannot fall back silently to a copied skill. Instruction-only initialization
+is still instruction-only, not runtime installation.
+Handoff validates present coverage before any runtime operation. Legacy scenarios
+without applicable accepted-outcome coverage retain legacy behavior; explicitly
+covered deliveries must not omit it from independent runtime verification.
+New intake marks `Accepted Outcome Coverage` in the generated planning files;
+the validator refuses missing coverage for those files instead of silently
+treating them as legacy. Author coverage from the existing confirmed outcome,
+not another approval meeting. Explicit read-only outcomes still validate with
+only read criteria.
+Configure the existing worker's `requirements_coverage` input with the exact
+artifact. Independent evidence binds criterion IDs, coverage/source/task hashes
+and claim identity; synthetic evidence cannot become native acceptance.
+For source-only reconciliation, the installed worker's `--reconcile-only` mode
+uses accepted current task/decision provenance, `task_kinds: ["prepare"]`,
+`scope.environment_writes: false`, separate `verify_command` and `verify_outputs`
+including `functional-evidence.json`. It reuses canonical claim/finish and holds,
+never imports fictional approval or runs an implicit application rebuild.
+Reconciliation never replays the handoff's completion or blocked-result cache:
+the worker must check current selected source and verifier fingerprints each time.
+Use explicit existing `-TaskIds` to request source-rechecks of eligible blocked
+tasks. Omission retains the worker's legacy selection, not blocked-task recovery.
+The canonical worker still rejects unknown IDs and preserves business, adoption,
+uncertainty and owner holds; selecting an ID does not release it.
+
+```powershell
+pwsh .\scripts\bootstrap\09-framework-handoff.ps1 -ProjectRoot <external-project> -RuntimeWorkspace <canonical-workspace> -ScenarioSlug <slug> -Action worker -WorkerConfigPath <selected-config.json> -ReconcileOnly -TaskIds <existing-task-id> -PythonExecutable <selected-python>
+```
+
+Inside PowerShell, call the script directly with `-TaskIds @('PREPARE-A',
+'PREPARE-B')` for multiple existing IDs. The Python entrypoint uses repeated
+`--task-id PREPARE-A --task-id PREPARE-B` alongside `--reconcile-only`; both
+forward the exact selection to the existing worker. Changed task selections
+are part of the handoff intent, never an implicit full-store dispatch.
+
+Omit `-ReconcileOnly` for an accepted implementation/extension task through the
+same worker/config. Keep accepted coverage and real independent assertions bound
+to the new task fingerprint; do not reuse a source-only receipt as delivery.
+
+Reusable credential-free fixture inputs:
+`scripts/ci/fixtures/requirements-coverage.fixture.json` and
+`requirements-confirmation.fixture.json` in that same folder. Copy confirmation
+into the external scenario as `confirmed.json`; bind its real SHA-256 (the input
+template's zero hash is intentionally invalid), use the exact outcome/task
+excerpts in spec/tasks, and let the generator hash spec/plan/tasks.
+`scripts/ci/test-requirements-coverage.ps1` executes this public CLI path. These
+are generic synthetic examples, not field/report approval or a native pilot.
+
+Native validator reuse is surgical, from
+`review/fast-reporting-integration-20261023` commit
+`378ebd0a90c609207b767a9bac81ab72f4c98f35`: semantic script/helper/schema/example/test,
+HTML schema/example/runbook, semantic standard and resilient Dataverse helper.
+Dependency inspection also required that commit's existing
+`choice-presentation-tokens.ps1` and `reporting-plan.ps1`. No branch merge or
+duplicate native validator was introduced. This lineage does not inherit that
+branch's FAST, source-baseline or native runner integration.
+`-RequireNativeBuild` reports BLOCKED until native executor integration is
+independently reviewed; preflight approval fields are always false.
+Run real `14-validate-semantic-fields.ps1` Planning/Payload/Metadata gates and
+approved report definitions through their actual native mechanisms. Existing
+semantic helper regression exercises planning, payload and injected metadata;
+`-IncludeBranchIntegration` explicitly requires the full authoritative branch's
+runner/source-baseline integration and is not this surgical adoption's acceptance.
+
 ## Before starting
 
 Use the [release consolidation guide](release-consolidation.md) to distinguish
@@ -119,7 +211,8 @@ facts; absence/unknown and source/live evidence stay distinct. New unfinished
 intake uses installed `init`/`wizard next`; discovery does not accept proposals.
 
 After required affected planning, `-Action deliver` forwards one existing slice,
-with optional `-RequirementId`. Select `-WorkerConfigPath` on POSIX, or
+with optional `-RequirementId`. Select `-WorkerConfigPath` on POSIX or a compatible
+installed Windows owned-Job runtime, or
 `-RecipePath -RehearseSlice` for explicit fictional execution. Live recipes
 instead require existing Q30 `-AuthorizationPath`/`-TenantId` and retain its
 resource-only nonproduction limits. Optional `-BrowserConfigPath` provides
@@ -198,7 +291,7 @@ Use the same project/runtime/scenario/interpreter parameters with `-Action`:
 | `disable`, `enable` | Explicit persistent synchronization selection |
 | `rehearse` | Synthetic execution; optional explicitly fixture-marked recipe/snapshot |
 | `status` | Read-only recorded status and current-input applicability |
-| `worker` | Explicit existing configuration on a supported POSIX host only |
+| `worker` | Explicit existing configuration on POSIX or an installed compatible Windows owned-Job runtime; observed ownership is still required |
 | `browser` | Optional installed Playwright diagnostics with `-BrowserConfigPath`; Windows/POSIX, fresh read-only observations |
 | `deploy` | Explicit installed Q30 delivery profile with `-AuthorizationPath` and `-TenantId`; nonproduction exact-resource publication and rendered verification |
 
@@ -286,7 +379,7 @@ do not retry. Worker repairs use configured attempt/task/time budgets and
 pass prior failure diagnostics to the next attempt.
 
 There is no installed reboot/startup controller in this integration. Native
-Windows supervised workers and Windows restart recovery are not verified;
+earlier Windows supervised-worker/restart acceptance was not performed;
 no host restart, service or scheduler installation is part of Status.
 POSIX subprocess recovery is separate from machine-reboot persistence.
 
@@ -322,10 +415,18 @@ normal recovery process, not automatic reset/abort by this adapter.
 ## Hosts, recovery and acceptance
 
 Native Windows supports the PowerShell guided path and requires neither Git
-in the consumer project nor WSL. Native Windows worker supervision is rejected.
+in the consumer project nor WSL. Native Windows worker supervision requires
+installed owned-Job v1.0 capability
+and actual launch ownership/recovery evidence; capability discovery alone is
+not process ownership. Missing/failed Job assignment blocks the affected worker.
 Linux/macOS/explicit WSL can use the framework's existing worker interface;
 host availability alone does not prove the package is installed. Never start
 an unattended scheduler merely because worker support exists.
+Use `12-check-wizard-capabilities.ps1 -RequireWindowsWorker` with the selected
+Python interpreter before a Windows worker. Actual runtime launch must prove
+owned Job assignment, direct process/child identity and prior checkpoint/resource
+reconciliation. Lease expiry alone and a WSL interop child are not ownership
+proof. Windows `guard_fds` batch coordination remains unsupported/POSIX-only.
 
 The installed Python CLI subprocess uses explicit UTF-8 input/output settings,
 including on Windows consoles configured for a legacy encoding. Unicode paths,

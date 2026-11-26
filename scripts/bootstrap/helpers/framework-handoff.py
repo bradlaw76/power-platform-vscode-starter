@@ -257,6 +257,17 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     if not re.fullmatch(r"[a-z0-9]+(?:-[a-z0-9]+)*", args.scenario):
         raise ValueError("Use a normalized scenario slug, not a path.")
     project, runtime = roots(args.project, args.runtime)
+    reconcile_only = getattr(args, "reconcile_only", False)
+    task_ids = getattr(args, "task_id", None)
+    if reconcile_only and args.action != "worker":
+        raise ValueError("Source reconciliation is an existing worker mode, not a deployment or separate stage.")
+    if task_ids is not None:
+        if args.action != "worker":
+            raise ValueError("Explicit existing task IDs apply only to the worker action.")
+        if (not isinstance(task_ids, list) or not task_ids
+                or any(not isinstance(item, str) or not item.strip() for item in task_ids)
+                or len(set(task_ids)) != len(task_ids)):
+            raise ValueError("Select a nonempty list of unique existing task IDs; the canonical worker validates eligibility.")
     selected = {key: f"specs/{args.scenario}/{key}.md" for key in ("spec", "plan", "tasks")}
     selected["build"] = args.build
     documents = [selected_path(project, name) for name in selected.values()]
@@ -275,6 +286,39 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
         raise ValueError("Installed framework missing; select its Python environment. No automatic installation.") from None
     if version != "0.2.1":
         raise ValueError("Review compatibility before using a framework version other than 0.2.1.")
+    coverage_path = selected_path(project, f"specs/{args.scenario}/requirements-coverage.json")
+    coverage_sources = []
+    if getattr(args, "reconcile_only", False) and not coverage_path.exists():
+        try:
+            from demo_builder.functional import COVERAGE_VERSION
+        except ImportError:
+            raise ValueError("Installed source reconciliation capability unavailable; no legacy execution fallback.") from None
+        if COVERAGE_VERSION != "1.0":
+            raise ValueError("Installed source reconciliation capability incompatible.")
+    if not coverage_path.exists() and any(
+            path.is_file() and "\n## Accepted Outcome Coverage" in path.read_text(encoding="utf-8-sig")
+            for path in documents[:3]):
+        raise ValueError("New accepted planning requires requirements-coverage.json; no read-only/mapping fallback.")
+    if coverage_path.exists():
+        try:
+            from demo_builder.functional import COVERAGE_VERSION, load_requirements_coverage
+        except ImportError:
+            raise ValueError("Installed runtime lacks requirements coverage; source/skill adoption is not installation.") from None
+        if COVERAGE_VERSION != "1.0":
+            raise ValueError("Installed requirements coverage version is incompatible.")
+        load_requirements_coverage(coverage_path)
+        coverage_value = load_json(coverage_path)
+        source = selected_path(coverage_path.parent, coverage_value["provenance"]["sourcePath"])
+        coverage_sources = [coverage_path, source]
+        if args.action == "deploy" and coverage_value["provenance"]["kind"] == "simulation":
+            raise ValueError("Simulation coverage cannot authorize native deployment or acceptance.")
+        if args.action in {"worker", "deliver"}:
+            if not args.worker_config:
+                raise ValueError("Covered delivery requires the existing worker config bound to requirements_coverage.")
+            config = load_json(Path(args.worker_config))
+            configured = config.get("requirements_coverage")
+            if not isinstance(configured, str) or not Path(configured).is_absolute() or Path(configured).resolve() != coverage_path:
+                raise ValueError("Worker requirements_coverage must select the exact accepted scenario artifact.")
     from demo_builder.workspace import assert_external_output
     from demo_builder.errors import BuildError
     try:
@@ -301,7 +345,16 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     for path in sources:
         load_json(path)
     if (args.action == "worker" or (args.action == "deliver" and args.worker_config)) and sys.platform == "win32":
-        raise ValueError("Native Windows worker supervision is unsupported; use an explicitly selected POSIX host.")
+        try:
+            from demo_builder import windows_process
+            supported = (
+                windows_process.WINDOWS_SUPERVISION_VERSION == "1.0"
+                and callable(windows_process.OwnedJob) and callable(windows_process.identity_alive)
+            )
+        except (ImportError, AttributeError):
+            supported = False
+        if not supported:
+            raise ValueError("Native Windows worker installed owned-Job capability unavailable; use explicitly selected POSIX or guided execution.")
     if args.action == "status":
         if previous is None:
             return {"status": "not-started", "next_action": "Run start with the accepted contract.",
@@ -323,21 +376,26 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
             value.update(status="blocked", exit_code=2, next_action=value["task_summary"]["next_action"])
             return value, 2
         return value, int(value["exit_code"])
-    observed = sources + documents + [runtime / name for name in (
+    observed = sources + documents + coverage_sources + [runtime / name for name in (
         "contract.json", "tasks.json", "identity-map.json", "spec-kit.json",
         "spec-kit-state.json", "memory-environment.json", "execution-summary.json")]
     observed += [Path(__file__), SOURCE / "scripts" / "bootstrap" / "09-framework-handoff.ps1"]
     intent = {"project": str(project), "selection": selected, "action": args.action,
               "enable_sync": args.enable_sync, "framework_version": version,
               "starter_source_head": source_head()}
+    if reconcile_only:
+        intent["reconcile_source_only"] = True
+    if task_ids is not None:
+        intent["task_ids"] = task_ids
     if (runtime / "spec-kit.json").exists():
         config = load_json(runtime / "spec-kit.json")
         if config["project"] != str(project) or config["files"] != selected:
             raise ValueError("Resume the original document selection; do not reclaim another adoption.")
-    if (args.action not in FRESH_ACTIONS and previous and previous["status"] == "completed" and previous["intent"] == intent
+    cache_allowed = args.action not in FRESH_ACTIONS and not reconcile_only
+    if (cache_allowed and previous and previous["status"] == "completed" and previous["intent"] == intent
             and previous["observed_hashes"] == observed_snapshot(observed, runtime)):
         return {**previous, "replayed": True, "source_changed": False}, 0
-    if (args.action not in FRESH_ACTIONS and previous and previous["status"] == "blocked" and previous["intent"] == intent
+    if (cache_allowed and previous and previous["status"] == "blocked" and previous["intent"] == intent
             and (previous.get("category") == "deterministic"
                  or (previous.get("category") == "conflict-or-incomplete"
                      and previous.get("current_command") == ["spec-kit", "sync"]
@@ -448,7 +506,12 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     elif args.action == "worker":
         if not args.worker_config:
             raise ValueError("Worker requires an explicitly selected existing worker configuration.")
-        commands.append(["worker", "--workspace", str(runtime), "--config", args.worker_config])
+        worker_command = ["worker", "--workspace", str(runtime), "--config", args.worker_config]
+        if reconcile_only:
+            worker_command.append("--reconcile-only")
+        for identifier in task_ids or []:
+            worker_command += ["--task-id", identifier]
+        commands.append(worker_command)
     elif args.action == "browser":
         if not getattr(args, "browser_config", None):
             raise ValueError("Browser diagnostics requires an explicitly selected browser configuration.")
@@ -540,6 +603,8 @@ def main() -> int:
     parser.add_argument("--repair-agent-fixture", action="store_true")
     parser.add_argument("--scenario-operation", choices=("capture", "replay", "reset"), default="replay")
     parser.add_argument("--accept-scenario", action="store_true")
+    parser.add_argument("--reconcile-only", action="store_true")
+    parser.add_argument("--task-id", action="append", help="Select existing canonical worker tasks; does not release protected holds.")
     parser.add_argument("--build", default="BUILD.md")
     parser.add_argument("--enable-sync", action="store_true")
     args = parser.parse_args()

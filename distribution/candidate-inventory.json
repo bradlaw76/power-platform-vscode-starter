@@ -4,60 +4,60 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "b76fcc95a953458dd46a7ae34b49355010687c6e",
-  "policySha256": "3dfad3b6a41a2a273e4528acb1470698947f15aa8327b2cb3d017a57e70981d5",
+  "sourceCommit": "5c231db3481668a35d5f74883c7197c027cde87a",
+  "policySha256": "c6153ab8e5b66670e7d3c46535654a5b08b35b92ea0cb65fd4d39b6f71e37626",
   "publisherVerified": false,
   "automaticApply": false,
-  "fileCount": 133,
-  "totalBytes": 2007130,
+  "fileCount": 151,
+  "totalBytes": 2243290,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
       "category": "claude-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 6850,
-      "sha256": "59119f35205c0090299aeca0f716cb83155876008847daacf9f5bd8622fc37b8"
+      "size": 7378,
+      "sha256": "010d96936c09d01e996430bfd9b27b6749f6744aeedecd8ef691e7c3222a39c1"
     },
     {
       "path": ".claude/skills/power-platform-vscode-wizard/SKILL.md",
       "category": "claude-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 25439,
-      "sha256": "eb6d38ba86eb3256762fd87144a821b7acb6fe62e75acfe97eb9087f2b033217"
+      "size": 28898,
+      "sha256": "57a267b1bc0bcdbd9ec5b10e9c7ab99278a6f1a60d93d406f284b0b41a9cd17c"
     },
     {
       "path": ".github/copilot-instructions.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 4914,
-      "sha256": "8d946313a2a63993be5e1a814a7efaef79010822b69d6e31c074a0e1e5938d82"
+      "size": 5617,
+      "sha256": "199078314abe877c9d5da7d297cd40bb930a6354186594ca8fe9bd6bd79cd993"
     },
     {
       "path": ".github/prompts/power-platform-demo-wizard.prompt.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 16572,
-      "sha256": "e440d0049167ab31d0220427423797d682bcff535b2e34911681ec0105e79d38"
+      "size": 19627,
+      "sha256": "c525fefe2344a64bf7b894e90e884659d505894bb4178f5b37ced9fa4a446579"
     },
     {
       "path": ".github/skills/dataverse-report-wizard/SKILL.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 8053,
-      "sha256": "a5cc569861783fe9e59ed514e23a220738b72af34c8795c02f666f7ee8dc60c0"
+      "size": 8600,
+      "sha256": "28f5e66ba591ac76a32173b06890bb7b84a96a6ef3d7cfec26fb23a1c659063d"
     },
     {
       "path": ".github/skills/power-platform-wizard-init/SKILL.md",
       "category": "copilot-asset",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 20023,
-      "sha256": "4436a10951c323b3f02ec95ffabcb2de0d4aa170c744d84f59d558b9bb1d4b1f"
+      "size": 23440,
+      "sha256": "6a28b8171c66f36f83f82d96e1c7bfbbfa8eb7f38bc00e117d2a22ab987d491c"
     },
     {
       "path": ".github/skills/power-platform-wizard-init/references/progress-monitoring.md",
@@ -112,8 +112,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 55709,
-      "sha256": "d37f6bfb5270410beca8d9bbaf4c767b3469e48a54215ab1923ba141e39b5359"
+      "size": 60117,
+      "sha256": "52e1bed43b8317c70ed48fcc87e9d04a8d8892ab1e91fa864674d6a712fc5a1f"
     },
     {
       "path": "SECURITY.md",
@@ -136,8 +136,8 @@
       "category": "schema-profile",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 7667,
-      "sha256": "dd822ea8f4343dd73c1f406dd6161107a53045873c446d957269ebe0c41ce248"
+      "size": 8730,
+      "sha256": "123cdfec130e4f16b5bd1184082b908878dd16af5f900312bdcba333968da8cb"
     },
     {
       "path": "docs/QUEUED_AUTONOMOUS_DELIVERY.md",
@@ -176,32 +176,32 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 7451,
-      "sha256": "767518a4f48afd790fcf8fc435e978bec5aeda8ae88cf23174b2f7d4d88d46e0"
+      "size": 7691,
+      "sha256": "dacca3d51e8d28e964ee2cd5894f7cdf8e4121d00102b1198d6e2f9e66864e2a"
     },
     {
       "path": "docs/framework-handoff.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 13737,
-      "sha256": "577bd80df79c553890948795ddf0c4173b92eedbfe1f157f607f43ec78c2954f"
+      "size": 30462,
+      "sha256": "344a13f0677ee9e634a1bd99ec966d4a67e9823537146322fb737203c52ff858"
     },
     {
       "path": "docs/live-report-web-resources-runbook.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 2131,
-      "sha256": "456c15121a4441b84c11939e31a6ff59a55214c5376a459743934e7e35d455ab"
+      "size": 6626,
+      "sha256": "9d1afd06c01c9b4aba73156f6a720937ec8699e634485f7a6896e820e9de0194"
     },
     {
       "path": "docs/onboarding.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 38981,
-      "sha256": "03cbc34293062c5cd185c4855a2a64bfcc3739c29aa1e0d3b1ad6f93c3a9a827"
+      "size": 41498,
+      "sha256": "90c6b52adaf0027c8376227ae7413cb937a82e4dbc9f96ff5a6aa2458cc7ac0f"
     },
     {
       "path": "docs/policies/authorization-and-execution.md",
@@ -224,16 +224,16 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 12762,
-      "sha256": "9c248dca5a2e5febd798782febde7a04a223ea807d4af01da977dc5ae3d92800"
+      "size": 13207,
+      "sha256": "7d3ebe1e2366641930bce242cbdbd30264d5e4e762768005757163e169fa12e3"
     },
     {
       "path": "docs/semantic-field-type-standard.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 5783,
-      "sha256": "a95bf1cc5c4953170e24d53fdcbc791b5357c2b6fca97b51b25815265bb7f910"
+      "size": 16866,
+      "sha256": "dc6e42837ade23a207b8aa510929b51061ae02d114f4026d29705dccecaf5eb3"
     },
     {
       "path": "docs/skill-distribution.md",
@@ -272,8 +272,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 29546,
-      "sha256": "46e31aafd4900515ae327361ec8ab6bac1d88971b908f2322729fdde6571a896"
+      "size": 30251,
+      "sha256": "5a8c7d626a6e2a9c77e051d6a423a5ac74b84cae0d33fc9b1304b2e95ac332fe"
     },
     {
       "path": "docs/wizard-hardening-runbook.md",
@@ -296,24 +296,40 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 22468,
-      "sha256": "39792d184575edcf7c046bfae2026db042aa77d543b48f8830e77a1ce0ecea27"
+      "size": 23655,
+      "sha256": "ea21d82332f096820b6c8dbe7c2f46246925d43982bc15fc61e786cf1dfc6f40"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-in-vscode-with-copilot.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 33031,
-      "sha256": "5a3273fc4b5cb5faa99c09351c3d96e73f1ed6d1557ca0f0575147490ded9a35"
+      "size": 34862,
+      "sha256": "76c15663c6a3dab94e4d96c97a97526b52853897a1881fbd1e616a9f67bb03c8"
     },
     {
       "path": "requirements/how-to-build-dynamics-model-driven-apps-wizard.md",
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 30544,
-      "sha256": "f4ac8156b9b9ef6a97f4012567bfe30cdec0c96c4335b0439a982658e88d26e1"
+      "size": 33178,
+      "sha256": "937617255668dccc3b60a795cf8961954c8836afcf95c2c80a526bb0f1ad3bd9"
+    },
+    {
+      "path": "schemas/examples/field-type-decisions.example.json",
+      "category": "schema-profile",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 4226,
+      "sha256": "820cfb9df0a8d4875804a8514406872643565ccca7f816362c85c28392fc3abf"
+    },
+    {
+      "path": "schemas/examples/html-reports.example.json",
+      "category": "schema-profile",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 997,
+      "sha256": "4e9bcda6693cd14da1cde0f0eb766008b7586faca00091ea0804caa3ba4f6f01"
     },
     {
       "path": "schemas/payloads/columns.schema.json",
@@ -330,6 +346,22 @@
       "gitMode": "100644",
       "size": 1923,
       "sha256": "20ca8ec203ad0397450d757ea8b9c22acc5548a0b1c409ccffa1ff91952b961f"
+    },
+    {
+      "path": "schemas/payloads/field-type-decisions.schema.json",
+      "category": "schema-profile",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 8797,
+      "sha256": "447391c889402e48bff45fd76202273af0f568110d4e0355c8d58d8b4589317b"
+    },
+    {
+      "path": "schemas/payloads/html-reports.schema.json",
+      "category": "schema-profile",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 2397,
+      "sha256": "ae619e3595c6aae75762dca8c553fdedd1b3e19a66f40f7405dc903700f6f290"
     },
     {
       "path": "schemas/payloads/keys.schema.json",
@@ -388,6 +420,14 @@
       "sha256": "e46328f66b388d31a5d59627aa95cd3f36a9f5f42c0051fd5f323229e95ec014"
     },
     {
+      "path": "schemas/requirements-coverage.schema.json",
+      "category": "schema-profile",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 3452,
+      "sha256": "6def724779c32e9781c0a4b93e50b3f3572caf0e0974e2b59699b129535135dd"
+    },
+    {
       "path": "schemas/requirements-materials.schema.json",
       "category": "schema-profile",
       "consumerAction": "explicit-review",
@@ -424,8 +464,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 6370,
-      "sha256": "fb85409b800600cd8343624ce0ed9aedb2447eb5b4ea2c1f33431ae297829f5d"
+      "size": 6472,
+      "sha256": "d2871c7fcec2823311546dea1a64525e94aadf1a4bd323942c06c6faea2d62e0"
     },
     {
       "path": "scripts/bootstrap/04-check-wizard-update.ps1",
@@ -440,8 +480,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 122363,
-      "sha256": "f0bf059134cc877cd95a6da8d3079d78bd7f10f6c9a672422d79a1de61f9d058"
+      "size": 124652,
+      "sha256": "8accb67f895e9e5ff8874925b6a5db448917e9219b08a476fdcada4502dca752"
     },
     {
       "path": "scripts/bootstrap/06-demo-script-wizard.ps1",
@@ -472,8 +512,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 1726,
-      "sha256": "c43afa45dd2109d7dceef0bffaf3e9230b964d98b184b98e99668c5e30e5ebe5"
+      "size": 3848,
+      "sha256": "4d9cf6e394f68420514c99f03a47bbbdd5bb801619a307ef9e988955e26bb5d5"
     },
     {
       "path": "scripts/bootstrap/10-auth-connect.ps1",
@@ -484,12 +524,36 @@
       "sha256": "f626e8b8ec2bcf86fb004a72f23a64e32e8c4c03ed261a243c8d783e2186052a"
     },
     {
+      "path": "scripts/bootstrap/12-check-wizard-capabilities.ps1",
+      "category": "core-runtime",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 7696,
+      "sha256": "bf5024e578f06f01306394cab85cc5d866b28a4c11d958fcddc1bbd353ccc15e"
+    },
+    {
+      "path": "scripts/bootstrap/13-validate-requirements-coverage.ps1",
+      "category": "core-runtime",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 741,
+      "sha256": "1eb0d61e8c7ced4beedab637e6a6b23ee41b112505b57a0ae7aa2258037ecae0"
+    },
+    {
+      "path": "scripts/bootstrap/14-validate-semantic-fields.ps1",
+      "category": "core-runtime",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 4351,
+      "sha256": "1594cd3d60f503a41739d66b2b811945ac9038dd46a3ad9648a7c0cb12b9572e"
+    },
+    {
       "path": "scripts/bootstrap/15-dry-validate.ps1",
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 20853,
-      "sha256": "85f96feff1767f759c5d42eb05a99aae81746830847fb048647497c55881c2d2"
+      "size": 21051,
+      "sha256": "e1c0245b6a7d890e051fa487db69aee97140da441c2e80bb397945e1bda945bf"
     },
     {
       "path": "scripts/bootstrap/20-build-tables.ps1",
@@ -668,20 +732,36 @@
       "sha256": "d3e1411225535aad60e2f1252c3bb4afd7c37179cbc50adb4d162f17005adc84"
     },
     {
+      "path": "scripts/bootstrap/helpers/choice-presentation-tokens.ps1",
+      "category": "helper",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 1348,
+      "sha256": "d355617d7a5a0f67c260ef6d37cdb212c5ae3a69e780dd76fa2bcb2dbcd598a8"
+    },
+    {
       "path": "scripts/bootstrap/helpers/dataverse-runtime.ps1",
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 12545,
-      "sha256": "6b36a95fdb63484975889a73710d5f42e64e50c66636e89410184d1a5bdce711"
+      "size": 13261,
+      "sha256": "955e744f7191b36c3bae4e70b974c6912b5f51987f0ea9d1c13e38ef730bcf0f"
     },
     {
       "path": "scripts/bootstrap/helpers/framework-handoff.py",
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 22347,
-      "sha256": "d9471c515d559f69fd4c725dea7d9ccd2e2fd0ba0113e3f1958eb6a04b7fefc6"
+      "size": 36851,
+      "sha256": "c3d7d7491bf252ccf0793cc2bdbafd23dbf2ca6691fbabf6918e2349febcb34c"
+    },
+    {
+      "path": "scripts/bootstrap/helpers/reporting-plan.ps1",
+      "category": "helper",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 8211,
+      "sha256": "10e34806a71bc39c1e576c6ba3e833803abbaa0e09c9b672994c266aca03493d"
     },
     {
       "path": "scripts/bootstrap/helpers/reporting-wizard.ps1",
@@ -690,6 +770,22 @@
       "gitMode": "100644",
       "size": 28960,
       "sha256": "b76c7cf367ee61bf7b6ac6b736d1c72539c0c5b6ef6ff50e87fab95fa523ba39"
+    },
+    {
+      "path": "scripts/bootstrap/helpers/requirements-coverage.ps1",
+      "category": "helper",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 10481,
+      "sha256": "27e588cdce8a70aaf66dc5a088db0a80e22f7cedd0661ad14883d25e06f2839b"
+    },
+    {
+      "path": "scripts/bootstrap/helpers/semantic-fields.ps1",
+      "category": "helper",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 31103,
+      "sha256": "c966a339df40059a9810f0340af84c8b669417bbb332c932a2d10191907cc987"
     },
     {
       "path": "scripts/bootstrap/helpers/solution-isolation.ps1",
@@ -706,6 +802,14 @@
       "gitMode": "100644",
       "size": 8149,
       "sha256": "9c132864cd4e96d33a362f7f2d16faa2ce63ded7cd6cac75b0d495e850a6be73"
+    },
+    {
+      "path": "scripts/bootstrap/helpers/wizard-capabilities.py",
+      "category": "helper",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 2318,
+      "sha256": "7ccadfa4dca8d4a8587a3e7b3f8e619f9c25c3630dc0656a218948d321ae4384"
     },
     {
       "path": "scripts/bootstrap/helpers/wizard-hardening.ps1",
@@ -744,8 +848,8 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 9244,
-      "sha256": "484ee6157fcae702a70dcff574844a4b1d86f9950b63eef49edc863314f388a1"
+      "size": 9254,
+      "sha256": "59571d355af2e961d7fe4fa9bb8926ac72baac31903b9600b4b7120346af196c"
     },
     {
       "path": "scripts/bootstrap/helpers/wizard_update.py",
@@ -834,6 +938,22 @@
       "gitMode": "100644",
       "size": 1039,
       "sha256": "207dc7e956fcbc3b1d807fee3454d2f8bdfb7aa48a0b560982aad3841075eda6"
+    },
+    {
+      "path": "scripts/ci/fixtures/requirements-confirmation.fixture.json",
+      "category": "validation",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 216,
+      "sha256": "356e0a7c2a129f000c9b4ed79d57652b4ecea1024e927afc059a880798186b23"
+    },
+    {
+      "path": "scripts/ci/fixtures/requirements-coverage.fixture.json",
+      "category": "validation",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 3069,
+      "sha256": "97d2129db13bb05d4075c26d1a20a8fdff8fde62a5932f505dbb320fe3b53b03"
     },
     {
       "path": "scripts/ci/test-alternate-key-support.ps1",
@@ -948,6 +1068,14 @@
       "sha256": "5a26abe2f0cd48a5fbdd19f34eb0aa3316e898407bab826c2f980b1114ea0903"
     },
     {
+      "path": "scripts/ci/test-requirements-coverage.ps1",
+      "category": "validation",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 10629,
+      "sha256": "0fe16a97e14c04e556b2208c7af54d99af9db8802c1b1c15323d859a055430ac"
+    },
+    {
       "path": "scripts/ci/test-run-state-persistence.ps1",
       "category": "validation",
       "consumerAction": "explicit-review",
@@ -978,6 +1106,14 @@
       "gitMode": "100644",
       "size": 10081,
       "sha256": "b6a78c6eb549de83e876491d8691c47ad7397e605870bec8ce15491424d7cda9"
+    },
+    {
+      "path": "scripts/ci/test-semantic-fields.ps1",
+      "category": "validation",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 31846,
+      "sha256": "7529554cd63d4179d4125ed9c1ea674985ac67af400de983353e17e20f9a2b0b"
     },
     {
       "path": "scripts/ci/test-solution-isolation.ps1",
@@ -1040,8 +1176,16 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 29922,
-      "sha256": "c24f373abdf4b7a8ab3340310dcad0c60557fc3383c1eba1bc762d7cbe1311ad"
+      "size": 47666,
+      "sha256": "70912bfefa0b0769d551b87896aa515f9299be76107af8e20abd1beb20c13ec3"
+    },
+    {
+      "path": "scripts/ci/test_wizard_capabilities.py",
+      "category": "validation",
+      "consumerAction": "explicit-review",
+      "gitMode": "100644",
+      "size": 2660,
+      "sha256": "0666a4b1d78277feabee742feda8dca5be39560e828e3b7e1401110744be5123"
     },
     {
       "path": "scripts/ci/test_wizard_distribution.py",
@@ -1064,8 +1208,8 @@
       "category": "schema-profile",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 10494,
-      "sha256": "9a02eb113015167d2d4f34b3ada594faaa5ae7837de96d4b22b2368a43fc67b3"
+      "size": 15389,
+      "sha256": "5a78055cfa4b90451f1a1e5865afa2bcb91bc1eb65bee613ccd9e57fde67e10e"
     },
     {
       "path": "wizard.release.json",

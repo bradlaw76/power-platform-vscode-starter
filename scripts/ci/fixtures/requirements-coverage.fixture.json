@@ -1,0 +1,34 @@
+{
+  "schemaVersion": "1.0",
+  "scenarioSlug": "generic-operations",
+  "provenance": {
+    "kind": "simulation",
+    "confirmed": true,
+    "sourcePath": "confirmed.json",
+    "sourceSha256": "0000000000000000000000000000000000000000000000000000000000000000"
+  },
+  "documents": [],
+  "outcomes": [{
+    "id": "outcome-001",
+    "document": "spec.md",
+    "excerpt": "Create and update a record, assign related work, inspect and resolve it; preserve binding and chronology, verify metrics, cancellation and concurrency.",
+    "operations": ["create", "update", "assign", "inspect", "resolve", "binding", "chronology", "metrics", "cancellation", "concurrency"],
+    "taskIds": ["T001"],
+    "criterionIds": ["check-crud", "check-binding", "check-lifecycle", "check-chronology", "check-metrics", "check-cancellation", "check-concurrency"]
+  }],
+  "tasks": [{
+    "id": "T001",
+    "excerpt": "- [ ] T001 Implement the confirmed record operations and independent functional readback.",
+    "operations": ["create", "update", "assign", "inspect", "resolve", "binding", "chronology", "metrics", "cancellation", "concurrency"],
+    "criterionIds": ["check-crud", "check-binding", "check-lifecycle", "check-chronology", "check-metrics", "check-cancellation", "check-concurrency"]
+  }],
+  "criteria": [
+    {"id": "check-crud", "operations": ["create", "update", "assign", "inspect"], "checkFamily": "crud", "taskIds": ["T001"], "surface": "Record editor and related record handlers", "assertion": "Create/update/assign/inspect expected records; reload and read back exact stable identities and permitted changes."},
+    {"id": "check-binding", "operations": ["binding"], "checkFamily": "binding", "taskIds": ["T001"], "surface": "Related-record editor", "assertion": "Selected parent and related-record identities survive save, navigation and reload."},
+    {"id": "check-lifecycle", "operations": ["resolve"], "checkFamily": "lifecycle", "taskIds": ["T001"], "surface": "Resolution action", "assertion": "Allowed resolution persists; invalid transitions reject without unintended changes."},
+    {"id": "check-chronology", "operations": ["chronology"], "checkFamily": "chronology", "taskIds": ["T001"], "surface": "Timestamp save handler", "assertion": "Valid chronology persists; reversed intervals reject without changing the retained before-state."},
+    {"id": "check-metrics", "operations": ["metrics"], "checkFamily": "metrics", "taskIds": ["T001"], "surface": "Summary metrics", "assertion": "Recompute counts and durations from retained records and compare exact expected values after reload."},
+    {"id": "check-cancellation", "operations": ["cancellation"], "checkFamily": "cancellation", "taskIds": ["T001"], "surface": "Editor cancellation", "assertion": "Cancel an unsaved edit; confirm persisted records remain unchanged."},
+    {"id": "check-concurrency", "operations": ["concurrency"], "checkFamily": "concurrency", "taskIds": ["T001"], "surface": "Versioned save handler", "assertion": "A stale save cannot overwrite a newer retained record version."}
+  ]
+}

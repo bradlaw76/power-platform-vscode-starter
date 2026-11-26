@@ -80,8 +80,12 @@ certificate settings. Never copy browser profiles, cookies or credentials.
    Tasks, journals and checkpoints resume work; no second scheduler is installed.
 
 Guided Windows use needs no WSL or native worker supervisor. Autonomous workers
-need Linux/macOS/WSL with Python 3.11+, process groups/signals, the reviewed package
-and an explicitly configured local worker. On Windows check `wsl --list --quiet`
+need the reviewed Python 3.11+ package and explicit local configuration: POSIX
+process groups/signals, or installed Windows owned-Job v1.0 supervision.
+Run the consolidated capability preflight with the selected interpreter;
+`-RequireWindowsWorker` checks availability, not actual launch ownership.
+If that capability is missing, use guided execution or explicit POSIX/WSL.
+On Windows check `wsl --list --quiet`
 and `wsl --exec python3 --version`; if unavailable, install WSL/Ubuntu through
 approved Windows tooling or continue guided Windows execution. Activate the
 POSIX environment's `bin/activate`, not Windows `Scripts`; Windows-only tools or

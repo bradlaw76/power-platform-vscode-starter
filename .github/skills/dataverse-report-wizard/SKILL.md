@@ -6,6 +6,14 @@ argument-hint: 'Optional: scenario=<slug> mode=simulate|live action=preview|depl
 
 # Dataverse Report Wizard
 
+For existing accepted reporting outcomes, bind required metrics and real
+functional criteria through scenario `requirements-coverage.json`; do not add
+rediscovery or infer an HTML requirement after native-only/no-report selection.
+Run the consolidated safe `12-check-wizard-capabilities.ps1` preflight for the
+selected executor; source/schema adoption is not runtime installation or native
+approval. Simulation provenance never approves semantic/report definitions.
+See [handoff](../../../docs/framework-handoff.md#accepted-outcome-reliability).
+
 ## Authorization and execution
 
 Load and follow [authorization and execution](../../../docs/policies/authorization-and-execution.md).

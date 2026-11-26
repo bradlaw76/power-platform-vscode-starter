@@ -4,6 +4,35 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Accepted-outcome and capability reliability corrections
+
+- Source-only isolated correction; no new work number, native build/deployment,
+  merge, release, distribution or application regeneration.
+- Original outcome operations now bind confirmation bytes/excerpts, real tasks
+  and proportional functional criteria; new intake cannot silently omit coverage.
+  Existing read-only/no-report and genuinely inapplicable legacy paths remain.
+- Reused native validators/schema/docs from exact commit
+  `378ebd0a90c609207b767a9bac81ab72f4c98f35`, including required existing Choice
+  token/report-plan dependencies. Preserved the current runtime's forcibly-closed
+  retry after targeted regression exposed a compatibility loss.
+- Credential-free source/planning/installed API preflight reports missing
+  capabilities explicitly. Native runner integration is unverified; source and
+  simulation confirmation never approve native fields/reports. Windows worker
+  support is conditional on installed owned-Job API and actual launch ownership.
+- Targeted checks: 17 coverage/preflight, 64 reused semantic helper,
+  18 Dataverse runtime, 3 capability compatibility and 5 packaging cases passed;
+  current intake/report-consent compatibility, JSON/contracts/docs also passed.
+  Native full-branch orchestration integration was not adopted or tested.
+  [Existing handoff contract and CLI fixtures](framework-handoff.md#accepted-outcome-reliability)
+  contain source provenance and functional/runtime boundaries.
+- Independent review corrections: reconciliation bypasses historical completed
+  and blocked handoff caches; explicit existing task IDs are forwarded through
+  PowerShell/Python and bound to handoff intent without altering canonical holds.
+  Four focused regressions reproduced red before the fix and passed green,
+  including selected source/verifier drift and both public entrypoints. These
+  and all 13 handoff boundary cases passed, preserving ordinary replay.
+  Boundary tests do not claim Pipeline end-to-end reconciliation acceptance.
+
 ## Q15-Q16 local instruction inheritance/migration
 
 - Source-only dependent campaign lane preserves H009/H010 and PR17; no H number,

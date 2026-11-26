@@ -70,6 +70,7 @@ reproduce its procedures here.
 
 | Enhancement | Contract and runtime scope |
 | --- | --- |
+| Accepted-outcome reliability | [Existing handoff](docs/framework-handoff.md#accepted-outcome-reliability); `requirements-coverage.json` links original confirmed excerpts/hash, implementation tasks and proportional functional criteria. `12-check-wizard-capabilities.ps1` consolidates source/installed API checks, including conditional Windows owned-Job availability, without credentials or installation; validator source alone is not native build readiness. `ReconcileOnly` bypasses historical handoff caches and forwards explicit existing `TaskIds` without releasing protected holds. No extra discovery question, stage or approval workflow. |
 | Delivery context | [Delivery pacing](docs/delivery-pacing-and-tooling.md); shared intake records goal/timeframe, with guided execution and optional WSL/automation |
 | Proportional scenario impact | [Impact gate](docs/scenario-change-impact-gate.md); affected-scope planning guidance, not a new build stage or impact compiler |
 | Authorization and execution | [Canonical policy](docs/policies/authorization-and-execution.md); standing scoped nonproduction authority, accepted-requirements reuse, proportional checks, recoverable administration/repair documentation, evidence-based writer recovery and native browser/principal/publication/record/form safety; byte-identical policy copies through the Claude installer. [Temporary registration proposal](docs/audits/development-execution-simplification-registration-proposal.md), no H allocation or new executor |
@@ -90,6 +91,17 @@ reproduce its procedures here.
 | H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit provenance, unconfirmed/not-applicable states, current-consent checks before resume, independent native/HTML stage selection and separate mapping approval; no legacy artifact migration |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
+
+For coverage/preflight changes, also align the one coverage schema, task/criterion
+links, installed runtime API/version/origin probe, packaging ownership policy and
+existing handoff/build log. Refresh candidate inventory only against the eventual
+exact committed source; do not publish a dirty-tree inventory as a release.
+For worker handoff corrections, preserve fresh source/verifier reconciliation,
+explicit task-ID forwarding and canonical holds in both entrypoints and tests.
+
+Native field decisions remain explicitly approved `field-type-decisions.json`
+under the semantic standard; report-definition approval remains independent of
+architecture/coverage confirmation.
 
 For authorization/execution changes specifically, update the canonical policy,
 Copilot instructions, prompt, both wizard/report skill families, consumer

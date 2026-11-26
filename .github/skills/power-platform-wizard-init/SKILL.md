@@ -6,6 +6,19 @@ argument-hint: 'Optional: mode=demo-builder|advanced-builder|framework-acceptanc
 
 # Power Platform Wizard Init
 
+Preserve original confirmed outcomes, excerpts/hash, real tasks and applicable
+functional criteria in scenario `requirements-coverage.json`, using existing
+confirmation rather than extra discovery. Accepted mutations cannot become
+mapping/read-only completion. Run consolidated credential-free
+`12-check-wizard-capabilities.ps1`; source/skill adoption is not installed runtime
+availability. Missing capabilities block affected work. Apply
+[semantic fields](../../../docs/semantic-field-type-standard.md) and actual
+`field-type-decisions.json`/report approvals; simulation never grants them.
+See [handoff](../../../docs/framework-handoff.md#accepted-outcome-reliability).
+Source-only `ReconcileOnly` always rechecks current source/verifier inputs.
+Select existing `TaskIds` explicitly for eligible blocked source tasks; protected
+holds remain with the canonical worker, not the handoff.
+
 ## Authorization and execution
 
 Load and follow [authorization and execution](../../../docs/policies/authorization-and-execution.md)
@@ -55,7 +68,10 @@ work allocation or release approval is inferred. Use
 Optional continuation after accepted planning uses
 [the installed H008 handoff](../../../docs/framework-handoff.md). Preserve native
 table/relationship decisions and explicit opt-in. Missing Spec Kit is a no-op;
-native Windows supports guided continuation, not autonomous worker supervision.
+native Windows always supports guided continuation; supervised workers additionally
+require the selected installed `demo_builder.windows_process` v1.0 owned-Job
+capability and actual ownership evidence. Do not infer ownership from lease
+expiry, a WSL interop child or a capability constant.
 Its read-only Status action projects canonical task counts, eligible IDs and
 dependency/owner holds with timestamps and next actions. Never dispatch from
 that projection, persist lease expiry or turn a missing store into zero success.

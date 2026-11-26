@@ -60,6 +60,7 @@ not consent; native/HTML decisions remain independent.
 ## Load affected contracts, not historical collections
 
 - Schema/type changes: [semantic fields](../docs/semantic-field-type-standard.md)
+  and explicitly approved `field-type-decisions.json`, never simulated approval.
   and approved scenario decisions; never delete/recreate String columns to hide drift.
 - Forms, views, navigation, inventory and solution sync: applicable onboarding/
   payload contracts; preserve business labels, idempotence, scoped publication,
@@ -72,6 +73,15 @@ not consent; native/HTML decisions remain independent.
   preserve custom instructions and project-specific security.
 
 ## SpeckKit and maintenance
+
+Use the existing confirmation to preserve original outcomes in scenario
+`requirements-coverage.json`: exact excerpts/hash, real implementation tasks,
+applicable binding/CRUD/lifecycle/chronology/metrics/cancellation/concurrency
+criteria. Read-only tasks cannot replace accepted mutations. Run consolidated
+`12-check-wizard-capabilities.ps1` before affected runtime handoff; missing source
+or installed API blocks affected work. Copied skill/schema is not installation.
+See [existing handoff](../docs/framework-handoff.md#accepted-outcome-reliability);
+do not add a discovery question, framework stage or approval ledger.
 
 Use `SYSTEM_MANIFEST.json.md`, `SPEC.md` and `BINDING_CERTIFICATION.md` for repository
 governance; scenario artifacts remain authoritative for individual builds.

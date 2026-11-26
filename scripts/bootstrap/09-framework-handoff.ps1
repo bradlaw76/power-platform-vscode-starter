@@ -20,6 +20,8 @@ param(
     [string]$AdoptionPath,
     [string]$DeliveryContextPath,
     [string]$WorkerConfigPath,
+    [switch]$ReconcileOnly,
+    [ValidateNotNullOrEmpty()] [string[]]$TaskIds,
     [string]$BrowserConfigPath,
     [string]$AuthorizationPath,
     [string]$TenantId,
@@ -41,6 +43,10 @@ param(
 )
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
+if ($TaskIds -and $Action -ne 'worker') { throw 'Explicit existing task IDs apply only to the worker action.' }
+& (Join-Path $PSScriptRoot '12-check-wizard-capabilities.ps1') -RepoRoot (Split-Path (Split-Path $PSScriptRoot -Parent) -Parent) `
+    -ScenarioFolder (Join-Path $ProjectRoot "specs\$ScenarioSlug") -RequireFrameworkRuntime -RequireFunctionalCapability:$ReconcileOnly -PythonExecutable $PythonExecutable
+if ($LASTEXITCODE -ne 0) { throw 'Consolidated handoff preflight blocked; no runtime operation performed.' }
 $arguments = @(
     (Join-Path $PSScriptRoot 'helpers/framework-handoff.py'),
     '--project', $ProjectRoot, '--runtime', $RuntimeWorkspace,
@@ -61,5 +67,7 @@ if ($EnableSpecKitSync) { $arguments += '--enable-sync' }
 if ($RehearseSlice) { $arguments += '--rehearse-slice' }
 if ($RepairAgentFixture) { $arguments += '--repair-agent-fixture' }
 if ($AcceptScenario) { $arguments += '--accept-scenario' }
+if ($ReconcileOnly) { $arguments += '--reconcile-only' }
+foreach ($taskId in $TaskIds) { $arguments += @('--task-id', $taskId) }
 & $PythonExecutable @arguments
 exit $LASTEXITCODE

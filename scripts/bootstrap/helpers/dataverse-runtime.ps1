@@ -94,7 +94,10 @@ function Get-WizardHttpStatusCode {
     if ($null -ne $statusProperty -and $null -ne $statusProperty.Value) {
         return [int]$statusProperty.Value
     }
-    if ($ErrorRecord.Exception.Message -match '(?<!\d)(?<status>401|403|404|409|429|5\d\d)(?!\d)') {
+    if ($ErrorRecord.Exception.Message -match '^HTTP\s+(?<status>\d{3})\b') {
+        return [int]$Matches.status
+    }
+    if ($ErrorRecord.Exception.Message -match '^Dataverse request failed \((?:Get|Post|Patch|Put|Delete) .*?, HTTP (?<status>\d+)\):') {
         return [int]$Matches.status
     }
     return 0
@@ -150,6 +153,8 @@ function Invoke-WizardDataverseRequest {
         [object]$Body,
         [switch]$PreviewOnly,
         [int]$MaxAttempts = 5,
+        [ValidateRange(1, 300)] [int]$TimeoutSec = 30,
+        [switch]$RejectRedirects,
         [scriptblock]$TokenProvider,
         [scriptblock]$RequestInvoker,
         [scriptblock]$SleepAction
@@ -163,21 +168,7 @@ function Invoke-WizardDataverseRequest {
     if ($null -eq $TokenProvider) {
         $TokenProvider = { param($url) Get-WizardDataverseToken -EnvironmentUrl $url }
     }
-    if ($null -eq $RequestInvoker) {
-        $RequestInvoker = {
-            param($request)
-            $parameters = @{
-                Method = $request.Method
-                Uri = $request.Uri
-                Headers = $request.Headers
-            }
-            if ($null -ne $request.Body) {
-                $parameters.Body = $request.Body
-                $parameters.ContentType = 'application/json'
-            }
-            Invoke-RestMethod @parameters
-        }
-    }
+    $useDefaultTransport = $null -eq $RequestInvoker
     if ($null -eq $SleepAction) {
         $SleepAction = { param($seconds) Start-Sleep -Seconds $seconds }
     }
@@ -196,9 +187,29 @@ function Invoke-WizardDataverseRequest {
             Uri = "$($EnvironmentUrl.TrimEnd('/'))/api/data/v9.2/$(ConvertTo-WizardRelativeDataversePath -Path $Path)"
             Headers = $headers
             Body = if ($null -eq $Body) { $null } elseif ($Body -is [string]) { $Body } else { $Body | ConvertTo-Json -Depth 30 -Compress }
+            TimeoutSec = $TimeoutSec
         }
 
         try {
+            if ($useDefaultTransport) {
+                $transportHeaders = @{}
+                foreach ($key in $request.Headers.Keys) {
+                    $transportHeaders[$key] = $request.Headers[$key]
+                }
+                $transportHeaders.Authorization = "Bearer $currentToken"
+                $parameters = @{
+                    Method = $request.Method
+                    Uri = $request.Uri
+                    Headers = $transportHeaders
+                    TimeoutSec = $request.TimeoutSec
+                }
+                if ($RejectRedirects) { $parameters.MaximumRedirection = 0 }
+                if ($null -ne $request.Body) {
+                    $parameters.Body = $request.Body
+                    $parameters.ContentType = 'application/json'
+                }
+                return Invoke-RestMethod @parameters
+            }
             return & $RequestInvoker $request
         } catch {
             $statusCode = Get-WizardHttpStatusCode -ErrorRecord $_

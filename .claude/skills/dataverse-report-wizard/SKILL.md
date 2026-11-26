@@ -5,6 +5,14 @@ description: Use when creating, previewing, simulating, or deploying native Data
 
 # Dataverse Report Wizard
 
+For existing accepted reporting outcomes, bind required metrics and real
+functional criteria through scenario `requirements-coverage.json`; do not add
+rediscovery or infer an HTML requirement after native-only/no-report selection.
+Run project `scripts/bootstrap/12-check-wizard-capabilities.ps1` credential-free;
+source/schema adoption is not runtime installation or native approval.
+Simulation provenance never approves semantic/report definitions. Reference:
+project `docs/framework-handoff.md#accepted-outcome-reliability`.
+
 ## Authorization and execution
 
 Load and follow project-root `docs/policies/authorization-and-execution.md`.

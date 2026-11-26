@@ -113,6 +113,10 @@ $payloadsFolder = if ([string]::IsNullOrWhiteSpace($PayloadsFolder)) {
     $PayloadsFolder
 }
 $payloadRootFolder = $payloadsFolder
+if ($ScenarioSlug) {
+    . (Join-Path $PSScriptRoot 'helpers\requirements-coverage.ps1')
+    Test-WizardRequirementsCoverage -ScenarioFolder (Join-Path $RepoRoot "specs\$ScenarioSlug") | Out-Null
+}
 $payloadValidationFolder = if ([string]::IsNullOrWhiteSpace($ScenarioSlug)) {
     $payloadsFolder
 } elseif (

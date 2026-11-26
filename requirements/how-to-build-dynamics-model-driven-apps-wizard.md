@@ -1,5 +1,15 @@
 # Dynamics Model-Driven App Wizard (VS Code + Copilot)
 
+Reuse existing confirmation for original accepted outcomes; link exact
+excerpts/hash, implementation tasks and proportional functional criteria in
+`requirements-coverage.json`. Mapping/read-only completion cannot replace
+mutations. Use the consolidated safe capability preflight and
+[handoff](../docs/framework-handoff.md#accepted-outcome-reliability); missing
+source/installed capabilities block affected work. Apply
+[semantic fields](../docs/semantic-field-type-standard.md) with actual
+`field-type-decisions.json`/report approvals, never simulation provenance.
+No extra discovery question, stage or approval ledger is required.
+
 Created: 2026-05-29
 Scope: Generic wizard playbook (not project-specific)
 Audience: Teams that want a guided, question-first process from idea to release
