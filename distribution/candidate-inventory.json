@@ -4,12 +4,12 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "036a035af72add9911e05bc364ebc15fba888fff",
+  "sourceCommit": "67218c0bad07151e0f8dc6ad62ec007f610643ec",
   "policySha256": "115f536076f77446219013f4bd6ddb5adb6fbcc9200beb4a59979ed0a883e149",
   "publisherVerified": false,
   "automaticApply": false,
   "fileCount": 153,
-  "totalBytes": 2305563,
+  "totalBytes": 2309273,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
@@ -1192,8 +1192,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 49196,
-      "sha256": "eb15d94770c69e0d6ff53d8cd2d3d9ce222504440bd996d5c1028fc2a67bcf52"
+      "size": 52906,
+      "sha256": "4cdcca2adf0c10c062c548aba4a3eda6f60e33897d5e8303e8d1cb9081f9b1b5"
     },
     {
       "path": "scripts/ci/test_wizard_capabilities.py",
