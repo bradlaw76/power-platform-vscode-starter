@@ -7,6 +7,7 @@ import argparse
 from contextlib import nullcontext
 from copy import deepcopy
 import errno
+import hashlib
 import importlib.util
 import json
 import os
@@ -452,7 +453,12 @@ class InstalledHandoff(unittest.TestCase):
                    "-PythonExecutable", sys.executable]
         result = subprocess.run(command, capture_output=True, text=True, timeout=30)
         self.assertEqual(result.returncode, 0, result.stderr)
-        self.assertFalse(json.loads(result.stdout)["scheduler_started"])
+        preflight, end = json.JSONDecoder().raw_decode(result.stdout.lstrip())
+        self.assertEqual(preflight["status"], "SOURCE READY")
+        self.assertTrue(preflight["runtime"]["available"])
+        self.assertFalse(preflight["nativeApproval"])
+        self.assertFalse(preflight["executionAuthorized"])
+        self.assertFalse(json.loads(result.stdout.lstrip()[end:])["scheduler_started"])
 
     def test_wizard_continues_to_installed_handoff_and_synthetic_rehearsal(self):
         project = self.root / "wizard-project"
@@ -468,17 +474,45 @@ class InstalledHandoff(unittest.TestCase):
             "Connected journey", "Coordinator | manage linked work",
             "Account, Work Item", "Save linked Work Items from an Account",
             "Synthetic two-parent separation", "Synthetic rehearsal only", "yes"]))
+        planning = project / "specs" / self.args.scenario
+        planning.mkdir(parents=True)
+        excerpt = "Create a Work Item and preserve its Account binding."
+        confirmation = planning / "confirmed.json"
+        confirmation.write_text(json.dumps({"kind": "simulation", "confirmed": True, "outcome": excerpt}))
+        coverage = self.root / "coverage-input.json"
+        criterion_ids = ["criterion-create", "criterion-binding"]
+        coverage.write_text(json.dumps({
+            "schemaVersion": "1.0", "scenarioSlug": self.args.scenario,
+            "provenance": {"kind": "simulation", "confirmed": True, "sourcePath": "confirmed.json",
+                           "sourceSha256": hashlib.sha256(confirmation.read_bytes()).hexdigest()},
+            "outcomes": [{"id": "outcome-linked-work", "document": "spec.md", "excerpt": excerpt,
+                          "operations": ["create", "binding"], "taskIds": ["task-linked-work"],
+                          "criterionIds": criterion_ids}],
+            "tasks": [{"id": "task-linked-work",
+                       "excerpt": "- [ ] T-Linked Create Work Items with persisted Account binding readback.",
+                       "operations": ["create", "binding"], "criterionIds": criterion_ids}],
+            "criteria": [
+                {"id": "criterion-create", "operations": ["create"], "checkFamily": "crud",
+                 "taskIds": ["task-linked-work"], "surface": "Synthetic Work Item persisted rows",
+                 "assertion": "Rehearsal persists exactly three approved Work Items."},
+                {"id": "criterion-binding", "operations": ["binding"], "checkFamily": "binding",
+                 "taskIds": ["task-linked-work"], "surface": "Synthetic Work Item Account relationship",
+                 "assertion": "Each persisted Work Item retains its approved Account relationship."}
+            ]
+        }))
         process = subprocess.run([
             shutil.which("pwsh"), "-NoProfile", "-File",
             str(ROOT / "scripts" / "bootstrap" / "05-start-wizard.ps1"),
             "-WorkspaceRoot", str(project), "-AnswersFile", str(answers),
             "-DeliveryGoal", "connected-demo", "-DeliveryTimeframe", "no fixed deadline",
             "-AcceptedContractPath", self.args.contract,
+            "-RequirementsCoveragePath", str(coverage),
             "-FrameworkRuntimeWorkspace", str(runtime),
             "-FrameworkPythonExecutable", sys.executable, "-EnableFrameworkSpecKitSync"],
             capture_output=True, text=True, timeout=60)
         self.assertEqual(process.returncode, 0, process.stdout + process.stderr)
         self.assertTrue((runtime / "tasks.json").is_file())
+        self.assertTrue((planning / "requirements-coverage.json").is_file())
         text = (project / "specs" / self.args.scenario / "spec.md").read_text()
         self.assertIn("Accepted Planning Source", text)
         self.assertIn("ppd_workitem", text)
@@ -487,6 +521,19 @@ class InstalledHandoff(unittest.TestCase):
         args = deepcopy(self.args)
         args.project, args.runtime = str(project), str(runtime)
         args.action, args.snapshot = "rehearse", str(self.inputs / "environment.json")
+        from demo_builder.errors import BuildError
+        with self.assertRaisesRegex(BuildError, "Coverage planning document changed"):
+            handoff.execute(args)
+        # Accepted-plan projection changes documentary bytes; reconcile the same approved coverage input.
+        helper = str(ROOT / "scripts" / "bootstrap" / "helpers" / "requirements-coverage.ps1").replace("'", "''")
+        escaped_coverage = str(coverage).replace("'", "''")
+        escaped_planning = str(planning).replace("'", "''")
+        command = (f". '{helper}'; Write-WizardRequirementsCoverage "
+                   f"-InputPath '{escaped_coverage}' -ScenarioFolder '{escaped_planning}' | ConvertTo-Json")
+        reconciled = subprocess.run([shutil.which("pwsh"), "-NoProfile", "-Command", command],
+                                    capture_output=True, text=True, timeout=30)
+        self.assertEqual(reconciled.returncode, 0, reconciled.stdout + reconciled.stderr)
+        self.assertEqual(json.loads(reconciled.stdout)["status"], "covered")
         result, code = handoff.execute(args)
         self.assertEqual(code, 0, result)
         summary = json.loads((runtime / "execution-summary.json").read_text())
@@ -767,7 +814,7 @@ class InstalledHandoff(unittest.TestCase):
         self.assertIsNone(report["task_summary"]["counts"])
         self.assertIn("reconcile", report["task_summary"]["next_action"].lower())
 
-    def test_transient_block_clears_without_input_change_and_native_worker_is_rejected(self):
+    def test_transient_block_clears_without_input_change_and_worker_requires_config_and_capability(self):
         self.start()
         original_run = handoff.subprocess.run
         def busy(command, **kwargs):
@@ -784,8 +831,12 @@ class InstalledHandoff(unittest.TestCase):
         self.assertNotIn("replayed", recovered)
         before = {p: p.read_bytes() for p in self.runtime.rglob("*") if p.is_file()}
         with patch.object(handoff.sys, "platform", "win32"):
-            with self.assertRaisesRegex(ValueError, "Native Windows worker"):
+            with self.assertRaisesRegex(ValueError, "explicitly selected existing worker configuration"):
                 self.action("worker")
+            from demo_builder import windows_process
+            with patch.object(windows_process, "OwnedJob", None):
+                with self.assertRaisesRegex(ValueError, "installed owned-Job capability unavailable"):
+                    self.action("worker")
         self.assertEqual(before, {p: p.read_bytes() for p in self.runtime.rglob("*") if p.is_file()})
 
     def test_new_synthetic_solution_target_and_stale_stage_receipts(self):
