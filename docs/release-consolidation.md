@@ -26,7 +26,7 @@ intended-user acceptance remain required before packaging/release claims.
    [distribution review](skill-distribution.md); do not activate unmerged
    installers, protection hooks or security settings implicitly.
 4. H008 uses an explicitly selected installed framework 0.2.1 or tested
-   0.2.2rc1 environment with compatible required APIs,
+   0.2.2rc1/0.2.2rc2 environment with compatible required APIs,
    accepted contract, separate external project/runtime roots and existing
    Spec Kit documents. Follow [the handoff guide](framework-handoff.md).
 5. Opt in to synchronization separately. Preserve native aliases, manual text,
@@ -238,7 +238,7 @@ No automatic source upgrade, package install or protection-hook activation.
 | Relationship migration | Compatible intent changes revisit dependencies; pinned endpoint/kind changes remain protected. No automatic identity migration, deletion/recreation or managed-component rewrite. |
 
 Requirements: PowerShell 7 for native guided commands; explicitly selected
-`power-platform-demo-builder` 0.2.1 or explicitly tested 0.2.2rc1 with Python
+`power-platform-demo-builder` 0.2.1 or explicitly tested 0.2.2rc1/0.2.2rc2 with Python
 3.11+ and required coverage/Windows APIs for H008; full profile,
 helpers, schemas and guides. The framework declares no third-party runtime
 dependencies; `setuptools>=68` is a build-time dependency, not an auto-install
@@ -288,7 +288,7 @@ Do not present the proposal's illustrative 1.11.0 as installed or available.
 Historical pre-H008 main: profile 1.4, contract 1.10.0, intake component 0.7.0.
 Merged H008 baseline: profile 1.6, contract 1.10.0, intake component 0.8.2;
 H009 intake component 0.9.0. Separate automation package accepts 0.2.1 and the
-explicitly tested 0.2.2rc1 candidate only when required APIs pass.
+explicitly tested 0.2.2rc1/0.2.2rc2 candidates only when required APIs pass.
 These versions do not establish wizard release identity.
 The observed release listing was empty; historical snapshot/rollback tags and
 a moving branch are not official update authority. Offline or unavailable

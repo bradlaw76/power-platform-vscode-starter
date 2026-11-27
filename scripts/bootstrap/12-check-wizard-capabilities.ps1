@@ -144,7 +144,7 @@ try {
         if ($LASTEXITCODE -ne 0) { throw 'Selected interpreter capability probe failed.' }
         $runtime = $output | ConvertFrom-Json -AsHashtable
         foreach ($error in $runtime.sourceErrors) { $failures.Add("Invalid Python source capability: $error") }
-        if ($RequireFrameworkRuntime -and -not $runtime.available) { $failures.Add('Selected interpreter lacks compatible installed framework 0.2.1 or tested 0.2.2rc1 with required APIs. Source/skill adoption is not installation.') }
+        if ($RequireFrameworkRuntime -and -not $runtime.available) { $failures.Add('Selected interpreter lacks compatible installed framework 0.2.1 or tested 0.2.2rc1/0.2.2rc2 with required APIs. Source/skill adoption is not installation.') }
         if ($RequireFrameworkRuntime -and ($RequireCoverage -or $RequireFunctionalCapability -or $coverage.status -eq 'covered') -and -not $runtime.coverage) { $failures.Add('Installed runtime lacks accepted-outcome functional verification/reconciliation capability.') }
         if ($RequireWindowsWorker -and -not $runtime.windowsSupervision) { $failures.Add('Installed Windows owned-worker supervision capability unavailable; guided execution remains independent.') }
         if ($RequireWindowsWorker -and $runtime.platform -ne 'win32') { $failures.Add('Selected interpreter is not native Windows; WSL interop is not owned-Job supervision proof.') }

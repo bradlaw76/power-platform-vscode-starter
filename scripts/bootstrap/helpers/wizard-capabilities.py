@@ -11,7 +11,7 @@ import sys
 import argparse
 import ast
 
-COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1"}
+COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1", "0.2.2rc2"}
 
 
 def probe() -> dict:

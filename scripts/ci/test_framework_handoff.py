@@ -85,7 +85,7 @@ class HandoffBoundaries(unittest.TestCase):
     def test_supported_versions_still_require_coverage_api_before_status(self):
         self.docs()
         self.args.action = "status"
-        for version in ("0.2.1", "0.2.2rc1"):
+        for version in ("0.2.1", "0.2.2rc1", "0.2.2rc2"):
             with self.subTest(version=version), self.framework_boundary(), \
                     patch.object(handoff.importlib.metadata, "version", return_value=version), \
                     patch.object(handoff, "canonical_task_status", return_value={"status": "unavailable"}):
@@ -127,9 +127,10 @@ class HandoffBoundaries(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "Duplicate"):
             handoff.load_json(path)
         self.docs()
-        with patch.object(handoff.importlib.metadata, "version", return_value="9.0.0"):
-            with self.assertRaisesRegex(ValueError, "compatibility"):
-                handoff.execute(self.args)
+        for version in ("0.2.2", "0.2.2rc3", "9.0.0"):
+            with self.subTest(version=version), patch.object(handoff.importlib.metadata, "version", return_value=version):
+                with self.assertRaisesRegex(ValueError, "compatibility"):
+                    handoff.execute(self.args)
         self.assertFalse(self.runtime.exists())
 
     def test_browser_action_uses_existing_runtime_and_never_reuses_cached_diagnostics(self):

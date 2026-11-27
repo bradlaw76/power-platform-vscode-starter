@@ -4,6 +4,23 @@ Record each build run here. One row per execution.
 
 Use this to document what was planned, built, validated, and promoted.
 
+## Q13-R9B bounded Choice readback and rc2 compatibility
+
+- Regression-first offline reproduction: newly created approved Choice with
+  icon `info` failed readback (`expected 'ℹ New', actual 'New'`).
+- Created-field readback now uses the same `AllowBasePresentation` validator as
+  existing-column checks. Strict final Metadata still rejects missing decoration,
+  changed option values, types and vocabulary. No semantic approval is weakened.
+- The existing native-source fixture captures actual creation payloads and tests
+  base creation, injected approved presentation and final Metadata. Stage 35 is
+  absent in this candidate; its execution, live publication and user acceptance
+  are not claimed.
+- Exact Automation compatibility now includes `0.2.2rc2` alongside `0.2.1` and
+  `0.2.2rc1`; unknown versions, missing origins and incompatible APIs still block.
+- Exact test results, code/inventory heads and controls are recorded in the
+  external `starter-results.json`. H009 inventory remains candidate-only:
+  publisher verification and automatic Apply remain false.
+
 ## Q13-R7 native source integration
 
 Selective prior-source reuse at `378ebd0a90c609207b767a9bac81ab72f4c98f35`

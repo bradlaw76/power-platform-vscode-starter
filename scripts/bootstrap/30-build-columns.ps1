@@ -4,7 +4,7 @@ COMPONENT:    Build Columns
 FILE:         scripts/bootstrap/30-build-columns.ps1
 VERSION:      0.1.0
 AUTHOR:       Power Platform VS Code Starter
-LAST UPDATED: 2026-11-26
+LAST UPDATED: 2026-11-27
 ENVIRONMENT:  PowerShell 7 | Dataverse Web API
 
 -----------------------------------------------------------------------------
@@ -38,6 +38,7 @@ TEST CASES
 -----------------------------------------------------------------------------
 CHANGELOG
 -----------------------------------------------------------------------------
+2026-11-27  Q13-R9B accept approved base Choice presentation during created readback.
 2026-11-26  Q13-R7 selective semantic enforcement; alternate-key/retry paths retained.
 v0.1.0  2026-07-19  Added PowerShell-adapted SpeckKit component header.
 
@@ -206,7 +207,7 @@ if ($changedTables.Count -gt 0) {
 }
 foreach ($field in $createdFields) {
     $live = Get-WizardSemanticLiveAttribute -Field $field -ReadMetadata $readMetadata
-    Assert-WizardSemanticLiveField -Field $field -Live $live -ReadMetadata $readMetadata -PayloadsFolder $PayloadsFolder
+    Assert-WizardSemanticLiveField -Field $field -Live $live -ReadMetadata $readMetadata -PayloadsFolder $PayloadsFolder -AllowBasePresentation
     Add-WizardArtifactManifestItem -RepoRoot $repoRoot -ScenarioSlug $ScenarioSlug -SolutionName $solutionName -PublisherPrefix $publisherPrefix -Kind 'column' -Name "$($field.table).$($field.field)" -Status 'created' -Step '30-build-columns.ps1' -Details @{ metadataId = $live.MetadataId; semanticDecision = $field.decisionId; validated = $true } | Out-Null
 }
 
