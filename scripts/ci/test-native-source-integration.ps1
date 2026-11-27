@@ -58,19 +58,23 @@ try {
     $env:DV_SOLUTION_NAME = 'NativeFixture'
     $env:DV_PUBLISHER_PREFIX = 'sample'
     $env:WIZARD_METRICS_OPTOUT = '1'
-    $state = @{ exists = $false; type = 'PicklistType'; status = 0; requests = [Collections.Generic.List[object]]::new() }
+    $state = @{ exists = $false; type = 'PicklistType'; status = 0; metadata = $null; requests = [Collections.Generic.List[object]]::new() }
     $transport = {
         param($request)
         $state.requests.Add($request)
         if ($state.status) { throw "HTTP $($state.status) synthetic failure" }
         if ($request.Method -eq 'Get') {
             if (-not $state.exists) { throw 'HTTP 404 synthetic absent column' }
-            $metadata = $field.expectedMetadata | ConvertTo-Json -Depth 50 | ConvertFrom-Json -AsHashtable
+            $metadata = $state.metadata | ConvertTo-Json -Depth 50 | ConvertFrom-Json -AsHashtable
             $metadata.AttributeTypeName = @{ Value = $state.type }
             $metadata.MetadataId = '11111111-1111-1111-1111-111111111111'
             return $metadata
         }
-        if ($request.Uri.EndsWith('/Attributes')) { $state.exists = $true; return @{} }
+        if ($request.Uri.EndsWith('/Attributes')) {
+            $state.metadata = $request.Body | ConvertFrom-Json -AsHashtable
+            $state.exists = $true
+            return @{}
+        }
         if ($request.Uri.EndsWith('/PublishXml')) { return @{} }
         throw 'Unexpected synthetic request.'
     }.GetNewClosure()
@@ -93,6 +97,40 @@ try {
     $state.requests.Clear()
     & $columns -ScenarioSlug $slug -RequestInvoker $transport
     Assert-Integration (@($state.requests | Where-Object Method -ne 'Get').Count -eq 0) 'Matching rerun must not mutate.'
+    $presentationPath = Join-Path $payloads 'choice-presentations-test.json'
+    Write-FixtureJson $presentationPath @{
+        TableLogicalName = $field.table
+        ColumnLogicalName = $field.field
+        LanguageCode = 1033
+        Options = @(@{ Value = $field.choice.options[0].value; Label = $field.choice.options[0].labels.LocalizedLabels[0].Label; Icon = 'info' })
+    }
+    $state.exists = $false
+    $state.requests.Clear()
+    & $columns -ScenarioSlug $slug -RequestInvoker $transport
+    Assert-Integration (@($state.requests | Where-Object { $_.Method -eq 'Post' -and $_.Uri.EndsWith('/Attributes') }).Count -eq 1) 'Approved icon must not block newly created base Choice readback.'
+    Assert-Integration ($state.metadata.OptionSet.Options[0].Label.LocalizedLabels[0].Label -ceq $field.choice.options[0].labels.LocalizedLabels[0].Label) 'Creation must preserve the approved base vocabulary.'
+    $metadataStage = Join-Path $bootstrap '14-validate-semantic-fields.ps1'
+    Assert-IntegrationBlock { & $metadataStage -ScenarioSlug $slug -Mode Metadata -RequestInvoker $transport } 'Configuration drift.*Label'
+    # Stage 35 is not shipped here: inject its approved output, without claiming execution.
+    . (Join-Path $bootstrap 'helpers\semantic-fields.ps1')
+    $state.metadata.OptionSet.Options = Get-SemanticPresentationOptions -Field $field -PayloadsFolder $payloads
+    & $metadataStage -ScenarioSlug $slug -Mode Metadata -RequestInvoker $transport
+    $metadataReport = Get-Content (Join-Path $fixture ".wizard-metrics\artifacts\semantic-fields\$slug\metadata-report.json") -Raw | ConvertFrom-Json
+    Assert-Integration ($metadataReport.status -eq 'verified') 'Final decorated Choice must pass strict Metadata validation.'
+    $decoratedOptions = $state.metadata.OptionSet.Options | ConvertTo-Json -Depth 30
+    $state.metadata.OptionSet.Options[0].Value++
+    Assert-IntegrationBlock { & $columns -ScenarioSlug $slug -RequestInvoker $transport } 'Configuration drift'
+    Assert-IntegrationBlock { & $metadataStage -ScenarioSlug $slug -Mode Metadata -RequestInvoker $transport } 'Configuration drift'
+    $state.metadata.OptionSet.Options = $decoratedOptions | ConvertFrom-Json -AsHashtable
+    $state.metadata.OptionSet.Options[0].Label.LocalizedLabels[0].Label = 'Unapproved vocabulary'
+    Assert-IntegrationBlock { & $columns -ScenarioSlug $slug -RequestInvoker $transport } 'Configuration drift.*Label'
+    Assert-IntegrationBlock { & $metadataStage -ScenarioSlug $slug -Mode Metadata -RequestInvoker $transport } 'Configuration drift.*Label'
+    $state.metadata.OptionSet.Options = $decoratedOptions | ConvertFrom-Json -AsHashtable
+    $state.requests.Clear()
+    & $columns -ScenarioSlug $slug -RequestInvoker $transport
+    Assert-Integration (@($state.requests | Where-Object Method -ne 'Get').Count -eq 0) 'Decorated matching rerun must remain read-only.'
+    Remove-Item -LiteralPath $presentationPath
+    $state.metadata.OptionSet.Options = $field.expectedMetadata.OptionSet.Options | ConvertTo-Json -Depth 30 | ConvertFrom-Json -AsHashtable
     $state.type = 'StringType'
     Assert-IntegrationBlock { & $runner -ScenarioSlug $slug -Mode Apply -VerificationProfile Demo -Resume -RequestInvoker $transport } 'expected PicklistType; actual StringType'
     Assert-Integration (@($state.requests | Where-Object Method -ne 'Get').Count -eq 0) 'Resumed wrong-type metadata must block before mutations.'

@@ -115,9 +115,9 @@ worker, Apply or deployment authorization.
   follow [the shared wizard lifecycle](wizard-updates.md#local-instruction-inheritance-and-migration),
   separately from runtime installation or synchronization authority.
 - Select the already installed `power-platform-demo-builder` **0.2.1** or the
-  explicitly tested **0.2.2rc1** candidate
+  explicitly tested **0.2.2rc1** or **0.2.2rc2** candidate
   Python environment (Python 3.11+). Missing/incompatible tooling is reported,
-  never silently installed. Both versions must supply coverage API 1.0 with
+  never silently installed. All accepted versions must supply coverage API 1.0 with
   `path`/`task_ids`; native Windows requires the existing owned-Job API 1.0.
   Future versions are not implicitly compatible. Interpreter/package-origin
   and external non-overlapping workspace checks remain required.

@@ -91,6 +91,7 @@ reproduce its procedures here.
 | Development-first instruction inheritance/migration | [Shared local instruction lifecycle](docs/wizard-updates.md#local-instruction-inheritance-and-migration); new terminal/chat projects inherit actual policy and assets; existing H009 transactions preview, preserve customizations, back up and recover instruction-only changes without upgrading runtime or bypassing official release gates |
 | H010 reporting consent | [Discovery contract](docs/wizard-contract-v1.md#reporting-consent-h010); native/HTML/both/none in the existing consolidated confirmation, explicit provenance, unconfirmed/not-applicable states, current-consent checks before resume, independent native/HTML stage selection and separate mapping approval; no legacy artifact migration |
 | Q13-R7 native source integration | Existing stages 30/65/90 reuse semantic and requirements-backed HTML gates from exact prior source `378ebd0a90c609207b767a9bac81ab72f4c98f35`; preflight checks actual source hooks and explicit runtime asset closure. Offline real-path regressions are not native acceptance. FAST-dependent Apply stays blocked; no release/publisher identity or automatic installation is granted. |
+| Q13-R9B Choice creation/readback | Stage 30 accepts approved base labels before optional presentation, using the existing semantic validator; final Metadata still requires decorated labels, numeric identities, types and vocabulary. The offline lifecycle fixture injects approved stage-35 output because stage 35 is not shipped in this candidate. Exact Automation 0.2.2rc2 compatibility joins 0.2.1/0.2.2rc1 without loosening API/origin/version checks. |
 
 For changes to these enhancements, keep the profile, prompt, both shipped skill families, authoritative guides, generated planning surfaces and applicable CI tests aligned. Preserve required approvals and verification; do not add an intake question, runtime stage or absent integration feature by implication.
 
@@ -100,6 +101,10 @@ existing handoff/build log. Refresh candidate inventory only against the eventua
 exact committed source; do not publish a dirty-tree inventory as a release.
 For worker handoff corrections, preserve fresh source/verifier reconciliation,
 explicit task-ID forwarding and canonical holds in both entrypoints and tests.
+For Choice readback changes, keep creation and existing-column validation aligned;
+test base creation, approved presentation and strict final Metadata together,
+including wrong numeric values, types and vocabulary. Do not infer optional
+stage execution or native acceptance from injected offline presentation.
 
 Native field decisions remain explicitly approved `field-type-decisions.json`
 under the semantic standard; report-definition approval remains independent of
@@ -139,7 +144,7 @@ reconciled before a custom build. Read the [final acceptance boundaries and
 next backlog](docs/release-consolidation.md#q7-q12-finalization-and-next-backlog).
 H009 now provides offline version/status and opt-in update planning, not automatic
 updates or an official release. Profile 1.6, contract 1.10.0 and installed
-automation package 0.2.1 (or explicitly tested 0.2.2rc1 with required APIs)
+automation package 0.2.1 (or explicitly tested 0.2.2rc1/0.2.2rc2 with required APIs)
 remain separate versions. Try
 `pwsh .\scripts\bootstrap\05-start-wizard.ps1 -VersionOnly` or the agent-shared
 `pwsh .\scripts\bootstrap\04-check-wizard-update.ps1 -Action Status`.

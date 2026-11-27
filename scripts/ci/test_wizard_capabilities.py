@@ -17,13 +17,13 @@ spec.loader.exec_module(capabilities)
 
 
 class Capabilities(unittest.TestCase):
-    def probe(self, modules, version="0.2.1"):
+    def probe(self, modules, version="0.2.1", origin="demo_builder/__init__.py"):
         package = ModuleType("demo_builder")
         package.__path__ = []
         modules = {"demo_builder": package, **modules}
         with patch.dict(sys.modules, modules), patch.object(
             capabilities.importlib.metadata, "version", return_value=version
-        ), patch.object(capabilities.importlib.util, "find_spec", return_value=SimpleNamespace(origin="demo_builder/__init__.py")):
+        ), patch.object(capabilities.importlib.util, "find_spec", return_value=SimpleNamespace(origin=origin)):
             return capabilities.probe()
 
     def functional(self, version="1.0"):
@@ -60,15 +60,18 @@ class Capabilities(unittest.TestCase):
         windows.OwnedJob = lambda: None
         windows.identity_alive = lambda identity: False
         modules = {"demo_builder.functional": self.functional(), windows.__name__: windows}
-        for version in ("0.2.1", "0.2.2rc1"):
+        for version in ("0.2.1", "0.2.2rc1", "0.2.2rc2"):
             with self.subTest(version=version):
                 self.assertTrue(self.probe(modules, version)["available"])
-        for version in ("0.2.2", "0.2.2rc2", "9.0.0"):
+                self.assertFalse(self.probe(modules, version, origin=None)["available"])
+                self.assertFalse(self.probe({"demo_builder.functional": self.functional("future")}, version)["available"])
+        for version in ("0.2.2", "0.2.2rc3", "9.0.0"):
             with self.subTest(version=version):
                 self.assertFalse(self.probe(modules, version)["available"])
         with patch.object(capabilities.sys, "platform", "win32"):
             windows.OwnedJob = None
-            self.assertFalse(self.probe(modules, "0.2.2rc1")["available"])
+            for version in ("0.2.1", "0.2.2rc1", "0.2.2rc2"):
+                self.assertFalse(self.probe(modules, version)["available"])
 
 
 if __name__ == "__main__":

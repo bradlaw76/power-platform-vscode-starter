@@ -1,7 +1,7 @@
 """Component: installed framework handoff, version 0.1.2.
 
 File: scripts/bootstrap/helpers/framework-handoff.py
-Environment: Python 3.11+; power-platform-demo-builder 0.2.1 or tested 0.2.2rc1.
+Environment: Python 3.11+; power-platform-demo-builder 0.2.1 or tested 0.2.2rc1/rc2.
 The status receipt is a derived view, not a task store or scheduler.
 """
 from __future__ import annotations
@@ -26,7 +26,7 @@ SOURCE = Path(__file__).resolve().parents[3]
 MAX_BYTES = 1024 * 1024
 MAX_LAUNCH_ATTEMPTS = 3
 FRESH_ACTIONS = {"browser", "deploy", "discover", "deliver", "feedback", "agent-test", "scenario", "git-review"}
-COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1"}
+COMPATIBLE_FRAMEWORK_VERSIONS = {"0.2.1", "0.2.2rc1", "0.2.2rc2"}
 
 
 def hash_file(path: Path) -> str:
@@ -287,7 +287,7 @@ def execute(args: argparse.Namespace) -> tuple[dict, int]:
     except importlib.metadata.PackageNotFoundError:
         raise ValueError("Installed framework missing; select its Python environment. No automatic installation.") from None
     if version not in COMPATIBLE_FRAMEWORK_VERSIONS:
-        raise ValueError("Review compatibility: supported framework versions are 0.2.1 and tested 0.2.2rc1 only.")
+        raise ValueError("Review compatibility: supported framework versions are 0.2.1 and tested 0.2.2rc1/0.2.2rc2 only.")
     try:
         from demo_builder.functional import COVERAGE_VERSION, load_requirements_coverage
         signature = inspect.signature(load_requirements_coverage)

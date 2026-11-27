@@ -11,6 +11,10 @@ Use [semantic field decisions](semantic-field-type-standard.md) and real
 native runner integration or install an executor. In the integrated source,
 stage 90 runs Payload before any stage, stage 30 checks existing types before
 creation, and Metadata gates follow relationships and precede export.
+Stage 30 accepts approved base Choice labels during creation/readback, before
+optional presentation. Final Metadata still requires the approved decorated
+labels and exact numeric values/types/vocabulary; skipping presentation does not
+waive that requirement. Stage 35 is not shipped in this source candidate.
 Preview plans Metadata without calling Dataverse; resume rechecks these gates.
 Stage 65 and stage 90 require approved, current `html-reports.json` when HTML
 is selected. `12-check-wizard-capabilities.ps1 -RequireNativeBuild` checks source

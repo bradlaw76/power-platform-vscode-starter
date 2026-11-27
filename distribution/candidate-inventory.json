@@ -4,12 +4,12 @@
   "inventoryVersion": "1.0.0",
   "repository": "bradlaw76/power-platform-vscode-starter",
   "repositoryUrl": "https://github.com/bradlaw76/power-platform-vscode-starter",
-  "sourceCommit": "d90834614339d0a3b6add8c89b421d1ea362d553",
+  "sourceCommit": "67218c0bad07151e0f8dc6ad62ec007f610643ec",
   "policySha256": "115f536076f77446219013f4bd6ddb5adb6fbcc9200beb4a59979ed0a883e149",
   "publisherVerified": false,
   "automaticApply": false,
   "fileCount": 153,
-  "totalBytes": 2300694,
+  "totalBytes": 2309273,
   "files": [
     {
       "path": ".claude/skills/dataverse-report-wizard/SKILL.md",
@@ -112,8 +112,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 60688,
-      "sha256": "3114ace273ee710633538be5f821a3fcc18f9bfec99fdd961ad2fbc6784b7a6d"
+      "size": 61463,
+      "sha256": "94293eebf56db431ff3057a1527fee7746b1af7fc56ac927a2bc783d42e9e3f8"
     },
     {
       "path": "SECURITY.md",
@@ -184,8 +184,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 30778,
-      "sha256": "d2498149f4a28e40083211331b3dc513b18464f0f8abfd96dd2980178c059714"
+      "size": 30802,
+      "sha256": "92fdb61c0d52fe66443de3857c3e46e055fc3bbd3dc67f94a745277b7b755c7e"
     },
     {
       "path": "docs/live-report-web-resources-runbook.md",
@@ -200,8 +200,8 @@
       "category": "shared-doc",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 42130,
-      "sha256": "2be8a416d64d7a367c136d8b4ba1ea1721b79f404479c5ede20cf3cb3d188bbc"
+      "size": 42439,
+      "sha256": "e361e465af2efe0000c7fe3b946515ebac572f53d2126a1d3f54e9bf66670741"
     },
     {
       "path": "docs/policies/authorization-and-execution.md",
@@ -536,8 +536,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 12005,
-      "sha256": "e03c9b1574fdde15b7b72358c486b2313e27b282f1c2c9a9fa0e8cbb5f8cc96f"
+      "size": 12014,
+      "sha256": "c4996cd031eb633a2e4513b1ee8a7ddf354953b99561f853526cddce649ece22"
     },
     {
       "path": "scripts/bootstrap/13-validate-requirements-coverage.ps1",
@@ -576,8 +576,8 @@
       "category": "core-runtime",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 14440,
-      "sha256": "6cfd398169eba1fa77fff3d7a637fd3ea2710fc7ab27bafb6d5b879db4f955c2"
+      "size": 14549,
+      "sha256": "d20c0f6f645f01464b22a6296fd5c1da54d135249b1437526e08a4ccd6d82baf"
     },
     {
       "path": "scripts/bootstrap/40-build-relationships.ps1",
@@ -760,8 +760,8 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 37557,
-      "sha256": "b2d04614f0c4b7ba083726e80b21718c27ba0e4e20171c7ef72706138ecf7688"
+      "size": 37582,
+      "sha256": "9866352fffd9c1eaf93315ecfddc92ef9e1352b8696bcc0c49faf7bcdacf9255"
     },
     {
       "path": "scripts/bootstrap/helpers/reporting-plan.ps1",
@@ -816,8 +816,8 @@
       "category": "helper",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 2539,
-      "sha256": "98c684306044866f5a69db1f0b24d83d39206733250bb69d821198323847f5d9"
+      "size": 2551,
+      "sha256": "965b2db48bbc508341d945d58c740b240af597743991434603807d7d1c6ca013"
     },
     {
       "path": "scripts/bootstrap/helpers/wizard-hardening.ps1",
@@ -1040,8 +1040,8 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 15319,
-      "sha256": "4cbada949df8e426126ce9a304178acad7adb42fe935aecba5efb1e8a64ef278"
+      "size": 18513,
+      "sha256": "322d650d0bba1b013bcbfefcbf18db54ade61ffe103d8528f57617256f774ee4"
     },
     {
       "path": "scripts/ci/test-post-build-analysis.ps1",
@@ -1192,16 +1192,16 @@
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 49086,
-      "sha256": "f81c571ae2c09dac54a5382ab93fd0f191300480fffb82c48aef81476ec1f0d2"
+      "size": 52906,
+      "sha256": "4cdcca2adf0c10c062c548aba4a3eda6f60e33897d5e8303e8d1cb9081f9b1b5"
     },
     {
       "path": "scripts/ci/test_wizard_capabilities.py",
       "category": "validation",
       "consumerAction": "explicit-review",
       "gitMode": "100644",
-      "size": 3566,
-      "sha256": "e590d3594dbbd37e446a12ca1b91f9fe85c656042d4bcf793f99f6825b636cac"
+      "size": 3868,
+      "sha256": "40636da257035d1db888664f3631bf499a36e9ba673635a4992f14d3ae212241"
     },
     {
       "path": "scripts/ci/test_wizard_distribution.py",
